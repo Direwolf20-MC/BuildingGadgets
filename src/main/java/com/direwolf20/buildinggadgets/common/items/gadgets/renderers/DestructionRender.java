@@ -86,7 +86,8 @@ public class DestructionRender extends BaseRenderer {
         RenderSystem.depthMask(false);
         GL14.glBlendColor(1F, 1F, 1F, 0.3f); //Set the alpha of the blocks we are rendering
         for (BlockPos coordinate : GadgetDestruction.getClearingPositionsForRendering(world, startBlock, facing, player, heldItem)) {
-            renderMissingBlock(bufferBuilder, coordinate);
+            //ToDo re-implement
+            //renderMissingBlock(bufferBuilder, coordinate);
         }
         Tessellator.getInstance().draw();
         RenderSystem.depthMask(true);

@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
+import com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods;
+import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.modes.BuildingMode;
@@ -17,19 +19,22 @@ import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -42,9 +47,11 @@ import net.minecraftforge.energy.IEnergyStorage;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getAnchor;
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getToolBlock;
 
@@ -53,7 +60,8 @@ public class BuildingRender extends BaseRenderer {
     @Override
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
         super.render(evt, player, heldItem);
-
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        IVertexBuilder builder;
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
         Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
 
@@ -81,7 +89,6 @@ public class BuildingRender extends BaseRenderer {
                 } else { //anchors need to be resorted
                     renderCoordinates = SortingHelper.Blocks.byDistance(coordinates, player);
                 }
-
                 IBuildContext buildContext = SimpleBuildContext.builder()
                         .usedStack(heldItem)
                         .buildingPlayer(player)
@@ -96,50 +103,38 @@ public class BuildingRender extends BaseRenderer {
                 //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
                 getBuilderWorld().setWorldAndState(player.world, renderBlockState, coordinates);
 
-                MatrixStack stack = evt.getMatrixStack();
-                stack.push();
-                stack.translate(playerPos.getX(), playerPos.getY(), playerPos.getZ());
+
 
                 //Save the current position that is being rendered (I think)
-                RenderSystem.pushMatrix();
-                RenderSystem.multMatrix(stack.getLast().getMatrix());
-
-                RenderSystem.pushTextureAttributes();
-                //Enable Blending (So we can have transparent effect)
-                RenderSystem.enableBlend();
-                //This blend function allows you to use a constant alpha, which is defined later
-                RenderSystem.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
-
-                RenderSystem.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
-                BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-                bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.BLOCK);
+                builder = buffer.getBuffer(MyRenderType.RenderBlock);
+                MatrixStack matrix = evt.getMatrixStack();
+                matrix.push();
+                matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
                 Random rand = new Random();
                 BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
                 for (BlockPos coordinate : renderCoordinates) {
-                    RenderSystem.pushMatrix();//Push matrix again just because
-                    RenderSystem.multMatrix(stack.getLast().getMatrix());
-                    stack.push();
-                    stack.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
-                    RenderSystem.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                    GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
+                    matrix.push();
+                    matrix.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
                     if (getBuilderWorld().getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
                         try {
                             state = renderBlockState;
                         } catch (Exception var8) {
                         }
                     }
+                    IBakedModel ibakedmodel = dispatcher.getModelForState(state);
                     try {
                         if (state.getRenderType() == BlockRenderType.MODEL)
-                            dispatcher.renderBlock(state, evt.getMatrixStack(), IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer()), 0, 0, EmptyModelData.INSTANCE);
+                            for (Direction direction : Direction.values()) {
+                                renderModelBrightnessColorQuads(matrix.getLast(), builder, 255, 255, 255, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(coordinate)), EmptyModelData.INSTANCE), 15728640, 655360);
+                            }
                     } catch (Throwable t) {
                         BuildingGadgets.LOG.trace("Block at {} with state {} threw exception, whilst rendering", coordinate, state, t);
                     }
                     //Move the render position back to where it was
-                    stack.pop();
-                    RenderSystem.popMatrix();
+                    matrix.pop();
                 }
-                Tessellator.getInstance().draw();
-                bufferBuilder = setupMissingRender();
+
+
                 for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
 
                     if (energyCap.isPresent()) {
@@ -149,24 +144,23 @@ public class BuildingRender extends BaseRenderer {
                     if (! match.isSuccess())
                         match = index.tryMatch(InventoryHelper.PASTE_LIST);
                     if (! match.isSuccess() || hasEnergy < 0) {
-                        renderMissingBlock(bufferBuilder, coordinate);
+                        builder = buffer.getBuffer(MyRenderType.MissingBlockOverlay);
+                        renderMissingBlock(matrix.getLast().getMatrix(), builder, coordinate);
                     } else {
                         index.applyMatch(match); //notify the recording index that this counts
                     }
-                    //Move the render position back to where it was
                 }
-                teardownMissingRender();
-
-                if (state.hasTileEntity()) {
+                //TODO Bring Back TE Rendering.
+                /*if (state.hasTileEntity()) {
                     TileEntity te = getTileEntityWorld().getTE(state, world);
                     TileEntityRenderer<TileEntity> teRender = getTileEntityWorld().getTER(state, world);
 
                     if (teRender != null && ! getInvalidTileEntities().contains(te)) {
                         for (BlockPos coordinate : coordinates) {
                             te.setPos(coordinate);
-                            stack.push();
-                            stack.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
-                            RenderSystem.multMatrix(stack.getLast().getMatrix());
+                            matrix.push();
+                            matrix.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
+                            RenderSystem.multMatrix(matrix.getLast().getMatrix());
                             RenderSystem.color4f(1F, 1F, 1F, 1F);
                             RenderSystem.scalef(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
                             RenderSystem.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
@@ -182,19 +176,13 @@ public class BuildingRender extends BaseRenderer {
                             }
                             RenderSystem.disableFog();
                             RenderSystem.popMatrix();
-                            stack.pop();
+                            matrix.pop();
                         }
                     }
-                }
-
-                //Set blending back to the default mode
-                RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-                ForgeHooksClient.setRenderLayer(MinecraftForgeClient.getRenderLayer());
-                //Disable blend
-                RenderSystem.disableBlend();
-                //Pop from the original push in this method
-                RenderSystem.popAttributes();
-                RenderSystem.popMatrix();
+                }*/
+                matrix.pop();
+                RenderSystem.disableDepthTest();
+                buffer.finish();
             }
         }
     }

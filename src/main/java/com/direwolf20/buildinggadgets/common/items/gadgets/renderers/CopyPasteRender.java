@@ -250,7 +250,8 @@ public class CopyPasteRender extends BaseRenderer {
         GlStateManager.depthMask(false);
         bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         for (PlacementTarget target : evaluator) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
-            renderMissingBlock(bufferBuilder, target.getPos());
+            //ToDo re-implement
+            //renderMissingBlock(bufferBuilder, target.getPos());
         }
         Tessellator.getInstance().draw();
         GlStateManager.depthMask(true);
