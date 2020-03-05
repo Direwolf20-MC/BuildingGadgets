@@ -40,4 +40,17 @@ public class MyRenderType extends RenderType {
                     .lightmap(LIGHTMAP_DISABLED)
                     .writeMask(COLOR_WRITE)
                     .build(false));
+
+    public static final RenderType CopyGadgetLines = makeType("GadgetCopyLines",
+            DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINE_STRIP, 256,
+            RenderType.State.getBuilder()
+                    .line(new LineState(OptionalDouble.of(2.0D)))
+                    .layer(PROJECTION_LAYERING)
+                    .transparency(TRANSLUCENT_TRANSPARENCY)
+                    .texture(NO_TEXTURE)
+                    .depthTest(DEPTH_LEQUAL)
+                    .cull(CULL_DISABLED)
+                    .lightmap(LIGHTMAP_DISABLED)
+                    .writeMask(COLOR_WRITE)
+                    .build(false));
 }

@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
+import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
@@ -26,10 +27,10 @@ import com.google.common.cache.RemovalListener;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.*;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -100,31 +101,17 @@ public class CopyPasteRender extends BaseRenderer {
         int dy = (startPos.getY() > endPos.getY()) ? startPos.getY() + 1 : endPos.getY() + 1;
         int dz = (startPos.getZ() > endPos.getZ()) ? startPos.getZ() + 1 : endPos.getZ() + 1;
 
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        IVertexBuilder builder;
+        builder = buffer.getBuffer(MyRenderType.CopyGadgetLines);
         MatrixStack stack = evt.getMatrixStack();
         stack.push();
-        stack.translate(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());
+        stack.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
 
-        RenderSystem.pushMatrix();
-        RenderSystem.multMatrix(stack.getLast().getMatrix());
+        renderCopyOutline(stack.getLast().getMatrix(), builder, x, y, z, dx, dy, dz, 255, 223, 127); // Draw the box around the blocks we've copied.
+
         stack.pop();
-
-        RenderSystem.disableLighting();
-        RenderSystem.disableTexture();
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-
-        renderCopyOutline(tessellator, bufferbuilder, x, y, z, dx, dy, dz, 255, 223, 127); // Draw the box around the blocks we've copied.
-
-        RenderSystem.lineWidth(1.0F);
-        RenderSystem.enableLighting();
-        RenderSystem.enableTexture();
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthMask(true);
-
-        RenderSystem.popMatrix();
+        buffer.finish();
     }
 
     private void renderPaste(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem, Vec3d playerPos) {
@@ -285,29 +272,26 @@ public class CopyPasteRender extends BaseRenderer {
             return false;
     }
 
-    private static void renderCopyOutline(Tessellator tessellator, BufferBuilder bufferBuilder, double startX, double startY, double startZ, double endX, double endY, double endZ, int R, int G, int B) {
-        GlStateManager.lineWidth(2.0F);
-        bufferBuilder.begin(GL11.GL_LINE_STRIP, DefaultVertexFormats.POSITION_COLOR);
-        bufferBuilder.pos(startX, startY, startZ).color(G, G, G, 0.0F).endVertex();
-        bufferBuilder.pos(startX, startY, startZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(endX, startY, startZ).color(G, B, B, R).endVertex();
-        bufferBuilder.pos(endX, startY, endZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(startX, startY, endZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(startX, startY, startZ).color(B, B, G, R).endVertex();
-        bufferBuilder.pos(startX, endY, startZ).color(B, G, B, R).endVertex();
-        bufferBuilder.pos(endX, endY, startZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(endX, endY, endZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(startX, endY, endZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(startX, endY, startZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(startX, endY, endZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(startX, startY, endZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(endX, startY, endZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(endX, endY, endZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(endX, endY, startZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(endX, startY, startZ).color(G, G, G, R).endVertex();
-        bufferBuilder.pos(endX, startY, startZ).color(G, G, G, 0.0F).endVertex();
-        tessellator.draw();
-        GlStateManager.lineWidth(1.0F);
+    private static void renderCopyOutline(Matrix4f matrix, IVertexBuilder builder, float startX, float startY, float startZ, float endX, float endY, float endZ, int R, int G, int B) {
+
+        builder.pos(matrix, startX, startY, startZ).color(G, G, G, 0.0F).endVertex();
+        builder.pos(matrix, startX, startY, startZ).color(G, G, G, R).endVertex();
+        builder.pos(matrix, endX, startY, startZ).color(G, B, B, R).endVertex();
+        builder.pos(matrix, endX, startY, endZ).color(G, G, G, R).endVertex();
+        builder.pos(matrix, startX, startY, endZ).color(G, G, G, R).endVertex();
+        builder.pos(matrix, startX, startY, startZ).color(B, B, G, R).endVertex();
+        builder.pos(matrix, startX, endY, startZ).color(B, G, B, R).endVertex();
+        builder.pos(matrix, endX, endY, startZ).color(G, G, G, R).endVertex();
+        builder.pos(matrix, endX, endY, endZ).color(G, G, G, R).endVertex();
+        builder.pos(matrix, startX, endY, endZ).color(G, G, G, R).endVertex();
+        builder.pos(matrix, startX, endY, startZ).color(G, G, G, R).endVertex();
+        builder.pos(matrix, startX, endY, endZ).color(G, G, G, R).endVertex();
+        builder.pos(matrix, startX, startY, endZ).color(G, G, G, R).endVertex();
+        builder.pos(matrix, endX, startY, endZ).color(G, G, G, R).endVertex();
+        builder.pos(matrix, endX, endY, endZ).color(G, G, G, R).endVertex();
+        builder.pos(matrix, endX, endY, startZ).color(G, G, G, R).endVertex();
+        builder.pos(matrix, endX, startY, startZ).color(G, G, G, R).endVertex();
+        builder.pos(matrix, endX, startY, startZ).color(G, G, G, 0.0F).endVertex();
     }
 
     /**
