@@ -26,22 +26,23 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.energy.CapabilityEnergy;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
@@ -50,8 +51,9 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 
 public class CopyPasteRender extends BaseRenderer {
 //    private ChestRenderer chestRenderer;
@@ -84,6 +86,7 @@ public class CopyPasteRender extends BaseRenderer {
             });
         } else
             renderPaste(evt, player, heldItem, playerPos);
+        //System.out.println("Done");
     }
 
     private void renderCopy(RenderWorldLastEvent evt, Vec3d playerPos, Region region) {
@@ -122,25 +125,25 @@ public class CopyPasteRender extends BaseRenderer {
                 UUID id = provider.getId(key);
                 float partialTicks = evt.getPartialTicks();
                 GadgetCopyPaste.getActivePos(player, heldItem).ifPresent(startPos -> {
-                    try {
-                        RenderInfo info = renderCache.get(new RenderKey(id, startPos), () -> {
-                            // todo: fix
-//                            int displayList = GLAllocation.generateDisplayLists(1);
-//                            GlStateManager.newList(displayList, GL11.GL_COMPILE);
-//                            this.performRender(world, player, heldItem, startPos, provider.getTemplateForKey(key), partialTicks);
-//                            GlStateManager.endList();
-                            return new RenderInfo( 0 );//displayList);
-                        });
-                        info.render(playerPos);
-                    } catch (ExecutionException e) {
-                        BuildingGadgets.LOG.error("Failed to create Render!", e);
-                    }
+                    //try {
+                    //RenderInfo info = renderCache.get(new RenderKey(id, startPos), () -> {
+                    // todo: fix - DireNote, What even is this
+                    //int displayList = GLAllocation.generateDisplayLists(1);
+                    //GlStateManager.newList(displayList, GL11.GL_COMPILE);
+                    this.performRender(world, player, heldItem, startPos, provider.getTemplateForKey(key), partialTicks, evt);
+                    //GlStateManager.endList();
+                    //return new RenderInfo( 0 );//displayList);
+                    //});
+                    //info.render(playerPos);
+                    //} catch (ExecutionException e) {
+                    //    BuildingGadgets.LOG.error("Failed to create Render!", e);
+                    //}
                 });
             });
         });
     }
 
-    private void performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, Template template, float partialTicks) {
+    private void performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, Template template, float partialTicks, RenderWorldLastEvent evt) {
         FakeDelegationWorld fakeWorld = new FakeDelegationWorld(world);
         IBuildContext context = SimpleBuildContext.builder()
                 .buildingPlayer(player)
@@ -155,42 +158,47 @@ public class CopyPasteRender extends BaseRenderer {
         }
         //Prepare the block rendering
         //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-        renderTargets(context, sorter, partialTicks);
+        renderTargets(context, sorter, partialTicks, evt);
 
-        if (! player.isCreative())
-            renderMissing(player, stack, view, sorter);
-        GlStateManager.disableBlend();
+        //if (! player.isCreative())
+        //renderMissing(player, stack, view, sorter);
+        //GlStateManager.disableBlend();
     }
 
-    private void renderTargets(IBuildContext context, RenderSorter sorter, float partialTicks) {
+    private void renderTargets(IBuildContext context, RenderSorter sorter, float partialTicks, RenderWorldLastEvent evt) {
         //Enable Blending (So we can have transparent effect)
-        GlStateManager.enableBlend();
+        //GlStateManager.enableBlend();
         //This blend function allows you to use a constant alpha, which is defined later
-        GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
+        //GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
         //GlStateManager.translate(-0.0005f, -0.0005f, 0.0005f);
         //GlStateManager.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
         //GlStateManager.translatef(0.0005f, 0.0005f, - 0.0005f);
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        IVertexBuilder builder;
+        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+        builder = buffer.getBuffer(MyRenderType.RenderBlock);
         BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
-        TileEntityRendererDispatcher teDispatcher = TileEntityRendererDispatcher.instance;
-        BufferBuilder builder = Tessellator.getInstance().getBuffer();
-        builder.begin(GL14.GL_QUADS, DefaultVertexFormats.BLOCK);
+        MatrixStack matrix = evt.getMatrixStack();
+        matrix.push();
+        matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
         Random rand = new Random();
+
         for (PlacementTarget target : sorter.getSortedTargets()) {
             BlockPos targetPos = target.getPos();
             BlockState state = context.getWorld().getBlockState(target.getPos());
             TileEntity te = context.getWorld().getTileEntity(target.getPos());
-            RenderSystem.pushMatrix();//Push matrix again in order to apply these settings individually
-            RenderSystem.translatef(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-            RenderSystem.enableBlend();
-            GL14.glBlendColor(1F, 1F, 1F, 0.6f); //Set the alpha of the blocks we are rendering
+            matrix.push();//Push matrix again in order to apply these settings individually
+            matrix.translate(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+            IBakedModel ibakedmodel = dispatcher.getModelForState(state);
             try {
-                // todo: fix
-//                if (state.getRenderType() == BlockRenderType.MODEL)
-//                    dispatcher.renderBlock(state, targetPos, context.getWorld(), builder, rand, te != null ? te.getModelData() : EmptyModelData.INSTANCE);
+                if (state.getRenderType() == BlockRenderType.MODEL)
+                    for (Direction direction : Direction.values()) {
+                        renderModelBrightnessColorQuads(matrix.getLast(), builder, 255, 255, 255, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                    }
             } catch (Exception e) {
                 BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
             }
-            try {
+/*            try {
                 if (te != null && ! erroredCache.get(target.getData(), () -> false)) {
                     TileEntityRenderer<TileEntity> renderer = teDispatcher.getRenderer(te);
                     if (renderer != null) {
@@ -206,11 +214,12 @@ public class CopyPasteRender extends BaseRenderer {
                 }
             } catch (Exception e) {
                 erroredCache.put(target.getData(), true);
-            }
-            RenderSystem.popMatrix();
+            }*/
+            matrix.pop();
         }
-        Tessellator.getInstance().draw();
-        GL14.glBlendColor(1F, 1F, 1F, 1f); //Set the alpha of the blocks we are rendering
+        matrix.pop();
+        buffer.finish();
+
     }
 
     private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter) {
