@@ -62,7 +62,7 @@ public final class OurBlocks {
     public static void registerBlocks(RegistryEvent.Register<Block> event) {
         IForgeRegistry<Block> registry = event.getRegistry();
 
-        registry.register(new EffectBlock(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f)).setRegistryName(BlockReference.EFFECT_BLOCK_RL));
+        registry.register(new EffectBlock(Block.Properties.create(Material.IRON).hardnessAndResistance(20f).notSolid().noDrops()).setRegistryName(BlockReference.EFFECT_BLOCK_RL));
         registry.register(new ConstructionBlock(Block.Properties.create(Material.SAND).hardnessAndResistance(2f, 0f).harvestTool(ToolType.SHOVEL)).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_RL));
         registry.register(new ConstructionBlockDense(Block.Properties.create(Material.ROCK).hardnessAndResistance(3f, 0f)).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_DENSE_RL));
         registry.register(new ConstructionBlockPowder(Block.Properties.create(Material.SAND).hardnessAndResistance(10f)).setRegistryName(BlockReference.CONSTRUCTION_BLOCK_POWDER_RL));

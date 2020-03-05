@@ -38,6 +38,6 @@ public class MyRenderType extends RenderType {
                     .depthTest(DEPTH_LEQUAL)
                     .cull(CULL_DISABLED)
                     .lightmap(LIGHTMAP_DISABLED)
-                    .writeMask(COLOR_DEPTH_WRITE)
+                    .writeMask(COLOR_WRITE)
                     .build(false));
 }
