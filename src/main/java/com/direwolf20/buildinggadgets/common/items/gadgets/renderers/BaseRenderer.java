@@ -148,9 +148,9 @@ public abstract class BaseRenderer {
         double x = pos.getX() - 0.001;
         double y = pos.getY() - 0.001;
         double z = pos.getZ() - 0.001;
-        double xEnd = pos.getX() + 1.001;
-        double yEnd = pos.getY() + 1.001;
-        double zEnd = pos.getZ() + 1.001;
+        double xEnd = pos.getX() + 1.0015;
+        double yEnd = pos.getY() + 1.0015;
+        double zEnd = pos.getZ() + 1.0015;
         renderBoxSolid(matrix, builder, x, y, z, xEnd, yEnd, zEnd, red, green, blue, alpha);
     }
 

@@ -25,7 +25,7 @@ public class MyRenderType extends RenderType {
                     .layer(PROJECTION_LAYERING)
                     .transparency(TRANSLUCENT_TRANSPARENCY)
                     .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_ENABLED)
+                    .cull(CULL_DISABLED)
                     .writeMask(COLOR_DEPTH_WRITE)
                     .build(false));
 
@@ -36,7 +36,7 @@ public class MyRenderType extends RenderType {
                     .transparency(TRANSLUCENT_TRANSPARENCY)
                     .texture(NO_TEXTURE)
                     .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_ENABLED)
+                    .cull(CULL_DISABLED)
                     .lightmap(LIGHTMAP_DISABLED)
                     .writeMask(COLOR_DEPTH_WRITE)
                     .build(false));
