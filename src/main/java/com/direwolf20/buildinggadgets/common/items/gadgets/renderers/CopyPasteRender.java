@@ -29,9 +29,10 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
@@ -44,8 +45,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.energy.CapabilityEnergy;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL14;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
@@ -160,8 +159,9 @@ public class CopyPasteRender extends BaseRenderer {
         //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
         renderTargets(context, sorter, partialTicks, evt);
 
+        //ToDo the red render now works but shows over everything regardless of circumstance, uncomment to see what i mean
         //if (! player.isCreative())
-        //renderMissing(player, stack, view, sorter);
+        //renderMissing(player, stack, view, sorter, evt);
         //GlStateManager.disableBlend();
     }
 
@@ -222,7 +222,7 @@ public class CopyPasteRender extends BaseRenderer {
 
     }
 
-    private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter) {
+    private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter, RenderWorldLastEvent evt) {
         int energyCost = ((GadgetCopyPaste) stack.getItem()).getEnergyCost(stack);
         //wrap in a recording index, to prevent a single item of some type from allowing all of that kind.
         //it sadly makes it very inefficient - we should try to find a faster solution
@@ -238,21 +238,20 @@ public class CopyPasteRender extends BaseRenderer {
                         (c, t) -> overwrite ? player.world.getBlockState(t.getPos()).isReplaceable(useContext) : player.world.isAirBlock(t.getPos()),
                         false),
                 view.getContext());
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        GlStateManager.enableBlend();
-        GL14.glBlendColor(1F, 1F, 1F, 0.3f); //Set the alpha of the blocks we are rendering
-        GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0001F);
-        GlStateManager.disableTexture();
-        GlStateManager.depthMask(false);
-        bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        IVertexBuilder builder;
+        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+        builder = buffer.getBuffer(MyRenderType.MissingBlockOverlay);
+        BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
+        MatrixStack matrix = evt.getMatrixStack();
+        matrix.push();
+        matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
         for (PlacementTarget target : evaluator) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
-            //ToDo re-implement
-            //renderMissingBlock(bufferBuilder, target.getPos());
+            renderMissingBlock(matrix.getLast().getMatrix(), builder, target.getPos());
         }
-        Tessellator.getInstance().draw();
-        GlStateManager.depthMask(true);
-        GlStateManager.enableTexture();
-        GL14.glBlendColor(1F, 1F, 1F, 1f); //Set the alpha of the blocks we are rendering
+        matrix.pop();
+        buffer.finish();
     }
 
     @Override
