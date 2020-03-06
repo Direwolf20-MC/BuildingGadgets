@@ -94,18 +94,6 @@ public final class OurBlocks {
     public static final class OurTileEntities {
         private OurTileEntities() {}
 
-        @ObjectHolder(TileEntityReference.CONSTRUCTION_TILE)
-        public static TileEntityType<?> CONSTRUCTION_BLOCK_TYPE;
-
-        @ObjectHolder(TileEntityReference.TEMPLATE_MANAGER_TILE)
-        public static TileEntityType<?> TEMPLATE_MANAGER_TYPE;
-
-        @ObjectHolder(TileEntityReference.CHARGING_STATION_TILE)
-        public static TileEntityType<?> CHARGING_STATION_TYPE;
-
-        @ObjectHolder(TileEntityReference.EFFECT_BLOCK_TILE)
-        public static TileEntityType<?> EFFECT_BLOCK_TYPE;
-
         /**
          * Called from {@link RegistryHandler} as this is required to be loaded
          * only on the client side.
@@ -113,8 +101,8 @@ public final class OurBlocks {
         @OnlyIn(Dist.CLIENT)
         static void registerRenderers() {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(event -> {
-                ClientRegistry.bindTileEntityRenderer(EFFECT_BLOCK_TYPE, dispatcher -> new EffectBlockTER(dispatcher));
-                ClientRegistry.bindTileEntityRenderer(CHARGING_STATION_TYPE, dispatcher -> new ChargingStationTER(dispatcher));
+                ClientRegistry.bindTileEntityRenderer(EffectBlockTileEntity.TYPE, EffectBlockTER::new);
+                ClientRegistry.bindTileEntityRenderer(ChargingStationTileEntity.TYPE, ChargingStationTER::new);
             });
         }
     }

@@ -3,20 +3,23 @@ package com.direwolf20.buildinggadgets.common.tiles;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.common.util.Constants.NBT;
+import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nullable;
 
 public class EffectBlockTileEntity extends TileEntity implements ITickableTileEntity {
+    @ObjectHolder(Reference.TileEntityReference.EFFECT_BLOCK_TILE)
+    public static TileEntityType<EffectBlockTileEntity> TYPE;
 
     /**
      * Even though this is called "rendered", is will be used for replacement under normal conditions.
@@ -33,7 +36,7 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
     private int ticks;
 
     public EffectBlockTileEntity() {
-        super(OurBlocks.OurTileEntities.EFFECT_BLOCK_TYPE);
+        super(TYPE);
     }
 
     public void initializeData(BlockState curState, @Nullable TileEntity te, BlockData replacementBlock, Mode mode, boolean usePaste) {

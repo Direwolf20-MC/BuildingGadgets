@@ -5,9 +5,9 @@ import com.direwolf20.buildinggadgets.common.capability.CappedEnergyStorage;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
 import com.direwolf20.buildinggadgets.common.items.ChargingStationItem;
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil;
 import com.google.common.base.Preconditions;
 import net.minecraft.block.AbstractFurnaceBlock;
@@ -24,6 +24,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
@@ -37,12 +38,16 @@ import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class ChargingStationTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
+    @ObjectHolder(Reference.TileEntityReference.CHARGING_STATION_TILE)
+    public static TileEntityType<ChargingStationTileEntity> TYPE;
+
     public static final int SIZE = 2;
     private static final int FUEL_SLOT = 0;
     private static final int CHARGE_SLOT = 1;
@@ -70,7 +75,7 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
     //-----------------------------------------------------------------
 
     public ChargingStationTileEntity() {
-        super(OurBlocks.OurTileEntities.CHARGING_STATION_TYPE);
+        super(TYPE);
         energy = new ChargingStationEnergyStorage();
         itemStackHandler = new ItemStackHandler(SIZE) {
             @Override

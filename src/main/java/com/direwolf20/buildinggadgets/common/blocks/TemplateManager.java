@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.block.Block;
@@ -14,8 +13,11 @@ import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
@@ -60,17 +62,17 @@ public class TemplateManager extends Block {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return OurBlocks.OurTileEntities.TEMPLATE_MANAGER_TYPE.create();
+        return TemplateManagerTileEntity.TYPE.create();
     }
 
     @Override
-    public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
+    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if (worldIn.isRemote)
+            return ActionResultType.SUCCESS;
+
         TileEntity te = worldIn.getTileEntity(pos);
         if (! (te instanceof TemplateManagerTileEntity))
-            return;
-
-        if (worldIn.isRemote)
-            return;
+            return ActionResultType.FAIL;
 
         te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
             worldIn.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
@@ -84,29 +86,6 @@ public class TemplateManager extends Block {
         });
 
         NetworkHooks.openGui((ServerPlayerEntity) player, (TemplateManagerTileEntity) te, pos);
+        return ActionResultType.SUCCESS;
     }
-
-// 1.14 - replacement above
-//    @Override
-//    public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult blockRayTraceResult) {
-//        // Only execute on the server
-//        TileEntity te = worldIn.getTileEntity(pos);
-//        if (! (te instanceof TemplateManagerTileEntity))
-//            return false;
-//        if (worldIn.isRemote)
-//            return true;
-//        te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
-//            worldIn.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-//                for (int i = 0; i < handler.getSlots(); i++) {
-//                    ItemStack itemStack = handler.getStackInSlot(i);
-//                    itemStack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-//                        provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player));
-//                    });
-//                }
-//            });
-//        });
-//
-//        NetworkHooks.openGui((ServerPlayerEntity) player, (TemplateManagerTileEntity) te, pos);
-//        return true;
-//    }
 }
