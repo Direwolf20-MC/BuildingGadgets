@@ -9,8 +9,8 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -202,30 +202,31 @@ public class ChargingStationTER<T extends TileEntity> extends TileEntityRenderer
 
     private void renderItem(ChargingStationTileEntity te, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
         ItemStack stack = te.getRenderStack();
-        RenderHelper.enableStandardItemLighting();
-        RenderSystem.enableLighting();
-        RenderSystem.pushMatrix();
+        //RenderHelper.enableStandardItemLighting();
+        //RenderSystem.enableLighting();
+        matrixStackIn.push();
         // Translate to the center of the block and .9 points higher
-        RenderSystem.translated(.5, 1.5, .5);
-        RenderSystem.scalef(.4f, .4f, .4f);
+        matrixStackIn.translate(.5, 1.5, .5);
+        matrixStackIn.scale(.4f, .4f, .4f);
         float rotation = (float) (te.getWorld().getGameTime() % 80);
-        RenderSystem.rotatef(360f * rotation / 80f, 0, 1, 0);
+        matrixStackIn.rotate(Vector3f.YP.rotationDegrees(360f * rotation / 80f));
 
         Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.NONE, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn);
 
-        RenderSystem.popMatrix();
+        matrixStackIn.pop();
     }
 
     @Override
     public void render(ChargingStationTileEntity te, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
         ItemStack stack = te.getRenderStack();
+
         if (! stack.isEmpty()) {
-            RenderSystem.pushLightingAttributes();
-            RenderSystem.pushMatrix();
+            //RenderSystem.pushLightingAttributes();
+            matrixStackIn.push();
 
             // Translate to the location of our tile entity
             //RenderSystem.translated(te.getPos().getX(), te.getPos().getY(), te.getPos().getZ());
-            RenderSystem.disableRescaleNormal();
+            //RenderSystem.disableRescaleNormal();
             // Render our item
             renderItem(te, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);
 
@@ -238,8 +239,8 @@ public class ChargingStationTER<T extends TileEntity> extends TileEntityRenderer
                     SphereSegmentation.BY_DISTANCE.compare(te.getLastRenderedSegmentation(), SphereSegmentation.MEDIUM_SEGMENTATION) < 0)
                 renderLightning(te);
 
-            RenderSystem.popMatrix();
-            RenderSystem.popAttributes();
+            matrixStackIn.pop();
+            //RenderSystem.popAttributes();
         }
     }
 }
