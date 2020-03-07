@@ -24,6 +24,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -116,11 +117,16 @@ public class ExchangerRender extends BaseRenderer {
                 state = renderBlockState;
 
                 IBakedModel ibakedmodel = dispatcher.getModelForState(state);
+                BlockColors blockColors = Minecraft.getInstance().getBlockColors();
+                int color = blockColors.getColor(renderBlockState, world, coordinate, 0);
+                float f = (float) (color >> 16 & 255) / 255.0F;
+                float f1 = (float) (color >> 8 & 255) / 255.0F;
+                float f2 = (float) (color & 255) / 255.0F;
                 try {
                     //cannot render into buffer, because we can't scale it in that case, which causes z-Fighting
                     if (state.getRenderType() == BlockRenderType.MODEL)
                         for (Direction direction : Direction.values()) {
-                            renderModelBrightnessColorQuads(matrix.getLast(), builder, 255, 255, 255, 0.5f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(coordinate)), EmptyModelData.INSTANCE), 15728640, 655360);
+                            renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.65f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(coordinate)), EmptyModelData.INSTANCE), 15728640, 655360);
                         }
                 } catch (Throwable t) {
                     BuildingGadgets.LOG.trace("Block at {} with state {} threw exception, whilst rendering", coordinate, state, t);

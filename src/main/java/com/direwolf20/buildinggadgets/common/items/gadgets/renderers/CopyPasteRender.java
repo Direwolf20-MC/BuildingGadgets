@@ -32,6 +32,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
@@ -190,10 +191,15 @@ public class CopyPasteRender extends BaseRenderer {
             matrix.push();//Push matrix again in order to apply these settings individually
             matrix.translate(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
             IBakedModel ibakedmodel = dispatcher.getModelForState(state);
+            BlockColors blockColors = Minecraft.getInstance().getBlockColors();
+            int color = blockColors.getColor(state, context.getWorld(), targetPos, 0);
+            float f = (float) (color >> 16 & 255) / 255.0F;
+            float f1 = (float) (color >> 8 & 255) / 255.0F;
+            float f2 = (float) (color & 255) / 255.0F;
             try {
                 if (state.getRenderType() == BlockRenderType.MODEL)
                     for (Direction direction : Direction.values()) {
-                        renderModelBrightnessColorQuads(matrix.getLast(), builder, 255, 255, 255, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                        renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                     }
             } catch (Exception e) {
                 BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);

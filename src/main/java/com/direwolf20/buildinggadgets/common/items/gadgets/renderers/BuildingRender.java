@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
-import com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods;
 import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
@@ -23,14 +22,12 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -38,16 +35,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL14;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -112,6 +104,7 @@ public class BuildingRender extends BaseRenderer {
                 matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
                 Random rand = new Random();
                 BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
+
                 for (BlockPos coordinate : renderCoordinates) {
                     matrix.push();
                     matrix.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
@@ -122,10 +115,15 @@ public class BuildingRender extends BaseRenderer {
                         }
                     }
                     IBakedModel ibakedmodel = dispatcher.getModelForState(state);
+                    BlockColors blockColors = Minecraft.getInstance().getBlockColors();
+                    int color = blockColors.getColor(renderBlockState, world, coordinate, 0);
+                    float f = (float) (color >> 16 & 255) / 255.0F;
+                    float f1 = (float) (color >> 8 & 255) / 255.0F;
+                    float f2 = (float) (color & 255) / 255.0F;
                     try {
                         if (state.getRenderType() == BlockRenderType.MODEL)
                             for (Direction direction : Direction.values()) {
-                                renderModelBrightnessColorQuads(matrix.getLast(), builder, 255, 255, 255, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(coordinate)), EmptyModelData.INSTANCE), 15728640, 655360);
+                                renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(coordinate)), EmptyModelData.INSTANCE), 15728640, 655360);
                             }
                     } catch (Throwable t) {
                         BuildingGadgets.LOG.trace("Block at {} with state {} threw exception, whilst rendering", coordinate, state, t);

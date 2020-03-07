@@ -11,6 +11,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -171,6 +172,7 @@ public class EffectBlockTER<T extends TileEntity> extends TileEntityRenderer<Eff
             scale = (float) (maxLife - teCounter) / maxLife;
         float trans = (1 - scale) / 2;
 
+
         stack.push();
         //stack.translate(tile.getPos().getX(), tile.getPos().getY(), tile.getPos().getZ());
         stack.translate(trans, trans, trans);
@@ -178,13 +180,20 @@ public class EffectBlockTER<T extends TileEntity> extends TileEntityRenderer<Eff
         stack.scale(scale, scale, scale);
 
         BlockState renderBlockState = renderData.getState();
+
+        BlockColors blockColors = Minecraft.getInstance().getBlockColors();
+        int color = blockColors.getColor(renderBlockState, tile.getWorld(), tile.getPos(), 0);
+        float f = (float) (color >> 16 & 255) / 255.0F;
+        float f1 = (float) (color >> 8 & 255) / 255.0F;
+        float f2 = (float) (color & 255) / 255.0F;
+
         if (tile.isUsingPaste() && toolMode == EffectBlock.Mode.PLACE)
             renderBlockState = OurBlocks.constructionBlockDense.getDefaultState();
         builder = buffer2.getBuffer(MyRenderType.RenderBlock);
         IBakedModel ibakedmodel = dispatcher.getModelForState(renderBlockState);
 //        try {
         for (Direction direction : Direction.values()) {
-            renderModelBrightnessColorQuads(stack.getLast(), builder, 255, 255, 255, 0.7f, ibakedmodel.getQuads(renderBlockState, direction, new Random(MathHelper.getPositionRandom(tile.getPos())), EmptyModelData.INSTANCE), 15728640, 655360);
+            renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(renderBlockState, direction, new Random(MathHelper.getPositionRandom(tile.getPos())), EmptyModelData.INSTANCE), 15728640, 655360);
         }
 
 
