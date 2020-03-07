@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.gui.materiallist;
+package com.direwolf20.buildinggadgets.client.screen.materiallist;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;

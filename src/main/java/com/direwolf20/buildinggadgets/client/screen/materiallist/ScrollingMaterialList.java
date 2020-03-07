@@ -1,6 +1,6 @@
-package com.direwolf20.buildinggadgets.client.gui.materiallist;
+package com.direwolf20.buildinggadgets.client.screen.materiallist;
 
-import com.direwolf20.buildinggadgets.client.gui.base.EntryList;
+import com.direwolf20.buildinggadgets.client.screen.base.EntryList;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
@@ -21,8 +21,8 @@ import org.lwjgl.glfw.GLFW;
 import java.awt.*;
 import java.util.Iterator;
 
-import static com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI.*;
-import static com.direwolf20.buildinggadgets.client.gui.materiallist.ScrollingMaterialList.Entry;
+import static com.direwolf20.buildinggadgets.client.screen.materiallist.MaterialListGUI.*;
+import static com.direwolf20.buildinggadgets.client.screen.materiallist.ScrollingMaterialList.Entry;
 import static org.lwjgl.opengl.GL11.*;
 
 class ScrollingMaterialList extends EntryList<Entry> {

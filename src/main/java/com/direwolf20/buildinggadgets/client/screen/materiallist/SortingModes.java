@@ -1,11 +1,11 @@
-package com.direwolf20.buildinggadgets.client.gui.materiallist;
+package com.direwolf20.buildinggadgets.client.screen.materiallist;
 
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 
 import java.util.Comparator;
 
-import static com.direwolf20.buildinggadgets.client.gui.materiallist.ScrollingMaterialList.Entry;
+import static com.direwolf20.buildinggadgets.client.screen.materiallist.ScrollingMaterialList.Entry;
 
 enum SortingModes {
 

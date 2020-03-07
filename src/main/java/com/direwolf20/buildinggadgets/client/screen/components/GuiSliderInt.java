@@ -1,7 +1,7 @@
-package com.direwolf20.buildinggadgets.client.gui.components;
+package com.direwolf20.buildinggadgets.client.screen.components;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
-import com.direwolf20.buildinggadgets.client.gui.GuiMod;
+import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketChangeRange;
 import com.google.common.collect.ImmutableSet;
