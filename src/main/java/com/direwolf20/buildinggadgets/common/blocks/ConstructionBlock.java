@@ -49,10 +49,10 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return true;
     }
 
-    @Override
+    /*@Override
     public boolean isAir(BlockState state, IBlockReader world, BlockPos pos) {
         return !state.get(ConstructionBlock.BRIGHT);
-    }
+    }*/
 
 // 1.14 code
 //    @Override
