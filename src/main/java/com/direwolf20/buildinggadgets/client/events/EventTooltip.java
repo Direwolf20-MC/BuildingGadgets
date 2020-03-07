@@ -150,20 +150,23 @@ public class EventTooltip {
     private static int renderRequiredBlocks(ItemStack itemStack, int x, int y, int count, int req) {
         Minecraft mc = Minecraft.getInstance();
         RenderSystem.disableDepthTest();
-        ItemRenderer render = mc.getItemRenderer();
+        RenderSystem.depthMask(false);
 
+        ItemRenderer render = mc.getItemRenderer();
+        //The zLevel is the position that the item is drawn on. If too low, it'll draw behind other items in the GUI. Bump it up and then back down to draw this on top of everything else
+        render.zLevel += 500f;
         net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
         render.renderItemIntoGUI(itemStack, x, y);
-
+        render.zLevel -= 500f;
         //String s1 = req == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
         String s1 = req == Integer.MAX_VALUE ? "\u221E" : Integer.toString(req);
         int w1 = mc.fontRenderer.getStringWidth(s1);
         int color = 0xFFFFFF;
 
         boolean hasReq = req > 0;
-
         RenderSystem.pushMatrix();
-        RenderSystem.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
+        //translating on the z axis here works like above. If too low, it'll draw the text behind items in the GUI. Items are drawn around zlevel 200 btw
+        RenderSystem.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 500);
         RenderSystem.scalef(0.5F, 0.5F, 0.5F);
         mc.fontRenderer.drawStringWithShadow(s1, 0, 0, color);
         RenderSystem.popMatrix();
@@ -177,7 +180,7 @@ public class EventTooltip {
                 int w2 = mc.fontRenderer.getStringWidth(s2);
 
                 RenderSystem.pushMatrix();
-                RenderSystem.translatef(x + 8 - w2 / 4, y + 17, 0);
+                RenderSystem.translatef(x + 8 - w2 / 4, y + 17, 500);
                 RenderSystem.scalef(0.5F, 0.5F, 0.5F);
                 mc.fontRenderer.drawStringWithShadow(s2, 0, 0, 0xFF0000);
                 RenderSystem.popMatrix();
@@ -185,6 +188,7 @@ public class EventTooltip {
             }
         }
         RenderSystem.enableDepthTest();
+        RenderSystem.depthMask(true);
         return missingCount;
     }
 }
