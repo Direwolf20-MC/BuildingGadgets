@@ -10,17 +10,14 @@ import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.google.common.collect.Multiset;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.ItemStack;
@@ -33,7 +30,6 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 import java.util.HashSet;
@@ -54,7 +50,7 @@ public abstract class BaseRenderer {
         bindBlocks();
 
         //if( this.isLinkable() )
-            //BaseRenderer.renderLinkedInventoryOutline(evt, heldItem, player);
+        //BaseRenderer.renderLinkedInventoryOutline(evt, heldItem, player);
     }
 
     protected void bindBlocks() {
@@ -74,8 +70,8 @@ public abstract class BaseRenderer {
             return;
 
         Vec3d renderPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView()
-                                .subtract(pos.getX(), pos.getY(), pos.getZ())
-                                .add(.005f, .005f, -.005f);
+                .subtract(pos.getX(), pos.getY(), pos.getZ())
+                .add(.005f, .005f, -.005f);
 
         RenderSystem.pushMatrix();
         RenderSystem.enableBlend();
@@ -102,7 +98,7 @@ public abstract class BaseRenderer {
     long playerHasBlocks(ItemStack stack, PlayerEntity player, BlockState state) {
         long hasBlocks = InventoryHelper.countItem(stack, player, getCacheInventory());
 
-        if ( !state.hasTileEntity() )
+        if (!state.hasTileEntity())
             hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
 
         return hasBlocks;
@@ -121,7 +117,7 @@ public abstract class BaseRenderer {
         return !itemStack.isEmpty() ? itemStack : state.getBlock().getPickBlock(state, null, world, BlockPos.ZERO, player);
     }
 
-    protected BufferBuilder setupMissingRender() {
+    /*protected BufferBuilder setupMissingRender() {
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         RenderSystem.alphaFunc(GL11.GL_GREATER, 0.0001F);
         RenderSystem.disableTexture();
@@ -138,7 +134,7 @@ public abstract class BaseRenderer {
         GlStateManager.depthMask(true);
         GlStateManager.enableTexture();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-    }
+    }*/
 
     protected void renderMissingBlock(Matrix4f matrix, IVertexBuilder builder, BlockPos pos) {
         float red = 1;
@@ -154,7 +150,7 @@ public abstract class BaseRenderer {
         renderBoxSolid(matrix, builder, x, y, z, xEnd, yEnd, zEnd, red, green, blue, alpha);
     }
 
-    protected void renderBoxSolid(Matrix4f  matrix,IVertexBuilder builder, double x, double y, double z, double xEnd, double yEnd, double zEnd, float red, float green, float blue, float alpha) {
+    protected void renderBoxSolid(Matrix4f matrix, IVertexBuilder builder, double x, double y, double z, double xEnd, double yEnd, double zEnd, float red, float green, float blue, float alpha) {
         //careful: mc want's it's vertices to be defined CCW - if you do it the other way around weird cullling issues will arise
         //CCW herby counts as if you were looking at it from the outside
         float xf = (float) x;
@@ -164,35 +160,35 @@ public abstract class BaseRenderer {
         float yEndf = (float) yEnd;
         float zEndf = (float) zEnd;
 
-        builder.pos(matrix,xf, yf, zf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xf, yEndf, zf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xEndf, yEndf, zf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xEndf, yf, zf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xf, yf, zf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xf, yEndf, zf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xEndf, yEndf, zf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xEndf, yf, zf).color(red, green, blue, alpha).endVertex();
         //left-side
-        builder.pos(matrix,xf, yf, zf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xf, yf, zEndf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xf, yEndf, zEndf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xf, yEndf, zf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xf, yf, zf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xf, yf, zEndf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xf, yEndf, zEndf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xf, yEndf, zf).color(red, green, blue, alpha).endVertex();
         //bottom
-        builder.pos(matrix,xf, yf, zf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xEndf, yf, zf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xEndf, yf, zEndf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xf, yf, zEndf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xf, yf, zf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xEndf, yf, zf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xEndf, yf, zEndf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xf, yf, zEndf).color(red, green, blue, alpha).endVertex();
         //top
-        builder.pos(matrix,xEndf, yEndf, zEndf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xEndf, yEndf, zf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xf, yEndf, zf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xf, yEndf, zEndf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xEndf, yEndf, zEndf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xEndf, yEndf, zf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xf, yEndf, zf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xf, yEndf, zEndf).color(red, green, blue, alpha).endVertex();
         //right-side
-        builder.pos(matrix,xEndf, yEndf, zEndf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xEndf, yf, zEndf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xEndf, yf, zf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xEndf, yEndf, zf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xEndf, yEndf, zEndf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xEndf, yf, zEndf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xEndf, yf, zf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xEndf, yEndf, zf).color(red, green, blue, alpha).endVertex();
         //back-side
-        builder.pos(matrix,xEndf, yEndf, zEndf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xf, yEndf, zEndf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xf, yf, zEndf).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix,xEndf, yf, zEndf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xEndf, yEndf, zEndf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xf, yEndf, zEndf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xf, yf, zEndf).color(red, green, blue, alpha).endVertex();
+        builder.pos(matrix, xEndf, yf, zEndf).color(red, green, blue, alpha).endVertex();
     }
 
     /**

@@ -116,7 +116,7 @@ public class ChargingStationTER<T extends TileEntity> extends TileEntityRenderer
             } else if (te.getCallList() == 0)
                 createCallList(te);
 //            else
-//                GlStateManager.callList(te.getCallList());
+//                RenderSystem.callList(te.getCallList());
         }
     }
 
@@ -194,26 +194,26 @@ public class ChargingStationTER<T extends TileEntity> extends TileEntityRenderer
 
         }
         t.draw();
-        GlStateManager.disableBlend();
-        GlStateManager.enableTexture();
-        GlStateManager.popAttributes();
-        GlStateManager.popMatrix();
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
+        RenderSystem.popAttributes();
+        RenderSystem.popMatrix();
     }
 
     private void renderItem(ChargingStationTileEntity te, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
         ItemStack stack = te.getRenderStack();
         RenderHelper.enableStandardItemLighting();
-        GlStateManager.enableLighting();
-        GlStateManager.pushMatrix();
+        RenderSystem.enableLighting();
+        RenderSystem.pushMatrix();
         // Translate to the center of the block and .9 points higher
-        GlStateManager.translated(.5, 1.5, .5);
-        GlStateManager.scalef(.4f, .4f, .4f);
+        RenderSystem.translated(.5, 1.5, .5);
+        RenderSystem.scalef(.4f, .4f, .4f);
         float rotation = (float) (te.getWorld().getGameTime() % 80);
-        GlStateManager.rotatef(360f * rotation / 80f, 0, 1, 0);
+        RenderSystem.rotatef(360f * rotation / 80f, 0, 1, 0);
 
-        Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.NONE, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn );
+        Minecraft.getInstance().getItemRenderer().renderItem(stack, ItemCameraTransforms.TransformType.NONE, combinedLightIn, combinedOverlayIn, matrixStackIn, bufferIn);
 
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
     }
 
     @Override
@@ -224,7 +224,7 @@ public class ChargingStationTER<T extends TileEntity> extends TileEntityRenderer
             RenderSystem.pushMatrix();
 
             // Translate to the location of our tile entity
-            RenderSystem.translated(te.getPos().getX(), te.getPos().getY(), te.getPos().getZ());
+            //RenderSystem.translated(te.getPos().getX(), te.getPos().getY(), te.getPos().getZ());
             RenderSystem.disableRescaleNormal();
             // Render our item
             renderItem(te, matrixStackIn, bufferIn, combinedLightIn, combinedOverlayIn);

@@ -12,7 +12,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -49,14 +49,14 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
     public static void renderTextVerticalCenter(String text, int leftX, int top, int bottom, int color) {
         FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
         int y = getYForAlignedCenter(top, bottom, fontRenderer.FONT_HEIGHT);
-        GlStateManager.enableTexture();
+        RenderSystem.enableTexture();
         fontRenderer.drawString(text, leftX, y, color);
     }
 
     public static void renderTextHorizontalRight(String text, int right, int y, int color) {
         FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
         int x = getXForAlignedRight(right, fontRenderer.getStringWidth(text));
-        GlStateManager.enableTexture();
+        RenderSystem.enableTexture();
         fontRenderer.drawString(text, x, y, color);
     }
 

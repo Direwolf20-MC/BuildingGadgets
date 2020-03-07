@@ -22,7 +22,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
@@ -82,7 +82,7 @@ public class ModeRadialMenu extends Screen {
         ScreenPosition left = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.LEFT;
 
         if (isDestruction) {
-            addButton(new PositionedIconActionable(RadialTranslation.DESTRUCTION_OVERLAY,"destroy_overlay", right, send -> {
+            addButton(new PositionedIconActionable(RadialTranslation.DESTRUCTION_OVERLAY, "destroy_overlay", right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketChangeRange());
 
@@ -140,7 +140,7 @@ public class ModeRadialMenu extends Screen {
         } else {
             // Copy Paste specific
             addButton(new PositionedIconActionable(RadialTranslation.OPEN_GUI, "copypaste_opengui", right, send -> {
-                if( !send )
+                if (!send)
                     return false;
 
                 getMinecraft().player.closeScreen();
@@ -152,7 +152,7 @@ public class ModeRadialMenu extends Screen {
             }));
         }
         addButton(new PositionedIconActionable(RadialTranslation.RAYTRACE_FLUID, "raytrace_fluid", right, send -> {
-            if( send )
+            if (send)
                 PacketHandler.sendToServer(new PacketToggleRayTraceFluid());
 
             return AbstractGadget.shouldRayTraceFluid(getGadget());
@@ -194,7 +194,7 @@ public class ModeRadialMenu extends Screen {
         boolean isDestruction = tool.getItem() instanceof GadgetDestruction;
         ScreenPosition right = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.RIGHT;
         for (int i = 0; i < buttons.size(); i++) {
-            if (!(buttons.get(i) instanceof PositionedIconActionable) )
+            if (!(buttons.get(i) instanceof PositionedIconActionable))
                 continue;
 
             PositionedIconActionable button = (PositionedIconActionable) buttons.get(i);
@@ -264,23 +264,23 @@ public class ModeRadialMenu extends Screen {
                     ((PositionedIconActionable) button).setFaded(inRange);
             }
         }
-        GlStateManager.pushMatrix();
-        GlStateManager.translatef((1 - fract) * x, (1 - fract) * y, 0);
-        GlStateManager.scalef(fract, fract, fract);
+        RenderSystem.pushMatrix();
+        RenderSystem.translatef((1 - fract) * x, (1 - fract) * y, 0);
+        RenderSystem.scalef(fract, fract, fract);
         super.render(mx, my, partialTicks);
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
         if (segments == 0)
             return;
 
-        GlStateManager.pushMatrix();
-        GlStateManager.disableTexture();
+        RenderSystem.pushMatrix();
+        RenderSystem.disableTexture();
 
         float angle = mouseAngle(x, y, mx, my);
 
 //        int highlight = 5;
 
-        GlStateManager.enableBlend();
-        GlStateManager.shadeModel(GL11.GL_SMOOTH);
+        RenderSystem.enableBlend();
+        RenderSystem.shadeModel(GL11.GL_SMOOTH);
         float totalDeg = 0;
         float degPer = 360F / segments;
 
@@ -328,7 +328,7 @@ public class ModeRadialMenu extends Screen {
                 r = g = b = 1F;
             }
 
-            GlStateManager.color4f(r, g, b, a);
+            RenderSystem.color4f(r, g, b, a);
 
             for (float i = degPer; i >= 0; i--) {
                 float rad = (float) ((i + totalDeg) / 180F * Math.PI);
@@ -343,13 +343,13 @@ public class ModeRadialMenu extends Screen {
             totalDeg += degPer;
 
             GL11.glEnd();
-            GlStateManager.color4f(1, 1, 1, 1);
+            RenderSystem.color4f(1, 1, 1, 1);
 
 //            if (mouseInSector)
 //                radius -= highlight;
         }
-        GlStateManager.shadeModel(GL11.GL_FLAT);
-        GlStateManager.enableTexture();
+        RenderSystem.shadeModel(GL11.GL_FLAT);
+        RenderSystem.enableTexture();
 
         for (int i = 0; i < nameData.size(); i++) {
             NameDisplayData data = nameData.get(i);
@@ -382,26 +382,26 @@ public class ModeRadialMenu extends Screen {
             int ydp = (int) ((yp - y) * mod + y);
 
             getMinecraft().getTextureManager().bindTexture(signs.get(i));
-            GlStateManager.color4f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
+            RenderSystem.color4f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
             getMinecraft().getTextureManager().bindTexture(signs.get(i));
             blit(xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
         }
 
-        GlStateManager.enableRescaleNormal();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFuncSeparate(770, 771, 1, 0);
+        RenderSystem.enableRescaleNormal();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(770, 771, 1, 0);
         RenderHelper.enableStandardItemLighting();
 
         float s = 2.25F * fract;
-        GlStateManager.scalef(s, s, s);
-        GlStateManager.translatef(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
+        RenderSystem.scalef(s, s, s);
+        RenderSystem.translatef(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
         itemRenderer.renderItemAndEffectIntoGUI(tool, 0, 0);
 
         RenderHelper.disableStandardItemLighting();
-        GlStateManager.disableBlend();
-        GlStateManager.disableRescaleNormal();
+        RenderSystem.disableBlend();
+        RenderSystem.disableRescaleNormal();
 
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
     }
 
     private boolean isCursorInSlice(float angle, float totalDeg, float degPer, boolean inRange) {
@@ -415,9 +415,9 @@ public class ModeRadialMenu extends Screen {
             // This should logically never fail but implementing a way to ensure that would
             // be a pretty solid idea for the next guy to touch this code.
             String mode;
-            if( gadget instanceof GadgetBuilding )
+            if (gadget instanceof GadgetBuilding)
                 mode = BuildingMode.values()[slotSelected].toString();
-            else if( gadget instanceof GadgetExchanger )
+            else if (gadget instanceof GadgetExchanger)
                 mode = ExchangingMode.values()[slotSelected].toString();
             else
                 mode = GadgetCopyPaste.ToolMode.values()[slotSelected].toString();
@@ -546,11 +546,11 @@ public class ModeRadialMenu extends Screen {
         }
 
         public final float dot(Vector2f v1) {
-            return (this.x*v1.x + this.y*v1.y);
+            return (this.x * v1.x + this.y * v1.y);
         }
 
         public final float length() {
-            return (float) Math.sqrt(this.x*this.x + this.y*this.y);
+            return (float) Math.sqrt(this.x * this.x + this.y * this.y);
         }
     }
 }

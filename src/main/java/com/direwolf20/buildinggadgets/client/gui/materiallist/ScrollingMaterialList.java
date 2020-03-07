@@ -9,7 +9,6 @@ import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUnique
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Multiset;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.list.ExtendedList;
@@ -56,7 +55,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
     private void updateEntries() {
         this.lastUpdate = System.currentTimeMillis();
         this.clearEntries();
-        if (multisetIterator == null || ! multisetIterator.hasNext()) {
+        if (multisetIterator == null || !multisetIterator.hasNext()) {
             MaterialList list = gui.getHeader().getRequiredItems();
             multisetIterator = list != null ? list.iterator() : Iterators.singletonIterator(ImmutableMultiset.of());
         }
@@ -152,16 +151,16 @@ class ScrollingMaterialList extends EntryList<Entry> {
                 int lineXStart = itemNameX + widthItemName + LINE_SIDE_MARGIN;
                 int lineXEnd = right - widthAmount - LINE_SIDE_MARGIN;
                 int lineY = getYForAlignedCenter(top, bottom - 1, 1);
-                GlStateManager.enableBlend();
-                GlStateManager.disableTexture();
-                GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                GlStateManager.color4f(255, 255, 255, 34);
+                RenderSystem.enableBlend();
+                RenderSystem.disableTexture();
+                RenderSystem.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                RenderSystem.color4f(255, 255, 255, 34);
                 glLineWidth(1);
                 glBegin(GL_LINES);
                 glVertex3f(lineXStart, lineY, 0);
                 glVertex3f(lineXEnd, lineY, 0);
                 glEnd();
-                GlStateManager.enableTexture();
+                RenderSystem.enableTexture();
             }
         }
 

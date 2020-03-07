@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.client.gui.base;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.list.ExtendedList;
 import net.minecraft.client.gui.widget.list.ExtendedList.AbstractListEntry;
@@ -36,8 +36,8 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
     // Copied and modified from AbstractLists#render(int, int, float)
     private void renderParts(int mouseX, int mouseY, float partialTicks) {
         renderBackground();
-        GlStateManager.disableLighting();
-        GlStateManager.disableFog();
+        RenderSystem.disableLighting();
+        RenderSystem.disableFog();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
 
@@ -50,7 +50,7 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
         }
 
         renderList(k, l, mouseX, mouseY, partialTicks);
-        GlStateManager.disableDepthTest();
+        RenderSystem.disableDepthTest();
 
         int j1 = getMaxScroll();
         if (j1 > 0) {
@@ -63,7 +63,7 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
             int x1 = getScrollbarPosition();
             int x2 = x1 + 6;
 
-            GlStateManager.disableTexture();
+            RenderSystem.disableTexture();
             bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
             bufferbuilder.pos(x1, y1, 0.0D).color(0, 0, 0, 255).endVertex();
             bufferbuilder.pos(x2, y1, 0.0D).color(0, 0, 0, 255).endVertex();
@@ -83,8 +83,8 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
         }
 
         renderDecorations(mouseX, mouseX);
-        GlStateManager.enableTexture();
-        GlStateManager.disableBlend();
+        RenderSystem.enableTexture();
+        RenderSystem.disableBlend();
     }
 
     protected void renderContentBackground(Tessellator tessellator, BufferBuilder bufferbuilder) {
