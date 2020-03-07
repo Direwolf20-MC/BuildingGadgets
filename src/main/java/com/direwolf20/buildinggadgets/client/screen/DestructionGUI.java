@@ -3,9 +3,9 @@
  * Chisel is Open Source and distributed under GNU GPL v2
  */
 
-package com.direwolf20.buildinggadgets.client.gui;
+package com.direwolf20.buildinggadgets.client.screen;
 
-import com.direwolf20.buildinggadgets.client.gui.components.GuiSliderInt;
+import com.direwolf20.buildinggadgets.client.screen.components.GuiSliderInt;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;

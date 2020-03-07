@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.registry;
 
-import com.direwolf20.buildinggadgets.client.gui.blocks.ChargingStationGUI;
+import com.direwolf20.buildinggadgets.client.screen.blocks.ChargingStationGUI;
 //import com.direwolf20.buildinggadgets.client.gui.blocks.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
