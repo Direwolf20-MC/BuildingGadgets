@@ -354,7 +354,14 @@ public class CopyPasteRender extends BaseRenderer {
     private void renderTargets(IBuildContext context, RenderSorter sorter, float partialTicks, RenderWorldLastEvent evt) {
         tickTrack ++;
         if( renderBuffer != null && tickTrack < 100 ) {
-            renderBuffer.render(evt.getMatrixStack().getLast().getMatrix());
+            Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+
+            MatrixStack matrix = evt.getMatrixStack();
+            matrix.push();
+            matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
+
+            renderBuffer.render(matrix.getLast().getMatrix());
+            matrix.pop();
             return;
         }
 
@@ -362,15 +369,12 @@ public class CopyPasteRender extends BaseRenderer {
         System.out.println("Creating cache");
         renderBuffer = MultiVBORenderer.of((buffer) -> {
             System.out.println("Building again");
-            Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
 
             IVertexBuilder builder = buffer.getBuffer(MyRenderType.RenderBlock);
             BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
 
-            MatrixStack matrix = evt.getMatrixStack();
+            MatrixStack matrix = new MatrixStack();
             matrix.push();
-            matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
-
             for (PlacementTarget target : sorter.getSortedTargets()) {
                 BlockPos targetPos = target.getPos();
                 BlockState state = context.getWorld().getBlockState(target.getPos());
@@ -396,7 +400,6 @@ public class CopyPasteRender extends BaseRenderer {
 
                 matrix.pop();
             }
-
             matrix.pop();
         });
     }
