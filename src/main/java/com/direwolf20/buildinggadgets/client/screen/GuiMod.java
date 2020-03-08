@@ -21,9 +21,8 @@ public enum GuiMod {
     DESTRUCTION(GadgetDestruction::getGadget, stack -> () -> new DestructionGUI(stack)),
     MATERIAL_LIST(player -> {
         ItemStack mainhand = player.getHeldItemMainhand();
-        if (mainhand.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent()) {
+        if (mainhand.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
             return mainhand;
-        }
 
         ItemStack offhand = player.getHeldItemOffhand();
         if (offhand.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())

@@ -25,10 +25,12 @@ public class EventKeyInput {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || event.phase == Phase.START)
             return;
+
         if (KeyBindings.materialList.isPressed()) {
             GuiMod.MATERIAL_LIST.openScreen(mc.player);
             return;
         }
+
         ItemStack tool = AbstractGadget.getGadget(mc.player);
         if (tool.isEmpty())
             return;
