@@ -5,52 +5,45 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.building.placement.InvertedPlacementEvaluator;
-import com.direwolf20.buildinggadgets.common.building.placement.PlacementChecker;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
-import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper.RenderSorter;
-import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
-import com.direwolf20.buildinggadgets.common.util.tools.SimulateEnergyStorage;
 import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
+import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
-import net.minecraftforge.energy.CapabilityEnergy;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
@@ -123,14 +116,14 @@ public class CopyPasteRender extends BaseRenderer {
         world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             heldItem.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 UUID id = provider.getId(key);
-                float partialTicks = evt.getPartialTicks();
                 GadgetCopyPaste.getActivePos(player, heldItem).ifPresent(startPos -> {
+                    this.render(evt, id, startPos, world, player, heldItem, provider.getTemplateForKey(key));
                     //try {
                     //RenderInfo info = renderCache.get(new RenderKey(id, startPos), () -> {
                     // todo: fix - DireNote, What even is this
                     //int displayList = GLAllocation.generateDisplayLists(1);
                     //GlStateManager.newList(displayList, GL11.GL_COMPILE);
-                    this.performRender(world, player, heldItem, startPos, provider.getTemplateForKey(key), partialTicks, evt);
+//                    this.performRender(world, player, heldItem, startPos, provider.getTemplateForKey(key), partialTicks, evt);
                     //GlStateManager.endList();
                     //return new RenderInfo( 0 );//displayList);
                     //});
@@ -143,7 +136,21 @@ public class CopyPasteRender extends BaseRenderer {
         });
     }
 
-    private void performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, Template template, float partialTicks, RenderWorldLastEvent evt) {
+    private void render(RenderWorldLastEvent evt, UUID id, BlockPos startPos, World world, PlayerEntity player, ItemStack stack, Template template) {
+        try {
+            RenderInfo info = renderCache.get(new RenderKey(id, startPos), () -> {
+                RenderInfo cacheCreator = new RenderInfo();
+                cacheCreator.getBuffer().upload(this.performRender(world, player, stack, startPos, template, evt.getPartialTicks(), evt));
+                return cacheCreator;
+            });
+
+            info.render(evt.getMatrixStack());
+        } catch (UncheckedExecutionException | ExecutionException e) {
+            BuildingGadgets.LOG.error("Failed to create Render!", e);
+        }
+    }
+
+    private BufferBuilder performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, Template template, float partialTicks, RenderWorldLastEvent evt) {
         FakeDelegationWorld fakeWorld = new FakeDelegationWorld(world);
         IBuildContext context = SimpleBuildContext.builder()
                 .buildingPlayer(player)
@@ -158,7 +165,7 @@ public class CopyPasteRender extends BaseRenderer {
         }
         //Prepare the block rendering
         //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-        renderTargets(context, sorter, partialTicks, evt);
+        return renderTargets(context, sorter, partialTicks, evt);
 
         //ToDo the red render now works but shows over everything regardless of circumstance, uncomment to see what i mean
         //if (! player.isCreative())
@@ -166,7 +173,7 @@ public class CopyPasteRender extends BaseRenderer {
         //GlStateManager.disableBlend();
     }
 
-    private void renderTargets(IBuildContext context, RenderSorter sorter, float partialTicks, RenderWorldLastEvent evt) {
+    private BufferBuilder renderTargets(IBuildContext context, RenderSorter sorter, float partialTicks, RenderWorldLastEvent evt) {
         //Enable Blending (So we can have transparent effect)
         //GlStateManager.enableBlend();
         //This blend function allows you to use a constant alpha, which is defined later
@@ -226,39 +233,40 @@ public class CopyPasteRender extends BaseRenderer {
         matrix.pop();
         buffer.finish();
 
+        return (BufferBuilder) builder;
     }
 
-    private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter, RenderWorldLastEvent evt) {
-        int energyCost = ((GadgetCopyPaste) stack.getItem()).getEnergyCost(stack);
-        //wrap in a recording index, to prevent a single item of some type from allowing all of that kind.
-        //it sadly makes it very inefficient - we should try to find a faster solution
-        IItemIndex index = new RecordingItemIndex(InventoryHelper.index(stack, player));
-        boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
-        BlockItemUseContext useContext = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
-        InvertedPlacementEvaluator evaluator = new InvertedPlacementEvaluator(
-                sorter.getOrderedTargets(),
-                new PlacementChecker(
-                        stack.getCapability(CapabilityEnergy.ENERGY).map(SimulateEnergyStorage::new),
-                        t -> energyCost,
-                        index,
-                        (c, t) -> overwrite ? player.world.getBlockState(t.getPos()).isReplaceable(useContext) : player.world.isAirBlock(t.getPos()),
-                        false),
-                view.getContext());
-
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
-        IVertexBuilder builder;
-        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
-        builder = buffer.getBuffer(MyRenderType.MissingBlockOverlay);
-        BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
-        MatrixStack matrix = evt.getMatrixStack();
-        matrix.push();
-        matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
-        for (PlacementTarget target : evaluator) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
-            renderMissingBlock(matrix.getLast().getMatrix(), builder, target.getPos());
-        }
-        matrix.pop();
-        buffer.finish();
-    }
+//    private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter, RenderWorldLastEvent evt) {
+//        int energyCost = ((GadgetCopyPaste) stack.getItem()).getEnergyCost(stack);
+//        //wrap in a recording index, to prevent a single item of some type from allowing all of that kind.
+//        //it sadly makes it very inefficient - we should try to find a faster solution
+//        IItemIndex index = new RecordingItemIndex(InventoryHelper.index(stack, player));
+//        boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
+//        BlockItemUseContext useContext = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
+//        InvertedPlacementEvaluator evaluator = new InvertedPlacementEvaluator(
+//                sorter.getOrderedTargets(),
+//                new PlacementChecker(
+//                        stack.getCapability(CapabilityEnergy.ENERGY).map(SimulateEnergyStorage::new),
+//                        t -> energyCost,
+//                        index,
+//                        (c, t) -> overwrite ? player.world.getBlockState(t.getPos()).isReplaceable(useContext) : player.world.isAirBlock(t.getPos()),
+//                        false),
+//                view.getContext());
+//
+//        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+//        IVertexBuilder builder;
+//        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+//        builder = buffer.getBuffer(MyRenderType.MissingBlockOverlay);
+//        BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
+//        MatrixStack matrix = evt.getMatrixStack();
+//        matrix.push();
+//        matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
+//        for (PlacementTarget target : evaluator) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
+//            renderMissingBlock(matrix.getLast().getMatrix(), builder, target.getPos());
+//        }
+//        matrix.pop();
+//        buffer.finish();
+//    }
 
     @Override
     public boolean isLinkable() {
@@ -359,24 +367,22 @@ public class CopyPasteRender extends BaseRenderer {
 
 
     private static final class RenderInfo {
-        private final int callList;
-
-        private RenderInfo(int callList) {
-            this.callList = callList;
+        VertexBuffer buffer = new VertexBuffer(DefaultVertexFormats.BLOCK);
+        private RenderInfo() {
+            System.out.println("Cache created");
         }
 
-        private void render(Vec3d playerPos) {
-            //Save the current position that is being rendered
-            GlStateManager.pushMatrix();
-            GlStateManager.translated(- playerPos.getX(), - playerPos.getY(), - playerPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-            // todo: fix
-//            GlStateManager.callList(callList);
-            GlStateManager.popMatrix();
+        public VertexBuffer getBuffer() {
+            return buffer;
+        }
+
+        private void render(MatrixStack stack) {
+            buffer.draw(stack.getLast().getMatrix(), 7);
         }
 
         private void onRemove() {
-            // todo: fix
-//            GLAllocation.deleteDisplayLists(callList);
+            System.out.println("Cache removed");
+            buffer.close();
         }
     }
 }
