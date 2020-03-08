@@ -2,11 +2,9 @@ package com.direwolf20.buildinggadgets.common.building.placement;
 
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.util.tools.MathUtils;
-import com.direwolf20.buildinggadgets.common.util.tools.VectorUtils;
 import com.google.common.base.Preconditions;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Direction.AxisDirection;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
@@ -19,82 +17,6 @@ import java.util.function.Function;
 public final class PlacementSequences {
 
     private PlacementSequences() {
-    }
-
-    /**
-     * Column is a line of blocks that is aligned to some axis, starting from a position to another where 2 and only 2 coordinates
-     * are the same. Whether the resulting {@link BlockPos BlockPositions} include the start/end position is up to the factory methods'
-     * specification.
-     */
-    public static final class Column {
-        private Column() {
-        }
-
-        /**
-         * Construct a column object with a starting point, including {@code range} amount of elements.
-         *
-         * @param hit   the source position, will not be included
-         * @param side  side to grow the column into
-         * @param range length of the column
-         * @implSpec this sequence includes the source position
-         *
-         * @return {@link IPositionPlacementSequence}
-         */
-        public static IPositionPlacementSequence extendFrom(BlockPos hit, Direction side, int range) {
-            return new Region(hit, hit.offset(side, range - 1));
-        }
-
-        /**
-         * Construct a column object of the specified length, centered at a point and aligned to the given axis.
-         *
-         * @param center center of the column
-         * @param axis   which axis will the column align to
-         * @param length length of the column, will be floored to an odd number if it is not one already
-         *
-         * @return {@link com.direwolf20.buildinggadgets.common.building.IPlacementSequence}
-         */
-        public static IPositionPlacementSequence centerAt(BlockPos center, Axis axis, int length) {
-            Direction positive = Direction.getFacingFromAxis(Direction.AxisDirection.POSITIVE, axis);
-            Direction negative = positive.getOpposite();
-            BlockPos base = center.offset(negative, (length - 1) / 2);
-            // -1 because Region's vertexes are inclusive
-            return new Region(base, base.offset(positive, MathUtils.floorToOdd(length) - 1));
-        }
-
-        /**
-         * Starts from the selected position, and extend a column of blocks towards a target position on the axis of the selected face.
-         *
-         * @param source         Source Block
-         * @param target         Target Block
-         * @param axis           which axis will the column align to
-         * @param maxProgression Max range / Progression
-         *
-         * @return {@link IPositionPlacementSequence}
-         */
-        public static IPositionPlacementSequence createAxisChasing(BlockPos source, BlockPos target, Axis axis, int maxProgression) {
-            int difference = VectorUtils.getAxisValue(target, axis) - VectorUtils.getAxisValue(source, axis);
-            if (difference < 0)
-                return createAxisChasing(source, target, Direction.getFacingFromAxis(AxisDirection.NEGATIVE, axis), maxProgression);
-            return createAxisChasing(source, target, Direction.getFacingFromAxis(AxisDirection.POSITIVE, axis), maxProgression);
-        }
-
-        /**
-         * <p>Note that this factory method does not verify that {@code offsetDirection} is appropriate.</p>
-         *
-         * @param source          Source Block
-         * @param target          Target Block
-         * @param offsetDirection The direction offset into
-         * @param maxProgression  Max range / Progression
-         *
-         * @return IPositionPlacementSequence
-         */
-        public static IPositionPlacementSequence createAxisChasing(BlockPos source, BlockPos target, Direction offsetDirection, int maxProgression) {
-            Axis axis = offsetDirection.getAxis();
-            int difference = VectorUtils.getAxisValue(target, axis) - VectorUtils.getAxisValue(source, axis);
-            maxProgression = Math.min(Math.abs(difference), maxProgression);
-
-            return extendFrom(source, offsetDirection, maxProgression);
-        }
     }
 
     /**
@@ -149,34 +71,6 @@ public final class PlacementSequences {
                     createdRegion = new Region(createdRegion.getMin().offset(extendingSide, extendingSize), createdRegion.getMax());
             }
             return createdRegion;
-        }
-    }
-
-    /**
-     * Grid is a set of blocks where each block is equidistant from its neighboring blocks. The distance between the blocks
-     * is a periodic sequence with a certain size.
-     */
-    public static final class Grid {
-        private Grid() {
-        }
-
-        public static IPositionPlacementSequence create(BlockPos base, int range, int periodSize) {
-            return new GridSequence(base, range, periodSize);
-        }
-    }
-
-    /**
-     * A sequence of blocks that offsets in 2 different directions where one is vertical, one is horizontal.
-     * <p>
-     * For example, a regular climbing up stair facing north would have (UP, NORTH) as its parameter. This also applies to
-     * descending stair like (DOWN, SOUTH) where each block is lower than the latter.
-     */
-    public static final class Stair {
-        private Stair() {
-        }
-
-        public static IPositionPlacementSequence create(BlockPos base, Direction horizontalAdvance, Direction verticalAdvance, int range) {
-            return new StairSequence(base, horizontalAdvance, verticalAdvance, range);
         }
     }
 
