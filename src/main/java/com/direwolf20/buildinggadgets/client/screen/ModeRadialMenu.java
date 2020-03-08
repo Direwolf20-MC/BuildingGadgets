@@ -419,11 +419,11 @@ public class ModeRadialMenu extends Screen {
             // be a pretty solid idea for the next guy to touch this code.
             String mode;
             if (gadget instanceof GadgetBuilding)
-                mode = BuildingModes.values()[slotSelected].toString();
+                mode = ForgeI18n.getPattern(BuildingModes.values()[slotSelected].getTranslationKey());
             else if (gadget instanceof GadgetExchanger)
-                mode = ExchangingModes.values()[slotSelected].toString();
+                mode = ForgeI18n.getPattern(ExchangingModes.values()[slotSelected].getTranslationKey());
             else
-                mode = GadgetCopyPaste.ToolMode.values()[slotSelected].toString();
+                mode = GadgetCopyPaste.ToolMode.values()[slotSelected].getTranslation().format();
 
             getMinecraft().player.sendStatusMessage(MessageTranslation.MODE_SET.componentTranslation(mode).setStyle(Styles.AQUA), true);
 
