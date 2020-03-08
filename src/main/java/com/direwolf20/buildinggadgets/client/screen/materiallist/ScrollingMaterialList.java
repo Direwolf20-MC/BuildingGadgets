@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.client.screen.materiallist;
 
-import com.direwolf20.buildinggadgets.client.screen.base.EntryList;
+import com.direwolf20.buildinggadgets.client.screen.components.EntryList;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;

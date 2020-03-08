@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import static com.direwolf20.buildinggadgets.common.registry.OurBlocks.constructionBlock;
+
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public final class Registries {
     /**
@@ -70,15 +72,13 @@ public final class Registries {
     public static void setup() {
         OurItems.setup();
 
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-//            OurEntities.registerModels();
-            OurBlocks.OurTileEntities.registerRenderers();
-        });
+        DistExecutor.runWhenOn(Dist.CLIENT, () ->
+                OurBlocks.OurTileEntities::registerRenderers);
     }
 
     public static void clientSetup() {
         OurContainers.registerContainerScreens();
-        OurBlocks.constructionBlock.initColorHandler(Minecraft.getInstance().getBlockColors());
+        constructionBlock.initColorHandler(Minecraft.getInstance().getBlockColors());
     }
 
     public static void onCreateRegistries() {

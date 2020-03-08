@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -194,7 +193,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
         boolean bright = state.get(ConstructionBlock.BRIGHT);
         if (!bright) return false;
-        if (adjacentBlockState.getBlock().equals(OurBlocks.constructionBlock)) {
+        if (adjacentBlockState.getBlock() instanceof ConstructionBlock) {
             return !adjacentBlockState.get(ConstructionBlock.BRIGHT);
         } else {
             //This is how vanilla BreakableBlock does it.
