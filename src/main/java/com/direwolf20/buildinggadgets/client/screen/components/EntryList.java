@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.screen.base;
+package com.direwolf20.buildinggadgets.client.screen.components;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
