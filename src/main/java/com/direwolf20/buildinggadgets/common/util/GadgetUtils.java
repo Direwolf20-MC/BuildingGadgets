@@ -2,14 +2,13 @@ package com.direwolf20.buildinggadgets.common.util;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.modes.BuildingMode;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.items.InventoryWrapper;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.items.gadgets.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
@@ -364,12 +363,12 @@ public class GadgetUtils {
                 return false;
             }
             List<BlockPos> coords = new ArrayList<BlockPos>();
+            BlockData blockData = getToolBlock(stack);
+            AbstractMode.UseContext context = new AbstractMode.UseContext(world, blockData.getState(), ((BlockRayTraceResult) lookingAt).getPos(), stack, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack));
             if (stack.getItem() instanceof GadgetBuilding) {
-                coords = BuildingMode
-                        .collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock); // Build the positions list based on tool mode and range
+                coords = GadgetBuilding.getToolMode(stack).getMode().getCollection(player, context, sideHit);
             } else if (stack.getItem() instanceof GadgetExchanger) {
-                coords = ExchangingMode
-                        .collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock); // Build the positions list based on tool mode and range
+                coords = GadgetBuilding.getToolMode(stack).getMode().getCollection(player, context, sideHit);
             }
             setAnchor(stack, coords); //Set the anchor NBT
             player.sendStatusMessage(MessageTranslation.ANCHOR_SET.componentTranslation().setStyle(Styles.AQUA), true);

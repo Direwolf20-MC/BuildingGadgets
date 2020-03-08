@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
@@ -13,6 +12,8 @@ import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.items.gadgets.modes.AbstractMode;
+import com.direwolf20.buildinggadgets.common.items.gadgets.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.ExchangerRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -110,15 +111,15 @@ public class GadgetExchanger extends ModeGadget {
         return enchantment == Enchantments.SILK_TOUCH || super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
-    private static void setToolMode(ItemStack tool, ExchangingMode mode) {
+    private static void setToolMode(ItemStack tool, ExchangingModes mode) {
         //Store the tool's mode in NBT as a string
         CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
-        tagCompound.putString("mode", mode.getRegistryName());
+        tagCompound.putString("mode", mode.toString());
     }
 
-    public static ExchangingMode getToolMode(ItemStack tool) {
+    public static ExchangingModes getToolMode(ItemStack tool) {
         CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
-        return ExchangingMode.byName(tagCompound.getString("mode"));
+        return ExchangingModes.getFromName(tagCompound.getString("mode"));
     }
 
     @Override
@@ -126,9 +127,9 @@ public class GadgetExchanger extends ModeGadget {
         super.addInformation(stack, world, tooltip, flag);
         addEnergyInformation(tooltip, stack);
 
-        ExchangingMode mode = getToolMode(stack);
+        ExchangingModes mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
-                .componentTranslation((mode == ExchangingMode.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
+                .componentTranslation((mode == ExchangingModes.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
                         .format(mode) : mode))
                 .setStyle(Styles.AQUA));
 
@@ -138,7 +139,7 @@ public class GadgetExchanger extends ModeGadget {
 
         int range = getToolRange(stack);
         tooltip.add(TooltipTranslation.GADGET_RANGE
-                            .componentTranslation(range, getRangeInBlocks(range, mode.getModeImplementation()))
+                            .componentTranslation(range, getRangeInBlocks(range, mode.getMode()))
                             .setStyle(Styles.LT_PURPLE));
 
         tooltip.add(TooltipTranslation.GADGET_FUZZY
@@ -174,13 +175,13 @@ public class GadgetExchanger extends ModeGadget {
 
     public void setMode(ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
-        ExchangingMode mode = ExchangingMode.values()[modeInt];
+        ExchangingModes mode = ExchangingModes.values()[modeInt];
         setToolMode(heldItem, mode);
     }
 
     public static void rangeChange(PlayerEntity player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) == ExchangingMode.GRID || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem) == ExchangingModes.GRID || (range % 2 == 0)) ? 1 : 2;
         if (player.isShiftKeyDown()) {
             range = (range <= 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         } else {
@@ -192,34 +193,42 @@ public class GadgetExchanger extends ModeGadget {
 
     private boolean exchange(ServerPlayerEntity player, ItemStack stack) {
         ServerWorld world = player.getServerWorld();
+        ItemStack heldItem = getGadget(player);
+        if (heldItem.isEmpty())
+            return false;
+
+        BlockData blockData = getToolBlock(heldItem);
         List<BlockPos> coords = GadgetUtils.getAnchor(stack);
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
             BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            BlockPos startBlock = lookingAt.getPos();
             Direction sideHit = lookingAt.getFace();
-//            BlockState setBlock = getToolBlock(stack);
-            coords = ExchangingMode.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
+
+            coords = getToolMode(stack).getMode().getCollection(
+                    player,
+                    new AbstractMode.UseContext(
+                            world,
+                            blockData.getState(),
+                            lookingAt.getPos(),
+                            heldItem
+                    ),
+                    sideHit
+            );
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }
         Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
 
-        ItemStack heldItem = getGadget(player);
-        if (heldItem.isEmpty())
-            return false;
-
-        BlockData blockState = getToolBlock(heldItem);
         Undo.Builder builder = Undo.builder();
         IItemIndex index = InventoryHelper.index(stack, player);
-        if (blockState.getState() != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
+        if (blockData.getState() != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             //TODO replace fakeWorld
-            fakeWorld.setWorldAndState(player.world, blockState.getState(), coordinates); // Initialize the fake world's blocks
+            fakeWorld.setWorldAndState(player.world, blockData.getState(), coordinates); // Initialize the fake world's blocks
             for (BlockPos coordinate : coords) {
                 //Get the extended block state in the fake world
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-                exchangeBlock(world, player, index, builder, coordinate, blockState);
+                exchangeBlock(world, player, index, builder, coordinate, blockData);
             }
         }
         pushUndo(stack, builder.build(world.getDimension().getType()));

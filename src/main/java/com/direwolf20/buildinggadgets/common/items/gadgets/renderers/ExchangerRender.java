@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
@@ -12,6 +11,8 @@ import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.items.gadgets.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -76,8 +77,16 @@ public class ExchangerRender extends BaseRenderer {
             }
             List<BlockPos> renderCoordinates;
             if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
-                coordinates = ExchangingMode
-                        .collectPlacementPos(world, player, lookingAt.getPos(), lookingAt.getFace(), heldItem, lookingAt.getPos());
+                coordinates = GadgetExchanger.getToolMode(heldItem).getMode().getCollection(
+                        player,
+                        new AbstractMode.UseContext(
+                                world,
+                                renderBlockState,
+                                lookingAt.getPos(),
+                                heldItem
+                        ),
+                        lookingAt.getFace()
+                );
                 renderCoordinates = coordinates;
             } else { //anchors need to be resorted
                 renderCoordinates = SortingHelper.Blocks.byDistance(coordinates, player);

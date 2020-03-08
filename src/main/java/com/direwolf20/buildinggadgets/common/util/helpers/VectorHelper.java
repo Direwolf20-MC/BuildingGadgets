@@ -15,6 +15,10 @@ public class VectorHelper {
         return getLookingAt(player, AbstractGadget.shouldRayTraceFluid(tool) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
     }
 
+    public static BlockRayTraceResult getLookingAt(PlayerEntity player, boolean shouldRayTrace) {
+        return getLookingAt(player, shouldRayTrace ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
+    }
+
     public static BlockRayTraceResult getLookingAt(PlayerEntity player, RayTraceContext.FluidMode rayTraceFluid) {
         double rayTraceRange = Config.GENERAL.rayTraceRange.get();
         RayTraceResult result = player.pick(rayTraceRange, 0f, rayTraceFluid != RayTraceContext.FluidMode.NONE);

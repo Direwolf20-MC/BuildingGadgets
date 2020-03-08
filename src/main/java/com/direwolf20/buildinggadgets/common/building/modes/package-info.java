@@ -1,7 +1,0 @@
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-package com.direwolf20.buildinggadgets.common.building.modes;
-
-import mcp.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;

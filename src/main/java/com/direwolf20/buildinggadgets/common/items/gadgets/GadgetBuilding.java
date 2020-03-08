@@ -2,8 +2,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.modes.BuildingMode;
-import com.direwolf20.buildinggadgets.common.building.modes.IAtopPlacingGadget;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -12,6 +10,8 @@ import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.items.gadgets.modes.AbstractMode;
+import com.direwolf20.buildinggadgets.common.items.gadgets.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildingRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -55,7 +55,7 @@ import java.util.function.Supplier;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
-public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
+public class GadgetBuilding extends ModeGadget {
 
     private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
 
@@ -78,20 +78,19 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
         return BuildingRender::new;
     }
 
-    @Override
     public boolean placeAtop(ItemStack stack) {
         return shouldPlaceAtop(stack);
     }
 
-    private static void setToolMode(ItemStack tool, BuildingMode mode) {
+    private static void setToolMode(ItemStack tool, BuildingModes mode) {
         //Store the tool's mode in NBT as a string
         CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
-        tagCompound.putString("mode", mode.getRegistryName());
+        tagCompound.putString("mode", mode.toString());
     }
 
-    public static BuildingMode getToolMode(ItemStack tool) {
+    public static BuildingModes getToolMode(ItemStack tool) {
         CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
-        return BuildingMode.byName(tagCompound.getString("mode"));
+        return BuildingModes.getFromName(tagCompound.getString("mode"));
     }
 
     public static boolean shouldPlaceAtop(ItemStack stack) {
@@ -106,11 +105,11 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
-        BuildingMode mode = getToolMode(stack);
+        BuildingModes mode = getToolMode(stack);
         addEnergyInformation(tooltip, stack);
 
         tooltip.add(TooltipTranslation.GADGET_MODE
-                .componentTranslation((mode == BuildingMode.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
+                .componentTranslation((mode == BuildingModes.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
                         .format(mode) : mode))
                 .setStyle(Styles.AQUA));
 
@@ -119,12 +118,12 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
                 .setStyle(Styles.DK_GREEN));
 
         int range = getToolRange(stack);
-        if (getToolMode(stack) != BuildingMode.TARGETED_AXIS_CHASING)
+        if (getToolMode(stack) != BuildingModes.BUILD_TO_ME)
             tooltip.add(TooltipTranslation.GADGET_RANGE
-                    .componentTranslation(range, getRangeInBlocks(range, mode.getModeImplementation()))
+                    .componentTranslation(range, getRangeInBlocks(range, mode.getMode()))
                     .setStyle(Styles.LT_PURPLE));
 
-        if (getToolMode(stack) == BuildingMode.SURFACE)
+        if (getToolMode(stack) == BuildingModes.SURFACE)
             tooltip.add(TooltipTranslation.GADGET_FUZZY
                     .componentTranslation(String.valueOf(getFuzzy(stack)))
                     .setStyle(Styles.GOLD));
@@ -161,14 +160,14 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
 
     public void setMode(ItemStack heldItem, int modeInt) {
         //Called when we specify a mode with the radial menu
-        BuildingMode mode = BuildingMode.values()[modeInt];
+        BuildingModes mode = BuildingModes.values()[modeInt];
         setToolMode(heldItem, mode);
     }
 
     public static void rangeChange(PlayerEntity player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) != BuildingMode.SURFACE || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem) != BuildingModes.SURFACE || (range % 2 == 0)) ? 1 : 2;
         if (player.isShiftKeyDown())
             range = (range == 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         else
@@ -181,25 +180,36 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
     private boolean build(ServerPlayerEntity player, ItemStack stack) {
         //Build the blocks as shown in the visual render
         World world = player.world;
-        List<BlockPos> coords = GadgetUtils.getAnchor(stack);
+        ItemStack heldItem = getGadget(player);
+        if (heldItem.isEmpty())
+            return false;
 
+        List<BlockPos> coords = GadgetUtils.getAnchor(heldItem);
+
+        BlockData blockData = getToolBlock(heldItem);
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
             RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
             if (lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) { //If we aren't looking at anything, exit
                 return false;
             }
-            BlockPos startBlock = ((BlockRayTraceResult) lookingAt).getPos();
+
             Direction sideHit = ((BlockRayTraceResult) lookingAt).getFace();
-            coords = BuildingMode.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
+            coords = getToolMode(stack).getMode().getCollection(
+                    player,
+                    new AbstractMode.UseContext(
+                            world,
+                            blockData.getState(),
+                            ((BlockRayTraceResult) lookingAt).getPos(),
+                            heldItem,
+                            placeAtop(stack)
+                    ),
+                    sideHit
+            );
+            System.out.println(coords);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }
 
-        ItemStack heldItem = getGadget(player);
-        if (heldItem.isEmpty())
-            return false;
-
-        BlockData blockData = getToolBlock(heldItem);
         Undo.Builder builder = Undo.builder();
         IItemIndex index = InventoryHelper.index(stack, player);
         if (blockData.getState() != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.

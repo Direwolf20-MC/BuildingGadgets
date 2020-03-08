@@ -8,10 +8,10 @@ package com.direwolf20.buildinggadgets.client.screen;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.screen.components.GuiIconActionable;
 import com.direwolf20.buildinggadgets.client.screen.components.GuiSliderInt;
-import com.direwolf20.buildinggadgets.common.building.modes.BuildingMode;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.*;
+import com.direwolf20.buildinggadgets.common.items.gadgets.modes.BuildingModes;
+import com.direwolf20.buildinggadgets.common.items.gadgets.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.registry.OurSounds;
@@ -40,8 +40,10 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class ModeRadialMenu extends Screen {
 
@@ -66,9 +68,9 @@ public class ModeRadialMenu extends Screen {
 
     public void setSocketable(ItemStack stack) {
         if (stack.getItem() instanceof GadgetBuilding)
-            segments = BuildingMode.values().length;
+            segments = BuildingModes.values().length;
         else if (stack.getItem() instanceof GadgetExchanger)
-            segments = ExchangingMode.values().length;
+            segments = ExchangingModes.values().length;
         else if (stack.getItem() instanceof GadgetCopyPaste)
             segments = GadgetCopyPaste.ToolMode.values().length;
     }
@@ -293,14 +295,14 @@ public class ModeRadialMenu extends Screen {
         slotSelected = -1;
         float offset = 8.5F;
 
-        ImmutableList<ResourceLocation> signs;
+        List<ResourceLocation> signs;
         int modeIndex;
         if (tool.getItem() instanceof GadgetBuilding) {
             modeIndex = GadgetBuilding.getToolMode(tool).ordinal();
-            signs = BuildingMode.getIcons();
+            signs = Arrays.stream(BuildingModes.values()).map(e -> new ResourceLocation(Reference.MODID, e.getIcon())).collect(Collectors.toList());
         } else if (tool.getItem() instanceof GadgetExchanger) {
             modeIndex = GadgetExchanger.getToolMode(tool).ordinal();
-            signs = ExchangingMode.getIcons();
+            signs = Arrays.stream(ExchangingModes.values()).map(e -> new ResourceLocation(Reference.MODID, e.getIcon())).collect(Collectors.toList());
         } else {
             modeIndex = GadgetCopyPaste.getToolMode(tool).ordinal();
             signs = signsCopyPaste;
@@ -358,9 +360,9 @@ public class ModeRadialMenu extends Screen {
 
             String name;
             if (tool.getItem() instanceof GadgetBuilding)
-                name = BuildingMode.values()[i].toString();
+                name = BuildingModes.values()[i].toString();
             else if (tool.getItem() instanceof GadgetExchanger)
-                name = ExchangingMode.values()[i].toString();
+                name = ExchangingModes.values()[i].toString();
             else
                 name = GadgetCopyPaste.ToolMode.values()[i].format();
 
@@ -416,9 +418,9 @@ public class ModeRadialMenu extends Screen {
             // be a pretty solid idea for the next guy to touch this code.
             String mode;
             if (gadget instanceof GadgetBuilding)
-                mode = BuildingMode.values()[slotSelected].toString();
+                mode = BuildingModes.values()[slotSelected].toString();
             else if (gadget instanceof GadgetExchanger)
-                mode = ExchangingMode.values()[slotSelected].toString();
+                mode = ExchangingModes.values()[slotSelected].toString();
             else
                 mode = GadgetCopyPaste.ToolMode.values()[slotSelected].toString();
 
@@ -457,9 +459,9 @@ public class ModeRadialMenu extends Screen {
         for (int i = 0; i < conditionalButtons.size(); i++) {
             Button button = conditionalButtons.get(i);
             if (builder)
-                curent = GadgetBuilding.getToolMode(tool) == BuildingMode.SURFACE;
+                curent = GadgetBuilding.getToolMode(tool) == BuildingModes.SURFACE;
             else
-                curent = i == 0 || GadgetExchanger.getToolMode(tool) == ExchangingMode.SURFACE;
+                curent = i == 0 || GadgetExchanger.getToolMode(tool) == ExchangingModes.SURFACE;
 
             if (button.visible != curent) {
                 button.visible = curent;

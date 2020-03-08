@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.modes.*;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
@@ -14,6 +13,7 @@ import com.direwolf20.buildinggadgets.common.concurrent.UndoScheduler;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.items.gadgets.modes.*;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.Undo;
@@ -303,15 +303,13 @@ public abstract class AbstractGadget extends Item {
     }
 
     // Todo: tweak and fix.
-    public static int getRangeInBlocks(int range, IBuildingMode mode) {
+    public static int getRangeInBlocks(int range, AbstractMode mode) {
         if( mode instanceof StairMode ||
-                mode instanceof BuildingVerticalColumnMode ||
-                mode instanceof BuildingHorizontalColumnMode ||
-                mode instanceof ExchangingVerticalColumnMode ||
-                mode instanceof ExchangingHorizontalColumnMode)
+                mode instanceof VerticalColumnMode ||
+                mode instanceof HorizontalColumnMode)
             return range;
 
-        if( mode instanceof GridMode )
+        if( mode instanceof GridMode)
             return range < 7 ? 9 : range < 13 ? 11 * 11: 19 * 19;
 
         return range == 1 ? 1 : (range + 1) * (range + 1);

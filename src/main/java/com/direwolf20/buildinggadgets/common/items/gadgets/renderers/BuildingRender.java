@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
@@ -12,6 +11,8 @@ import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.items.gadgets.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -75,16 +76,27 @@ public class BuildingRender extends BaseRenderer {
                 }
                 List<BlockPos> renderCoordinates;
                 if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
-                    coordinates = BuildingMode
-                            .collectPlacementPos(world, player, lookingAt.getPos(), lookingAt.getFace(), heldItem, lookingAt.getPos());
+                    coordinates = GadgetBuilding.getToolMode(heldItem).getMode().getCollection(
+                            player,
+                            new AbstractMode.UseContext(
+                                    world,
+                                    renderBlockState,
+                                    lookingAt.getPos(),
+                                    heldItem,
+                                    GadgetBuilding.shouldPlaceAtop(heldItem)
+                            ),
+                            lookingAt.getFace()
+                    );
                     renderCoordinates = coordinates;
                 } else { //anchors need to be resorted
                     renderCoordinates = SortingHelper.Blocks.byDistance(coordinates, player);
                 }
+
                 IBuildContext buildContext = SimpleBuildContext.builder()
                         .usedStack(heldItem)
                         .buildingPlayer(player)
                         .build(world);
+
                 // Figure out how many of the block we're rendering we have in the inventory of the player.
                 IItemIndex index = new RecordingItemIndex(InventoryHelper.index(heldItem, player));
                 MaterialList materials = data.getRequiredItems(buildContext, null, null);
