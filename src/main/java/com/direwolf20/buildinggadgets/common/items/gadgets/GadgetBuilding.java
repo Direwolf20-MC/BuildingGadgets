@@ -205,7 +205,6 @@ public class GadgetBuilding extends ModeGadget {
                     ),
                     sideHit
             );
-            System.out.println(coords);
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack, new ArrayList<BlockPos>());
         }

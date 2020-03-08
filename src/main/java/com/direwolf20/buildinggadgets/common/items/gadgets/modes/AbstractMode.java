@@ -64,8 +64,6 @@ public abstract class AbstractMode {
         return Config.GENERAL.allowOverwriteBlocks.get()
                 ? context.getWorldState(pos).getMaterial().isReplaceable()
                 : context.getWorldState(pos).getMaterial() != Material.AIR;
-
-//        return true;
     }
 
     private boolean exchangingValidator(BlockPos pos, BlockState lookingAtState, UseContext context) {
