@@ -35,6 +35,7 @@ import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
@@ -48,14 +49,16 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.energy.CapabilityEnergy;
 
+import java.io.Closeable;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BiConsumer;
 
 import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 
 public class CopyPasteRender extends BaseRenderer {
-    private VertexBuffer buffer = new VertexBuffer(DefaultVertexFormats.BLOCK);
+    private VBORenderer renderBuffer = new VBORenderer(new VertexBuffer(DefaultVertexFormats.BLOCK), 7);
     private int tickTrack = 0;
 
     private final Cache<BlockData, Boolean> erroredCache = CacheBuilder
@@ -167,41 +170,43 @@ public class CopyPasteRender extends BaseRenderer {
 
         tickTrack ++;
         if( tickTrack <= 100 ) {
-            buffer.draw(evt.getMatrixStack().getLast().getMatrix(), 7);
+            renderBuffer.render(evt.getMatrixStack().getLast().getMatrix());
             return;
         }
 
-        tickTrack = 0;
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
-        IVertexBuilder builder;
-        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
-        builder = buffer.getBuffer(MyRenderType.RenderBlock);
-        BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
-        MatrixStack matrix = evt.getMatrixStack();
-        matrix.push();
-        matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
-        Random rand = new Random();
+        renderBuffer = VBORenderer.of(7, DefaultVertexFormats.BLOCK, (bufferBuilder, vertexFormat) -> {
+            tickTrack = 0;
+            IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+            IVertexBuilder builder;
 
-        for (PlacementTarget target : sorter.getSortedTargets()) {
-            BlockPos targetPos = target.getPos();
-            BlockState state = context.getWorld().getBlockState(target.getPos());
-            TileEntity te = context.getWorld().getTileEntity(target.getPos());
-            matrix.push();//Push matrix again in order to apply these settings individually
-            matrix.translate(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
-            IBakedModel ibakedmodel = dispatcher.getModelForState(state);
-            BlockColors blockColors = Minecraft.getInstance().getBlockColors();
-            int color = blockColors.getColor(state, context.getWorld(), targetPos, 0);
-            float f = (float) (color >> 16 & 255) / 255.0F;
-            float f1 = (float) (color >> 8 & 255) / 255.0F;
-            float f2 = (float) (color & 255) / 255.0F;
-            try {
-                if (state.getRenderType() == BlockRenderType.MODEL)
-                    for (Direction direction : Direction.values()) {
-                        renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
-                    }
-            } catch (Exception e) {
-                BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
-            }
+            Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+            builder = buffer.getBuffer(MyRenderType.RenderBlock);
+            BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
+            MatrixStack matrix = evt.getMatrixStack();
+            matrix.push();
+            matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
+            Random rand = new Random();
+
+            for (PlacementTarget target : sorter.getSortedTargets()) {
+                BlockPos targetPos = target.getPos();
+                BlockState state = context.getWorld().getBlockState(target.getPos());
+                TileEntity te = context.getWorld().getTileEntity(target.getPos());
+                matrix.push();//Push matrix again in order to apply these settings individually
+                matrix.translate(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+                IBakedModel ibakedmodel = dispatcher.getModelForState(state);
+                BlockColors blockColors = Minecraft.getInstance().getBlockColors();
+                int color = blockColors.getColor(state, context.getWorld(), targetPos, 0);
+                float f = (float) (color >> 16 & 255) / 255.0F;
+                float f1 = (float) (color >> 8 & 255) / 255.0F;
+                float f2 = (float) (color & 255) / 255.0F;
+                try {
+                    if (state.getRenderType() == BlockRenderType.MODEL)
+                        for (Direction direction : Direction.values()) {
+                            renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                        }
+                } catch (Exception e) {
+                    BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
+                }
 /*            try {
                 if (te != null && ! erroredCache.get(target.getData(), () -> false)) {
                     TileEntityRenderer<TileEntity> renderer = teDispatcher.getRenderer(te);
@@ -219,12 +224,14 @@ public class CopyPasteRender extends BaseRenderer {
             } catch (Exception e) {
                 erroredCache.put(target.getData(), true);
             }*/
+                matrix.pop();
+            }
             matrix.pop();
-        }
-        matrix.pop();
 
-        this.buffer.upload((BufferBuilder) builder);
-        buffer.finish();
+            bufferBuilder.
+            bufferBuilder = (BufferBuilder) builder;
+            buffer.finish();
+        });
     }
 
     private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter, RenderWorldLastEvent evt) {
@@ -305,5 +312,43 @@ public class CopyPasteRender extends BaseRenderer {
         builder.pos(matrix, endX, endY, startZ).color(G, G, G, R).endVertex();
         builder.pos(matrix, endX, startY, startZ).color(G, G, G, R).endVertex();
         builder.pos(matrix, endX, startY, startZ).color(G, G, G, 0.0F).endVertex();
+    }
+
+    public static class VBORenderer implements Closeable
+    {
+        private static final int BUFFER_SIZE = 2*1024*1024;
+        private static final BufferBuilder BUILDER = new BufferBuilder(BUFFER_SIZE);
+
+        public static VBORenderer of(int glMode, VertexFormat fmt, BiConsumer<BufferBuilder, VertexFormat> vertexProducer)
+        {
+            VertexBuffer vbo = new VertexBuffer(fmt);
+            BUILDER.begin(glMode, fmt);
+            vertexProducer.accept(BUILDER, fmt);
+            BUILDER.reset();
+            // 1.14: vbo.bufferData(BUILDER.getByteBuffer());
+            vbo.upload(BUILDER);
+            return new VBORenderer(vbo, glMode);
+        }
+
+        final VertexBuffer vbo;
+        final int glMode;
+
+        public VBORenderer(VertexBuffer vbo, int glMode)
+        {
+            this.vbo = vbo;
+            this.glMode = glMode;
+        }
+
+        public void render(Matrix4f matrix)
+        {
+            // 1.14: vbo.drawArrays(glMode);
+            vbo.draw(matrix, glMode);
+        }
+
+        public void close()
+        {
+            //1.14: vbo.deleteGlBuffers();
+            vbo.close();
+        }
     }
 }
