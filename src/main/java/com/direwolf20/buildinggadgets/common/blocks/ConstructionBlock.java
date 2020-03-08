@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
@@ -23,10 +24,13 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.IPlantable;
 
 import javax.annotation.Nullable;
@@ -188,7 +192,14 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
 
     @Override
     public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
-        return false;
+        boolean bright = state.get(ConstructionBlock.BRIGHT);
+        if (!bright) return false;
+        if (adjacentBlockState.getBlock().equals(OurBlocks.constructionBlock)) {
+            return !adjacentBlockState.get(ConstructionBlock.BRIGHT);
+        } else {
+            //This is how vanilla BreakableBlock does it.
+            return adjacentBlockState.getBlock() == this ? true : super.isSideInvisible(state, adjacentBlockState, side);
+        }
     }
 
     @Override
@@ -200,6 +211,9 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public VoxelShape getRenderShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
+        if (!mimic.isSolid()) {
+            return VoxelShapes.empty();
+        }
         return !isMimicNull(mimic) ? mimic.getRenderShape(worldIn, pos) : super.getRenderShape(state, worldIn, pos);
     }
 
@@ -386,28 +400,27 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return !isMimicNull(mimic) ? mimic.canSustainPlant(world, pos, facing, plantable) : super.canSustainPlant(state, world, pos, facing, plantable);
     }
 
- /* Todo re-eval
-    public boolean shouldSideBeRendered(BlockState blockState, IBlockAccess blockAccess, BlockPos pos, Direction side) {
-        FakeRenderWorld fakeWorld = new FakeRenderWorld();
+    // Todo re-eval
+   /* @Override
+    @OnlyIn(Dist.CLIENT)
+    public static boolean shouldSideBeRendered(BlockState adjacentState, IBlockReader blockState, BlockPos blockAccess, Direction pos) {
+        //FakeRenderWorld fakeWorld = new FakeRenderWorld();
 
-        BlockState mimicBlock = getActualMimicBlock(blockAccess, pos);
+        BlockState mimicBlock = getActualMimicBlock(blockState, blockAccess);
         if (mimicBlock == null) {
-            return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
+            return true;
         }
-        BlockState sideBlockState = blockAccess.getBlockData(pos.offset(side));
-        if (sideBlockState.getBlock().equals(ModBlocks.constructionBlock)) {
-            if (!(getActualMimicBlock(blockAccess, pos.offset(side)) == null)) {
-                sideBlockState = getActualMimicBlock(blockAccess, pos.offset(side));
+        BlockState sideBlockState = blockState.getBlockState(blockAccess.offset(pos));
+        if (sideBlockState.getBlock().equals(OurBlocks.constructionBlock)) {
+            if (!(getActualMimicBlock(blockState, blockAccess.offset(pos)) == null)) {
+                sideBlockState = getActualMimicBlock(blockState, blockAccess.offset(pos));
             }
         }
 
-        fakeWorld.setState(blockAccess, mimicBlock, pos);
-        fakeWorld.setState(blockAccess, sideBlockState, pos.offset(side));
-
         try {
-            return mimicBlock.getBlock().shouldSideBeRendered(mimicBlock, fakeWorld, pos, side);
+            return mimicBlock.getBlock().shouldSideBeRendered(sideBlockState, blockState, blockAccess, pos);
         } catch (Exception var8) {
-            return super.shouldSideBeRendered(blockState, blockAccess, pos, side);
+            return true;
         }
     }*/
 
@@ -425,6 +438,16 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         }
     }
 
+    @Deprecated
+    @OnlyIn(Dist.CLIENT)
+    public float getAmbientOcclusionLightValue(BlockState state, IBlockReader worldIn, BlockPos pos) {
+        Boolean bright = state.get(ConstructionBlock.BRIGHT);
+        Boolean neighborBrightness = state.get(ConstructionBlock.NEIGHBOR_BRIGHTNESS);
+        if (bright || neighborBrightness) {
+            return 1f;
+        }
+        return 0.2f;
+    }
 // fixme: removed as of 1.14?
 //    @Deprecated
 //    public float getAmbientOcclusionLightValue(BlockState state) {
