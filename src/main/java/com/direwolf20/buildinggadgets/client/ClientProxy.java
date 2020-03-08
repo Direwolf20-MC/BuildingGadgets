@@ -56,6 +56,7 @@ public class ClientProxy {
 
     private static void bakeModels(ModelBakeEvent event) {
         ResourceLocation ConstrName = new ResourceLocation(Reference.MODID, "construction_block");
+        TextureAtlasSprite breakPart = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(Blocks.STONE.getDefaultState()).getParticleTexture();
         ModelResourceLocation ConstrLocation1 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=false,neighbor_brightness=false");
         ModelResourceLocation ConstrLocation1a = new ModelResourceLocation(ConstrName, "ambient_occlusion=true,bright=false,neighbor_brightness=false");
         ModelResourceLocation ConstrLocation2 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=true,neighbor_brightness=false");
@@ -105,7 +106,8 @@ public class ClientProxy {
 
             @Override
             public TextureAtlasSprite getParticleTexture() {
-                return null;
+                //Fixes a crash until forge does something
+                return breakPart;
             }
 
             @Override
@@ -160,7 +162,8 @@ public class ClientProxy {
 
             @Override
             public TextureAtlasSprite getParticleTexture() {
-                return null; // MissingTextureSprite.func_217790_a(); 1.14
+                //Fixes a crash until forge does something
+                return breakPart;
             }
 
             @Override
