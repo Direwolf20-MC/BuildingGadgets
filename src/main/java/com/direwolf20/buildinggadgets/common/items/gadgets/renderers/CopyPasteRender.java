@@ -15,6 +15,7 @@ import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper.RenderSo
 import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -141,49 +142,7 @@ public class CopyPasteRender extends BaseRenderer {
         }
         //Prepare the block rendering
         //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-        if( renderBuffer == null ) {
-            renderBuffer = MultiVBORenderer.of((buffer) -> {
-                System.out.println("Building again");
-                Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
-
-                IVertexBuilder builder = buffer.getBuffer(MyRenderType.RenderBlock);
-                BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
-
-                MatrixStack matrix = evt.getMatrixStack();
-                matrix.push();
-                matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
-
-                for (PlacementTarget target : sorter.getSortedTargets()) {
-                    BlockPos targetPos = target.getPos();
-                    BlockState state = context.getWorld().getBlockState(target.getPos());
-
-                    matrix.push();
-                    matrix.translate(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-
-                    IBakedModel ibakedmodel = dispatcher.getModelForState(state);
-                    BlockColors blockColors = Minecraft.getInstance().getBlockColors();
-                    int color = blockColors.getColor(state, context.getWorld(), targetPos, 0);
-
-                    float f = (float) (color >> 16 & 255) / 255.0F;
-                    float f1 = (float) (color >> 8 & 255) / 255.0F;
-                    float f2 = (float) (color & 255) / 255.0F;
-                    try {
-                        if (state.getRenderType() == BlockRenderType.MODEL)
-                            for (Direction direction : Direction.values()) {
-                                renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
-                            }
-                    } catch (Exception e) {
-                        BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
-                    }
-
-                    matrix.pop();
-                }
-
-                matrix.pop();
-            });
-        }
-        else
-            renderTargets(context, sorter, partialTicks, evt);
+        renderTargets(context, sorter, partialTicks, evt);
 
         //ToDo the red render now works but shows over everything regardless of circumstance, uncomment to see what i mean
         //if (! player.isCreative())
@@ -393,54 +352,53 @@ public class CopyPasteRender extends BaseRenderer {
     }
 
     private void renderTargets(IBuildContext context, RenderSorter sorter, float partialTicks, RenderWorldLastEvent evt) {
-//        if( renderBuffer != null ) {
-////            renderBuffer.render(evt.getMatrixStack().getLast().getMatrix());
-////            System.out.println("Running cache");
-//            return;
-//        }
-//
-//        System.out.println("Creating cache");
-//        renderBuffer = MultiVBORenderer.of((buffer) -> {
-//            System.out.println("Building again");
-//            Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
-//
-//            IVertexBuilder builder = buffer.getBuffer(MyRenderType.RenderBlock);
-//            BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
-//
-//            MatrixStack matrix = evt.getMatrixStack();
-//            matrix.push();
-//            matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
-//
-//            for (PlacementTarget target : sorter.getSortedTargets()) {
-//                BlockPos targetPos = target.getPos();
-//                BlockState state = context.getWorld().getBlockState(target.getPos());
-//
-//                matrix.push();
-//                matrix.translate(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-//
-//                IBakedModel ibakedmodel = dispatcher.getModelForState(state);
-//                BlockColors blockColors = Minecraft.getInstance().getBlockColors();
-//                int color = blockColors.getColor(state, context.getWorld(), targetPos, 0);
-//
-//                float f = (float) (color >> 16 & 255) / 255.0F;
-//                float f1 = (float) (color >> 8 & 255) / 255.0F;
-//                float f2 = (float) (color & 255) / 255.0F;
-//                try {
-//                    if (state.getRenderType() == BlockRenderType.MODEL)
-//                        for (Direction direction : Direction.values()) {
-//                            renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
-//                        }
-//                } catch (Exception e) {
-//                    BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
-//                }
-//
-//                matrix.pop();
-//            }
-//
-//            matrix.pop();
-//        });
+        tickTrack ++;
+        if( renderBuffer != null && tickTrack < 100 ) {
+            renderBuffer.render(evt.getMatrixStack().getLast().getMatrix());
+            return;
+        }
 
-        renderBuffer.render(evt.getMatrixStack().getLast().getMatrix());
+        tickTrack = 0;
+        System.out.println("Creating cache");
+        renderBuffer = MultiVBORenderer.of((buffer) -> {
+            System.out.println("Building again");
+            Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+
+            IVertexBuilder builder = buffer.getBuffer(MyRenderType.RenderBlock);
+            BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
+
+            MatrixStack matrix = evt.getMatrixStack();
+            matrix.push();
+            matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
+
+            for (PlacementTarget target : sorter.getSortedTargets()) {
+                BlockPos targetPos = target.getPos();
+                BlockState state = context.getWorld().getBlockState(target.getPos());
+
+                matrix.push();
+                matrix.translate(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+
+                IBakedModel ibakedmodel = dispatcher.getModelForState(state);
+                BlockColors blockColors = Minecraft.getInstance().getBlockColors();
+                int color = blockColors.getColor(state, context.getWorld(), targetPos, 0);
+
+                float f = (float) (color >> 16 & 255) / 255.0F;
+                float f1 = (float) (color >> 8 & 255) / 255.0F;
+                float f2 = (float) (color & 255) / 255.0F;
+                try {
+                    if (state.getRenderType() == BlockRenderType.MODEL)
+                        for (Direction direction : Direction.values()) {
+                            renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                        }
+                } catch (Exception e) {
+                    BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
+                }
+
+                matrix.pop();
+            }
+
+            matrix.pop();
+        });
     }
 
     public static class MultiVBORenderer implements Closeable
@@ -474,13 +432,12 @@ public class CopyPasteRender extends BaseRenderer {
             return new MultiVBORenderer(buffers);
         }
 
-        private final Map<RenderType, VertexBuffer> buffers;
+        private final ImmutableMap<RenderType, VertexBuffer> buffers;
 
-        public MultiVBORenderer(Map<RenderType, VertexBuffer> buffers)
+        protected MultiVBORenderer(Map<RenderType, VertexBuffer> buffers)
         {
-            this.buffers = buffers;
+            this.buffers = ImmutableMap.copyOf(buffers);
         }
-
         public void render(Matrix4f matrix)
         {
             buffers.forEach((rt, vbo) -> {
