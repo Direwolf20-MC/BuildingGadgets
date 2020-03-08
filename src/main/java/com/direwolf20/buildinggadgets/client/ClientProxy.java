@@ -51,6 +51,7 @@ public class ClientProxy {
 
         // @michaelhillcox: I have questions on why this is here
         Registries.clientSetup();
+        RenderTypeLookup.setRenderLayer(OurBlocks.constructionBlock, (RenderType) -> true);
     }
 
     private static void bakeModels(ModelBakeEvent event) {

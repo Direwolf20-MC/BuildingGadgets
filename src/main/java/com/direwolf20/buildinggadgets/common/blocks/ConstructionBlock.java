@@ -99,13 +99,6 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return BlockRenderType.MODEL;
     }
 
-// 1.14 code
-//    @Override
-//    public boolean canRenderInLayer(BlockState state, BlockRenderLayer layer) {
-//        return true; // delegated to FacadeBakedModel#getQuads
-//    }
-//
-
     @Override
     public int getOpacity(BlockState state, IBlockReader worldIn, BlockPos pos) {
         Boolean bright = state.get(ConstructionBlock.BRIGHT);
