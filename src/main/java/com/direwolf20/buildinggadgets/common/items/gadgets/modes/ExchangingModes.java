@@ -29,8 +29,9 @@ public enum ExchangingModes {
     }
 
     public String getIcon() {
-        return "textures/gui/mode/" + name;
+        return "textures/gui/mode/" + name + ".png";
     }
+
     public static ExchangingModes getFromName(String name) {
         return Arrays.stream(ExchangingModes.values())
                 .filter(e -> e.toString().equals(name))
