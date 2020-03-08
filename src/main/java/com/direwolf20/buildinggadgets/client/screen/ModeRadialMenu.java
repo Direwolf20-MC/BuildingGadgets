@@ -36,6 +36,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.fml.ForgeI18n;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -360,11 +361,11 @@ public class ModeRadialMenu extends Screen {
 
             String name;
             if (tool.getItem() instanceof GadgetBuilding)
-                name = BuildingModes.values()[i].toString();
+                name = ForgeI18n.getPattern(BuildingModes.values()[i].getTranslationKey());
             else if (tool.getItem() instanceof GadgetExchanger)
-                name = ExchangingModes.values()[i].toString();
+                name = ForgeI18n.getPattern(ExchangingModes.values()[i].getTranslationKey());
             else
-                name = GadgetCopyPaste.ToolMode.values()[i].format();
+                name = GadgetCopyPaste.ToolMode.values()[i].getTranslation().format();
 
             int xsp = xp - 4;
             int ysp = yp;

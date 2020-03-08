@@ -32,7 +32,7 @@ public enum BuildingModes {
     }
 
     public String getIcon() {
-        return "textures/gui/mode/" + name;
+        return "textures/gui/mode/" + name + ".png";
     }
 
     public static BuildingModes getFromName(String name) {

@@ -206,7 +206,7 @@ public class GadgetBuilding extends ModeGadget {
                     sideHit
             );
         } else { //If we do have an anchor, erase it (Even if the build fails)
-            setAnchor(stack, new ArrayList<BlockPos>());
+            setAnchor(stack, new ArrayList<>());
         }
 
         Undo.Builder builder = Undo.builder();

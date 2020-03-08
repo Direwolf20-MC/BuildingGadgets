@@ -100,17 +100,13 @@ public class GadgetCopyPaste extends AbstractGadget {
             return id;
         }
 
-        public ToolMode next() {
-            return VALUES[(this.ordinal() + 1) % VALUES.length];
-        }
-
-        public String format(Object... args) {
-            return translation.format(args);
-        }
-
         @Nullable
         public static ToolMode ofId(byte id) {
             return BY_ID.get(id);
+        }
+
+        public ITranslationProvider getTranslation() {
+            return translation;
         }
     }
     private static final Joiner CHUNK_JOINER = Joiner.on("; ");
@@ -291,7 +287,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         super.addInformation(stack, world, tooltip, flag);
         addEnergyInformation(tooltip, stack);
 
-        tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack).format()).setStyle(Styles.AQUA));
+        tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack).translation.format()).setStyle(Styles.AQUA));
         addInformationRayTraceFluid(tooltip, stack);
         GadgetUtils.addTooltipNameAndAuthor(stack, world, tooltip);
     }
