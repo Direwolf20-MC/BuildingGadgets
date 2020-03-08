@@ -23,17 +23,14 @@ import com.direwolf20.buildinggadgets.common.util.tools.SimulateEnergyStorage;
 import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Maps;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.entity.player.PlayerEntity;
@@ -50,15 +47,17 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.energy.CapabilityEnergy;
 
 import java.io.Closeable;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 
 public class CopyPasteRender extends BaseRenderer {
-    private VBORenderer renderBuffer = new VBORenderer(new VertexBuffer(DefaultVertexFormats.BLOCK), 7);
+    private MultiVBORenderer renderBuffer;
     private int tickTrack = 0;
 
     private final Cache<BlockData, Boolean> erroredCache = CacheBuilder
@@ -168,19 +167,15 @@ public class CopyPasteRender extends BaseRenderer {
         //GlStateManager.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
         //GlStateManager.translatef(0.0005f, 0.0005f, - 0.0005f);
 
-        tickTrack ++;
-        if( tickTrack <= 100 ) {
+        if( renderBuffer != null ) {
             renderBuffer.render(evt.getMatrixStack().getLast().getMatrix());
+            System.out.println("Rendering Cache");
             return;
         }
 
-        renderBuffer = VBORenderer.of(7, DefaultVertexFormats.BLOCK, (bufferBuilder, vertexFormat) -> {
-            tickTrack = 0;
-            IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
-            IVertexBuilder builder;
-
+        renderBuffer = MultiVBORenderer.of((buffer) -> {
             Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
-            builder = buffer.getBuffer(MyRenderType.RenderBlock);
+            IVertexBuilder builder = buffer.getBuffer(MyRenderType.RenderBlock);
             BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
             MatrixStack matrix = evt.getMatrixStack();
             matrix.push();
@@ -208,30 +203,81 @@ public class CopyPasteRender extends BaseRenderer {
                     BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
                 }
 /*            try {
-                if (te != null && ! erroredCache.get(target.getData(), () -> false)) {
-                    TileEntityRenderer<TileEntity> renderer = teDispatcher.getRenderer(te);
-                    if (renderer != null) {
-                        if (te.hasFastRenderer()) {
-                            // todo: fix
+            if (te != null && ! erroredCache.get(target.getData(), () -> false)) {
+                TileEntityRenderer<TileEntity> renderer = teDispatcher.getRenderer(te);
+                if (renderer != null) {
+                    if (te.hasFastRenderer()) {
+                        // todo: fix
 //                            renderer.render(te, 0, 0, 0, partialTicks, - 1, builder);
-                        } else {
-                            // todo: fix
+                    } else {
+                        // todo: fix
 //                            renderer.render(te, 0, 0, 0, partialTicks, - 1);
-                            bindBlocks(); //some blocks (all vanilla tiles I tested) rebind the atlas!
-                        }
+                        bindBlocks(); //some blocks (all vanilla tiles I tested) rebind the atlas!
                     }
                 }
-            } catch (Exception e) {
-                erroredCache.put(target.getData(), true);
-            }*/
+            }
+        } catch (Exception e) {
+            erroredCache.put(target.getData(), true);
+        }*/
                 matrix.pop();
             }
             matrix.pop();
-
-            bufferBuilder.
-            bufferBuilder = (BufferBuilder) builder;
-            buffer.finish();
+//            builder.endVertex();
+//            buffer.finish();
         });
+
+//        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+//        IVertexBuilder builder;
+
+//        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+//        builder = buffer.getBuffer(MyRenderType.RenderBlock);
+//        BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
+//        MatrixStack matrix = evt.getMatrixStack();
+//        matrix.push();
+//        matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
+//        Random rand = new Random();
+//
+//        for (PlacementTarget target : sorter.getSortedTargets()) {
+//            BlockPos targetPos = target.getPos();
+//            BlockState state = context.getWorld().getBlockState(target.getPos());
+//            TileEntity te = context.getWorld().getTileEntity(target.getPos());
+//            matrix.push();//Push matrix again in order to apply these settings individually
+//            matrix.translate(targetPos.getX(), targetPos.getY(), targetPos.getZ());//The render starts at the player, so we subtract the player coords and move the render to 0,0,0
+//            IBakedModel ibakedmodel = dispatcher.getModelForState(state);
+//            BlockColors blockColors = Minecraft.getInstance().getBlockColors();
+//            int color = blockColors.getColor(state, context.getWorld(), targetPos, 0);
+//            float f = (float) (color >> 16 & 255) / 255.0F;
+//            float f1 = (float) (color >> 8 & 255) / 255.0F;
+//            float f2 = (float) (color & 255) / 255.0F;
+//            try {
+//                if (state.getRenderType() == BlockRenderType.MODEL)
+//                    for (Direction direction : Direction.values()) {
+//                        renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+//                    }
+//            } catch (Exception e) {
+//                BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
+//            }
+///*            try {
+//            if (te != null && ! erroredCache.get(target.getData(), () -> false)) {
+//                TileEntityRenderer<TileEntity> renderer = teDispatcher.getRenderer(te);
+//                if (renderer != null) {
+//                    if (te.hasFastRenderer()) {
+//                        // todo: fix
+////                            renderer.render(te, 0, 0, 0, partialTicks, - 1, builder);
+//                    } else {
+//                        // todo: fix
+////                            renderer.render(te, 0, 0, 0, partialTicks, - 1);
+//                        bindBlocks(); //some blocks (all vanilla tiles I tested) rebind the atlas!
+//                    }
+//                }
+//            }
+//        } catch (Exception e) {
+//            erroredCache.put(target.getData(), true);
+//        }*/
+//            matrix.pop();
+//        }
+//        matrix.pop();
+//        buffer.finish();
     }
 
     private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter, RenderWorldLastEvent evt) {
@@ -314,41 +360,55 @@ public class CopyPasteRender extends BaseRenderer {
         builder.pos(matrix, endX, startY, startZ).color(G, G, G, 0.0F).endVertex();
     }
 
-    public static class VBORenderer implements Closeable
+    public static class MultiVBORenderer implements Closeable
     {
         private static final int BUFFER_SIZE = 2*1024*1024;
-        private static final BufferBuilder BUILDER = new BufferBuilder(BUFFER_SIZE);
 
-        public static VBORenderer of(int glMode, VertexFormat fmt, BiConsumer<BufferBuilder, VertexFormat> vertexProducer)
+        public static MultiVBORenderer of(Consumer<IRenderTypeBuffer> vertexProducer)
         {
-            VertexBuffer vbo = new VertexBuffer(fmt);
-            BUILDER.begin(glMode, fmt);
-            vertexProducer.accept(BUILDER, fmt);
-            BUILDER.reset();
-            // 1.14: vbo.bufferData(BUILDER.getByteBuffer());
-            vbo.upload(BUILDER);
-            return new VBORenderer(vbo, glMode);
+            final Map<RenderType, BufferBuilder> builders = Maps.newHashMap();
+
+            vertexProducer.accept(rt -> builders.computeIfAbsent(rt, (_rt) -> {
+                BufferBuilder builder = new BufferBuilder(BUFFER_SIZE);
+                builder.begin(_rt.getDrawMode(), _rt.getVertexFormat());
+                return builder;
+            }));
+
+            Map<RenderType, VertexBuffer> buffers = Maps.transformEntries(builders, (rt, builder) -> {
+                Objects.requireNonNull(rt);
+                Objects.requireNonNull(builder);
+
+                builder.finishDrawing();
+
+                VertexFormat fmt = rt.getVertexFormat();
+                VertexBuffer vbo = new VertexBuffer(fmt);
+
+                vbo.upload(builder);
+
+                return vbo;
+            });
+            return new MultiVBORenderer(buffers);
         }
 
-        final VertexBuffer vbo;
-        final int glMode;
+        private final Map<RenderType, VertexBuffer> buffers;
 
-        public VBORenderer(VertexBuffer vbo, int glMode)
+        public MultiVBORenderer(Map<RenderType, VertexBuffer> buffers)
         {
-            this.vbo = vbo;
-            this.glMode = glMode;
+            this.buffers = buffers;
         }
 
         public void render(Matrix4f matrix)
         {
-            // 1.14: vbo.drawArrays(glMode);
-            vbo.draw(matrix, glMode);
+            buffers.forEach((rt, vbo) -> {
+                rt.setupRenderState();
+                vbo.draw(matrix, rt.getDrawMode());
+                rt.clearRenderState();
+            });
         }
 
         public void close()
         {
-            //1.14: vbo.deleteGlBuffers();
-            vbo.close();
+            buffers.values().forEach(VertexBuffer::close);
         }
     }
 }
