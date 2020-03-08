@@ -116,13 +116,13 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         this.children.add(scrollingList);
 
         int buttonY = getWindowBottomY() - (ScrollingMaterialList.BOTTOM / 2 + BUTTON_HEIGHT / 2);
-        this.buttonClose = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_CLOSE.format(), b -> Minecraft.getInstance().player.closeScreen());
+        this.buttonClose = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_CLOSE.format(), b -> getMinecraft().player.closeScreen());
         this.buttonSortingModes = new Button(0, buttonY, 0, BUTTON_HEIGHT, scrollingList.getSortingMode().getLocalizedName(), (button) -> {
             scrollingList.setSortingMode(scrollingList.getSortingMode().next());
             buttonSortingModes.setMessage(scrollingList.getSortingMode().getLocalizedName());
         });
         this.buttonCopyList = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_COPY.format(), (button) -> {
-            getMinecraft().keyboardListener.setClipboardString(stringify(Screen.hasControlDown()));
+            getMinecraft().keyboardListener.setClipboardString(evaluateTemplateHeader().toJson(false, hasControlDown()));
             getMinecraft().player.sendStatusMessage(new TranslationTextComponent(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
         });
 
@@ -134,26 +134,14 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         this.calculateButtonsWidthAndX();
     }
 
-    private String stringify(boolean detailed) {
-        if (detailed)
-            return stringifyDetailed();
-        return stringifySimple();
-    }
-
-    private String stringifyDetailed() {
-        return evaluateTemplateHeader().toJson(false, true);
-    }
-
-    private String stringifySimple() {
-        return evaluateTemplateHeader().toJson(false, false);
-    }
-
     public TemplateHeader evaluateTemplateHeader() {
         Template template = getTemplateCapability();
+
         IBuildContext context = SimpleBuildContext.builder()
                 .buildingPlayer(getMinecraft().player)
                 .usedStack(getTemplateItem())
                 .build(getMinecraft().world);
+
         return template.getHeaderAndForceMaterials(context);
     }
 
@@ -163,7 +151,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
 
     @Override
     public void render(int mouseX, int mouseY, float particleTicks) {
-        Minecraft.getInstance().getTextureManager().bindTexture(BACKGROUND_TEXTURE);
+        getMinecraft().getTextureManager().bindTexture(BACKGROUND_TEXTURE);
         GuiUtils.drawTexturedModalRect(backgroundX, backgroundY, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, 0F);
 
         scrollingList.render(mouseX, mouseY, particleTicks);
@@ -225,7 +213,10 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
     }
 
     public Template getTemplateCapability() {
-        LazyOptional<ITemplateProvider> providerCap = Minecraft.getInstance().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);
+        if( getMinecraft().world == null || getMinecraft().player == null )
+            return null;
+
+        LazyOptional<ITemplateProvider> providerCap = getMinecraft().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);
         if (providerCap.isPresent()) {
             LazyOptional<ITemplateKey> keyCap = item.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY);
             ITemplateProvider provider = providerCap.orElseThrow(RuntimeException::new);
@@ -235,11 +226,11 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
                 return provider.getTemplateForKey(key);
             }
             BuildingGadgets.LOG.warn("Item used for material list does not have an ITemplateKey capability!");
-            Minecraft.getInstance().player.closeScreen();
+            getMinecraft().player.closeScreen();
             return null;
         }
         BuildingGadgets.LOG.warn("Client world used for material list does not have an ITemplateProvider capability!");
-        Minecraft.getInstance().player.closeScreen();
+        getMinecraft().player.closeScreen();
         return null;
     }
 
@@ -265,11 +256,18 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
     private void evaluateTitle() {
         String name = getHeader().getName();
         String author = getHeader().getAuthor();
+
         this.title = name == null && author == null ? MaterialListTranslation.TITLE_EMPTY.format()
                 : name == null ? MaterialListTranslation.TITLE_AUTHOR_ONLY.format(author)
                 : author == null ? MaterialListTranslation.TITLE_NAME_ONLY.format(name)
                 : MaterialListTranslation.TITLE.format(name, author);
+
         this.titleTop = getYForAlignedCenter(backgroundY, getWindowTopY() + ScrollingMaterialList.TOP, font.FONT_HEIGHT);
         this.titleLeft = getXForAlignedCenter(backgroundX, getWindowRightX(), font.getStringWidth(title));
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
     }
 }

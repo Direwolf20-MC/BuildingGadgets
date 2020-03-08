@@ -1,11 +1,10 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.client.screen.materiallist.MaterialListGUI;
-import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.items.TemplateItem;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.entity.player.PlayerEntity;
@@ -19,17 +18,7 @@ public enum GuiMod {
     COPY(GadgetCopyPaste::getGadget, stack -> () -> new CopyGUI(stack)),
     PASTE(GadgetCopyPaste::getGadget, stack -> () -> new PasteGUI(stack)),
     DESTRUCTION(GadgetDestruction::getGadget, stack -> () -> new DestructionGUI(stack)),
-    MATERIAL_LIST(player -> {
-        ItemStack mainhand = player.getHeldItemMainhand();
-        if (mainhand.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
-            return mainhand;
-
-        ItemStack offhand = player.getHeldItemOffhand();
-        if (offhand.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
-            return offhand;
-
-        return ItemStack.EMPTY;
-    }, stack -> () -> new MaterialListGUI(stack));
+    MATERIAL_LIST(TemplateItem::getHeldCapItem, stack -> () -> new MaterialListGUI(stack));
 
     private Function<PlayerEntity, ItemStack> stackReader;
     private Function<ItemStack, Supplier<? extends Screen>> clientScreenProvider;
