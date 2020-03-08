@@ -5,67 +5,63 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.common.building.placement.InvertedPlacementEvaluator;
+import com.direwolf20.buildinggadgets.common.building.placement.PlacementChecker;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper.RenderSorter;
+import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.tools.SimulateEnergyStorage;
 import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalListener;
-import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.energy.CapabilityEnergy;
 
-import javax.annotation.Nonnull;
-import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 
 public class CopyPasteRender extends BaseRenderer {
-//    private ChestRenderer chestRenderer;
-    private final Cache<RenderKey, RenderInfo> renderCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(1, TimeUnit.SECONDS)
-            .removalListener((RemovalListener<RenderKey, RenderInfo>) notification -> notification.getValue().onRemove())
-            .build();
+    private VertexBuffer buffer = new VertexBuffer(DefaultVertexFormats.BLOCK);
+    private int tickTrack = 0;
 
     private final Cache<BlockData, Boolean> erroredCache = CacheBuilder
             .newBuilder()
             .expireAfterAccess(1, TimeUnit.MINUTES)
             .build();
-
-    // 1.14
-//    public ChestRenderer getChestRenderer() {
-//        if (chestRenderer == null)
-//            chestRenderer = new ChestRenderer();
-//        return chestRenderer;
-//    }
 
     @Override
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
@@ -117,13 +113,13 @@ public class CopyPasteRender extends BaseRenderer {
             heldItem.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 UUID id = provider.getId(key);
                 GadgetCopyPaste.getActivePos(player, heldItem).ifPresent(startPos -> {
-                    this.render(evt, id, startPos, world, player, heldItem, provider.getTemplateForKey(key));
+//                    this.render(evt, id, startPos, world, player, heldItem, provider.getTemplateForKey(key));
                     //try {
                     //RenderInfo info = renderCache.get(new RenderKey(id, startPos), () -> {
                     // todo: fix - DireNote, What even is this
                     //int displayList = GLAllocation.generateDisplayLists(1);
                     //GlStateManager.newList(displayList, GL11.GL_COMPILE);
-//                    this.performRender(world, player, heldItem, startPos, provider.getTemplateForKey(key), partialTicks, evt);
+                    this.performRender(world, player, heldItem, startPos, provider.getTemplateForKey(key), evt.getPartialTicks(), evt);
                     //GlStateManager.endList();
                     //return new RenderInfo( 0 );//displayList);
                     //});
@@ -136,21 +132,8 @@ public class CopyPasteRender extends BaseRenderer {
         });
     }
 
-    private void render(RenderWorldLastEvent evt, UUID id, BlockPos startPos, World world, PlayerEntity player, ItemStack stack, Template template) {
-        try {
-            RenderInfo info = renderCache.get(new RenderKey(id, startPos), () -> {
-                RenderInfo cacheCreator = new RenderInfo();
-                cacheCreator.getBuffer().upload(this.performRender(world, player, stack, startPos, template, evt.getPartialTicks(), evt));
-                return cacheCreator;
-            });
 
-            info.render(evt.getMatrixStack());
-        } catch (UncheckedExecutionException | ExecutionException e) {
-            BuildingGadgets.LOG.error("Failed to create Render!", e);
-        }
-    }
-
-    private BufferBuilder performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, Template template, float partialTicks, RenderWorldLastEvent evt) {
+    private void performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, Template template, float partialTicks, RenderWorldLastEvent evt) {
         FakeDelegationWorld fakeWorld = new FakeDelegationWorld(world);
         IBuildContext context = SimpleBuildContext.builder()
                 .buildingPlayer(player)
@@ -165,7 +148,7 @@ public class CopyPasteRender extends BaseRenderer {
         }
         //Prepare the block rendering
         //BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-        return renderTargets(context, sorter, partialTicks, evt);
+        renderTargets(context, sorter, partialTicks, evt);
 
         //ToDo the red render now works but shows over everything regardless of circumstance, uncomment to see what i mean
         //if (! player.isCreative())
@@ -173,7 +156,7 @@ public class CopyPasteRender extends BaseRenderer {
         //GlStateManager.disableBlend();
     }
 
-    private BufferBuilder renderTargets(IBuildContext context, RenderSorter sorter, float partialTicks, RenderWorldLastEvent evt) {
+    private void renderTargets(IBuildContext context, RenderSorter sorter, float partialTicks, RenderWorldLastEvent evt) {
         //Enable Blending (So we can have transparent effect)
         //GlStateManager.enableBlend();
         //This blend function allows you to use a constant alpha, which is defined later
@@ -181,6 +164,14 @@ public class CopyPasteRender extends BaseRenderer {
         //GlStateManager.translate(-0.0005f, -0.0005f, 0.0005f);
         //GlStateManager.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
         //GlStateManager.translatef(0.0005f, 0.0005f, - 0.0005f);
+
+        tickTrack ++;
+        if( tickTrack <= 100 ) {
+            buffer.draw(evt.getMatrixStack().getLast().getMatrix(), 7);
+            return;
+        }
+
+        tickTrack = 0;
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         IVertexBuilder builder;
         Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
@@ -231,42 +222,42 @@ public class CopyPasteRender extends BaseRenderer {
             matrix.pop();
         }
         matrix.pop();
-        buffer.finish();
 
-        return (BufferBuilder) builder;
+        this.buffer.upload((BufferBuilder) builder);
+        buffer.finish();
     }
 
-//    private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter, RenderWorldLastEvent evt) {
-//        int energyCost = ((GadgetCopyPaste) stack.getItem()).getEnergyCost(stack);
-//        //wrap in a recording index, to prevent a single item of some type from allowing all of that kind.
-//        //it sadly makes it very inefficient - we should try to find a faster solution
-//        IItemIndex index = new RecordingItemIndex(InventoryHelper.index(stack, player));
-//        boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
-//        BlockItemUseContext useContext = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
-//        InvertedPlacementEvaluator evaluator = new InvertedPlacementEvaluator(
-//                sorter.getOrderedTargets(),
-//                new PlacementChecker(
-//                        stack.getCapability(CapabilityEnergy.ENERGY).map(SimulateEnergyStorage::new),
-//                        t -> energyCost,
-//                        index,
-//                        (c, t) -> overwrite ? player.world.getBlockState(t.getPos()).isReplaceable(useContext) : player.world.isAirBlock(t.getPos()),
-//                        false),
-//                view.getContext());
-//
-//        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
-//        IVertexBuilder builder;
-//        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
-//        builder = buffer.getBuffer(MyRenderType.MissingBlockOverlay);
-//        BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
-//        MatrixStack matrix = evt.getMatrixStack();
-//        matrix.push();
-//        matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
-//        for (PlacementTarget target : evaluator) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
-//            renderMissingBlock(matrix.getLast().getMatrix(), builder, target.getPos());
-//        }
-//        matrix.pop();
-//        buffer.finish();
-//    }
+    private void renderMissing(PlayerEntity player, ItemStack stack, IBuildView view, RenderSorter sorter, RenderWorldLastEvent evt) {
+        int energyCost = ((GadgetCopyPaste) stack.getItem()).getEnergyCost(stack);
+        //wrap in a recording index, to prevent a single item of some type from allowing all of that kind.
+        //it sadly makes it very inefficient - we should try to find a faster solution
+        IItemIndex index = new RecordingItemIndex(InventoryHelper.index(stack, player));
+        boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
+        BlockItemUseContext useContext = new BlockItemUseContext(new ItemUseContext(player, Hand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
+        InvertedPlacementEvaluator evaluator = new InvertedPlacementEvaluator(
+                sorter.getOrderedTargets(),
+                new PlacementChecker(
+                        stack.getCapability(CapabilityEnergy.ENERGY).map(SimulateEnergyStorage::new),
+                        t -> energyCost,
+                        index,
+                        (c, t) -> overwrite ? player.world.getBlockState(t.getPos()).isReplaceable(useContext) : player.world.isAirBlock(t.getPos()),
+                        false),
+                view.getContext());
+
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        IVertexBuilder builder;
+        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+        builder = buffer.getBuffer(MyRenderType.MissingBlockOverlay);
+        BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
+        MatrixStack matrix = evt.getMatrixStack();
+        matrix.push();
+        matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
+        for (PlacementTarget target : evaluator) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
+            renderMissingBlock(matrix.getLast().getMatrix(), builder, target.getPos());
+        }
+        matrix.pop();
+        buffer.finish();
+    }
 
     @Override
     public boolean isLinkable() {
@@ -314,75 +305,5 @@ public class CopyPasteRender extends BaseRenderer {
         builder.pos(matrix, endX, endY, startZ).color(G, G, G, R).endVertex();
         builder.pos(matrix, endX, startY, startZ).color(G, G, G, R).endVertex();
         builder.pos(matrix, endX, startY, startZ).color(G, G, G, 0.0F).endVertex();
-    }
-
-    /**
-     * We use both the id and the target pos as keys, so that it re-render's once the player has looks at a different Block.
-     * We cache the hashcode, as renders should be as fast as possible.
-     */
-    private static final class RenderKey {
-        @Nonnull
-        private final UUID id;
-        @Nonnull
-        private final BlockPos targetPos;
-        private int hash;
-
-        private RenderKey(UUID id, BlockPos targetPos) {
-            this.id = Objects.requireNonNull(id, "Cannot create RenderKey without ID!");
-            this.targetPos = Objects.requireNonNull(targetPos, "Cannot create RenderKey for " + id + " without target Pos!");
-            this.hash = 0;
-        }
-
-        @Nonnull
-        private UUID getId() {
-            return id;
-        }
-
-        @Nonnull
-        private BlockPos getTargetPos() {
-            return targetPos;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (! (o instanceof RenderKey)) return false;
-
-            RenderKey renderKey = (RenderKey) o;
-
-            if (! getId().equals(renderKey.getId())) return false;
-            return getTargetPos().equals(renderKey.getTargetPos());
-        }
-
-        @Override
-        public int hashCode() {
-            if (hash == 0) {//very unlikely that we hash to 0 - no need to add an evaluated boolean
-                hash = getId().hashCode();
-                hash = 31 * hash + getTargetPos().hashCode();
-                return hash;
-            }
-            return hash;
-        }
-    }
-
-
-    private static final class RenderInfo {
-        VertexBuffer buffer = new VertexBuffer(DefaultVertexFormats.BLOCK);
-        private RenderInfo() {
-            System.out.println("Cache created");
-        }
-
-        public VertexBuffer getBuffer() {
-            return buffer;
-        }
-
-        private void render(MatrixStack stack) {
-            buffer.draw(stack.getLast().getMatrix(), 7);
-        }
-
-        private void onRemove() {
-            System.out.println("Cache removed");
-            buffer.close();
-        }
     }
 }
