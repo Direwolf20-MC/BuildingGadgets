@@ -3,11 +3,11 @@
  * Psi is Open Source and distributed under the
  * Psi License: http://psi.vazkii.us/license.php
  */
-package com.direwolf20.buildinggadgets.client.gui;
+package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
-import com.direwolf20.buildinggadgets.client.gui.components.GuiIconActionable;
-import com.direwolf20.buildinggadgets.client.gui.components.GuiSliderInt;
+import com.direwolf20.buildinggadgets.client.screen.components.GuiIconActionable;
+import com.direwolf20.buildinggadgets.client.screen.components.GuiSliderInt;
 import com.direwolf20.buildinggadgets.common.building.modes.BuildingMode;
 import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.config.Config;

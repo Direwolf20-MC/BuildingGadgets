@@ -1,10 +1,7 @@
-package com.direwolf20.buildinggadgets.client.gui.components;
+package com.direwolf20.buildinggadgets.client.screen.components;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.StringTextComponent;
 
 import java.awt.*;
 

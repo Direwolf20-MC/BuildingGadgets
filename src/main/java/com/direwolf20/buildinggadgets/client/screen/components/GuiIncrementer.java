@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.gui.components;
+package com.direwolf20.buildinggadgets.client.screen.components;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;

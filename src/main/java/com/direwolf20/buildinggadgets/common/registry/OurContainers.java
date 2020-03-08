@@ -1,7 +1,8 @@
 package com.direwolf20.buildinggadgets.common.registry;
 
-import com.direwolf20.buildinggadgets.client.gui.blocks.ChargingStationGUI;
+import com.direwolf20.buildinggadgets.client.screen.blocks.ChargingStationGUI;
 //import com.direwolf20.buildinggadgets.client.gui.blocks.TemplateManagerGUI;
+import com.direwolf20.buildinggadgets.client.screen.blocks.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -29,7 +30,7 @@ public final class OurContainers {
     public static void registerContainers(RegistryEvent.Register<ContainerType<?>> event) {
         IForgeRegistry<ContainerType<?>> registry = event.getRegistry();
 
-//        registry.register(TEMPLATE_MANAGER_CONTAINER.setRegistryName(ContainerReference.TEMPLATE_MANAGER_CONTAINER_RL));
+        registry.register(TEMPLATE_MANAGER_CONTAINER.setRegistryName(ContainerReference.TEMPLATE_MANAGER_CONTAINER_RL));
         registry.register(CHARGING_STATION_CONTAINER.setRegistryName(ContainerReference.CHARGING_STATION_CONTAINER_RL));
     }
 
@@ -37,7 +38,7 @@ public final class OurContainers {
      * Called from some Client Dist runner in the main class
      */
     public static void registerContainerScreens() {
-//        ScreenManager.<TemplateManagerContainer, TemplateManagerGUI>registerFactory(TEMPLATE_MANAGER_CONTAINER, TemplateManagerGUI::new);
+        ScreenManager.<TemplateManagerContainer, TemplateManagerGUI>registerFactory(TEMPLATE_MANAGER_CONTAINER, TemplateManagerGUI::new);
         ScreenManager.<ChargingStationContainer, ChargingStationGUI>registerFactory(CHARGING_STATION_CONTAINER, ChargingStationGUI::new);
     }
 }

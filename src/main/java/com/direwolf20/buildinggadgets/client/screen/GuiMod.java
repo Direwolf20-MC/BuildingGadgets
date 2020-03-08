@@ -1,6 +1,6 @@
-package com.direwolf20.buildinggadgets.client.gui;
+package com.direwolf20.buildinggadgets.client.screen;
 
-import com.direwolf20.buildinggadgets.client.gui.materiallist.MaterialListGUI;
+import com.direwolf20.buildinggadgets.client.screen.materiallist.MaterialListGUI;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;

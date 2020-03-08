@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.gui.blocks;
+package com.direwolf20.buildinggadgets.client.screen.blocks;
 
 import com.direwolf20.buildinggadgets.common.containers.ChargingStationContainer;
 import com.direwolf20.buildinggadgets.common.tiles.ChargingStationTileEntity;

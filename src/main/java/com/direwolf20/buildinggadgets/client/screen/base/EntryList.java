@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.gui.base;
+package com.direwolf20.buildinggadgets.client.screen.base;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
@@ -8,6 +8,8 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.client.gui.ScrollPanel;
+import org.lwjgl.opengl.GL11;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -25,10 +27,13 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
     public void render(int mouseX, int mouseY, float partialTicks) {
         glEnable(GL_SCISSOR_TEST);
         double guiScaleFactor = Minecraft.getInstance().getMainWindow().getGuiScaleFactor();
-        glScissor((int) (getLeft() * guiScaleFactor),
-                (int) (Minecraft.getInstance().getMainWindow().getHeight() - (getBottom() * guiScaleFactor)),
-                (int) (width * guiScaleFactor),
-                (int) (height * guiScaleFactor));
+
+        GL11.glEnable(GL11.GL_SCISSOR_TEST);
+        GL11.glScissor((int)(getLeft()  * guiScaleFactor),
+                (int)(Minecraft.getInstance().getMainWindow().getFramebufferHeight() - (getBottom() * guiScaleFactor)),
+                (int)(width * guiScaleFactor),
+                (int)(height * guiScaleFactor));
+
         renderParts(mouseX, mouseY, partialTicks);
         glDisable(GL_SCISSOR_TEST);
     }
