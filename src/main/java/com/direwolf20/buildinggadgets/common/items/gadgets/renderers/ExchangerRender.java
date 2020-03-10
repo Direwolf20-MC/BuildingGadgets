@@ -16,7 +16,6 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
-import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -38,6 +37,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.List;
@@ -105,7 +105,7 @@ public class ExchangerRender extends BaseRenderer {
             MaterialList materials = data.getRequiredItems(buildContext, null, null);
             int hasEnergy = getEnergy(player, heldItem);
 
-            LazyOptional<IEnergyStorage> energy = CapabilityUtil.EnergyUtil.getCap(heldItem);
+            LazyOptional<IEnergyStorage> energy = heldItem.getCapability(CapabilityEnergy.ENERGY);
 
             //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
             getBuilderWorld().setWorldAndState(player.world, renderBlockState, coordinates);

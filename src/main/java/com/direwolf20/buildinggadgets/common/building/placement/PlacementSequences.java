@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.building.placement;
 
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.util.tools.MathUtils;
-import com.google.common.base.Preconditions;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.AxisDirection;
@@ -40,22 +39,6 @@ public final class PlacementSequences {
          */
         public static IPositionPlacementSequence clickedSide(BlockPos center, Direction side, int radius) {
             return create(center, side, radius, null, 0);
-        }
-
-        /**
-         * Creates a wall extending to some direction with the given position as its bottom.
-         *
-         * @param posHit    bottom of the wall
-         * @param extension top side (growing direction) of the wall
-         * @param flatSide  front face of the wall
-         * @param radius    radius of the wall.
-         * @param extra     amount of blocks to add beyond the radius
-         *
-         * @return {@link IPositionPlacementSequence}
-         */
-        public static IPositionPlacementSequence extendingFrom(BlockPos posHit, Direction extension, Direction flatSide, int radius, int extra) {
-            Preconditions.checkArgument(extension != flatSide, "Cannot have a wall extending to " + extension + " and flat at " + flatSide);
-            return create(posHit.offset(extension, radius + 1), flatSide, radius, extension, extra);
         }
 
         private static IPositionPlacementSequence create(BlockPos posHit, Direction side, int radius, @Nullable Direction extendingSide, int extendingSize) {

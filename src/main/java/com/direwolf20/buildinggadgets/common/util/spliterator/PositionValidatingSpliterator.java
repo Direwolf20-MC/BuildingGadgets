@@ -35,6 +35,7 @@ public final class PositionValidatingSpliterator extends DelegatingSpliterator<B
         Spliterator<BlockPos> split = getOther().trySplit();
         if (split != null)
             return new PositionValidatingSpliterator(split, predicate, dataExtractor);
+
         return null;
     }
 }

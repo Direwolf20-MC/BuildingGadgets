@@ -235,12 +235,12 @@ public class GadgetUtils {
 
     public static void setToolRange(ItemStack stack, int range) {
         //Store the tool's range in NBT as an Integer
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tagCompound = stack.getOrCreateTag();
         tagCompound.putInt("range", range);
     }
 
     public static int getToolRange(ItemStack stack) {
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tagCompound = stack.getOrCreateTag();
         return MathHelper.clamp(tagCompound.getInt("range"), 1, 15);
     }
 
@@ -258,7 +258,7 @@ public class GadgetUtils {
 
     private static void setToolBlock(ItemStack stack, @Nullable BlockData data) {
         //Store the selected block in the tool's NBT
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tagCompound = stack.getOrCreateTag();
         if (data == null)
             data = BlockData.AIR;
 
@@ -269,7 +269,7 @@ public class GadgetUtils {
 
     private static void setToolActualBlock(ItemStack stack, @Nullable BlockData data) {
         // Store the selected block actual state in the tool's NBT
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tagCompound = stack.getOrCreateTag();
         if (data == null)
             data = BlockData.AIR;
 
@@ -280,7 +280,7 @@ public class GadgetUtils {
 
     @Nonnull
     public static BlockData getToolBlock(ItemStack stack) {
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tagCompound = stack.getOrCreateTag();
         BlockData res = BlockData.tryDeserialize(tagCompound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE), true);
         if (res == null) {
             setToolActualBlock(stack, BlockData.AIR);
@@ -291,7 +291,7 @@ public class GadgetUtils {
 
     @Nonnull
     public static BlockData getToolActualBlock(ItemStack stack) {
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tagCompound = stack.getOrCreateTag();
         BlockData res = BlockData.tryDeserialize(tagCompound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL), true);
         if (res == null) {
             setToolActualBlock(stack, BlockData.AIR);
@@ -498,10 +498,10 @@ public class GadgetUtils {
 
     @Nullable
     public static BlockPos getPOSFromNBT(ItemStack stack, String tagName) {
-        CompoundNBT stackTag = NBTHelper.getOrNewTag(stack);
+        CompoundNBT stackTag = stack.getOrCreateTag();
         if (! stackTag.contains(tagName))
             return null;
-        CompoundNBT posTag = NBTHelper.getOrNewTag(stack).getCompound(tagName);
+        CompoundNBT posTag = stack.getOrCreateTag().getCompound(tagName);
         if (posTag.isEmpty())
             return null;
         return NBTUtil.readBlockPos(posTag);

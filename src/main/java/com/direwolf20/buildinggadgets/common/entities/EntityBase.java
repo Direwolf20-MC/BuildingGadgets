@@ -14,17 +14,11 @@ public abstract class EntityBase extends Entity {
 
     public EntityBase(EntityType<?> entityType, World world) {
         super(entityType, world);
-//  fixme: Removed as of 1.14
-//        getSize(0.1F, 0.1F);
     }
 
     protected abstract int getMaxLife();
 
     protected abstract void onSetDespawning();
-
-    protected int getTicksExisted() {
-        return ticksExisted;
-    }
 
     @Override
     public void baseTick() {

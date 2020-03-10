@@ -28,7 +28,7 @@ import java.util.function.ToIntFunction;
 
 /**
  * This class performs all Placement checks required for the Copy-Paste-Gadget. Aka it tests for availability of energy, items and free placement-space.
- * You can extract information about whether the tests succed, paste was used etc. from the CheckResult.
+ * You can extract information about whether the tests succeed, paste was used etc. from the CheckResult.
  */
 public final class PlacementChecker {
     private final LazyOptional<IEnergyStorage> energyCap;
@@ -50,7 +50,7 @@ public final class PlacementChecker {
      */
     public CheckResult checkPositionWithResult(IBuildContext context, PlacementTarget target, boolean giveBackItems) {
         if (target.getPos().getY() > context.getWorld().getMaxHeight() || target.getPos().getY() < 0 || ! placeCheck.test(context, target))
-            return new CheckResult(MatchResult.failure(), ImmutableMultiset.of(), - 1, false, false);
+            return new CheckResult(MatchResult.failure(), ImmutableMultiset.of(), false, false);
         int energy = energyFun.applyAsInt(target);
         Multiset<IUniqueObject<?>> insertedItems = ImmutableMultiset.of();
         boolean isCreative = context.getBuildingPlayer() != null && context.getBuildingPlayer().isCreative();
@@ -58,7 +58,7 @@ public final class PlacementChecker {
         // We're using the IPrivateEnergy interface to get around the simulated power class
         IPrivateEnergy storage = (IPrivateEnergy) energyCap.orElseThrow(CapabilityNotPresentException::new);
         if (! isCreative && storage.extractPower(energy, true) != energy)
-            return new CheckResult(MatchResult.failure(), insertedItems, energy, false, false);
+            return new CheckResult(MatchResult.failure(), insertedItems, false, false);
 
         RayTraceResult targetRayTrace = null;
         if (context.getBuildingPlayer() != null) {
@@ -71,20 +71,20 @@ public final class PlacementChecker {
         if (! match.isSuccess()) {
             match = index.tryMatch(InventoryHelper.PASTE_LIST);
             if (! match.isSuccess())
-                return new CheckResult(match, insertedItems, energy, false, false);
+                return new CheckResult(match, insertedItems, false, false);
             usePaste = true;
         }
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(context.getWorld(), target.getPos());
         boolean isAir = blockSnapshot.getCurrentBlock().isAir(context.getWorld(), target.getPos());
         if (firePlaceEvents && ForgeEventFactory.onBlockPlace(context.getBuildingPlayer(), blockSnapshot, Direction.UP))
-            return new CheckResult(match, insertedItems, energy, false, usePaste);
+            return new CheckResult(match, insertedItems, false, usePaste);
         if (! isAir) {
             if (firePlaceEvents) {
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(context.getWorld().getWorld(),
                         target.getPos(), blockSnapshot.getCurrentBlock(),
                         context.getBuildingPlayer());
                 if (MinecraftForge.EVENT_BUS.post(e))
-                    return new CheckResult(match, insertedItems, energy, false, usePaste);
+                    return new CheckResult(match, insertedItems, false, usePaste);
             }
             if (giveBackItems) {
                 insertedItems = TileSupport.createTileData(context.getWorld().getTileEntity(target.getPos()))
@@ -96,24 +96,18 @@ public final class PlacementChecker {
         if (! isCreative)
             success = storage.extractPower(energy, false) == energy;
         success = success && index.applyMatch(match);
-        return new CheckResult(match, insertedItems, energy, success, usePaste);
-    }
-
-    public boolean checkPosition(IBuildContext context, PlacementTarget target, boolean giveBackItems) {
-        return checkPositionWithResult(context, target, giveBackItems).isSuccess();
+        return new CheckResult(match, insertedItems, success, usePaste);
     }
 
     public static final class CheckResult {
         private final MatchResult match;
         private final Multiset<IUniqueObject<?>> insertedItems;
-        private final int usedEnergy;
         private final boolean success;
         private final boolean usingPaste;
 
-        private CheckResult(MatchResult match, Multiset<IUniqueObject<?>> insertedItems, int usedEnergy, boolean success, boolean usingPaste) {
+        private CheckResult(MatchResult match, Multiset<IUniqueObject<?>> insertedItems, boolean success, boolean usingPaste) {
             this.match = match;
             this.insertedItems = insertedItems;
-            this.usedEnergy = usedEnergy;
             this.success = success;
             this.usingPaste = usingPaste;
         }
@@ -124,10 +118,6 @@ public final class PlacementChecker {
 
         public MatchResult getMatch() {
             return match;
-        }
-
-        public int getUsedEnergy() {
-            return usedEnergy;
         }
 
         public boolean isSuccess() {

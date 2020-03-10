@@ -25,6 +25,7 @@ import static com.direwolf20.buildinggadgets.client.screen.materiallist.Material
 import static com.direwolf20.buildinggadgets.client.screen.materiallist.ScrollingMaterialList.Entry;
 import static org.lwjgl.opengl.GL11.*;
 
+// Todo change to AbstractList as it's an easy fix compared to duping the class
 class ScrollingMaterialList extends EntryList<Entry> {
     private static final int UPDATE_MILLIS = 1000;
     static final int TOP = 16;
@@ -42,30 +43,37 @@ class ScrollingMaterialList extends EntryList<Entry> {
     private Iterator<ImmutableMultiset<IUniqueObject<?>>> multisetIterator;
 
     public ScrollingMaterialList(MaterialListGUI gui) {
-        super(gui.getWindowLeftX(),
-                gui.getWindowTopY() + TOP,
-                gui.getWindowWidth(),
-                gui.getWindowHeight() - TOP - BOTTOM,
-                ENTRY_HEIGHT);
+        super(gui.getWindowLeftX(), gui.getWindowTopY() + TOP, gui.getWindowWidth(), gui.getWindowHeight() - TOP - BOTTOM, ENTRY_HEIGHT);
+
         this.gui = gui;
         this.setSortingMode(SortingModes.NAME);
+
         updateEntries();
     }
 
     private void updateEntries() {
         this.lastUpdate = System.currentTimeMillis();
         this.clearEntries();
+
         if (multisetIterator == null || !multisetIterator.hasNext()) {
             MaterialList list = gui.getHeader().getRequiredItems();
             multisetIterator = list != null ? list.iterator() : Iterators.singletonIterator(ImmutableMultiset.of());
         }
+
         PlayerEntity player = Minecraft.getInstance().player;
+
+        // Could likely just assert
+        if( player == null )
+            return;
+
         IItemIndex index = InventoryHelper.index(gui.getTemplateItem(), player);
         MatchResult result = index.tryMatch(multisetIterator.next());
+
         for (Multiset.Entry<IUniqueObject<?>> entry : result.getChosenOption().entrySet()) {
             IUniqueObject<?> item = entry.getElement();
             addEntry(new Entry(this, item, entry.getCount(), result.getFoundItems().count(entry.getElement())));
         }
+
         sort();
     }
 
@@ -77,7 +85,9 @@ class ScrollingMaterialList extends EntryList<Entry> {
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_E) {
-            Minecraft.getInstance().player.closeScreen();
+            assert minecraft.player != null;
+
+            minecraft.player.closeScreen();
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -87,6 +97,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
     public void render(int mouseX, int mouseY, float partialTicks) {
         if (lastUpdate + UPDATE_MILLIS < System.currentTimeMillis())
             updateEntries();
+
         super.render(mouseX, mouseY, partialTicks);
     }
 
@@ -115,6 +126,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
 
             this.stack = item.createStack();
             this.itemName = stack.getDisplayName().getString();
+
             // Use this.available since the parameter is not clamped
             this.amount = this.available + "/" + required;
             this.widthItemName = Minecraft.getInstance().fontRenderer.getStringWidth(itemName);
@@ -155,11 +167,13 @@ class ScrollingMaterialList extends EntryList<Entry> {
                 RenderSystem.disableTexture();
                 RenderSystem.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 RenderSystem.color4f(255, 255, 255, 34);
+
                 glLineWidth(1);
                 glBegin(GL_LINES);
                 glVertex3f(lineXStart, lineY, 0);
                 glVertex3f(lineXEnd, lineY, 0);
                 glEnd();
+
                 RenderSystem.enableTexture();
             }
         }

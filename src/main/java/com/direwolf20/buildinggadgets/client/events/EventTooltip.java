@@ -47,6 +47,7 @@ public class EventTooltip {
             .<Multiset.Entry<IUniqueObject<?>>, Integer>comparing(Entry::getCount)
             .reversed()
             .thenComparing(e -> e.getElement().getObjectRegistryName());
+
     private static final int STACKS_PER_LINE = 8;
     private static RemoteInventoryCache cache = new RemoteInventoryCache(true);
 
@@ -57,20 +58,24 @@ public class EventTooltip {
     public static void addTemplatePadding(ItemStack stack, List<ITextComponent> tooltip) {
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
         Minecraft mc = Minecraft.getInstance();
-        if (mc.world == null) //populateSearchTreeManager...
+        if (mc.world == null || mc.player == null) //populateSearchTreeManager...
             return;
+
         mc.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(templateKey -> {
                 Template template = provider.getTemplateForKey(templateKey);
                 IItemIndex index = InventoryHelper.index(stack, mc.player);
+
                 IBuildContext buildContext = SimpleBuildContext.builder()
                         .usedStack(stack)
                         .buildingPlayer(mc.player)
                         .build(mc.world);
+
                 TemplateHeader header = template.getHeaderAndForceMaterials(buildContext);
                 MaterialList list = header.getRequiredItems();
                 if (list == null)
                     list = MaterialList.empty();
+
                 MatchResult match = index.tryMatch(list);
                 int count = match.isSuccess() ? match.getChosenOption().entrySet().size() : match.getChosenOption().entrySet().size() + 1;
                 if (count > 0 && Screen.hasShiftDown()) {
@@ -91,9 +96,14 @@ public class EventTooltip {
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
         if (!Screen.hasShiftDown())
             return;
+
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
         Minecraft mc = Minecraft.getInstance();
+
+        if( mc.world == null || mc.player == null )
+            return;
+
         mc.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(templateKey -> {
                 Template template = provider.getTemplateForKey(templateKey);

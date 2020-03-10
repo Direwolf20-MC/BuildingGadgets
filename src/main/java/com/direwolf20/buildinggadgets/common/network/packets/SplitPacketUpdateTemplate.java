@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
-import com.direwolf20.buildinggadgets.common.template.SimpleTemplateKey;
+import com.direwolf20.buildinggadgets.common.template.TemplateKey;
 import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.template.TemplateIO;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadException;
@@ -49,9 +49,9 @@ public final class SplitPacketUpdateTemplate extends UUIDPacket {
     public void handle(Supplier<Context> contextSupplier) {
         contextSupplier.get().enqueueWork(() -> {
             if (contextSupplier.get().getDirection().getReceptionSide() == LogicalSide.CLIENT)
-                ClientProxy.CACHE_TEMPLATE_PROVIDER.setTemplate(new SimpleTemplateKey(getId()), template);
+                ClientProxy.CACHE_TEMPLATE_PROVIDER.setTemplate(new TemplateKey(getId()), template);
             else
-                SaveManager.INSTANCE.getTemplateProvider().setTemplate(new SimpleTemplateKey(getId()), template);
+                SaveManager.INSTANCE.getTemplateProvider().setTemplate(new TemplateKey(getId()), template);
         });
     }
 }

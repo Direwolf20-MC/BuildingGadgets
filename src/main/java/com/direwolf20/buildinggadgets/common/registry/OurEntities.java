@@ -43,12 +43,4 @@ private OurEntities() {}
     public static void registerModels(ModelRegistryEvent evt) {
         RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.TYPE, ConstructionBlockEntityRender::new);
     }
-
-//    /**
-//     * Called from the runWhenOn(Dist.CLIENT...) method somewhere else.
-//     * This is a client side only render.
-//     */
-//    public static void registerModels() {
-//        FMLJavaModLoadingContext.get().getModEventBus().addListener(event -> RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.TYPE, ConstructionBlockEntityRender::new));
-//    }
 }

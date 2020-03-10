@@ -26,7 +26,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
-import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
+import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.google.common.collect.ImmutableMultiset;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.Screen;
@@ -57,7 +57,7 @@ import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
 public class GadgetBuilding extends ModeGadget {
 
-    private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+    private static final MockBuilderWorld fakeWorld = new MockBuilderWorld();
 
     public GadgetBuilding(Properties builder, IntSupplier undoLengthSupplier, String undoName) {
         super(builder, undoLengthSupplier, undoName, TagReference.WHITELIST_BUILDING, TagReference.BLACKLIST_BUILDING);
@@ -84,21 +84,21 @@ public class GadgetBuilding extends ModeGadget {
 
     private static void setToolMode(ItemStack tool, BuildingModes mode) {
         //Store the tool's mode in NBT as a string
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
+        CompoundNBT tagCompound = tool.getOrCreateTag();
         tagCompound.putString("mode", mode.toString());
     }
 
     public static BuildingModes getToolMode(ItemStack tool) {
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
+        CompoundNBT tagCompound = tool.getOrCreateTag();
         return BuildingModes.getFromName(tagCompound.getString("mode"));
     }
 
     public static boolean shouldPlaceAtop(ItemStack stack) {
-        return !NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_PLACE_INSIDE);
+        return !stack.getOrCreateTag().getBoolean(NBTKeys.GADGET_PLACE_INSIDE);
     }
 
     public static void togglePlaceAtop(PlayerEntity player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_PLACE_INSIDE, shouldPlaceAtop(stack));
+        stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_PLACE_INSIDE, shouldPlaceAtop(stack));
         player.sendStatusMessage((shouldPlaceAtop(stack) ? MessageTranslation.PLACE_ATOP : MessageTranslation.PLACE_INSIDE).componentTranslation().setStyle(Styles.AQUA), true);
     }
 

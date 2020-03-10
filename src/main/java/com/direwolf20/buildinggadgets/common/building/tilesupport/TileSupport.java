@@ -11,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 
 import javax.annotation.Nullable;
+import java.util.Iterator;
 import java.util.Objects;
 
 public final class TileSupport {
@@ -34,11 +35,14 @@ public final class TileSupport {
         if (te == null)
             return dummyTileEntityData();
         ITileEntityData res;
-        for (ITileDataFactory factory : TileEntityData.getTileDataFactories()) {
+
+        for (Iterator<ITileDataFactory> it = TileEntityData.getTileDataFactories().iterator(); it.hasNext(); ) {
+            ITileDataFactory factory = it.next();
             res = factory.createDataFor(te);
             if (res != null)
                 return res;
         }
+
         return dummyTileEntityData();
     }
 

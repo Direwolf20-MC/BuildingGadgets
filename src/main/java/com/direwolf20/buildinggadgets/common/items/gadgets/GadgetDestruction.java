@@ -16,7 +16,6 @@ import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
@@ -107,7 +106,7 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public static void setAnchorSide(ItemStack stack, Direction side) {
-        CompoundNBT tag = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tag = stack.getOrCreateTag();
         if (side == null)
             tag.remove(NBTKeys.GADGET_ANCHOR_SIDE);
         else
@@ -115,7 +114,7 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public static Direction getAnchorSide(ItemStack stack) {
-        CompoundNBT tag = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tag = stack.getOrCreateTag();
         String facing = tag.getString(NBTKeys.GADGET_ANCHOR_SIDE);
         if (facing.isEmpty())
             return null;
@@ -123,15 +122,15 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public static void setToolValue(ItemStack stack, int value, String valueName) {
-        NBTHelper.getOrNewTag(stack).putInt(valueName, value);
+        stack.getOrCreateTag().putInt(valueName, value);
     }
 
     public static int getToolValue(ItemStack stack, String valueName) {
-        return NBTHelper.getOrNewTag(stack).getInt(valueName);
+        return stack.getOrCreateTag().getInt(valueName);
     }
 
     public static boolean getOverlay(ItemStack stack) {
-        CompoundNBT tag = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tag = stack.getOrCreateTag();
         if (tag.contains(NBTKeys.GADGET_OVERLAY))
             return tag.getBoolean(NBTKeys.GADGET_OVERLAY);
 
@@ -141,7 +140,7 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public static void setOverlay(ItemStack stack, boolean showOverlay) {
-        NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_OVERLAY, showOverlay);
+        stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_OVERLAY, showOverlay);
     }
 
     public static void switchOverlay(PlayerEntity player, ItemStack stack) {

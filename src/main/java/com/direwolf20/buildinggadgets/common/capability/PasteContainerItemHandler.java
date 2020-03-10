@@ -57,13 +57,17 @@ public final class PasteContainerItemHandler implements IItemHandlerModifiable {
     public ItemStack extractItem(int slot, int amount, boolean simulate) {
         if (amount <= 0)
             return ItemStack.EMPTY;
+
         if (isCreative)
             return new ItemStack(OurItems.constructionPaste, amount);
+
         int currentCount = getCount();
         int newCount = setCount(currentCount - amount, simulate);
+
         int dif = currentCount - newCount;
         if (dif == 0)
             return ItemStack.EMPTY;
+
         return new ItemStack(OurItems.constructionPaste, dif);
     }
 

@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.util.spliterator;
 import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.Region;
 
+import javax.annotation.Nonnull;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -19,21 +20,25 @@ public class DelegatingPlacementSequence<T, U> implements IPlacementSequence<T> 
         this.mapper = mapper;
     }
 
+    @Nonnull
     @Override
     public Stream<T> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
 
+    @Nonnull
     @Override
     public Spliterator<T> spliterator() {
         return new MappingSpliterator<>(other.spliterator(), mapper);
     }
 
+    @Nonnull
     @Override
     public Iterator<T> iterator() {
         return Spliterators.iterator(spliterator());
     }
 
+    @Nonnull
     @Override
     public Region getBoundingBox() {
         return other.getBoundingBox();
@@ -44,6 +49,7 @@ public class DelegatingPlacementSequence<T, U> implements IPlacementSequence<T> 
         return other.mayContain(x, y, z);
     }
 
+    @Nonnull
     @Override
     public IPlacementSequence<T> copy() {
         return new DelegatingPlacementSequence<>(other.copy(), mapper);

@@ -85,10 +85,6 @@ public final class OurBlocks {
     public static final class OurTileEntities {
         private OurTileEntities() {}
 
-        /**
-         * Called from {@link RegistryHandler} as this is required to be loaded
-         * only on the client side.
-         */
         @OnlyIn(Dist.CLIENT)
         static void registerRenderers() {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(event -> ClientRegistry.bindTileEntityRenderer(EffectBlockTileEntity.TYPE, EffectBlockTER::new));

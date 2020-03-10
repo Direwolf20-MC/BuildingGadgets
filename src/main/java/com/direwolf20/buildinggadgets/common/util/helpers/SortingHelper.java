@@ -72,12 +72,9 @@ public class SortingHelper {
         }
 
         public List<PlacementTarget> getSortedTargets() {
-            if (sortedTargets == null) {
-                //long nanoTime = System.nanoTime();
+            if (sortedTargets == null)
                 sortedTargets = sort(orderedTargets);
-                //long dif = System.nanoTime() - nanoTime;
-                //BuildingGadgets.LOG.info("Render sorting took {} nano seconds.", dif);
-            }
+
             return Collections.unmodifiableList(sortedTargets);
 
         }

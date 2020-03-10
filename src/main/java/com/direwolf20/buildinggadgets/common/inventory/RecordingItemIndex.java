@@ -61,12 +61,4 @@ public final class RecordingItemIndex implements IItemIndex {
         }
         return false;
     }
-
-    public Multiset<IUniqueObject<?>> getExtractedItems() {
-        return Multisets.unmodifiableMultiset(extractedItems);
-    }
-
-    public Multiset<IUniqueObject<?>> getInsertedItems() {
-        return Multisets.unmodifiableMultiset(insertedItems);
-    }
 }

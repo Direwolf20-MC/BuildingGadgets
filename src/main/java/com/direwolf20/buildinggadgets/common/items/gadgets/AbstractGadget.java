@@ -154,7 +154,7 @@ public abstract class AbstractGadget extends Item {
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return !EnergyUtil.hasCap(toRepair) && repair.getItem() == Items.DIAMOND;
+        return !toRepair.getCapability(CapabilityEnergy.ENERGY).isPresent() && repair.getItem() == Items.DIAMOND;
     }
 
     public boolean isAllowedBlock(Block block) {
@@ -186,7 +186,7 @@ public abstract class AbstractGadget extends Item {
         if (player.isCreative() || getEnergyMax() == 0)
             return true;
 
-        IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
+        IEnergyStorage energy = tool.getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new);
         return getEnergyCost(tool) <= energy.getEnergyStored();
     }
 
@@ -194,7 +194,7 @@ public abstract class AbstractGadget extends Item {
         if (player.isCreative() || getEnergyMax() == 0)
             return;
 
-        ItemEnergyForge energy = (ItemEnergyForge) EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
+        ItemEnergyForge energy = (ItemEnergyForge) tool.getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new);
         energy.extractPower(getEnergyCost(tool), false);
     }
 
@@ -245,7 +245,7 @@ public abstract class AbstractGadget extends Item {
     }
 
     protected void onAnchorRemoved(ItemStack stack, PlayerEntity player) {
-        NBTHelper.getOrNewTag(stack).remove(NBTKeys.GADGET_ANCHOR);
+        stack.getOrCreateTag().remove(NBTKeys.GADGET_ANCHOR);
     }
 
     @Nullable
@@ -254,30 +254,30 @@ public abstract class AbstractGadget extends Item {
     }
 
     public static boolean getFuzzy(ItemStack stack) {
-        return NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_FUZZY);
+        return stack.getOrCreateTag().getBoolean(NBTKeys.GADGET_FUZZY);
     }
 
     public static void toggleFuzzy(PlayerEntity player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_FUZZY, !getFuzzy(stack));
+        stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_FUZZY, !getFuzzy(stack));
         player.sendStatusMessage(MessageTranslation.FUZZY_MODE.componentTranslation(getFuzzy(stack)).setStyle(Styles.AQUA), true);
     }
 
     public static boolean getConnectedArea(ItemStack stack) {
-        return !NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_UNCONNECTED_AREA);
+        return !stack.getOrCreateTag().getBoolean(NBTKeys.GADGET_UNCONNECTED_AREA);
     }
 
     public static void toggleConnectedArea(PlayerEntity player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_UNCONNECTED_AREA, getConnectedArea(stack));
+        stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_UNCONNECTED_AREA, getConnectedArea(stack));
         player.sendStatusMessage((stack.getItem() instanceof GadgetDestruction ? MessageTranslation.CONNECTED_AREA : MessageTranslation.CONNECTED_SURFACE)
                 .componentTranslation(getConnectedArea(stack)).setStyle(Styles.AQUA), true);
     }
 
     public static boolean shouldRayTraceFluid(ItemStack stack) {
-        return NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_RAYTRACE_FLUID);
+        return stack.getOrCreateTag().getBoolean(NBTKeys.GADGET_RAYTRACE_FLUID);
     }
 
     public static void toggleRayTraceFluid(ServerPlayerEntity player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_RAYTRACE_FLUID, !shouldRayTraceFluid(stack));
+        stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_RAYTRACE_FLUID, !shouldRayTraceFluid(stack));
         player.sendStatusMessage(MessageTranslation.RAYTRACE_FLUID.componentTranslation(shouldRayTraceFluid(stack)).setStyle(Styles.AQUA), true);
     }
 
@@ -289,17 +289,13 @@ public abstract class AbstractGadget extends Item {
 
     //this should only be called Server-Side!!!
     public UUID getUUID(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (! nbt.hasUniqueId(NBTKeys.GADGET_UUID)) {
             UUID newId = getUndoSave().getFreeUUID();
             nbt.putUniqueId(NBTKeys.GADGET_UUID, newId);
             return newId;
         }
         return nbt.getUniqueId(NBTKeys.GADGET_UUID);
-    }
-
-    protected static String formatName(String name) {
-        return name.replaceAll("(?=[A-Z])", " ").trim();
     }
 
     // Todo: tweak and fix.

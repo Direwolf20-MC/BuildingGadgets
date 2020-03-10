@@ -12,7 +12,6 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import java.util.function.Supplier;
 
 public class PacketAnchor {
-
     public static void encode(PacketAnchor msg, PacketBuffer buffer) {}
     public static PacketAnchor decode(PacketBuffer buffer) { return new PacketAnchor(); }
 

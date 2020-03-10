@@ -29,7 +29,6 @@ import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
 import com.direwolf20.buildinggadgets.common.util.Additions;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.*;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
@@ -161,7 +160,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     public static void setRelativeVector(ItemStack stack, BlockPos vec) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (vec.equals(BlockPos.ZERO))
             nbt.remove(NBTKeys.GADGET_REL_POS);
         else
@@ -169,18 +168,18 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     public static BlockPos getRelativeVector(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         //if not present, then this will just return (0, 0, 0)
         return NBTUtil.readBlockPos(nbt.getCompound(NBTKeys.GADGET_REL_POS));
     }
 
     public static int getCopyCounter(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         return nbt.getInt(NBTKeys.TEMPLATE_COPY_COUNT); //returns 0 if not present
     }
 
     public static int getAndIncrementCopyCounter(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         int count = nbt.getInt(NBTKeys.TEMPLATE_COPY_COUNT); //returns 0 if not present
         nbt.putInt(NBTKeys.TEMPLATE_COPY_COUNT, count + 1);
         return count;
@@ -216,7 +215,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     public static void setUpperRegionBound(ItemStack stack, @Nullable BlockPos pos) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (pos != null)
             nbt.put(NBTKeys.GADGET_START_POS, NBTUtil.writeBlockPos(pos));
         else
@@ -224,7 +223,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     public static void setLowerRegionBound(ItemStack stack, @Nullable BlockPos pos) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (pos != null)
             nbt.put(NBTKeys.GADGET_END_POS, NBTUtil.writeBlockPos(pos));
         else
@@ -233,7 +232,7 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     @Nullable
     public static BlockPos getUpperRegionBound(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (nbt.contains(NBTKeys.GADGET_START_POS, NBT.TAG_COMPOUND))
             return NBTUtil.readBlockPos(nbt.getCompound(NBTKeys.GADGET_START_POS));
         return null;
@@ -241,19 +240,19 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     @Nullable
     public static BlockPos getLowerRegionBound(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (nbt.contains(NBTKeys.GADGET_END_POS, NBT.TAG_COMPOUND))
             return NBTUtil.readBlockPos(nbt.getCompound(NBTKeys.GADGET_END_POS));
         return null;
     }
 
     private static void setToolMode(ItemStack stack, ToolMode mode) {
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tagCompound = stack.getOrCreateTag();
         tagCompound.putByte(NBTKeys.GADGET_MODE, mode.getId());
     }
 
     public static ToolMode getToolMode(ItemStack stack) {
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tagCompound = stack.getOrCreateTag();
         ToolMode mode = ToolMode.COPY;
         if (! tagCompound.contains(NBTKeys.GADGET_MODE, NBT.TAG_BYTE)) {
             setToolMode(stack, mode);

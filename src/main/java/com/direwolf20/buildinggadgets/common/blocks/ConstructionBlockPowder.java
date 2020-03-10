@@ -39,8 +39,8 @@ public class ConstructionBlockPowder extends FallingBlock {
     private boolean tryTouchWater(IWorld worldIn, BlockPos pos) {
         boolean foundWater = false;
 
-        for (Direction enumfacing : Direction.values()) {
-            if (enumfacing != Direction.DOWN && worldIn.getFluidState(pos.offset(enumfacing)).isTagged(FluidTags.WATER)) {
+        for (Direction enumFacing : Direction.values()) {
+            if (enumFacing != Direction.DOWN && worldIn.getFluidState(pos.offset(enumFacing)).isTagged(FluidTags.WATER)) {
                 foundWater = true;
                 break;
             }

@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
  */
 @EventBusSubscriber
 public final class WorldTemplateProviderHandler {
+
     @SubscribeEvent
     public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event) {
         if (event.getObject().isRemote())

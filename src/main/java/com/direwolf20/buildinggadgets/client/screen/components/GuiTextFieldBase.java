@@ -11,7 +11,8 @@ public class GuiTextFieldBase extends TextFieldWidget {
     private BiConsumer<GuiTextFieldBase, String> postModification;
 
     public GuiTextFieldBase(FontRenderer fontRenderer, int x, int y, int width) {
-        super(fontRenderer, x, y, width, 15,"Hello?"); //TODO find out messages
+        super(fontRenderer, x, y, width, 15,"");
+
         setMaxStringLength(50);
         setValidator(s -> {
             valueOld = getText();
@@ -22,8 +23,9 @@ public class GuiTextFieldBase extends TextFieldWidget {
     @Override
     public void setText(String textIn) {
         super.setText(textIn);
-        postModification(textIn);//TODO validate that this is the correct place
 
+        //TODO validate that this is the correct place
+        postModification(textIn);
     }
 
     public void postModification(String text) {
@@ -32,11 +34,6 @@ public class GuiTextFieldBase extends TextFieldWidget {
             postModification.accept(this, valueOld);
             suspended = false;
         }
-    }
-
-    public GuiTextFieldBase onPostModification(BiConsumer<GuiTextFieldBase, String> postModification) {
-        this.postModification = postModification;
-        return this;
     }
 
     public GuiTextFieldBase restrictToNumeric() {
@@ -52,6 +49,7 @@ public class GuiTextFieldBase extends TextFieldWidget {
                 return false;
             }
         });
+
         return this;
     }
 
@@ -70,9 +68,5 @@ public class GuiTextFieldBase extends TextFieldWidget {
     public GuiTextFieldBase setDefaultValue(String defaultValue) {
         this.valueDefault = defaultValue;
         return this;
-    }
-
-    public String getDefaultValue() {
-        return valueDefault;
     }
 }

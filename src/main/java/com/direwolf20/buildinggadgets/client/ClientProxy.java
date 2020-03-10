@@ -32,7 +32,6 @@ import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DeferredWorkQueue;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -43,7 +42,8 @@ import java.util.Random;
 public class ClientProxy {
     public static final CacheTemplateProvider CACHE_TEMPLATE_PROVIDER = new CacheTemplateProvider();
     public static void clientSetup(final IEventBus eventBus) {
-        DeferredWorkQueue.runLater(KeyBindings::init);
+        KeyBindings.init();
+
         eventBus.addListener(ClientProxy::bakeModels);
         eventBus.addListener(ClientProxy::registerSprites);
         MinecraftForge.EVENT_BUS.addListener(EventTooltip::onDrawTooltip);
@@ -52,6 +52,19 @@ public class ClientProxy {
         // @michaelhillcox: I have questions on why this is here
         Registries.clientSetup();
         RenderTypeLookup.setRenderLayer(OurBlocks.constructionBlock, (RenderType) -> true);
+    }
+
+    private static void registerSprites(TextureStitchEvent.Pre event) {
+        event.addSprite(new ResourceLocation(TemplateManagerContainer.TEXTURE_LOC_SLOT_TOOL));
+        event.addSprite(new ResourceLocation(TemplateManagerContainer.TEXTURE_LOC_SLOT_TEMPLATE));
+    }
+
+    public static void playSound(SoundEvent sound, float pitch) {
+        Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(sound, pitch));
+    }
+
+    private static void onPlayerLoggedOut(PlayerLoggedOutEvent event) {
+        CACHE_TEMPLATE_PROVIDER.clear();
     }
 
     private static void bakeModels(ModelBakeEvent event) {
@@ -185,18 +198,5 @@ public class ClientProxy {
         event.getModelRegistry().put(ConstrLocation2a, bakedModelLoaderAmbient);
         event.getModelRegistry().put(ConstrLocation3a, bakedModelLoaderAmbient);
         event.getModelRegistry().put(ConstrLocation4a, bakedModelLoaderAmbient);
-    }
-
-    private static void registerSprites(TextureStitchEvent.Pre event) {
-        event.addSprite(new ResourceLocation(TemplateManagerContainer.TEXTURE_LOC_SLOT_TOOL));
-        event.addSprite(new ResourceLocation(TemplateManagerContainer.TEXTURE_LOC_SLOT_TEMPLATE));
-    }
-
-    public static void playSound(SoundEvent sound, float pitch) {
-        Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(sound, pitch));
-    }
-
-    private static void onPlayerLoggedOut(PlayerLoggedOutEvent event) {
-        CACHE_TEMPLATE_PROVIDER.clear();
     }
 }

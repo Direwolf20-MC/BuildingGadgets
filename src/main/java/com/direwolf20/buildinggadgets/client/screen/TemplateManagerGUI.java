@@ -28,9 +28,8 @@ import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
+import com.direwolf20.buildinggadgets.common.world.MockDelegationWorld;
 import com.google.gson.JsonParseException;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -38,16 +37,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.Rectangle2d;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -56,12 +57,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import org.lwjgl.opengl.GL11;
 
-import java.nio.ByteBuffer;
-import java.util.List;
 import java.util.Random;
 
 public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
@@ -71,9 +69,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     private boolean panelClicked;
     private int clickButton, clickX, clickY;
     private float initRotX, initRotY, initZoom, initPanX, initPanY;
-    private float prevRotX, prevRotY;
     private float momentumX, momentumY;
-    private float momentumDampening = 0.98f;
     private float rotX = 0, rotY = 0, zoom = 1;
     private float panX = 0, panY = 0;
 
@@ -86,9 +82,6 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     // It is so stupid I can't get the key from the template.
     private Template template;
-    private ITemplateKey templateKey;
-
-    private int displayList;
 
     public TemplateManagerGUI(TemplateManagerContainer container, PlayerInventory playerInventory, ITextComponent title) {
         super(container, playerInventory, new StringTextComponent(""));
@@ -149,8 +142,6 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         // Invalidate the render
         if( container.getSlot(0).getStack().isEmpty() && template != null ) {
             template = null;
-            templateKey = null;
-//            GLAllocation.deleteDisplayLists(this.displayList);
             resetViewport();
             return;
         }
@@ -162,13 +153,12 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                 return;
 
             this.template = template;
-            this.templateKey = key;
 
             IBuildView view = template.createViewInContext(
                     SimpleBuildContext.builder()
                             .buildingPlayer(getMinecraft().player)
                             .usedStack(container.getSlot(0).getStack())
-                            .build(new FakeDelegationWorld(getMinecraft().world)));
+                            .build(new MockDelegationWorld(getMinecraft().world)));
 
 //            int displayList = GLAllocation.generateDisplayLists(1);
 //            GlStateManager.newList(displayList, GL11.GL_COMPILE);
@@ -278,9 +268,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void pasteTemplateToStack(World world, ItemStack stack, Template newTemplate, boolean replaced) {
-        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-            pasteTemplateToStack(provider, stack, newTemplate, replaced && world.isRemote());
-        });
+        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider ->
+                pasteTemplateToStack(provider, stack, newTemplate, replaced && world.isRemote()));
     }
 
     private void pasteTemplateToStack(ITemplateProvider provider, ItemStack stack, Template newTemplate, boolean replaced) {
@@ -348,36 +337,36 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             zoomScale = overH / 40;
         }
 
-        GlStateManager.pushMatrix();
-        GlStateManager.matrixMode(GL11.GL_PROJECTION);
-        GlStateManager.pushMatrix();
-        GlStateManager.loadIdentity();
+        RenderSystem.pushMatrix();
+        RenderSystem.matrixMode(GL11.GL_PROJECTION);
+        RenderSystem.pushMatrix();
+        RenderSystem.loadIdentity();
 
-        GlStateManager.multMatrix(Matrix4f.perspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000));
-        GlStateManager.matrixMode(GL11.GL_MODELVIEW);
-        GlStateManager.viewport((int) Math.round((guiLeft + panel.getX()) * scale),
+        RenderSystem.multMatrix(Matrix4f.perspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000));
+        RenderSystem.matrixMode(GL11.GL_MODELVIEW);
+        RenderSystem.viewport((int) Math.round((guiLeft + panel.getX()) * scale),
                 (int) Math.round(getMinecraft().getMainWindow().getFramebufferHeight() - (guiTop + panel.getY() + panel.getHeight()) * scale),
                 (int) Math.round(panel.getWidth() * scale),
                 (int) Math.round(panel.getHeight() * scale));
 
-        GlStateManager.clear(GL11.GL_DEPTH_BUFFER_BIT, true);
+        RenderSystem.clear(GL11.GL_DEPTH_BUFFER_BIT, true);
 
         sc = (293 * sc) + zoom / zoomScale;
-        GlStateManager.scaled(sc, sc, sc);
+        RenderSystem.scaled(sc, sc, sc);
         int moveX = startPos.getX() - endPos.getX();
 
-        GlStateManager.rotatef(30, 0, 1, 0);
+        RenderSystem.rotatef(30, 0, 1, 0);
         if (startPos.getX() >= endPos.getX())
             moveX--;
 
         RenderSystem.translated((moveX) / 1.75, -Math.abs(startPos.getY() - endPos.getY()) / 1.75, 0);
         RenderSystem.translated(panX, -panY, 0);
-        RenderSystem.translated(((startPos.getX() - endPos.getX()) / 2) * -1, ((startPos.getY() - endPos.getY()) / 2) * -1, ((startPos.getZ() - endPos.getZ()) / 2) * -1);
+        RenderSystem.translated(((startPos.getX() - endPos.getX()) / 2f) * -1, ((startPos.getY() - endPos.getY()) / 2f) * -1, ((startPos.getZ() - endPos.getZ()) / 2f) * -1);
         RenderSystem.rotatef(-rotX, 1, 0, 0);
         RenderSystem.rotatef(rotY, 0, 1, 0);
-        RenderSystem.translated(((startPos.getX() - endPos.getX()) / 2), ((startPos.getY() - endPos.getY()) / 2), ((startPos.getZ() - endPos.getZ()) / 2));
+        RenderSystem.translated(((startPos.getX() - endPos.getX()) / 2f), ((startPos.getY() - endPos.getY()) / 2f), ((startPos.getZ() - endPos.getZ()) / 2f));
 
-        getMinecraft().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+        getMinecraft().getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
 
 //        RenderSystem.callList(displayList);
 
@@ -434,30 +423,25 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     @Override
     protected void drawGuiContainerForegroundLayer(int j, int i) {
-        boolean doMomentum = false;
         if (panelClicked) {
             if (clickButton == 0) {
-                prevRotX = rotX;
-                prevRotY = rotY;
+                float prevRotX = rotX;
+                float prevRotY = rotY;
                 rotX = initRotX - ((int) getMinecraft().mouseHelper.getMouseY() - clickY);
                 rotY = initRotY + ((int) getMinecraft().mouseHelper.getMouseX() - clickX);
                 momentumX = rotX - prevRotX;
                 momentumY = rotY - prevRotY;
-                doMomentum = false;
             } else if (clickButton == 1) {
-                //prevPanX = panX;
-                //prevPanY = panY;
-                panX = initPanX + ((int) getMinecraft().mouseHelper.getMouseX() - clickX) / 8;
-                panY = initPanY + ((int) getMinecraft().mouseHelper.getMouseY() - clickY) / 8;
+                panX = initPanX + ((int) getMinecraft().mouseHelper.getMouseX() - clickX) / 8f;
+                panY = initPanY + ((int) getMinecraft().mouseHelper.getMouseY() - clickY) / 8f;
             }
         }
 
-        if (doMomentum) {
-            rotX += momentumX;
-            rotY += momentumY;
-            momentumX *= momentumDampening;
-            momentumY *= momentumDampening;
-        }
+        rotX += momentumX;
+        rotY += momentumY;
+        float momentumDampening = 0.98f;
+        momentumX *= momentumDampening;
+        momentumY *= momentumDampening;
 
         if (! nameField.isFocused() && nameField.getText().isEmpty())
             getMinecraft().fontRenderer.drawString("template name", nameField.x - guiLeft + 4, (nameField.y + 2) - guiTop, - 10197916);
@@ -467,9 +451,9 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void drawSlotOverlay(Slot slot) {
-        GlStateManager.translated(0, 0, 1000);
+        RenderSystem.translated(0, 0, 1000);
         fill(slot.xPos, slot.yPos, slot.xPos + 16, slot.yPos + 16, - 1660903937);
-        GlStateManager.translated(0, 0, - 1000);
+        RenderSystem.translated(0, 0, - 1000);
     }
 
     @Override
@@ -560,10 +544,13 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     private void onCopy() {
         runAfterUpdate(1, () -> { //we are copying from slot 1 => slot 1 needs to be updated
+
             ItemStack stack = container.getSlot(1).getStack();
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 templateProvider.ifPresent(provider -> {
                     PlayerEntity player = getMinecraft().player;
+                    assert player != null;
+
                     IBuildContext buildContext = SimpleBuildContext.builder()
                             .buildingPlayer(player)
                             .usedStack(stack)
@@ -588,6 +575,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void onPaste() {
+        assert getMinecraft().player != null;
+
         String CBString = getMinecraft().keyboardListener.getClipboardString();
         if (GadgetUtils.mightBeLink(CBString)) {
             getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.RED), false);

@@ -52,19 +52,10 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return true;
     }
 
-    /*@Override
-    public boolean isAir(BlockState state, IBlockReader world, BlockPos pos) {
+    @Override
+    public boolean isAir(BlockState state) {
         return !state.get(ConstructionBlock.BRIGHT);
-    }*/
-
-// 1.14 code
-//    @Override
-//    @Deprecated
-//    public boolean isSolid(BlockState state) {
-//        boolean bright = state.get(ConstructionBlock.BRIGHT);
-//        return ! bright;
-//        //return this.blocksMovement && this.getRenderLayer() == BlockRenderLayer.SOLID;
-//    }
+    }
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {

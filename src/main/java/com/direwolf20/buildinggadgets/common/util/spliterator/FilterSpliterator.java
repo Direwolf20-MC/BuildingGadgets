@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.util.spliterator;
 
-
 import javax.annotation.Nullable;
 import java.util.Spliterator;
 import java.util.function.Consumer;

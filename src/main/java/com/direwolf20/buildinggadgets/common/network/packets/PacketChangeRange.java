@@ -26,7 +26,6 @@ public class PacketChangeRange {
     public static void encode(PacketChangeRange msg, PacketBuffer buffer) {
         buffer.writeInt(msg.range);
     }
-
     public static PacketChangeRange decode(PacketBuffer buffer) {
         return new PacketChangeRange(buffer.readInt());
     }
@@ -48,6 +47,7 @@ public class PacketChangeRange {
                 else if (stack.getItem() instanceof GadgetDestruction)
                     GadgetDestruction.switchOverlay(player, stack);
             });
+
             ctx.get().setPacketHandled(true);
         }
     }

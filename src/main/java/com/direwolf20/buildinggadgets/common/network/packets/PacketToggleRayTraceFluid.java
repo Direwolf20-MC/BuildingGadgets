@@ -24,6 +24,7 @@ public class PacketToggleRayTraceFluid {
                 if (!stack.isEmpty())
                     AbstractGadget.toggleRayTraceFluid(player, stack);
             });
+
             ctx.get().setPacketHandled(true);
         }
     }
