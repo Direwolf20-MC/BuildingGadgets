@@ -356,12 +356,12 @@ public class CopyPasteRender extends BaseRenderer {
         if( renderBuffer != null && tickTrack < 100 ) {
             Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
 
-            MatrixStack matrix = evt.getMatrixStack();
-            matrix.push();
-            matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
-
-            renderBuffer.render(matrix.getLast().getMatrix());
-            matrix.pop();
+            MatrixStack matrix = evt.getMatrixStack(); //Get current matrix position from the evt call
+            matrix.push(); //Save the render position from RenderWorldLast
+            matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ()); //Sets render position to 0,0,0
+            matrix.translate(-152, 63, -55); //This is where the draw will occur, change to anchor/player look vector
+            renderBuffer.render(matrix.getLast().getMatrix()); //Actually draw whats in the buffer
+            matrix.pop(); //Load the save that we did above, undoing the past 2 translates
             return;
         }
 
@@ -373,15 +373,16 @@ public class CopyPasteRender extends BaseRenderer {
             IVertexBuilder builder = buffer.getBuffer(MyRenderType.RenderBlock);
             BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
 
-            MatrixStack matrix = new MatrixStack();
-            matrix.push();
+            MatrixStack matrix = new MatrixStack(); //Create a new matrix stack for use in the buffer building process
+            matrix.push(); //Save position
             for (PlacementTarget target : sorter.getSortedTargets()) {
                 BlockPos targetPos = target.getPos();
                 BlockState state = context.getWorld().getBlockState(target.getPos());
 
-                matrix.push();
-                matrix.translate(targetPos.getX(), targetPos.getY(), targetPos.getZ());
-
+                matrix.push(); //Save position again
+                //matrix.translate(todo); //Todo - We need to reposition the matrix relative to the start coords of our render.
+                //Start pos = 0,0,0 and then iterate through to endpos.
+                //So block above startpos would be 0,1,0, we'd pass that to translate
                 IBakedModel ibakedmodel = dispatcher.getModelForState(state);
                 BlockColors blockColors = Minecraft.getInstance().getBlockColors();
                 int color = blockColors.getColor(state, context.getWorld(), targetPos, 0);
@@ -398,9 +399,9 @@ public class CopyPasteRender extends BaseRenderer {
                     BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
                 }
 
-                matrix.pop();
+                matrix.pop(); // Load the position we saved earlier
             }
-            matrix.pop();
+            matrix.pop(); //Load after loop
         });
     }
 
@@ -441,11 +442,18 @@ public class CopyPasteRender extends BaseRenderer {
         {
             this.buffers = ImmutableMap.copyOf(buffers);
         }
-        public void render(Matrix4f matrix)
-        {
-            buffers.forEach((rt, vbo) -> {
+        public void render(Matrix4f matrix) {
+            buffers.entrySet().forEach(kv -> {
+                RenderType rt = kv.getKey();
+                VertexBuffer vbo = kv.getValue();
+                VertexFormat fmt = rt.getVertexFormat();
+
                 rt.setupRenderState();
+                vbo.bindBuffer();
+                fmt.setupBufferState(0L);
                 vbo.draw(matrix, rt.getDrawMode());
+                VertexBuffer.unbindBuffer();
+                fmt.clearBufferState();
                 rt.clearRenderState();
             });
         }
