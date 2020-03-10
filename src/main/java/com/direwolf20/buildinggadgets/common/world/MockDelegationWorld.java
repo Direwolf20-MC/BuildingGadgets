@@ -43,11 +43,11 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
-public class FakeDelegationWorld implements IWorld {
+public class MockDelegationWorld implements IWorld {
     private final IWorld delegate;
     private Map<BlockPos, BlockInfo> posToBlock;
 
-    public FakeDelegationWorld(IWorld delegate) {
+    public MockDelegationWorld(IWorld delegate) {
         this.delegate = Objects.requireNonNull(delegate);
         posToBlock = new HashMap<>();
     }

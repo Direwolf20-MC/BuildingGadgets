@@ -11,13 +11,9 @@ import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.Undo.BlockInfo;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.google.common.base.Preconditions;
 import net.minecraft.block.BlockState;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemUseContext;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
@@ -29,11 +25,14 @@ import java.util.Spliterator;
 public final class UndoScheduler extends SteppedScheduler {
     public static UndoScheduler scheduleUndo(Undo undo, IItemIndex index, IBuildContext context, int steps) {
         Preconditions.checkArgument(steps > 0);
+
         UndoScheduler res = new UndoScheduler(
                 Objects.requireNonNull(undo),
                 Objects.requireNonNull(index),
                 Objects.requireNonNull(context),
-                steps);
+                steps
+        );
+
         ServerTickingScheduler.runTicked(res);
         return res;
     }
@@ -42,14 +41,12 @@ public final class UndoScheduler extends SteppedScheduler {
     private boolean lastWasSuccess;
     private final IBuildContext context;
     private final IItemIndex index;
-    private final BlockItemUseContext useContext;
 
     private UndoScheduler(Undo undo, IItemIndex index, IBuildContext context, int steps) {
         super(steps);
         assert context.getBuildingPlayer() != null;
         assert ! context.getUsedStack().isEmpty();
-        this.useContext = new BlockItemUseContext(new ItemUseContext(context.getBuildingPlayer(), Hand.MAIN_HAND,
-                VectorHelper.getLookingAt(context.getBuildingPlayer(), context.getUsedStack())));
+
         this.spliterator = undo.getUndoData().entrySet().spliterator();
         this.index = index;
         this.context = context;

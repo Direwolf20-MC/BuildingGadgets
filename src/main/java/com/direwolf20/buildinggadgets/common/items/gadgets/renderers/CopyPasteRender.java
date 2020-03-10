@@ -12,7 +12,7 @@ import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper.RenderSorter;
-import com.direwolf20.buildinggadgets.common.world.FakeDelegationWorld;
+import com.direwolf20.buildinggadgets.common.world.MockDelegationWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
@@ -128,7 +128,7 @@ public class CopyPasteRender extends BaseRenderer {
 
 
     private void performRender(World world, PlayerEntity player, ItemStack stack, BlockPos startPos, Template template, float partialTicks, RenderWorldLastEvent evt) {
-        FakeDelegationWorld fakeWorld = new FakeDelegationWorld(world);
+        MockDelegationWorld fakeWorld = new MockDelegationWorld(world);
         IBuildContext context = SimpleBuildContext.builder()
                 .buildingPlayer(player)
                 .usedStack(stack)

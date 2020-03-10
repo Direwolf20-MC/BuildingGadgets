@@ -6,9 +6,6 @@ import net.minecraft.block.BlockState;
 
 public final class LangUtil {
     private LangUtil() {}
-    public static String getLangKeyPrefix(String type, String... args) {
-        return getLangKey(type, args) + ".";
-    }
 
     public static String getLangKey(String type, String... args) {
         return String.join(".", type, Reference.MODID, String.join(".", args));

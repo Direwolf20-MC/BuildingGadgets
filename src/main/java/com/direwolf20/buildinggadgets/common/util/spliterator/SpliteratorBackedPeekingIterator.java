@@ -18,6 +18,7 @@ public final class SpliteratorBackedPeekingIterator<T> extends AbstractIterator<
     protected T computeNext() {
         if (adapter.hasNext())
             return adapter.next();
+
         return endOfData();
     }
 }

@@ -12,13 +12,11 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import java.util.function.Supplier;
 
 public class PacketToggleMode {
-
     private final int mode;
 
     public static void encode(PacketToggleMode msg, PacketBuffer buffer) {
         buffer.writeInt(msg.mode);
     }
-
     public static PacketToggleMode decode(PacketBuffer buffer) {
         return new PacketToggleMode(buffer.readInt());
     }

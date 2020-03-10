@@ -30,43 +30,6 @@ import java.util.UUID;
 
 public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdateListener {
 
-    public static int getXForAlignedRight(int right, int width) {
-        return right - width;
-    }
-
-    public static int getXForAlignedCenter(int left, int right, int width) {
-        return left + (right - left) / 2 - width / 2;
-    }
-
-    public static int getYForAlignedCenter(int top, int bottom, int height) {
-        return top + (bottom - top) / 2 - height / 2;
-    }
-
-    public static int getYForAlignedBottom(int bottom, int height) {
-        return bottom - height;
-    }
-
-    public static void renderTextVerticalCenter(String text, int leftX, int top, int bottom, int color) {
-        FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-        int y = getYForAlignedCenter(top, bottom, fontRenderer.FONT_HEIGHT);
-        RenderSystem.enableTexture();
-        fontRenderer.drawString(text, leftX, y, color);
-    }
-
-    public static void renderTextHorizontalRight(String text, int right, int y, int color) {
-        FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-        int x = getXForAlignedRight(right, fontRenderer.getStringWidth(text));
-        RenderSystem.enableTexture();
-        fontRenderer.drawString(text, x, y, color);
-    }
-
-    public static boolean isPointInBox(double x, double y, int bx, int by, int width, int height) {
-        return x >= bx &&
-                y >= by &&
-                x < bx + width &&
-                y < by + height;
-    }
-
     public static final int BUTTON_HEIGHT = 20;
     public static final int BUTTONS_PADDING = 4;
 
@@ -110,6 +73,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
 
         header = evaluateTemplateHeader();
         evaluateTitle();
+
         this.scrollingList = new ScrollingMaterialList(this);
         // Make it receive mouse scroll events, so that the player can use his mouse wheel at the start
         this.setFocused(scrollingList);
@@ -121,15 +85,19 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
             scrollingList.setSortingMode(scrollingList.getSortingMode().next());
             buttonSortingModes.setMessage(scrollingList.getSortingMode().getLocalizedName());
         });
+
         this.buttonCopyList = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_COPY.format(), (button) -> {
             getMinecraft().keyboardListener.setClipboardString(evaluateTemplateHeader().toJson(false, hasControlDown()));
-            getMinecraft().player.sendStatusMessage(new TranslationTextComponent(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
+
+            if( getMinecraft().player != null )
+                getMinecraft().player.sendStatusMessage(new TranslationTextComponent(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
         });
 
         // Buttons will be placed left to right in this order
         this.addButton(buttonSortingModes);
         this.addButton(buttonCopyList);
         this.addButton(buttonClose);
+
         this.children.add(scrollingList);
         this.calculateButtonsWidthAndX();
     }
@@ -184,34 +152,6 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         }
     }
 
-    public int getWindowLeftX() {
-        return backgroundX + BORDER_SIZE;
-    }
-
-    public int getWindowRightX() {
-        return backgroundX + BACKGROUND_WIDTH - BORDER_SIZE;
-    }
-
-    public int getWindowTopY() {
-        return backgroundY + BORDER_SIZE;
-    }
-
-    public int getWindowBottomY() {
-        return backgroundY + BACKGROUND_HEIGHT - BORDER_SIZE;
-    }
-
-    public int getWindowWidth() {
-        return WINDOW_WIDTH;
-    }
-
-    public int getWindowHeight() {
-        return WINDOW_HEIGHT;
-    }
-
-    public ItemStack getTemplateItem() {
-        return item;
-    }
-
     public Template getTemplateCapability() {
         if( getMinecraft().world == null || getMinecraft().player == null )
             return null;
@@ -229,6 +169,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
             getMinecraft().player.closeScreen();
             return null;
         }
+
         BuildingGadgets.LOG.warn("Client world used for material list does not have an ITemplateProvider capability!");
         getMinecraft().player.closeScreen();
         return null;
@@ -269,5 +210,66 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
     @Override
     public boolean isPauseScreen() {
         return false;
+    }
+
+    public int getWindowLeftX() {
+        return backgroundX + BORDER_SIZE;
+    }
+
+    public int getWindowRightX() {
+        return backgroundX + BACKGROUND_WIDTH - BORDER_SIZE;
+    }
+
+    public int getWindowTopY() {
+        return backgroundY + BORDER_SIZE;
+    }
+
+    public int getWindowBottomY() {
+        return backgroundY + BACKGROUND_HEIGHT - BORDER_SIZE;
+    }
+
+    public int getWindowWidth() {
+        return WINDOW_WIDTH;
+    }
+
+    public int getWindowHeight() {
+        return WINDOW_HEIGHT;
+    }
+
+    public ItemStack getTemplateItem() {
+        return item;
+    }
+
+    public static int getXForAlignedRight(int right, int width) {
+        return right - width;
+    }
+
+    public static int getXForAlignedCenter(int left, int right, int width) {
+        return left + (right - left) / 2 - width / 2;
+    }
+
+    public static int getYForAlignedCenter(int top, int bottom, int height) {
+        return top + (bottom - top) / 2 - height / 2;
+    }
+
+    public static void renderTextVerticalCenter(String text, int leftX, int top, int bottom, int color) {
+        FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
+        int y = getYForAlignedCenter(top, bottom, fontRenderer.FONT_HEIGHT);
+        RenderSystem.enableTexture();
+        fontRenderer.drawString(text, leftX, y, color);
+    }
+
+    public static void renderTextHorizontalRight(String text, int right, int y, int color) {
+        FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
+        int x = getXForAlignedRight(right, fontRenderer.getStringWidth(text));
+        RenderSystem.enableTexture();
+        fontRenderer.drawString(text, x, y, color);
+    }
+
+    public static boolean isPointInBox(double x, double y, int bx, int by, int width, int height) {
+        return x >= bx &&
+                y >= by &&
+                x < bx + width &&
+                y < by + height;
     }
 }

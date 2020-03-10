@@ -13,10 +13,7 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import java.util.function.Supplier;
 
 public class PacketBindTool {
-
-    public static void encode(PacketBindTool msg, PacketBuffer buffer) {
-    }
-
+    public static void encode(PacketBindTool msg, PacketBuffer buffer) { }
     public static PacketBindTool decode(PacketBuffer buffer) {
         return new PacketBindTool();
     }

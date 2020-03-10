@@ -56,8 +56,8 @@ public final class Registries {
 
     private static IForgeRegistry<ITileDataSerializer> tileDataSerializers = null;
     private static IForgeRegistry<IUniqueObjectSerializer> uniqueObjectSerializers = null;
-    private static IOrderedRegistry<ITileDataFactory> tileDataFactories = null;
-    private static IOrderedRegistry<IHandleProvider> handleProviders = null;
+    private static ImmutableOrderedRegistry<ITileDataFactory> tileDataFactories = null;
+    private static ImmutableOrderedRegistry<IHandleProvider> handleProviders = null;
 
     static {
         addDefaultOrdered();
@@ -157,7 +157,7 @@ public final class Registries {
     public static final class TileEntityData {
         private TileEntityData() {}
 
-        public static IOrderedRegistry<ITileDataFactory> getTileDataFactories() {
+        public static ImmutableOrderedRegistry<ITileDataFactory> getTileDataFactories() {
             Preconditions
                     .checkState(tileDataFactories != null, "Attempted to retrieve TileDataFactoryRegistry before it was created!");
             return tileDataFactories;
@@ -173,7 +173,7 @@ public final class Registries {
     public static final class HandleProvider {
         private HandleProvider() {}
 
-        public static IOrderedRegistry<IHandleProvider> getHandleProviders() {
+        public static ImmutableOrderedRegistry<IHandleProvider> getHandleProviders() {
             Preconditions
                     .checkState(tileDataFactories != null, "Attempted to retrieve HandleProviderRegistry before it was created!");
             return handleProviders;

@@ -42,14 +42,12 @@ public class PacketRotateMirror {
 
                 ItemStack stack = AbstractGadget.getGadget(player);
                 Operation operation = msg.operation != null ? msg.operation : (player.isShiftKeyDown() ? Operation.MIRROR : Operation.ROTATE);
-                switch (operation) {
-                    case MIRROR:
-                        ((AbstractGadget) stack.getItem()).onMirror(stack, player);
-                        break;
-                    default:
-                        ((AbstractGadget) stack.getItem()).onRotate(stack, player);
+
+                if (operation == Operation.MIRROR) {
+                    ((AbstractGadget) stack.getItem()).onMirror(stack, player);
+                } else {
+                    ((AbstractGadget) stack.getItem()).onRotate(stack, player);
                 }
-                //GadgetCopyPaste.rotateOrMirrorBlocks(stack, player, operation);
             });
             ctx.get().setPacketHandled(true);
         }

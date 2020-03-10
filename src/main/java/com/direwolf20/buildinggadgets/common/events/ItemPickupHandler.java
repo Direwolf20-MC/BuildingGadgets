@@ -10,10 +10,12 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 @EventBusSubscriber
 public class ItemPickupHandler {
+
     @SubscribeEvent
     public static void GetDrops(EntityItemPickupEvent event) {
         ItemEntity entityItem = event.getItem();
         ItemStack itemStack = entityItem.getItem();
+
         if (itemStack.getItem() instanceof ConstructionPaste) {
             itemStack = InventoryHelper.addPasteToContainer(event.getPlayer(), itemStack);
             entityItem.setItem(itemStack);

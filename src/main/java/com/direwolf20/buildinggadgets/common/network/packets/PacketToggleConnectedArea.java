@@ -27,6 +27,7 @@ public class PacketToggleConnectedArea {
                 if (stack.getItem() instanceof GadgetExchanger || stack.getItem() instanceof GadgetBuilding || stack.getItem() instanceof GadgetDestruction)
                     AbstractGadget.toggleConnectedArea(player, stack);
             });
+
             ctx.get().setPacketHandled(true);
         }
     }

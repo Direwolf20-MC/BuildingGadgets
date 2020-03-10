@@ -6,9 +6,8 @@ import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
-import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
+import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.google.common.collect.Multiset;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -29,6 +28,7 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.lwjgl.opengl.GL14;
 
@@ -39,7 +39,7 @@ public abstract class BaseRenderer {
     public static final BlockState AIR = Blocks.AIR.getDefaultState();
 
     private static final FakeTERWorld tileEntityWorld = new FakeTERWorld();
-    private static final FakeBuilderWorld builderWorld = new FakeBuilderWorld();
+    private static final MockBuilderWorld builderWorld = new MockBuilderWorld();
     private static final Set<TileEntity> invalidTileEntities = new HashSet<>();
 
     private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
@@ -88,7 +88,7 @@ public abstract class BaseRenderer {
     }
 
     int getEnergy(PlayerEntity player, ItemStack heldItem) {
-        LazyOptional<IEnergyStorage> energy = CapabilityUtil.EnergyUtil.getCap(heldItem);
+        LazyOptional<IEnergyStorage> energy = heldItem.getCapability(CapabilityEnergy.ENERGY);
         if (player.isCreative() || !energy.isPresent())
             return Integer.MAX_VALUE;
 
@@ -206,7 +206,7 @@ public abstract class BaseRenderer {
         return tileEntityWorld;
     }
 
-    static FakeBuilderWorld getBuilderWorld() {
+    static MockBuilderWorld getBuilderWorld() {
         return builderWorld;
     }
 

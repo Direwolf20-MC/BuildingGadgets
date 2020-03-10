@@ -31,6 +31,7 @@ final class AllowPlayerOverrideManager {
                                 "He/She will need to run the command again for '{}' to become active again.",
                         notification.getKey(), logMessage, notification.getValue() ? "" : "not", logMessage))
                 .build();
+
         this.noPlayerTranslation = noPlayerTranslation;
         this.toggledTranslation = toggledTranslation;
         this.listTranslation = listTranslation;

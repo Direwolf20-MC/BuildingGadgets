@@ -32,10 +32,6 @@ public final class WorldBuildView implements IBuildView {
     private final BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory;
     private BlockPos translation;
 
-    public static WorldBuildView inWorld(IWorld world, Region region) {
-        return create(SimpleBuildContext.builder().build(world), region);
-    }
-
     public static WorldBuildView create(IBuildContext context, Region region) {
         return create(context, region, null);
     }
@@ -73,10 +69,6 @@ public final class WorldBuildView implements IBuildView {
     @Override
     public WorldBuildView copy() {
         return new WorldBuildView(getContext(), getBoundingBox(), dataFactory);
-    }
-
-    public PositionalBuildView evaluate() {
-        return PositionalBuildView.ofIterable(getContext(), this);
     }
 
     @Override

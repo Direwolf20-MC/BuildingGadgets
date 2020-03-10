@@ -40,10 +40,6 @@ public class GuiIncrementer extends Widget {
         this.field.setText(String.valueOf(this.value));
     }
 
-    public GuiIncrementer(int x, int y, @Nullable IIncrementerChanged onChange) {
-        this(x, y, Integer.MIN_VALUE, Integer.MAX_VALUE, onChange);
-    }
-
     public GuiIncrementer(int x, int y) {
         this(x, y, Integer.MIN_VALUE, Integer.MAX_VALUE, null);
     }
@@ -71,12 +67,6 @@ public class GuiIncrementer extends Widget {
 
         if( this.onChange != null )
             this.onChange.onChange(value);
-    }
-
-    public void updateMax(int max) {
-        this.max = max;
-        if( this.value > max )
-            this.setValue(max);
     }
 
     @Override

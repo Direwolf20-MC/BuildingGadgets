@@ -21,11 +21,15 @@ public class GuiSliderInt extends Slider {
     private int value;
 
     public GuiSliderInt(int xPos, int yPos, int width, int height, String prefix, String suf, double minVal, double maxVal,
-                        double currentVal, boolean showDec, boolean drawStr, Color color, IPressable par, BiConsumer<GuiSliderInt, Integer> increment) {
+                        double currentVal, boolean showDec, boolean drawStr, Color color, IPressable par,
+                        BiConsumer<GuiSliderInt, Integer> increment) {
+
         super(xPos, yPos, width, height, prefix, suf, minVal, maxVal, currentVal, showDec, drawStr, par);
+
         colorBackground = GuiMod.getColor(color, 200).getRGB();
         colorSliderBackground = GuiMod.getColor(color.darker(), 200).getRGB();
         colorSlider = GuiMod.getColor(color.brighter().brighter(), 200).getRGB();
+
         this.increment = increment;
     }
 
@@ -74,9 +78,7 @@ public class GuiSliderInt extends Slider {
     }
 
     @Override
-    public void playDownSound(SoundHandler p_playDownSound_1_) {
-
-    }
+    public void playDownSound(SoundHandler p_playDownSound_1_) { }
 
     @Override
     protected void renderBg(Minecraft mc, int mouseX, int mouseY) {
@@ -87,6 +89,7 @@ public class GuiSliderInt extends Slider {
             sliderValue = (mouseX - (x + 4)) / (float) (width - 8);
             updateSlider();
         }
+
         drawBorderedRect(x + (int) (sliderValue * (width - 8)), y, 8, height);
     }
 
@@ -96,9 +99,11 @@ public class GuiSliderInt extends Slider {
     }
 
     public Collection<Button> getComponents() {
-        return ImmutableSet.of(this,
+        return ImmutableSet.of(
+                this,
                 new GuiButtonIncrement(this, x - height, y, height, height, "-", b -> increment.accept(this, - 1)),
-                new GuiButtonIncrement(this, x + width, y, height, height, "+", b -> increment.accept(this, 1)));
+                new GuiButtonIncrement(this, x + width, y, height, height, "+", b -> increment.accept(this, 1)
+        ));
     }
 
     private static class GuiButtonIncrement extends Button {
@@ -122,8 +127,6 @@ public class GuiSliderInt extends Slider {
         }
 
         @Override
-        public void playDownSound(SoundHandler p_playDownSound_1_) {
-
-        }
+        public void playDownSound(SoundHandler p_playDownSound_1_) { }
     }
 }
