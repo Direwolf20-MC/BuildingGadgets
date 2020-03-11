@@ -353,13 +353,13 @@ public class CopyPasteRender extends BaseRenderer {
 
     private void renderTargets(IBuildContext context, RenderSorter sorter, float partialTicks, RenderWorldLastEvent evt) {
         tickTrack ++;
-        if( renderBuffer != null && tickTrack < 100 ) {
+        if (renderBuffer != null && tickTrack < 300) {
             Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
 
             MatrixStack matrix = evt.getMatrixStack(); //Get current matrix position from the evt call
             matrix.push(); //Save the render position from RenderWorldLast
             matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ()); //Sets render position to 0,0,0
-            matrix.translate(-152, 63, -55); //This is where the draw will occur, change to anchor/player look vector
+            //matrix.translate(-152, 63, -55); //This is where the draw will occur, change to anchor/player look vector
             renderBuffer.render(matrix.getLast().getMatrix()); //Actually draw whats in the buffer
             matrix.pop(); //Load the save that we did above, undoing the past 2 translates
             return;
@@ -367,6 +367,8 @@ public class CopyPasteRender extends BaseRenderer {
 
         tickTrack = 0;
         System.out.println("Creating cache");
+        if (renderBuffer != null) //Reset Render Buffer before rebuilding
+            renderBuffer.close();
         renderBuffer = MultiVBORenderer.of((buffer) -> {
             System.out.println("Building again");
 
@@ -375,14 +377,15 @@ public class CopyPasteRender extends BaseRenderer {
 
             MatrixStack matrix = new MatrixStack(); //Create a new matrix stack for use in the buffer building process
             matrix.push(); //Save position
+            //BlockPos startPos = GadgetUtils.getPOSFromNBT(context.getUsedStack(), "start_pos");
             for (PlacementTarget target : sorter.getSortedTargets()) {
                 BlockPos targetPos = target.getPos();
                 BlockState state = context.getWorld().getBlockState(target.getPos());
 
                 matrix.push(); //Save position again
-                //matrix.translate(todo); //Todo - We need to reposition the matrix relative to the start coords of our render.
-                //Start pos = 0,0,0 and then iterate through to endpos.
-                //So block above startpos would be 0,1,0, we'd pass that to translate
+                //matrix.translate(-startPos.getX(), -startPos.getY(), -startPos.getZ());
+                matrix.translate(targetPos.getX(), targetPos.getY(), targetPos.getZ());
+
                 IBakedModel ibakedmodel = dispatcher.getModelForState(state);
                 BlockColors blockColors = Minecraft.getInstance().getBlockColors();
                 int color = blockColors.getColor(state, context.getWorld(), targetPos, 0);
@@ -403,6 +406,14 @@ public class CopyPasteRender extends BaseRenderer {
             }
             matrix.pop(); //Load after loop
         });
+        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+
+        MatrixStack matrix = evt.getMatrixStack(); //Get current matrix position from the evt call
+        matrix.push(); //Save the render position from RenderWorldLast
+        matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ()); //Sets render position to 0,0,0
+        //matrix.translate(-152, 63, -55); //This is where the draw will occur, change to anchor/player look vector
+        renderBuffer.render(matrix.getLast().getMatrix()); //Actually draw whats in the buffer
+        matrix.pop(); //Load the save that we did above, undoing the past 2 translates
     }
 
     public static class MultiVBORenderer implements Closeable
@@ -429,7 +440,8 @@ public class CopyPasteRender extends BaseRenderer {
 
                 VertexFormat fmt = rt.getVertexFormat();
                 VertexBuffer vbo = new VertexBuffer(fmt);
-
+                BlockPos playerPos = getMc().player.getPosition();
+                builder.sortVertexData((float) playerPos.getX(), (float) playerPos.getY(), (float) playerPos.getZ());//This sorts the buffer relative to the player's camera
                 vbo.upload(builder);
                 return vbo;
             });
