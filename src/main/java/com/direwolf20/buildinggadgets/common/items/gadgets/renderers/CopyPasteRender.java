@@ -39,10 +39,7 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.io.Closeable;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -360,11 +357,20 @@ public class CopyPasteRender extends BaseRenderer {
             matrix.push(); //Save the render position from RenderWorldLast
             matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ()); //Sets render position to 0,0,0
             //matrix.translate(-152, 63, -55); //This is where the draw will occur, change to anchor/player look vector
+            playerPos.inverse();
+            try {
+                //renderBuffer.sort((float) playerPos.getX(), (float) playerPos.getY(), (float) playerPos.getZ());
+            } catch (Exception e) {
+
+            }
             renderBuffer.render(matrix.getLast().getMatrix()); //Actually draw whats in the buffer
             matrix.pop(); //Load the save that we did above, undoing the past 2 translates
             return;
         }
-
+        ArrayList<BlockPos> blockPosList = new ArrayList<>();
+        for (PlacementTarget target : sorter.getSortedTargets()) {
+            blockPosList.add(target.getPos());
+        }
         tickTrack = 0;
         System.out.println("Creating cache");
         if (renderBuffer != null) //Reset Render Buffer before rebuilding
@@ -378,6 +384,7 @@ public class CopyPasteRender extends BaseRenderer {
             MatrixStack matrix = new MatrixStack(); //Create a new matrix stack for use in the buffer building process
             matrix.push(); //Save position
             //BlockPos startPos = GadgetUtils.getPOSFromNBT(context.getUsedStack(), "start_pos");
+
             for (PlacementTarget target : sorter.getSortedTargets()) {
                 BlockPos targetPos = target.getPos();
                 BlockState state = context.getWorld().getBlockState(target.getPos());
@@ -396,6 +403,7 @@ public class CopyPasteRender extends BaseRenderer {
                 try {
                     if (state.getRenderType() == BlockRenderType.MODEL)
                         for (Direction direction : Direction.values()) {
+                            //if (!blockPosList.contains(targetPos.offset(direction)))
                             renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                         }
                 } catch (Exception e) {
@@ -431,29 +439,46 @@ public class CopyPasteRender extends BaseRenderer {
                 return builder;
             }));
 
+            Map<RenderType, BufferBuilder.State> sortCaches = Maps.newHashMap();
             Map<RenderType, VertexBuffer> buffers = Maps.transformEntries(builders, (rt, builder) -> {
                 Objects.requireNonNull(rt);
                 Objects.requireNonNull(builder);
-
+                sortCaches.put(rt, builder.getVertexState());
                 System.out.println("Finishing builder for RT=" + rt);
                 builder.finishDrawing();
-
                 VertexFormat fmt = rt.getVertexFormat();
                 VertexBuffer vbo = new VertexBuffer(fmt);
                 BlockPos playerPos = getMc().player.getPosition();
                 builder.sortVertexData((float) playerPos.getX(), (float) playerPos.getY(), (float) playerPos.getZ());//This sorts the buffer relative to the player's camera
+
                 vbo.upload(builder);
                 return vbo;
             });
-            return new MultiVBORenderer(buffers);
+            return new MultiVBORenderer(buffers, sortCaches);
         }
 
         private final ImmutableMap<RenderType, VertexBuffer> buffers;
+        private final ImmutableMap<RenderType, BufferBuilder.State> sortCaches;
 
-        protected MultiVBORenderer(Map<RenderType, VertexBuffer> buffers)
-        {
+        protected MultiVBORenderer(Map<RenderType, VertexBuffer> buffers, Map<RenderType, BufferBuilder.State> sortCaches) {
             this.buffers = ImmutableMap.copyOf(buffers);
+            this.sortCaches = ImmutableMap.copyOf(sortCaches);
         }
+
+        public void sort(float x, float y, float z) {
+            for (Map.Entry<RenderType, BufferBuilder.State> kv : sortCaches.entrySet()) {
+                RenderType rt = kv.getKey();
+                BufferBuilder.State state = kv.getValue();
+                BufferBuilder builder = new BufferBuilder(BUFFER_SIZE);
+                builder.begin(rt.getDrawMode(), rt.getVertexFormat());
+                builder.setVertexState(state);
+                builder.sortVertexData(x, y, z);
+                builder.finishDrawing();
+                VertexBuffer vbo = buffers.get(rt);
+                vbo.upload(builder);
+            }
+        }
+
         public void render(Matrix4f matrix) {
             buffers.entrySet().forEach(kv -> {
                 RenderType rt = kv.getKey();
