@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
+import com.direwolf20.buildinggadgets.client.renderer.DireBufferBuilder;
+import com.direwolf20.buildinggadgets.client.renderer.DireVertexBuffer;
 import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
@@ -21,10 +23,12 @@ import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.vertex.VertexBuffer;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItem;
@@ -357,11 +361,12 @@ public class CopyPasteRender extends BaseRenderer {
             matrix.push(); //Save the render position from RenderWorldLast
             matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ()); //Sets render position to 0,0,0
             //matrix.translate(-152, 63, -55); //This is where the draw will occur, change to anchor/player look vector
-            playerPos.inverse();
-            try {
-                //renderBuffer.sort((float) playerPos.getX(), (float) playerPos.getY(), (float) playerPos.getZ());
-            } catch (Exception e) {
+            if (tickTrack % 30 == 0) {
+                try {
+                    renderBuffer.sort((float) playerPos.getX(), (float) playerPos.getY(), (float) playerPos.getZ());
+                } catch (Exception e) {
 
+                }
             }
             renderBuffer.render(matrix.getLast().getMatrix()); //Actually draw whats in the buffer
             matrix.pop(); //Load the save that we did above, undoing the past 2 translates
@@ -426,30 +431,29 @@ public class CopyPasteRender extends BaseRenderer {
 
     public static class MultiVBORenderer implements Closeable
     {
-        private static final int BUFFER_SIZE = 2*1024*1024;
+        private static final int BUFFER_SIZE = 2 * 1024 * 1024 * 3;
 
-        public static MultiVBORenderer of(Consumer<IRenderTypeBuffer> vertexProducer)
-        {
-            final Map<RenderType, BufferBuilder> builders = Maps.newHashMap();
+        public static MultiVBORenderer of(Consumer<IRenderTypeBuffer> vertexProducer) {
+            final Map<RenderType, DireBufferBuilder> builders = Maps.newHashMap();
 
             vertexProducer.accept(rt -> builders.computeIfAbsent(rt, (_rt) -> {
-                BufferBuilder builder = new BufferBuilder(BUFFER_SIZE);
+                DireBufferBuilder builder = new DireBufferBuilder(BUFFER_SIZE);
                 builder.begin(_rt.getDrawMode(), _rt.getVertexFormat());
                 System.out.println("Created new builder for RT=" + _rt);
                 return builder;
             }));
 
-            Map<RenderType, BufferBuilder.State> sortCaches = Maps.newHashMap();
-            Map<RenderType, VertexBuffer> buffers = Maps.transformEntries(builders, (rt, builder) -> {
+            Map<RenderType, DireBufferBuilder.State> sortCaches = Maps.newHashMap();
+            Map<RenderType, DireVertexBuffer> buffers = Maps.transformEntries(builders, (rt, builder) -> {
                 Objects.requireNonNull(rt);
                 Objects.requireNonNull(builder);
                 sortCaches.put(rt, builder.getVertexState());
                 System.out.println("Finishing builder for RT=" + rt);
                 builder.finishDrawing();
                 VertexFormat fmt = rt.getVertexFormat();
-                VertexBuffer vbo = new VertexBuffer(fmt);
+                DireVertexBuffer vbo = new DireVertexBuffer(fmt);
                 BlockPos playerPos = getMc().player.getPosition();
-                builder.sortVertexData((float) playerPos.getX(), (float) playerPos.getY(), (float) playerPos.getZ());//This sorts the buffer relative to the player's camera
+                //builder.sortVertexData((float) playerPos.getX(), (float) playerPos.getY(), (float) playerPos.getZ());//This sorts the buffer relative to the player's camera
 
                 vbo.upload(builder);
                 return vbo;
@@ -457,24 +461,25 @@ public class CopyPasteRender extends BaseRenderer {
             return new MultiVBORenderer(buffers, sortCaches);
         }
 
-        private final ImmutableMap<RenderType, VertexBuffer> buffers;
-        private final ImmutableMap<RenderType, BufferBuilder.State> sortCaches;
+        private final ImmutableMap<RenderType, DireVertexBuffer> buffers;
+        private final ImmutableMap<RenderType, DireBufferBuilder.State> sortCaches;
 
-        protected MultiVBORenderer(Map<RenderType, VertexBuffer> buffers, Map<RenderType, BufferBuilder.State> sortCaches) {
+        protected MultiVBORenderer(Map<RenderType, DireVertexBuffer> buffers, Map<RenderType, DireBufferBuilder.State> sortCaches) {
             this.buffers = ImmutableMap.copyOf(buffers);
             this.sortCaches = ImmutableMap.copyOf(sortCaches);
         }
 
         public void sort(float x, float y, float z) {
-            for (Map.Entry<RenderType, BufferBuilder.State> kv : sortCaches.entrySet()) {
+            for (Map.Entry<RenderType, DireBufferBuilder.State> kv : sortCaches.entrySet()) {
                 RenderType rt = kv.getKey();
-                BufferBuilder.State state = kv.getValue();
-                BufferBuilder builder = new BufferBuilder(BUFFER_SIZE);
+                DireBufferBuilder.State state = kv.getValue();
+                DireBufferBuilder builder = new DireBufferBuilder(BUFFER_SIZE);
                 builder.begin(rt.getDrawMode(), rt.getVertexFormat());
                 builder.setVertexState(state);
                 builder.sortVertexData(x, y, z);
                 builder.finishDrawing();
-                VertexBuffer vbo = buffers.get(rt);
+
+                DireVertexBuffer vbo = buffers.get(rt);
                 vbo.upload(builder);
             }
         }
@@ -482,14 +487,14 @@ public class CopyPasteRender extends BaseRenderer {
         public void render(Matrix4f matrix) {
             buffers.entrySet().forEach(kv -> {
                 RenderType rt = kv.getKey();
-                VertexBuffer vbo = kv.getValue();
+                DireVertexBuffer vbo = kv.getValue();
                 VertexFormat fmt = rt.getVertexFormat();
 
                 rt.setupRenderState();
                 vbo.bindBuffer();
                 fmt.setupBufferState(0L);
                 vbo.draw(matrix, rt.getDrawMode());
-                VertexBuffer.unbindBuffer();
+                DireVertexBuffer.unbindBuffer();
                 fmt.clearBufferState();
                 rt.clearRenderState();
             });
@@ -497,7 +502,7 @@ public class CopyPasteRender extends BaseRenderer {
 
         public void close()
         {
-            buffers.values().forEach(VertexBuffer::close);
+            buffers.values().forEach(DireVertexBuffer::close);
         }
     }
 }
