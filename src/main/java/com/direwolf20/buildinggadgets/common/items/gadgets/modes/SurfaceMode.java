@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.modes;
 
 import com.direwolf20.buildinggadgets.common.building.Region;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -35,10 +36,9 @@ public class SurfaceMode extends AbstractMode {
     @Override
     public boolean validator(PlayerEntity player, BlockPos pos, UseContext context) {
         // Do our default checks, then do our more complex fuzzy aware checks.
-//        boolean firstValidation = super.validator(player, pos, context);
-//
-//        BlockState startState = context.getWorldState(context.getStartPos());
-//        return (!context.isFuzzy() ? context.getWorld().isAirBlock(pos) : context.getWorldState(pos) != startState) && firstValidation;
-        return true;
+        boolean firstValidation = super.validator(player, pos, context);
+
+        BlockState startState = context.getWorldState(context.getStartPos());
+        return (!context.isFuzzy() ? context.getWorld().isAirBlock(pos) : context.getWorldState(pos) != startState) && firstValidation;
     }
 }

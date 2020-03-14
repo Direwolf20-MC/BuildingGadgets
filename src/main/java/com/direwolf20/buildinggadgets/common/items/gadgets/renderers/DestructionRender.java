@@ -44,7 +44,6 @@ public class DestructionRender extends BaseRenderer {
         stack.push();
         stack.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
 
-
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         IVertexBuilder builder = buffer.getBuffer(MyRenderType.MissingBlockOverlay);
 

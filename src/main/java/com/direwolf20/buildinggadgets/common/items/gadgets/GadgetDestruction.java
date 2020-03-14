@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.placement.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.common.building.placement.PlacementSequences.ConnectedSurface;
 import com.direwolf20.buildinggadgets.common.building.placement.SetBackedPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -46,7 +45,6 @@ import net.minecraftforge.event.world.BlockEvent;
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -194,22 +192,17 @@ public class GadgetDestruction extends AbstractGadget {
 
     public static IPositionPlacementSequence getClearingPositions(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
         ItemStack tool = getGadget(player);
-        GadgetDestruction item = (GadgetDestruction) tool.getItem();
         int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
         if (tool.isEmpty() || depth == 0 || ! player.isAllowEdit())
             return CommonUtils.emptyPositionSequence();
 
         Region boundary = getClearingRegion(pos, incomingSide, player, stack);
-        BlockPos startPos = (item.getAnchor(stack) == null) ? pos : item.getAnchor(stack);
         boolean fuzzy = ! Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || AbstractGadget.getFuzzy(stack);
         BlockState stateTarget = fuzzy ? null : world.getBlockState(pos);
 
-        if (AbstractGadget.getConnectedArea(stack))
-            return ConnectedSurface.create(world, boundary, Function.identity(), startPos, null, (s, p) -> isValidBlock(world, p, player, s, fuzzy));
-        else
-            return new SetBackedPlacementSequence(boundary.stream()
-                    .filter(p -> isValidBlock(world, p, player, stateTarget, fuzzy))
-                    .collect(Collectors.toCollection(HashSet::new)), boundary);
+        return new SetBackedPlacementSequence(boundary.stream()
+                .filter(p -> isValidBlock(world, p, player, stateTarget, fuzzy))
+                .collect(Collectors.toCollection(HashSet::new)), boundary);
     }
 
     public static List<BlockPos> getClearingPositionsForRendering(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
