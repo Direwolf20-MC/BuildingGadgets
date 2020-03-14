@@ -215,18 +215,21 @@ public class CopyPasteRender extends BaseRenderer {
                 float f1 = (float) (color >> 8 & 255) / 255.0F;
                 float f2 = (float) (color & 255) / 255.0F;
                 try {
-                    if (state.getRenderType() == BlockRenderType.MODEL)
+                    if (state.getRenderType() == BlockRenderType.MODEL) {
                         for (Direction direction : Direction.values()) {
-                            if (Block.shouldSideBeRendered(state, context.getWorld(), targetPos, direction)) {
-                                if (state.getBlock().getMaterial(state).isOpaque()) {
+                            if (Block.shouldSideBeRendered(state, context.getWorld(), targetPos, direction) && !(context.getWorld().getBlockState(targetPos.offset(direction)).getBlock().equals(state.getBlock()))) {
+                                if (state.getMaterial().isOpaque()) {
                                     renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
-                                    renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                                 } else {
                                     renderModelBrightnessColorQuads(stack.getLast(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
-                                    renderModelBrightnessColorQuads(stack.getLast(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                                 }
                             }
                         }
+                        if (state.getMaterial().isOpaque())
+                            renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                        else
+                            renderModelBrightnessColorQuads(stack.getLast(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                    }
                 } catch (Exception e) {
                     BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
                 }
