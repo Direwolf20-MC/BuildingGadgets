@@ -12,8 +12,6 @@ import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.template.Template;
-import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper.RenderSorter;
 import com.direwolf20.buildinggadgets.common.world.MockDelegationWorld;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -21,7 +19,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.block.*;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
@@ -31,8 +30,6 @@ import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -46,7 +43,6 @@ import java.io.Closeable;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 
@@ -75,8 +71,7 @@ public class CopyPasteRender extends BaseRenderer {
         if (GadgetCopyPaste.getToolMode(heldItem) == GadgetCopyPaste.ToolMode.COPY) {
             GadgetCopyPaste.getSelectedRegion(heldItem).ifPresent(region ->
                     renderCopy(stack, region));
-        }
-        else
+        } else
             renderPaste(stack, projectedView, player, heldItem);
 
         stack.pop();
@@ -127,8 +122,9 @@ public class CopyPasteRender extends BaseRenderer {
 
     /**
      * todo: eval how much load the caps add template fetching put on the render
-     * @since 1.14 - 3.2.0b
+     *
      * @implNote @michaelhillcox
+     * @since 1.14 - 3.2.0b
      */
     private void renderPaste(MatrixStack matrix, Vec3d projectedView, PlayerEntity player, ItemStack heldItem) {
         World world = player.world;
@@ -150,30 +146,36 @@ public class CopyPasteRender extends BaseRenderer {
 
                     // Get the template and move it to the start pos (player.pick())
                     IBuildView view = provider.getTemplateForKey(key).createViewInContext(context);
-                    view.translateTo(startPos);
+                    //view.translateTo(startPos);
 
                     // Sort the render
-                    RenderSorter sorter = new RenderSorter(player, view.estimateSize());
+                    //RenderSorter sorter = new RenderSorter(player, view.estimateSize());
+                    List<PlacementTarget> targets = new ArrayList<>(view.estimateSize());
                     for (PlacementTarget target : view) {
                         if (target.placeIn(context))
-                            sorter.onPlaced(target);
+                            targets.add(target);
                     }
 
-                    renderTargets(matrix, projectedView, context, sorter);
+                    renderTargets(matrix, projectedView, context, targets, startPos);
                 });
             });
         });
     }
 
-    private void renderTargets(MatrixStack matrix, Vec3d projectedView, IBuildContext context, RenderSorter sorter) {
-        tickTrack ++;
+    private void renderTargets(MatrixStack matrix, Vec3d projectedView, IBuildContext context, List<PlacementTarget> targets, BlockPos startPos) {
+        tickTrack++;
         if (renderBuffer != null && tickTrack < 300) {
             if (tickTrack % 30 == 0) {
                 try {
-                    renderBuffer.sort((float) projectedView.getX(), (float) projectedView.getY(), (float) projectedView.getZ());
-                } catch (Exception ignored) {}
+                    Vec3d projectedView2 = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+                    Vec3d startPosView = new Vec3d(startPos.getX(), startPos.getY(), startPos.getZ());
+                    projectedView2 = projectedView2.subtract(startPosView);
+                    renderBuffer.sort((float) projectedView2.getX(), (float) projectedView2.getY(), (float) projectedView2.getZ());
+                } catch (Exception ignored) {
+                }
             }
 
+            matrix.translate(startPos.getX(), startPos.getY(), startPos.getZ());
             renderBuffer.render(matrix.getLast().getMatrix()); //Actually draw whats in the buffer
             return;
         }
@@ -194,7 +196,7 @@ public class CopyPasteRender extends BaseRenderer {
             MatrixStack stack = new MatrixStack(); //Create a new matrix stack for use in the buffer building process
             stack.push(); //Save position
 
-            for (PlacementTarget target : sorter.getSortedTargets()) {
+            for (PlacementTarget target : targets) {
                 BlockPos targetPos = target.getPos();
                 BlockState state = context.getWorld().getBlockState(target.getPos());
 
@@ -213,7 +215,7 @@ public class CopyPasteRender extends BaseRenderer {
                     if (state.getRenderType() == BlockRenderType.MODEL)
                         for (Direction direction : Direction.values()) {
 //                            if (!blockPosList.contains(targetPos.offset(direction)))
-                                renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                            renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                         }
                 } catch (Exception e) {
                     BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
@@ -223,7 +225,14 @@ public class CopyPasteRender extends BaseRenderer {
             }
             stack.pop(); //Load after loop
         });
-
+        try {
+            Vec3d projectedView2 = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+            Vec3d startPosView = new Vec3d(startPos.getX(), startPos.getY(), startPos.getZ());
+            projectedView2 = projectedView2.subtract(startPosView);
+            renderBuffer.sort((float) projectedView2.getX(), (float) projectedView2.getY(), (float) projectedView2.getZ());
+        } catch (Exception ignored) {
+        }
+        matrix.translate(startPos.getX(), startPos.getY(), startPos.getZ());
         renderBuffer.render(matrix.getLast().getMatrix()); //Actually draw whats in the buffer
     }
 
@@ -232,8 +241,7 @@ public class CopyPasteRender extends BaseRenderer {
         return true;
     }
 
-    public static class MultiVBORenderer implements Closeable
-    {
+    public static class MultiVBORenderer implements Closeable {
         private static final int BUFFER_SIZE = 2 * 1024 * 1024 * 3;
 
         public static MultiVBORenderer of(Consumer<IRenderTypeBuffer> vertexProducer) {
@@ -302,8 +310,7 @@ public class CopyPasteRender extends BaseRenderer {
             });
         }
 
-        public void close()
-        {
+        public void close() {
             buffers.values().forEach(DireVertexBuffer::close);
         }
     }
