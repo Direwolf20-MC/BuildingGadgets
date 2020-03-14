@@ -117,14 +117,16 @@ public class ModeRadialMenu extends Screen {
                 addButton(button);
                 conditionalButtons.add(button);
             }
-            Button button = new PositionedIconActionable((isDestruction ? RadialTranslation.CONNECTED_AREA : RadialTranslation.CONNECTED_SURFACE), "connected_area", right, send -> {
-                if (send)
-                    PacketHandler.sendToServer(new PacketToggleConnectedArea());
+            if( !isDestruction ) {
+                Button button = new PositionedIconActionable(RadialTranslation.CONNECTED_SURFACE, "connected_area", right, send -> {
+                    if (send)
+                        PacketHandler.sendToServer(new PacketToggleConnectedArea());
 
-                return AbstractGadget.getConnectedArea(getGadget());
-            });
-            addButton(button);
-            conditionalButtons.add(button);
+                    return AbstractGadget.getConnectedArea(getGadget());
+                });
+                addButton(button);
+                conditionalButtons.add(button);
+            }
             if (!isDestruction) {
                 int widthSlider = 82;
                 GuiSliderInt sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, "Range ", "", 1, Config.GADGETS.maxRange.get(),
