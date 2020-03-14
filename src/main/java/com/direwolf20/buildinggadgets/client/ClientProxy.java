@@ -99,7 +99,7 @@ public class ClientProxy {
 
             @Override
             public boolean isAmbientOcclusion() {
-                return false;
+                return true;
             }
 
             @Override
