@@ -141,6 +141,8 @@ public class GadgetBuilding extends AbstractGadget {
 
         player.setActiveHand(hand);
         if (!world.isRemote) {
+            // Debug code for free energy
+            //itemstack.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> e.receiveEnergy(15000000, false));
             if (player.isShiftKeyDown()) {
                 selectBlock(itemstack, player);
             } else if (player instanceof ServerPlayerEntity) {
