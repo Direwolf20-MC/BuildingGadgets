@@ -64,6 +64,6 @@ public class MyRenderType extends RenderType {
                     .transparency(TRANSLUCENT_TRANSPARENCY)
                     .depthTest(DEPTH_LEQUAL)
                     .cull(CULL_DISABLED)
-                    .writeMask(COLOR_DEPTH_WRITE)
+                    .writeMask(COLOR_WRITE)
                     .build(false));
 }
