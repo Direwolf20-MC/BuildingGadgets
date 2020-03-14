@@ -169,7 +169,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
 
     @Override
     public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
-        return false; //TODO Find a way to make this work, glass adjacent to fake glass shows the middle side.
+        return super.isSideInvisible(state, adjacentBlockState, side); //TODO Find a way to make this work, glass adjacent to fake glass shows the middle side.
         /*boolean bright = state.get(ConstructionBlock.BRIGHT);
         if (!bright) return false;
         if (adjacentBlockState.getBlock() instanceof ConstructionBlock) {

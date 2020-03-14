@@ -134,10 +134,12 @@ public class BuildRender extends BaseRenderer {
             float f1 = (float) (color >> 8 & 255) / 255.0F;
             float f2 = (float) (color & 255) / 255.0F;
             try {
-                if (state.getRenderType() == BlockRenderType.MODEL)
+                if (state.getRenderType() == BlockRenderType.MODEL) {
                     for (Direction direction : Direction.values()) {
                         renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(coordinate)), EmptyModelData.INSTANCE), 15728640, 655360);
                     }
+                    renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(coordinate)), EmptyModelData.INSTANCE), 15728640, 655360);
+                }
             } catch (Throwable t) {
                 BuildingGadgets.LOG.trace("Block at {} with state {} threw exception, whilst rendering", coordinate, state, t);
             }
