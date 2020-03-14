@@ -15,7 +15,7 @@ import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUnique
 import com.direwolf20.buildinggadgets.common.items.gadgets.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.items.gadgets.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
-import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.ExchangerRender;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.save.Undo;
@@ -87,7 +87,7 @@ public class GadgetExchanger extends ModeGadget {
 
     @Override
     protected Supplier<BaseRenderer> createRenderFactory() {
-        return ExchangerRender::new;
+        return () -> new BuildRender(true);
     }
 
     @Override
@@ -195,7 +195,7 @@ public class GadgetExchanger extends ModeGadget {
             return false;
 
         BlockData blockData = getToolBlock(heldItem);
-        List<BlockPos> coords = GadgetUtils.getAnchor(stack);
+        List<BlockPos> coords = GadgetUtils.getAnchor(stack).orElse(new ArrayList<>());
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
             BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);

@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
@@ -12,6 +11,7 @@ import com.direwolf20.buildinggadgets.common.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.gadgets.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
@@ -33,7 +33,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
@@ -49,8 +48,14 @@ import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.ren
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getAnchor;
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getToolBlock;
 
-public class BuildingRender extends BaseRenderer {
+public class BuildRender extends BaseRenderer {
+    // @implNote: this'll only work for now as we only have the 2 gadgets.
+    private boolean isExchanger = false;
     private static final BlockState DEFAULT_EFFECT_BLOCK = OurBlocks.effectBlock.getDefaultState();
+
+    public BuildRender(boolean isExchanger) {
+        this.isExchanger = isExchanger;
+    }
 
     @Override
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
@@ -64,7 +69,7 @@ public class BuildingRender extends BaseRenderer {
         BlockState state = AIR;
         Optional<List<BlockPos>> anchor = getAnchor(heldItem);
 
-        if( player.world.isAirBlock(lookingAt.getPos()) || !anchor.isPresent() )
+        if( player.world.isAirBlock(lookingAt.getPos()) && !anchor.isPresent() )
             return;
 
         BlockState startBlock = player.world.getBlockState(lookingAt.getPos());
@@ -78,10 +83,14 @@ public class BuildingRender extends BaseRenderer {
             return;
 
         // Get the coordinates from the anchor. If the anchor isn't present then build the collector.
-        List<BlockPos> coordinates = anchor.orElseGet(() -> GadgetBuilding.getToolMode(heldItem).getMode().getCollection(
-                new AbstractMode.UseContext(player.world, renderBlockState, lookingAt.getPos(), heldItem, GadgetBuilding.shouldPlaceAtop(heldItem)), player,
-                lookingAt.getFace()
-        ));
+        List<BlockPos> coordinates = anchor.orElseGet(() -> {
+            AbstractMode mode = !this.isExchanger ? GadgetBuilding.getToolMode(heldItem).getMode() : GadgetExchanger.getToolMode(heldItem).getMode();
+            return mode.getCollection(
+                    new AbstractMode.UseContext(player.world, renderBlockState, lookingAt.getPos(), heldItem, !this.isExchanger && GadgetBuilding.shouldPlaceAtop(heldItem)),
+                    player,
+                    lookingAt.getFace()
+            );
+        });
 
         // Sort them on a new line for readability
         coordinates = SortingHelper.Blocks.byDistance(coordinates, player);
@@ -107,6 +116,11 @@ public class BuildingRender extends BaseRenderer {
         for (BlockPos coordinate : coordinates) {
             matrix.push();
             matrix.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
+            if( this.isExchanger ) {
+                matrix.translate(-0.0005f, -0.0005f, -0.0005f);
+                matrix.scale(1.001f, 1.001f, 1.001f);
+            }
+
             if (getBuilderWorld().getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
                 try {
                     state = renderBlockState;

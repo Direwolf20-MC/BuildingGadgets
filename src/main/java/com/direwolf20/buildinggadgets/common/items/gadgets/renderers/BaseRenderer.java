@@ -44,7 +44,6 @@ public abstract class BaseRenderer {
 
     private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
 
-
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
         // This is necessary to prevent issues with not rendering the overlay's at all (when Botania being present) - See #329 for more information
         bindBlocks();
@@ -53,7 +52,7 @@ public abstract class BaseRenderer {
         //BaseRenderer.renderLinkedInventoryOutline(evt, heldItem, player);
     }
 
-    protected void bindBlocks() {
+    private void bindBlocks() {
         getMc().getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
     }
 
@@ -93,28 +92,6 @@ public abstract class BaseRenderer {
             return Integer.MAX_VALUE;
 
         return energy.orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
-    }
-
-    long playerHasBlocks(ItemStack stack, PlayerEntity player, BlockState state) {
-        long hasBlocks = InventoryHelper.countItem(stack, player, getCacheInventory());
-
-        if (!state.hasTileEntity())
-            hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
-
-        return hasBlocks;
-    }
-
-    ItemStack getItemStackForRender(BlockState state, PlayerEntity player, IWorld world) {
-        ItemStack itemStack = ItemStack.EMPTY;
-
-        // Todo: use blockdata apparently
-//        if (state.getBlock().canSilkHarvest(state, world, BlockPos.ZERO, player))
-//            itemStack = InventoryHelper.getSilkTouchDrop(state);
-//        else
-        itemStack = state.getBlock().getPickBlock(state, null, world, BlockPos.ZERO, player);
-
-
-        return !itemStack.isEmpty() ? itemStack : state.getBlock().getPickBlock(state, null, world, BlockPos.ZERO, player);
     }
 
     /*protected BufferBuilder setupMissingRender() {

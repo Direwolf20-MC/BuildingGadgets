@@ -13,7 +13,7 @@ import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUnique
 import com.direwolf20.buildinggadgets.common.items.gadgets.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.items.gadgets.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
-import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildingRender;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.save.Undo;
@@ -73,7 +73,7 @@ public class GadgetBuilding extends ModeGadget {
 
     @Override
     protected Supplier<BaseRenderer> createRenderFactory() {
-        return BuildingRender::new;
+        return () -> new BuildRender(false);
     }
 
     public boolean placeAtop(ItemStack stack) {
