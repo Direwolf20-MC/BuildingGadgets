@@ -368,7 +368,7 @@ public class GadgetUtils {
             if (stack.getItem() instanceof GadgetBuilding) {
                 coords = GadgetBuilding.getToolMode(stack).getMode().getCollection(player, context, sideHit);
             } else if (stack.getItem() instanceof GadgetExchanger) {
-                coords = GadgetBuilding.getToolMode(stack).getMode().getCollection(player, context, sideHit);
+                coords = GadgetExchanger.getToolMode(stack).getMode().getCollection(player, context, sideHit);
             }
             setAnchor(stack, coords); //Set the anchor NBT
             player.sendStatusMessage(MessageTranslation.ANCHOR_SET.componentTranslation().setStyle(Styles.AQUA), true);

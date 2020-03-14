@@ -167,7 +167,7 @@ public class CopyPasteRender extends BaseRenderer {
         if (renderBuffer != null && tickTrack < 300) {
             if (tickTrack % 30 == 0) {
                 try {
-                    Vec3d projectedView2 = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+                    Vec3d projectedView2 = projectedView;
                     Vec3d startPosView = new Vec3d(startPos.getX(), startPos.getY(), startPos.getZ());
                     projectedView2 = projectedView2.subtract(startPosView);
                     renderBuffer.sort((float) projectedView2.getX(), (float) projectedView2.getY(), (float) projectedView2.getZ());
