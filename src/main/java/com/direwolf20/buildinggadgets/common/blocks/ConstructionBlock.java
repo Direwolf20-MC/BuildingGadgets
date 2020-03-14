@@ -52,10 +52,10 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return true;
     }
 
-    @Override
-    public boolean isAir(BlockState state) {
-        return !state.get(ConstructionBlock.BRIGHT);
-    }
+    //@Override
+    //public boolean isAir(BlockState state) {
+    //    return !state.get(ConstructionBlock.BRIGHT);
+    //}
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
@@ -182,14 +182,15 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
 
     @Override
     public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
-        boolean bright = state.get(ConstructionBlock.BRIGHT);
+        return false; //TODO Find a way to make this work, glass adjacent to fake glass shows the middle side.
+        /*boolean bright = state.get(ConstructionBlock.BRIGHT);
         if (!bright) return false;
         if (adjacentBlockState.getBlock() instanceof ConstructionBlock) {
             return !adjacentBlockState.get(ConstructionBlock.BRIGHT);
         } else {
             //This is how vanilla BreakableBlock does it.
             return adjacentBlockState.getBlock() == this ? true : super.isSideInvisible(state, adjacentBlockState, side);
-        }
+        }*/
     }
 
     @Override
