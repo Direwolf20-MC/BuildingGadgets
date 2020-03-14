@@ -20,13 +20,11 @@ import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil.EnergyUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import net.minecraft.block.Block;
@@ -48,6 +46,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.DistExecutor;
@@ -123,23 +122,32 @@ public abstract class AbstractGadget extends Item {
 
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
-        return EnergyUtil.returnDoubleIfPresent(stack,
-                (energy -> 1D - (energy.getEnergyStored() / (double) energy.getMaxEnergyStored())),
-                () -> super.getDurabilityForDisplay(stack));
+        LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
+        if( !cap.isPresent() )
+            return super.getDurabilityForDisplay(stack);
+
+        IEnergyStorage energyStorage = cap.orElseThrow(CapabilityNotPresentException::new);
+        return 1D - (energyStorage.getEnergyStored() / (double) energyStorage.getMaxEnergyStored());
     }
 
     @Override
     public int getRGBDurabilityForDisplay(ItemStack stack) {
-        return EnergyUtil.returnIntIfPresent(stack,
-                (energy -> MathHelper.hsvToRGB(Math.max(0.0F, energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F)),
-                () -> super.getRGBDurabilityForDisplay(stack));
+        LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
+        if( !cap.isPresent() )
+            return super.getRGBDurabilityForDisplay(stack);
+
+        IEnergyStorage energyStorage = cap.orElseThrow(CapabilityNotPresentException::new);
+        return MathHelper.hsvToRGB(Math.max(0.0F, energyStorage.getEnergyStored() / (float) energyStorage.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
     }
 
     @Override
     public boolean isDamaged(ItemStack stack) {
-        return EnergyUtil.returnBooleanIfPresent(stack,
-                energy -> energy.getEnergyStored() != energy.getMaxEnergyStored(),
-                () -> super.isDamaged(stack));
+        LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
+        if( !cap.isPresent() )
+            return super.isDamaged(stack);
+
+        IEnergyStorage energyStorage = cap.orElseThrow(CapabilityNotPresentException::new);
+        return energyStorage.getEnergyStored() != energyStorage.getMaxEnergyStored();
     }
 
     @Override
@@ -147,9 +155,12 @@ public abstract class AbstractGadget extends Item {
         if (stack.hasTag() && stack.getTag().contains(NBTKeys.CREATIVE_MARKER))
             return false;
 
-        return EnergyUtil.returnBooleanIfPresent(stack,
-                energy -> energy.getEnergyStored() != energy.getMaxEnergyStored(),
-                () -> super.showDurabilityBar(stack));
+        LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
+        if( !cap.isPresent() )
+            return super.showDurabilityBar(stack);
+
+        IEnergyStorage energyStorage = cap.orElseThrow(CapabilityNotPresentException::new);
+        return energyStorage.getEnergyStored() != energyStorage.getMaxEnergyStored();
     }
 
     @Override
