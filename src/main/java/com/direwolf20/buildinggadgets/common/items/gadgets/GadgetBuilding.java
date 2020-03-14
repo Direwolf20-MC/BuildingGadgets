@@ -16,6 +16,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRendere
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -53,7 +54,7 @@ import java.util.function.Supplier;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
-public class GadgetBuilding extends ModeGadget {
+public class GadgetBuilding extends AbstractGadget {
 
     private static final MockBuilderWorld fakeWorld = new MockBuilderWorld();
 
@@ -258,5 +259,17 @@ public class GadgetBuilding extends ModeGadget {
         if (!(stack.getItem() instanceof GadgetBuilding))
             return ItemStack.EMPTY;
         return stack;
+    }
+
+    @Override
+    public boolean performRotate(ItemStack stack, PlayerEntity player) {
+        GadgetUtils.rotateOrMirrorToolBlock(stack, player, PacketRotateMirror.Operation.ROTATE);
+        return true;
+    }
+
+    @Override
+    public boolean performMirror(ItemStack stack, PlayerEntity player) {
+        GadgetUtils.rotateOrMirrorToolBlock(stack, player, PacketRotateMirror.Operation.MIRROR);
+        return true;
     }
 }
