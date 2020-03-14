@@ -202,17 +202,16 @@ public class GadgetExchanger extends ModeGadget {
             Direction sideHit = lookingAt.getFace();
 
             coords = getToolMode(stack).getMode().getCollection(
-                    player,
                     new AbstractMode.UseContext(
                             world,
                             blockData.getState(),
                             lookingAt.getPos(),
                             heldItem
-                    ),
+                    ), player,
                     sideHit
             );
         } else { //If we do have an anchor, erase it (Even if the build fails)
-            setAnchor(stack, new ArrayList<>());
+            setAnchor(stack);
         }
         Set<BlockPos> coordinates = new HashSet<>(coords);
 

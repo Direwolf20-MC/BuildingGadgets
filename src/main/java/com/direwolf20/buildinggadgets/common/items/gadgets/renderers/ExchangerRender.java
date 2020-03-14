@@ -54,6 +54,7 @@ public class ExchangerRender extends BaseRenderer {
         super.render(evt, player, heldItem);
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         IVertexBuilder builder;
+
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
         Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
 
@@ -66,7 +67,7 @@ public class ExchangerRender extends BaseRenderer {
             return;
         World world = player.world;
         BlockState startBlock = AIR;
-        startBlock = world.getBlockState(new BlockPos(lookingAt.getPos()));
+        startBlock = world.getBlockState(lookingAt.getPos());
         if (startBlock != OurBlocks.effectBlock.getDefaultState()) {
             BlockData data = getToolBlock(heldItem);
             BlockState renderBlockState = data.getState();
@@ -78,13 +79,12 @@ public class ExchangerRender extends BaseRenderer {
             List<BlockPos> renderCoordinates;
             if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
                 coordinates = GadgetExchanger.getToolMode(heldItem).getMode().getCollection(
-                        player,
                         new AbstractMode.UseContext(
                                 world,
                                 renderBlockState,
                                 lookingAt.getPos(),
                                 heldItem
-                        ),
+                        ), player,
                         lookingAt.getFace()
                 );
                 renderCoordinates = coordinates;
@@ -96,15 +96,13 @@ public class ExchangerRender extends BaseRenderer {
             //ItemStack itemStack = renderBlockState.getBlock().getPickBlock(renderBlockState, null, world, new BlockPos(0, 0, 0), player);
             //ItemStack itemStack = InventoryHelper.getSilkTouchDrop(renderBlockState);
 
-            IBuildContext buildContext = SimpleBuildContext.builder()
-                    .usedStack(heldItem)
-                    .buildingPlayer(player)
-                    .build(world);
+            IBuildContext buildContext = new SimpleBuildContext(world, player, heldItem);
+
             // Figure out how many of the block we're rendering we have in the inventory of the player.
             IItemIndex index = new RecordingItemIndex(InventoryHelper.index(heldItem, player));
             MaterialList materials = data.getRequiredItems(buildContext, null, null);
-            int hasEnergy = getEnergy(player, heldItem);
 
+            int hasEnergy = getEnergy(player, heldItem);
             LazyOptional<IEnergyStorage> energy = heldItem.getCapability(CapabilityEnergy.ENERGY);
 
             //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.

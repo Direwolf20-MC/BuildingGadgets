@@ -22,7 +22,7 @@ public final class ItemEnergyForge extends ConfigEnergyStorage implements IPriva
     }
 
     protected void updateEnergy() {
-        CompoundNBT nbt = GadgetUtils.enforceHasTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (nbt.contains(NBTKeys.ENERGY))
             setEnergy(nbt.getInt(NBTKeys.ENERGY));
         updateMaxEnergy();

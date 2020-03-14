@@ -179,7 +179,7 @@ public class ModeRadialMenu extends Screen {
             if (stack.getItem() instanceof GadgetCopyPaste || stack.getItem() instanceof GadgetDestruction)
                 return ((AbstractGadget) stack.getItem()).getAnchor(stack) != null;
 
-            return !GadgetUtils.getAnchor(stack).isEmpty();
+            return GadgetUtils.getAnchor(stack).isPresent();
         }));
         if (!(tool.getItem() instanceof GadgetExchanger)) {
             addButton(new PositionedIconActionable(RadialTranslation.UNDO, "undo", left, false, send -> {

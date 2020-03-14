@@ -18,7 +18,6 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
@@ -41,7 +40,6 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.BlockSnapshot;
@@ -177,37 +175,30 @@ public class GadgetBuilding extends ModeGadget {
         player.sendStatusMessage(MessageTranslation.RANGE_SET.componentTranslation(range).setStyle(Styles.AQUA), true);
     }
 
-    private boolean build(ServerPlayerEntity player, ItemStack stack) {
+    private void build(ServerPlayerEntity player, ItemStack stack) {
         //Build the blocks as shown in the visual render
         World world = player.world;
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
-            return false;
+            return;
 
-        List<BlockPos> coords = GadgetUtils.getAnchor(heldItem);
+        List<BlockPos> coords = GadgetUtils.getAnchor(heldItem).orElse(new ArrayList<>());
 
         BlockData blockData = getToolBlock(heldItem);
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
-            RayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            if (lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())) { //If we aren't looking at anything, exit
-                return false;
-            }
+            BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
+            if (world.isAirBlock(lookingAt.getPos())) //If we aren't looking at anything, exit
+                return;
 
-            Direction sideHit = ((BlockRayTraceResult) lookingAt).getFace();
+            Direction sideHit = lookingAt.getFace();
             coords = getToolMode(stack).getMode().getCollection(
+                    new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, placeAtop(stack)),
                     player,
-                    new AbstractMode.UseContext(
-                            world,
-                            blockData.getState(),
-                            ((BlockRayTraceResult) lookingAt).getPos(),
-                            heldItem,
-                            placeAtop(stack)
-                    ),
                     sideHit
             );
-        } else { //If we do have an anchor, erase it (Even if the build fails)
-            setAnchor(stack, new ArrayList<>());
         }
+        else  //If we do have an anchor, erase it (Even if the build fails)
+            setAnchor(stack);
 
         Undo.Builder builder = Undo.builder();
         IItemIndex index = InventoryHelper.index(stack, player);
@@ -222,45 +213,36 @@ public class GadgetBuilding extends ModeGadget {
             }
         }
         pushUndo(stack, builder.build(world.getDimension().getType()));
-        return true;
     }
 
-    private boolean placeBlock(World world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
-        if (pos.getY() > world.getMaxHeight() || pos.getY() < 0)
-            return false;
-        if (!player.isAllowEdit())
-            return false;
+    private void placeBlock(World world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
+        if ((pos.getY() > world.getMaxHeight() || pos.getY() < 0) || !player.isAllowEdit())
+            return;
 
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
-            return false;
+            return;
 
         boolean useConstructionPaste = false;
 
-        IBuildContext buildContext = SimpleBuildContext.builder()
-                .usedStack(heldItem)
-                .buildingPlayer(player)
-                .build(world);
+        IBuildContext buildContext = new SimpleBuildContext(world, player, heldItem);
         MaterialList requiredItems = setBlock.getRequiredItems(buildContext, null, pos);
+
+        // #majorcode
         MatchResult match = index.tryMatch(requiredItems);
         if (! match.isSuccess()) {
             if (setBlock.getState().hasTileEntity())
-                return false;
+                return;
             match = index.tryMatch(InventoryHelper.PASTE_LIST);
             if (! match.isSuccess())
-                return false;
+                return;
             else
                 useConstructionPaste = true;
         }
-        if (! world.isBlockModifiable(player, pos))
-            return false;
-        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
-        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP)) {
-            return false;
-        }
 
-        if (!this.canUse(heldItem, player))
-            return false;
+        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
+        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP) || ! world.isBlockModifiable(player, pos) || !this.canUse(heldItem, player))
+            return;
 
         this.applyDamage(heldItem, player);
 
@@ -268,9 +250,7 @@ public class GadgetBuilding extends ModeGadget {
             ImmutableMultiset<IUniqueObject<?>> usedItems = match.getChosenOption();
             builder.record(world, pos, setBlock, usedItems, ImmutableMultiset.of());
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.PLACE, useConstructionPaste);
-            return true;
         }
-        return false;
     }
 
     public static ItemStack getGadget(PlayerEntity player) {
