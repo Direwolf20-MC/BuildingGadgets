@@ -1,11 +1,12 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
-import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -52,41 +53,6 @@ public class SortingHelper {
 
     }
 
-    public static class RenderSorter {
-        private final List<PlacementTarget> orderedTargets;
-        private final PlayerEntity player;
-        private List<PlacementTarget> sortedTargets;
-
-        public RenderSorter(PlayerEntity player, int estimatedSize) {
-            this.orderedTargets = new ArrayList<>(estimatedSize);
-            this.player = player;
-            this.sortedTargets = null;
-        }
-
-        public void onPlaced(PlacementTarget target) {
-            this.orderedTargets.add(target);
-        }
-
-        public List<PlacementTarget> getOrderedTargets() {
-            return orderedTargets;
-        }
-
-        public List<PlacementTarget> getSortedTargets() {
-            if (sortedTargets == null)
-                sortedTargets = sort(orderedTargets);
-
-            return Collections.unmodifiableList(sortedTargets);
-
-        }
-
-        private List<PlacementTarget> sort(Iterable<PlacementTarget> orderedTargets) {
-            return Blocks.byDistance(orderedTargets, PlacementTarget::getPos, getPlayer());
-        }
-
-        public PlayerEntity getPlayer() {
-            return player;
-        }
-    }
 
     private static final class TargetObject<T> {
         public static final Comparator<TargetObject<?>> BY_DISTANCE = Comparator.<TargetObject<?>>comparingDouble(TargetObject::getDist);
