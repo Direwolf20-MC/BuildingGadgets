@@ -214,7 +214,7 @@ public class CopyPasteRender extends BaseRenderer {
                 try {
                     if (state.getRenderType() == BlockRenderType.MODEL)
                         for (Direction direction : Direction.values()) {
-//                            if (!blockPosList.contains(targetPos.offset(direction)))
+                            //if (Block.shouldSideBeRendered(state, context.getWorld(), targetPos, direction))
                             renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                         }
                 } catch (Exception e) {

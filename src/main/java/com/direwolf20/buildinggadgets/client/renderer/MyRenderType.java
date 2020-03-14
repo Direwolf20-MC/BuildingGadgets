@@ -26,7 +26,7 @@ public class MyRenderType extends RenderType {
                     .transparency(TRANSLUCENT_TRANSPARENCY)
                     .depthTest(DEPTH_LEQUAL)
                     .cull(CULL_DISABLED)
-                    .writeMask(COLOR_DEPTH_WRITE)
+                    .writeMask(COLOR_DEPTH_WRITE) //Todo make this not use depth for Copy/Paste gadget, it'll need its own render
                     .build(false));
 
     public static final RenderType MissingBlockOverlay = makeType("GadgetMissingBlockOverlay",
