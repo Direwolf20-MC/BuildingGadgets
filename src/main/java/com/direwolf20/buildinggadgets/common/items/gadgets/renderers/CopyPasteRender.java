@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -190,7 +191,7 @@ public class CopyPasteRender extends BaseRenderer {
         renderBuffer = MultiVBORenderer.of((buffer) -> {
             System.out.println("Building again");
 
-            IVertexBuilder builder = buffer.getBuffer(MyRenderType.RenderBlock);
+            IVertexBuilder builder = buffer.getBuffer(MyRenderType.CopyPasteRenderBlock);
             BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
 
             MatrixStack stack = new MatrixStack(); //Create a new matrix stack for use in the buffer building process
@@ -214,8 +215,8 @@ public class CopyPasteRender extends BaseRenderer {
                 try {
                     if (state.getRenderType() == BlockRenderType.MODEL)
                         for (Direction direction : Direction.values()) {
-                            //if (Block.shouldSideBeRendered(state, context.getWorld(), targetPos, direction))
-                            renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                            if (Block.shouldSideBeRendered(state, context.getWorld(), targetPos, direction))
+                                renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                         }
                     renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                 } catch (Exception e) {
