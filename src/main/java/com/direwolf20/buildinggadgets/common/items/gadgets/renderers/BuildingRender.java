@@ -87,7 +87,7 @@ public class BuildingRender extends BaseRenderer {
                             ),
                             lookingAt.getFace()
                     );
-                    renderCoordinates = coordinates;
+                    renderCoordinates = SortingHelper.Blocks.byDistance(coordinates, player);
                 } else { //anchors need to be resorted
                     renderCoordinates = SortingHelper.Blocks.byDistance(coordinates, player);
                 }
