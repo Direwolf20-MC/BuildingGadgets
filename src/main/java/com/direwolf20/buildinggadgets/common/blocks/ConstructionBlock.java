@@ -252,7 +252,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
      * change. Cases may include when redstone power is updated, cactus blocks popping off due to a neighboring solid
      * block, etc.
      */
-    @Override
+    /*@Override
     public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean p_220069_6_) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         if (!isMimicNull(mimic)) {
@@ -260,7 +260,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         } else {
             super.neighborChanged(state, worldIn, pos, blockIn, fromPos, p_220069_6_);
         }
-    }
+    }*/
 
     /**
      * Get the hardness of this Block relative to the ability of the given player
