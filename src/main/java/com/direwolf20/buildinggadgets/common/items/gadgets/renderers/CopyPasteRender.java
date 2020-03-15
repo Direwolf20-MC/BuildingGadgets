@@ -184,12 +184,12 @@ public class CopyPasteRender extends BaseRenderer {
 //        List<BlockPos> blockPosList = sorter.getSortedTargets().stream().map(PlacementTarget::getPos).collect(Collectors.toList());
 
         tickTrack = 0;
-        System.out.println("Creating cache");
+//        System.out.println("Creating cache");
         if (renderBuffer != null) //Reset Render Buffer before rebuilding
             renderBuffer.close();
 
         renderBuffer = MultiVBORenderer.of((buffer) -> {
-            System.out.println("Building again");
+//            System.out.println("Building again");
 
             IVertexBuilder builder = buffer.getBuffer(MyRenderType.RenderBlock);
             IVertexBuilder noDepthbuilder = buffer.getBuffer(MyRenderType.CopyPasteRenderBlock);
@@ -263,7 +263,7 @@ public class CopyPasteRender extends BaseRenderer {
             vertexProducer.accept(rt -> builders.computeIfAbsent(rt, (_rt) -> {
                 DireBufferBuilder builder = new DireBufferBuilder(BUFFER_SIZE);
                 builder.begin(_rt.getDrawMode(), _rt.getVertexFormat());
-                System.out.println("Created new builder for RT=" + _rt);
+//                System.out.println("Created new builder for RT=" + _rt);
                 return builder;
             }));
 
@@ -272,7 +272,7 @@ public class CopyPasteRender extends BaseRenderer {
                 Objects.requireNonNull(rt);
                 Objects.requireNonNull(builder);
                 sortCaches.put(rt, builder.getVertexState());
-                System.out.println("Finishing builder for RT=" + rt);
+//                System.out.println("Finishing builder for RT=" + rt);
                 builder.finishDrawing();
                 VertexFormat fmt = rt.getVertexFormat();
                 DireVertexBuffer vbo = new DireVertexBuffer(fmt);

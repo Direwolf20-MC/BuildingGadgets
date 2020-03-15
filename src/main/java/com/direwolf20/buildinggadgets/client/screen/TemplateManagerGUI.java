@@ -543,9 +543,9 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void onCopy() {
-        runAfterUpdate(1, () -> { //we are copying from slot 1 => slot 1 needs to be updated
+        runAfterUpdate(0, () -> { //we are copying from slot 1 => slot 1 needs to be updated
 
-            ItemStack stack = container.getSlot(1).getStack();
+            ItemStack stack = container.getSlot(0).getStack();
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 templateProvider.ifPresent(provider -> {
                     PlayerEntity player = getMinecraft().player;
