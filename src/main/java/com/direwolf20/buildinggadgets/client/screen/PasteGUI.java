@@ -13,7 +13,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.StringTextComponent;
 
 import java.util.ArrayList;
@@ -23,7 +22,7 @@ public class PasteGUI extends Screen {
     private GuiIncrementer X, Y, Z;
     private List<GuiIncrementer> fields = new ArrayList<>();
 
-    PasteGUI(ItemStack tool) {
+    PasteGUI() {
         super(new StringTextComponent(""));
     }
 

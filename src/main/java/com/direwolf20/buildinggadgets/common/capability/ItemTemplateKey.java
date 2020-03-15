@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.capability;
 
 import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -18,7 +17,7 @@ public final class ItemTemplateKey implements ITemplateKey {
 
     @Override
     public UUID getTemplateId(Supplier<UUID> freeIdAllocator) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (! nbt.hasUniqueId(NBTKeys.TEMPLATE_KEY_ID)) {
             UUID newID = freeIdAllocator.get();
             nbt.putUniqueId(NBTKeys.TEMPLATE_KEY_ID, newID);

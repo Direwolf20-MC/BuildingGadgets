@@ -10,7 +10,6 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
@@ -65,10 +64,6 @@ public class PacketHandler {
             HANDLER.sendTo(msg, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }
 
-    public static void sendToAllClients(Object msg) {
-        HANDLER.send(PacketDistributor.ALL.noArg(), msg);
-    }
-
     public static void sendToServer(Object msg) {
         HANDLER.sendToServer(msg);
     }
@@ -76,6 +71,7 @@ public class PacketHandler {
     public static void send(Object msg, PacketTarget target) {
         HANDLER.send(target, msg);
     }
+
     private static <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<Context>> messageConsumer) {
         HANDLER.registerMessage(index, messageType, encoder, decoder, messageConsumer);
         index++;

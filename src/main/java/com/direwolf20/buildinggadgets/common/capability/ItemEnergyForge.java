@@ -17,12 +17,12 @@ public final class ItemEnergyForge extends ConfigEnergyStorage implements IPriva
     }
 
     protected void writeEnergy() {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         nbt.putInt(NBTKeys.ENERGY, getEnergyStoredCache());
     }
 
     protected void updateEnergy() {
-        CompoundNBT nbt = GadgetUtils.enforceHasTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (nbt.contains(NBTKeys.ENERGY))
             setEnergy(nbt.getInt(NBTKeys.ENERGY));
         updateMaxEnergy();
@@ -40,6 +40,7 @@ public final class ItemEnergyForge extends ConfigEnergyStorage implements IPriva
     public int extractPower(int maxExtract, boolean simulate) {
         if (maxExtract < 0)
             return 0;
+
         int energyExtracted = evaluateEnergyExtracted(maxExtract, simulate);
         if (! simulate) {
             setEnergy(getEnergyStored() - energyExtracted);

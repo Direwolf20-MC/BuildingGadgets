@@ -32,28 +32,36 @@ public final class OurItems {
     // Our Gadgets
     @ObjectHolder(ItemReference.GADGET_BUILDING)
     public static GadgetBuilding gadgetBuilding;
+
     @ObjectHolder(ItemReference.GADGET_COPY_PASTE)
     public static GadgetCopyPaste gadgetCopyPaste;
+
     @ObjectHolder(ItemReference.GADGET_EXCHANGING)
     public static GadgetExchanger gadgetExchanger;
+
     @ObjectHolder(ItemReference.GADGET_DESTRUCTION)
     public static GadgetDestruction gadgetDestruction;
 
     // Building Items
     @ObjectHolder(ItemReference.CONSTRUCTION_PASTE)
     public static ConstructionPaste constructionPaste;
+
     @ObjectHolder(ItemReference.CONSTRUCTION_CHUNK_DENSE)
     public static Item constructionChunkDense;
+
     @ObjectHolder(ItemReference.TEMPLATE)
     public static TemplateItem template;
 
     // Construction Paste Containers
     @ObjectHolder(ItemReference.PASTE_CONTAINER_T1)
     public static ConstructionPasteContainer constructionPasteContainerT1;
+
     @ObjectHolder(ItemReference.PASTE_CONTAINER_T2)
     public static ConstructionPasteContainer constructionPasteContainerT2;
+
     @ObjectHolder(ItemReference.PASTE_CONTAINER_T3)
     public static ConstructionPasteContainer constructionPasteContainerT3;
+
     @ObjectHolder(ItemReference.PASTE_CONTAINER_CREATIVE)
     public static ConstructionPasteContainerCreative creativeConstructionPasteContainer;
 

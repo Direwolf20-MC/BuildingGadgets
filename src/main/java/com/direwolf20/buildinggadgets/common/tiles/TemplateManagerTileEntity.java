@@ -77,7 +77,7 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
 
     @Nullable
     @Override
-    public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+    public Container createMenu(int windowId, @Nonnull PlayerInventory playerInventory, @Nonnull PlayerEntity playerEntity) {
         Preconditions.checkArgument(getWorld() != null);
         return new TemplateManagerContainer(windowId, playerInventory, this);
     }
@@ -89,13 +89,14 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
     }
 
     @Override
-    public void read(CompoundNBT compound) {
+    public void read(@Nonnull CompoundNBT compound) {
         super.read(compound);
 
         if (compound.contains(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
             itemStackHandler.deserializeNBT(compound.getCompound(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));
     }
 
+    @Nonnull
     @Override
     public CompoundNBT write(CompoundNBT compound) {
         compound.put(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS, itemStackHandler.serializeNBT());
@@ -121,9 +122,5 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
             handlerOpt.invalidate();
             handlerOpt = null;
         }
-    }
-
-    public TemplateManagerContainer getContainer(PlayerEntity playerIn) {
-        return new TemplateManagerContainer(0, playerIn.inventory, this);
     }
 }

@@ -39,6 +39,9 @@ public class EffectBlock extends Block {
             @Override
             public void onBuilderRemoved(EffectBlockTileEntity builder) {
                 World world = builder.getWorld();
+                if( world == null )
+                    return;
+
                 BlockPos targetPos = builder.getPos();
                 BlockData targetBlock = builder.getRenderedBlock();
                 if (builder.isUsingPaste()) {
@@ -147,17 +150,6 @@ public class EffectBlock extends Block {
     public boolean isSideInvisible(BlockState p_200122_1_, BlockState p_200122_2_, Direction p_200122_3_) {
         return true;
     }
-
-// 1.14
-//    /**
-//     * Gets the render layer this block will render on. SOLID for solid blocks, CUTOUT or CUTOUT_MIPPED for on-off
-//     * transparency (glass, reeds), TRANSLUCENT for fully blended transparency (stained glass)
-//     */
-//    @Override
-//    public BlockRenderLayer getRenderLayer() {
-//        // Since the effect block has no model rendering at all, which means we don't need blending, simply cutout is fine
-//        return BlockRenderLayer.CUTOUT;
-//    }
 
     /**
      * This gets a complete list of items dropped from this block.

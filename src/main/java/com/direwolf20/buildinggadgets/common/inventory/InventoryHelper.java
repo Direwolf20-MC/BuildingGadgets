@@ -13,7 +13,6 @@ import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteConta
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
-import com.direwolf20.buildinggadgets.common.registry.Registries.HandleProvider;
 import com.direwolf20.buildinggadgets.common.registry.TopologicalRegistryBuilder;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.CommonUtils;
@@ -22,7 +21,6 @@ import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresen
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -35,7 +33,6 @@ import net.minecraft.state.IProperty;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -59,8 +56,10 @@ public class InventoryHelper {
 
     private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE =
             ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).add(RailBlock.SHAPE, PoweredRailBlock.SHAPE, ChestBlock.TYPE).build();
+
     private static final Set<IProperty<?>> UNSAFE_PROPERTIES =
             ImmutableSet.<IProperty<?>>builder().add(CropsBlock.AGE).build();
+
     public static final CreativeItemIndex CREATIVE_INDEX = new CreativeItemIndex();
 
     public static IItemIndex index(ItemStack tool, PlayerEntity player) {
@@ -91,18 +90,6 @@ public class InventoryHelper {
         return Arrays.asList(
                 GadgetUtils.getRemoteInventory(stack, player.world),
                 player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new));
-    }
-
-    private static void indexHandler(Multimap<Item, IObjectHandle> map, IItemHandler handler) {
-        for (int i = 0; i < handler.getSlots(); i++) {
-            ItemStack stack = handler.getStackInSlot(i);
-            if (! stack.isEmpty()) {
-                Set<Class<?>> testedClasses = null;
-                for (IHandleProvider provider : HandleProvider.getHandleProviders().getValuesInOrder()) {
-
-                }
-            }
-        }
     }
 
     public static void registerHandleProviders() {
@@ -253,7 +240,7 @@ public class InventoryHelper {
             slotMap.put(slot, GenericPasteContainer.getPasteAmount(inv.getStackInSlot(slot)));
         }
         List<Map.Entry<Integer, Integer>> list = new ArrayList<>(slotMap.entrySet());
-        Comparator<Map.Entry<Integer, Integer>> comparator = Comparator.comparing(entry -> entry.getValue());
+        Comparator<Map.Entry<Integer, Integer>> comparator = Map.Entry.comparingByValue();
         comparator = comparator.reversed();
         list.sort(comparator);
 
@@ -311,7 +298,7 @@ public class InventoryHelper {
         return slots;
     }
 
-    public static List<Integer> findItemClass(Class c, PlayerInventory inv) {
+    public static List<Integer> findItemClass(Class<?> c, PlayerInventory inv) {
         List<Integer> slots = new ArrayList<>();
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getStackInSlot(i);
@@ -359,12 +346,5 @@ public class InventoryHelper {
     //proper generics...
     private static <T extends Comparable<T>> BlockState applyProperty(BlockState state, BlockState from, IProperty<T> prop) {
         return state.with(prop, from.get(prop));
-    }
-
-    private static NonNullList<ItemStack> playerInv(PlayerEntity player) {
-        NonNullList<ItemStack> wholeInv = NonNullList.from(ItemStack.EMPTY, (ItemStack[]) player.inventory.mainInventory.toArray());
-        wholeInv.addAll(player.inventory.offHandInventory);
-        wholeInv.addAll(player.inventory.armorInventory);
-        return wholeInv;
     }
 }

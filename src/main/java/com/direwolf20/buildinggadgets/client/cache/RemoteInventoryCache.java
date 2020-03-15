@@ -16,6 +16,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class RemoteInventoryCache implements IRemoteInventoryProvider {
@@ -55,7 +56,7 @@ public class RemoteInventoryCache implements IRemoteInventoryProvider {
     }
 
     private boolean isCacheOld(@Nullable Pair<ResourceLocation, BlockPos> loc) {
-        if (locCached == null ? loc != null : !locCached.equals(loc)) {
+        if (!Objects.equals(locCached, loc)) {
             timer = loc == null ? null : Stopwatch.createStarted();
             return true;
         }

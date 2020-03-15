@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 
 public enum GuiMod {
     COPY(GadgetCopyPaste::getGadget, stack -> () -> new CopyGUI(stack)),
-    PASTE(GadgetCopyPaste::getGadget, stack -> () -> new PasteGUI(stack)),
+    PASTE(GadgetCopyPaste::getGadget, stack -> () -> new PasteGUI()),
     DESTRUCTION(GadgetDestruction::getGadget, stack -> () -> new DestructionGUI(stack)),
     MATERIAL_LIST(TemplateItem::getHeldCapItem, stack -> () -> new MaterialListGUI(stack));
 

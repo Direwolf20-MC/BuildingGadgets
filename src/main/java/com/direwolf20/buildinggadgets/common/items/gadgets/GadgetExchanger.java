@@ -15,20 +15,20 @@ import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUnique
 import com.direwolf20.buildinggadgets.common.items.gadgets.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.items.gadgets.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
-import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.ExchangerRender;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
-import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
+import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.google.common.collect.ImmutableMultiset;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -69,8 +69,8 @@ import java.util.function.Supplier;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
-public class GadgetExchanger extends ModeGadget {
-    private static final FakeBuilderWorld fakeWorld = new FakeBuilderWorld();
+public class GadgetExchanger extends AbstractGadget {
+    private static final MockBuilderWorld fakeWorld = new MockBuilderWorld();
 
     public GadgetExchanger(Properties builder, IntSupplier undoLengthSupplier, String undoName) {
         super(builder, undoLengthSupplier, undoName, TagReference.WHITELIST_EXCHANGING, TagReference.BLACKLIST_EXCHANGING);
@@ -88,7 +88,7 @@ public class GadgetExchanger extends ModeGadget {
 
     @Override
     protected Supplier<BaseRenderer> createRenderFactory() {
-        return ExchangerRender::new;
+        return () -> new BuildRender(true);
     }
 
     @Override
@@ -113,12 +113,12 @@ public class GadgetExchanger extends ModeGadget {
 
     private static void setToolMode(ItemStack tool, ExchangingModes mode) {
         //Store the tool's mode in NBT as a string
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
+        CompoundNBT tagCompound = tool.getOrCreateTag();
         tagCompound.putString("mode", mode.toString());
     }
 
     public static ExchangingModes getToolMode(ItemStack tool) {
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(tool);
+        CompoundNBT tagCompound = tool.getOrCreateTag();
         return ExchangingModes.getFromName(tagCompound.getString("mode"));
     }
 
@@ -155,8 +155,6 @@ public class GadgetExchanger extends ModeGadget {
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isShiftKeyDown()) {
-                //Remove debug code
-                //EnergyUtil.getCap(itemstack).ifPresent(energy -> energy.receiveEnergy(105000, false));
                 selectBlock(itemstack, player);
             } else if (player instanceof ServerPlayerEntity) {
                 exchange((ServerPlayerEntity) player, itemstack);
@@ -198,26 +196,25 @@ public class GadgetExchanger extends ModeGadget {
             return false;
 
         BlockData blockData = getToolBlock(heldItem);
-        List<BlockPos> coords = GadgetUtils.getAnchor(stack);
+        List<BlockPos> coords = GadgetUtils.getAnchor(stack).orElse(new ArrayList<>());
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
             BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
             Direction sideHit = lookingAt.getFace();
 
             coords = getToolMode(stack).getMode().getCollection(
-                    player,
                     new AbstractMode.UseContext(
                             world,
                             blockData.getState(),
                             lookingAt.getPos(),
                             heldItem
-                    ),
+                    ), player,
                     sideHit
             );
         } else { //If we do have an anchor, erase it (Even if the build fails)
-            setAnchor(stack, new ArrayList<BlockPos>());
+            setAnchor(stack);
         }
-        Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
+        Set<BlockPos> coordinates = new HashSet<>(coords);
 
         Undo.Builder builder = Undo.builder();
         IItemIndex index = InventoryHelper.index(stack, player);
@@ -246,16 +243,15 @@ public class GadgetExchanger extends ModeGadget {
             data = TileSupport.createTileData(world, pos);
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
 
-
         ItemStack tool = getGadget(player);
         if (tool.isEmpty())
             return false;
-
 
         IBuildContext buildContext = SimpleBuildContext.builder()
                 .usedStack(tool)
                 .buildingPlayer(player)
                 .build(world);
+
         MaterialList requiredItems = setBlock.getRequiredItems(buildContext, null, pos);
         MatchResult match = index.tryMatch(requiredItems);
         boolean useConstructionPaste = false;
@@ -268,33 +264,35 @@ public class GadgetExchanger extends ModeGadget {
             else
                 useConstructionPaste = true;
         }
+
         if (! player.isAllowEdit())
             return false;
+
         if (! world.isBlockModifiable(player, pos))
             return false;
+
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP))
             return false;
+
         BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
-        if (MinecraftForge.EVENT_BUS.post(e)) {
+        if (MinecraftForge.EVENT_BUS.post(e))
             return false;
-        }
 
         if (!this.canUse(tool, player))
             return false;
 
         this.applyDamage(tool, player);
 
-//        currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
-
-
         if (index.applyMatch(match)) {
             ImmutableMultiset<IUniqueObject<?>> usedItems = match.getChosenOption();
+
             MaterialList materials = te instanceof ConstructionBlockTileEntity ? InventoryHelper.PASTE_LIST : data.getRequiredItems(
                     buildContext,
                     currentBlock,
                     world.rayTraceBlocks(new RayTraceContext(player.getPositionVec(), new Vec3d(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
                     pos);
+
             Iterator<ImmutableMultiset<IUniqueObject<?>>> it = materials.iterator();
             ImmutableMultiset<IUniqueObject<?>> producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
             index.insert(producedItems);
@@ -324,4 +322,15 @@ public class GadgetExchanger extends ModeGadget {
         return false;
     }
 
+    @Override
+    public boolean performRotate(ItemStack stack, PlayerEntity player) {
+        GadgetUtils.rotateOrMirrorToolBlock(stack, player, PacketRotateMirror.Operation.ROTATE);
+        return true;
+    }
+
+    @Override
+    public boolean performMirror(ItemStack stack, PlayerEntity player) {
+        GadgetUtils.rotateOrMirrorToolBlock(stack, player, PacketRotateMirror.Operation.MIRROR);
+        return true;
+    }
 }

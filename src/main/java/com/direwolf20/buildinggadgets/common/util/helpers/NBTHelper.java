@@ -2,18 +2,17 @@ package com.direwolf20.buildinggadgets.common.util.helpers;
 
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.Multiset;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
-import it.unimi.dsi.fastutil.ints.IntList;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.Tuple;
 
-import javax.annotation.Nonnull;
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
@@ -83,22 +82,6 @@ public class NBTHelper {
     public static <T> Multiset<T> deserializeMultisetEntries(ListNBT list, Multiset<T> toAppendTo, Function<INBT, Tuple<? extends T, Integer>> entryDeserializer) {
         list.stream().map(entryDeserializer).forEach(p -> toAppendTo.add(p.getA(), p.getB()));
         return toAppendTo;
-    }
-
-    /**
-     * If the given stack has a tag, returns it. If the given stack does not have a tag, it will set a reference and
-     * return the new tag compound.
-     *
-     * @param stack itemStack
-     * @return new CompoundNBT
-     */
-    public static CompoundNBT getOrNewTag(ItemStack stack) {
-        if (stack.hasTag()) {
-            return stack.getTag();
-        }
-        CompoundNBT tag = new CompoundNBT();
-        stack.setTag(tag);
-        return tag;
     }
 
     public static <T extends INBT> Collector<T, ListNBT, ListNBT> toListNBT() {

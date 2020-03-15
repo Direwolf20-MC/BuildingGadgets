@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.util.lang;
 
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 
-import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
 public enum GuiTranslation implements ITranslationProvider {
@@ -25,11 +24,6 @@ public enum GuiTranslation implements ITranslationProvider {
     private static final String PREFIX = "gui." + Reference.MODID + ".";
     private final String key;
     private final int argCount;
-
-    GuiTranslation(@Nonnull String key, @Nonnegative int argCount) {
-        this.key = PREFIX + key;
-        this.argCount = argCount;
-    }
 
     GuiTranslation(@Nonnull String key) {
         this.key = PREFIX + key;

@@ -53,4 +53,17 @@ public class MyRenderType extends RenderType {
                     .lightmap(LIGHTMAP_DISABLED)
                     .writeMask(COLOR_WRITE)
                     .build(false));
+
+    public static final RenderType CopyPasteRenderBlock = makeType("CopyPasteRenderBlock",
+            DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 256,
+            RenderType.State.getBuilder()
+                    .shadeModel(SHADE_ENABLED)
+                    .lightmap(LIGHTMAP_ENABLED)
+                    .texture(BLOCK_SHEET_MIPPED)
+                    .layer(PROJECTION_LAYERING)
+                    .transparency(TRANSLUCENT_TRANSPARENCY)
+                    .depthTest(DEPTH_LEQUAL)
+                    .cull(CULL_DISABLED)
+                    .writeMask(COLOR_WRITE)
+                    .build(false));
 }

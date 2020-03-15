@@ -94,7 +94,7 @@ public final class TopologicalRegistryBuilder<T> {
         return this;
     }
 
-    public IOrderedRegistry<T> build() {
+    public ImmutableOrderedRegistry<T> build() {
         validateUnbuild();
         build = true;
         values.clear();

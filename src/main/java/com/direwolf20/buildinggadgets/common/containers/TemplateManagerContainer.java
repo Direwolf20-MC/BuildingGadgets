@@ -9,9 +9,11 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
@@ -81,5 +83,24 @@ public class TemplateManagerContainer extends BaseContainer {
 
     public TemplateManagerTileEntity getTe() {
         return te;
+    }
+
+    public static class SlotTemplateManager extends SlotItemHandler {
+        private String backgroundLoc;
+
+        public SlotTemplateManager(IItemHandler itemHandler, int index, int xPosition, int yPosition, String backgroundLoc) {
+            super(itemHandler, index, xPosition, yPosition);
+            this.backgroundLoc = backgroundLoc;
+        }
+
+        @Override
+        public Slot setBackground(ResourceLocation atlas, ResourceLocation sprite) {
+            return super.setBackground(atlas, new ResourceLocation(Reference.MODID, this.backgroundLoc));
+        }
+
+        @Override
+        public int getSlotStackLimit() {
+            return 1;
+        }
     }
 }

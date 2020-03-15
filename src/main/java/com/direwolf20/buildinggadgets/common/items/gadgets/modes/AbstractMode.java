@@ -34,7 +34,7 @@ public abstract class AbstractMode {
      * Gets the collection with filters applied stopping us having to handle the filters in the actual collection
      * method from having to handle the world etc.
      */
-    public List<BlockPos> getCollection(PlayerEntity player, UseContext context, Direction side) {
+    public List<BlockPos> getCollection(UseContext context, PlayerEntity player, Direction side) {
         BlockPos startPos = this.withOffset(context.getStartPos(), side, context.isPlaceOnTop());
 
         // We don't need this unless we're using the exchanger but I also don't want to
@@ -88,8 +88,7 @@ public abstract class AbstractMode {
         boolean hasSingeValid = false;
         for(Direction direction : Direction.values()) {
             BlockPos offset = pos.offset(direction);
-            BlockState state = context.getWorldState(offset);
-            if( !state.isSideInvisible(state, direction.getOpposite()) ) {
+            if( context.getWorld().isAirBlock(offset) ) {
                 hasSingeValid = true;
                 break;
             }

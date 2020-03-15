@@ -16,8 +16,10 @@ public class EventRenderWorldLast {
     @SubscribeEvent
     static void renderWorldLastEvent(RenderWorldLastEvent evt) {
         PlayerEntity player = Minecraft.getInstance().player;
-        ItemStack heldItem = AbstractGadget.getGadget(player);
+        if( player == null )
+            return;
 
+        ItemStack heldItem = AbstractGadget.getGadget(player);
         if (heldItem.isEmpty())
             return;
 

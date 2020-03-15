@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class FakeBuilderWorld implements IBlockReader {
+public class MockBuilderWorld implements IBlockReader {
     private Set<BlockPos> positions;
     private BlockState state;
     private World realWorld;

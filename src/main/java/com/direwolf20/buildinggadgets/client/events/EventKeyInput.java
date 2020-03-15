@@ -34,6 +34,7 @@ public class EventKeyInput {
         ItemStack tool = AbstractGadget.getGadget(mc.player);
         if (tool.isEmpty())
             return;
+
         KeyBinding mode = KeyBindings.menuSettings;
         if (!(mc.currentScreen instanceof ModeRadialMenu) && mode.isPressed() && ((mode.getKeyModifier() == KeyModifier.NONE
                 && KeyModifier.getActiveModifier() == KeyModifier.NONE) || mode.getKeyModifier() != KeyModifier.NONE)) {

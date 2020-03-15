@@ -67,10 +67,6 @@ public class SetBackedPlacementSequence implements IPositionPlacementSequence, S
         return new SetBackedPlacementSequence(internalSet, boundingBox);
     }
 
-    public Set<BlockPos> getInternalSet() {
-        return internalSet;
-    }
-
     private void readObject(ObjectInputStream in) throws ClassNotFoundException, IOException {
         boundingBox = (Region) in.readObject();
         internalSet = new LinkedHashSet<>();

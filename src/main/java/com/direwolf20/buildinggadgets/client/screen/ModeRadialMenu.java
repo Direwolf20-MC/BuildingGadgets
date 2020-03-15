@@ -47,8 +47,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ModeRadialMenu extends Screen {
+    public enum ScreenPosition {
+        RIGHT, LEFT, BOTTOM, TOP
+    }
 
-    //TODO move to a enum of modes of Copy-Paste Gadget
     private static final ImmutableList<ResourceLocation> signsCopyPaste = ImmutableList.of(
             new ResourceLocation(Reference.MODID, "textures/gui/mode/copy.png"),
             new ResourceLocation(Reference.MODID, "textures/gui/mode/paste.png")
@@ -57,7 +59,6 @@ public class ModeRadialMenu extends Screen {
     private int timeIn = 0;
     private int slotSelected = -1;
     private int segments;
-    private GuiSliderInt sliderRange;
     private final List<Button> conditionalButtons = new ArrayList<>();
 
     public ModeRadialMenu(ItemStack stack) {
@@ -116,17 +117,19 @@ public class ModeRadialMenu extends Screen {
                 addButton(button);
                 conditionalButtons.add(button);
             }
-            Button button = new PositionedIconActionable((isDestruction ? RadialTranslation.CONNECTED_AREA : RadialTranslation.CONNECTED_SURFACE), "connected_area", right, send -> {
-                if (send)
-                    PacketHandler.sendToServer(new PacketToggleConnectedArea());
+            if( !isDestruction ) {
+                Button button = new PositionedIconActionable(RadialTranslation.CONNECTED_SURFACE, "connected_area", right, send -> {
+                    if (send)
+                        PacketHandler.sendToServer(new PacketToggleConnectedArea());
 
-                return AbstractGadget.getConnectedArea(getGadget());
-            });
-            addButton(button);
-            conditionalButtons.add(button);
+                    return AbstractGadget.getConnectedArea(getGadget());
+                });
+                addButton(button);
+                conditionalButtons.add(button);
+            }
             if (!isDestruction) {
                 int widthSlider = 82;
-                sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, "Range ", "", 1, Config.GADGETS.maxRange.get(),
+                GuiSliderInt sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, "Range ", "", 1, Config.GADGETS.maxRange.get(),
                         GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
                     GuiSliderInt sliderI = (GuiSliderInt) slider;
                     sendRangeUpdate(sliderI.getValueInt());
@@ -146,11 +149,13 @@ public class ModeRadialMenu extends Screen {
                 if (!send)
                     return false;
 
+                assert getMinecraft().player != null;
+
                 getMinecraft().player.closeScreen();
                 if (GadgetCopyPaste.getToolMode(tool) == GadgetCopyPaste.ToolMode.COPY)
                     getMinecraft().displayGuiScreen(new CopyGUI(tool));
                 else
-                    getMinecraft().displayGuiScreen(new PasteGUI(tool));
+                    getMinecraft().displayGuiScreen(new PasteGUI());
                 return true;
             }));
         }
@@ -176,7 +181,7 @@ public class ModeRadialMenu extends Screen {
             if (stack.getItem() instanceof GadgetCopyPaste || stack.getItem() instanceof GadgetDestruction)
                 return ((AbstractGadget) stack.getItem()).getAnchor(stack) != null;
 
-            return !GadgetUtils.getAnchor(stack).isEmpty();
+            return GadgetUtils.getAnchor(stack).isPresent();
         }));
         if (!(tool.getItem() instanceof GadgetExchanger)) {
             addButton(new PositionedIconActionable(RadialTranslation.UNDO, "undo", left, false, send -> {
@@ -196,11 +201,11 @@ public class ModeRadialMenu extends Screen {
         int padding = 10;
         boolean isDestruction = tool.getItem() instanceof GadgetDestruction;
         ScreenPosition right = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.RIGHT;
-        for (int i = 0; i < buttons.size(); i++) {
-            if (!(buttons.get(i) instanceof PositionedIconActionable))
+        for (Widget widget : buttons) {
+            if (!(widget instanceof PositionedIconActionable))
                 continue;
 
-            PositionedIconActionable button = (PositionedIconActionable) buttons.get(i);
+            PositionedIconActionable button = (PositionedIconActionable) widget;
 
             if (!button.visible) continue;
             int offset;
@@ -221,11 +226,11 @@ public class ModeRadialMenu extends Screen {
         }
         posRight = resetPos(tool, padding, posRight);
         posLeft = resetPos(tool, padding, posLeft);
-        for (int i = 0; i < buttons.size(); i++) {
-            if (!(buttons.get(i) instanceof PositionedIconActionable))
+        for (Widget widget : buttons) {
+            if (!(widget instanceof PositionedIconActionable))
                 continue;
 
-            PositionedIconActionable button = (PositionedIconActionable) buttons.get(i);
+            PositionedIconActionable button = (PositionedIconActionable) widget;
             if (!button.visible) continue;
             boolean isRight = button.position == right;
             int pos = isRight ? posRight : posLeft;
@@ -246,7 +251,8 @@ public class ModeRadialMenu extends Screen {
     }
 
     private ItemStack getGadget() {
-        return AbstractGadget.getGadget(Minecraft.getInstance().player);
+        assert getMinecraft().player != null;
+        return AbstractGadget.getGadget(getMinecraft().player);
     }
 
     @Override
@@ -267,11 +273,13 @@ public class ModeRadialMenu extends Screen {
                     ((PositionedIconActionable) button).setFaded(inRange);
             }
         }
+
         RenderSystem.pushMatrix();
         RenderSystem.translatef((1 - fract) * x, (1 - fract) * y, 0);
         RenderSystem.scalef(fract, fract, fract);
         super.render(mx, my, partialTicks);
         RenderSystem.popMatrix();
+
         if (segments == 0)
             return;
 
@@ -279,8 +287,6 @@ public class ModeRadialMenu extends Screen {
         RenderSystem.disableTexture();
 
         float angle = mouseAngle(x, y, mx, my);
-
-//        int highlight = 5;
 
         RenderSystem.enableBlend();
         RenderSystem.shadeModel(GL11.GL_SMOOTH);
@@ -294,7 +300,6 @@ public class ModeRadialMenu extends Screen {
             return;
 
         slotSelected = -1;
-        float offset = 8.5F;
 
         List<ResourceLocation> signs;
         int modeIndex;
@@ -343,14 +348,13 @@ public class ModeRadialMenu extends Screen {
                 GL11.glVertex2d(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F);
                 GL11.glVertex2d(xp, yp);
             }
+
             totalDeg += degPer;
 
             GL11.glEnd();
             RenderSystem.color4f(1, 1, 1, 1);
-
-//            if (mouseInSector)
-//                radius -= highlight;
         }
+
         RenderSystem.shadeModel(GL11.GL_FLAT);
         RenderSystem.enableTexture();
 
@@ -378,7 +382,7 @@ public class ModeRadialMenu extends Screen {
 
             Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
             if (data.isSelected())
-                font.drawStringWithShadow(name, xsp + (data.isCentralized() ? width / 2 - 4 : 0), ysp, color.getRGB());
+                font.drawStringWithShadow(name, xsp + (data.isCentralized() ? width / 2f - 4 : 0), ysp, color.getRGB());
 
             double mod = 0.7;
             int xdp = (int) ((xp - x) * mod + x);
@@ -425,6 +429,7 @@ public class ModeRadialMenu extends Screen {
             else
                 mode = GadgetCopyPaste.ToolMode.values()[slotSelected].getTranslation().format();
 
+            assert getMinecraft().player != null;
             getMinecraft().player.sendStatusMessage(MessageTranslation.MODE_SET.componentTranslation(mode).setStyle(Styles.AQUA), true);
 
             PacketHandler.sendToServer(new PacketToggleMode(slotSelected));
@@ -519,10 +524,6 @@ public class ModeRadialMenu extends Screen {
         private boolean isCentralized() {
             return centralize;
         }
-    }
-
-    public enum ScreenPosition {
-        RIGHT, LEFT, BOTTOM, TOP
     }
 
     private static class PositionedIconActionable extends GuiIconActionable {

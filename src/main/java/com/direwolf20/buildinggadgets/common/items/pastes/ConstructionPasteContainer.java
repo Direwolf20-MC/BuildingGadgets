@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.pastes;
 
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
@@ -36,7 +35,7 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
 
     @Override
     public void setPasteCount(ItemStack stack, int amount) {
-        NBTHelper.getOrNewTag(stack).putInt(NBTKeys.PASTE_COUNT, amount);
+        stack.getOrCreateTag().putInt(NBTKeys.PASTE_COUNT, amount);
     }
 
     @Override

@@ -43,11 +43,11 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 
 @MethodsReturnNonnullByDefault
-public class FakeDelegationWorld implements IWorld {
+public class MockDelegationWorld implements IWorld {
     private final IWorld delegate;
     private Map<BlockPos, BlockInfo> posToBlock;
 
-    public FakeDelegationWorld(IWorld delegate) {
+    public MockDelegationWorld(IWorld delegate) {
         this.delegate = Objects.requireNonNull(delegate);
         posToBlock = new HashMap<>();
     }
@@ -318,7 +318,7 @@ public class FakeDelegationWorld implements IWorld {
         if (World.isOutsideBuildHeight(pos))
             return Blocks.VOID_AIR.getDefaultState();
         BlockState state = getOverriddenState(pos);
-        return state != null ? state : delegate.getBlockState(pos);
+        return state != null ? state : Blocks.AIR.getDefaultState();
     }
 
     @Override

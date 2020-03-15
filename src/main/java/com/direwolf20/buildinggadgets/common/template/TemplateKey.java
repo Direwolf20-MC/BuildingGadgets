@@ -7,15 +7,15 @@ import java.util.function.Supplier;
  * A very simple {@link ITemplateKey} which allows to query an {@link ITemplateProvider} for a specific Template, without
  * having the CapabilityProvider at hand. (For example useful for packets)
  */
-public final class SimpleTemplateKey implements ITemplateKey {
+public final class TemplateKey implements ITemplateKey {
     @Nullable
     private UUID id;
 
-    public SimpleTemplateKey() {
+    public TemplateKey() {
         this(null);
     }
 
-    public SimpleTemplateKey(@Nullable UUID id) {
+    public TemplateKey(@Nullable UUID id) {
         this.id = id;
     }
 
@@ -31,7 +31,7 @@ public final class SimpleTemplateKey implements ITemplateKey {
         return id;
     }
 
-    public SimpleTemplateKey setUUID(@Nullable UUID id) {
+    public TemplateKey setUUID(@Nullable UUID id) {
         this.id = id;
         return this;
     }

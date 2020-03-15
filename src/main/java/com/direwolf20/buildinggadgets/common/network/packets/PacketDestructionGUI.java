@@ -33,12 +33,6 @@ public class PacketDestructionGUI {
     }
 
     public static class Handler {
-//        @Override
-//        public IMessage onMessage(PacketDestructionGUI message, MessageContext ctx) {
-//            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> handle(message, ctx));
-//            return null;
-//        }
-
         public static void handle(final PacketDestructionGUI msg, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
                 ItemStack heldItem = GadgetDestruction.getGadget(ctx.get().getSender());

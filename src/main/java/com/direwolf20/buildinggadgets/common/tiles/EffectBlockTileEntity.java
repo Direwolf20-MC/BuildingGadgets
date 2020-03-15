@@ -15,6 +15,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.registries.ObjectHolder;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class EffectBlockTileEntity extends TileEntity implements ITickableTileEntity {
@@ -53,7 +54,6 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
             this.renderedBlock = te instanceof ConstructionBlockTileEntity ? ((ConstructionBlockTileEntity) te).getConstructionBlockData() : TileSupport.createBlockData(curState, te);
         else
             this.renderedBlock = te instanceof ConstructionBlockTileEntity ? ((ConstructionBlockTileEntity) te).getConstructionBlockData() : replacementBlock;
-        //world.notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), 0);
     }
 
     @Override
@@ -65,8 +65,9 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
     }
 
     private void complete() {
-        if (world.isRemote || mode == null || renderedBlock == null)
+        if (world == null || world.isRemote || mode == null || renderedBlock == null)
             return;
+
         mode.onBuilderRemoved(this);
     }
 
@@ -100,6 +101,7 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
         return new SUpdateTileEntityPacket(pos, 0, getUpdateTag());
     }
 
+    @Nonnull
     @Override
     public CompoundNBT getUpdateTag() {
         return write(new CompoundNBT());
@@ -115,8 +117,9 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
         read(pkt.getNbtCompound());
     }
 
+    @Nonnull
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
+    public CompoundNBT write(@Nonnull CompoundNBT compound) {
         if (mode != null && renderedBlock != null && sourceBlock != null) {
             compound.putInt(NBTKeys.GADGET_TICKS, ticks);
             compound.putInt(NBTKeys.GADGET_MODE, mode.ordinal());
@@ -128,13 +131,15 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
     }
 
     @Override
-    public void read(CompoundNBT compound) {
+    public void read(@Nonnull CompoundNBT compound) {
         super.read(compound);
+
         if (compound.contains(NBTKeys.GADGET_TICKS, NBT.TAG_INT) &&
                 compound.contains(NBTKeys.GADGET_MODE, NBT.TAG_INT) &&
                 compound.contains(NBTKeys.GADGET_SOURCE_BLOCK, NBT.TAG_COMPOUND) &&
                 compound.contains(NBTKeys.GADGET_REPLACEMENT_BLOCK, NBT.TAG_COMPOUND) &&
                 compound.contains(NBTKeys.GADGET_USE_PASTE)) {
+
             ticks = compound.getInt(NBTKeys.GADGET_TICKS);
             mode = Mode.VALUES[compound.getInt(NBTKeys.GADGET_MODE)];
             renderedBlock = BlockData.tryDeserialize(compound.getCompound(NBTKeys.GADGET_REPLACEMENT_BLOCK), true);

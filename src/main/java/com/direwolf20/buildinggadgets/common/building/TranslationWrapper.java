@@ -50,7 +50,7 @@ public final class TranslationWrapper implements IBlockProvider<TranslationWrapp
      * The underlying block provider that was wrapped in the constructor.
      * @return {@link IPlacementSequence}
      */
-    public IBlockProvider getProvider() {
+    public IBlockProvider<TranslationWrapper> getProvider() {
         return provider;
     }
 

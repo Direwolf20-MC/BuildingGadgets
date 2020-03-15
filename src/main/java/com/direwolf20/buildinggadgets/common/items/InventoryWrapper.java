@@ -13,8 +13,10 @@ import java.util.function.Predicate;
 public final class InventoryWrapper implements IInventory {
     @Nonnull
     private final IItemHandlerModifiable handler;
+
     @Nonnull
     private final Predicate<PlayerEntity> usablePredicate;
+
     @Nonnull
     private final Runnable markDirtyCallback;
 

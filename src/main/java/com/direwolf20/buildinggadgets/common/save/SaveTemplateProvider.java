@@ -85,10 +85,6 @@ public final class SaveTemplateProvider implements ITemplateProvider {
         return true;
     }
 
-    public boolean requestUpdate(ITemplateKey key, ServerPlayerEntity playerEntity) {
-        return requestUpdate(key, PacketDistributor.PLAYER.with(() -> playerEntity));
-    }
-
     @Override
     public boolean requestUpdate(ITemplateKey key, PacketTarget target) {
         UUID id = getId(key);

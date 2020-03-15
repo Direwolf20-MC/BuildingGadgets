@@ -81,7 +81,7 @@ public final class BuildingGadgets {
         theMod = (BuildingGadgets) ModLoadingContext.get().getActiveContainer().getMod();
         CapabilityBlockProvider.register();
         CapabilityTemplate.register();
-        DeferredWorkQueue.runLater(PacketHandler::register);
+        PacketHandler.register();
     }
 
     private void registerRegistries(RegistryEvent.NewRegistry event) {

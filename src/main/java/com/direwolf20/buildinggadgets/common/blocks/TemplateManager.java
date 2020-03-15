@@ -30,7 +30,7 @@ public class TemplateManager extends Block {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public TemplateManager(Properties builder) {
-        super(builder); //all mc blocks use south as the default...
+        super(builder);
         setDefaultState(getStateContainer().getBaseState().with(FACING, Direction.SOUTH));
     }
 
@@ -78,9 +78,8 @@ public class TemplateManager extends Block {
             worldIn.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack itemStack = handler.getStackInSlot(i);
-                    itemStack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                        provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player));
-                    });
+                    itemStack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key ->
+                            provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player)));
                 }
             });
         });

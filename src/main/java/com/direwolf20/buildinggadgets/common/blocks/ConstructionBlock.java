@@ -5,21 +5,16 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.material.PushReaction;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.IProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -27,13 +22,10 @@ import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.IPlantable;
 
 import javax.annotation.Nullable;
-import java.util.Random;
 
 //@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
 public class ConstructionBlock extends Block /*implements IFacade*/ {
@@ -51,20 +43,6 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public boolean isVariableOpacity() {
         return true;
     }
-
-    /*@Override
-    public boolean isAir(BlockState state, IBlockReader world, BlockPos pos) {
-        return !state.get(ConstructionBlock.BRIGHT);
-    }*/
-
-// 1.14 code
-//    @Override
-//    @Deprecated
-//    public boolean isSolid(BlockState state) {
-//        boolean bright = state.get(ConstructionBlock.BRIGHT);
-//        return ! bright;
-//        //return this.blocksMovement && this.getRenderLayer() == BlockRenderLayer.SOLID;
-//    }
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
@@ -191,14 +169,16 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
 
     @Override
     public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
-        boolean bright = state.get(ConstructionBlock.BRIGHT);
+        if (state.getBlock().equals(adjacentBlockState.getBlock())) return false;
+        return super.isSideInvisible(state, adjacentBlockState, side); //TODO Find a way to make this work, glass adjacent to fake glass shows the middle side.
+        /*boolean bright = state.get(ConstructionBlock.BRIGHT);
         if (!bright) return false;
         if (adjacentBlockState.getBlock() instanceof ConstructionBlock) {
             return !adjacentBlockState.get(ConstructionBlock.BRIGHT);
         } else {
             //This is how vanilla BreakableBlock does it.
             return adjacentBlockState.getBlock() == this ? true : super.isSideInvisible(state, adjacentBlockState, side);
-        }
+        }*/
     }
 
     @Override
@@ -228,7 +208,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return !isMimicNull(mimic) ? mimic.propagatesSkylightDown(reader, pos) : super.propagatesSkylightDown(state, reader, pos);
     }
 
-    @Override
+    /*@Override
     public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         BlockState mimic = getActualMimicBlock(world, pos);
         if (!isMimicNull(mimic)) {
@@ -246,14 +226,14 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         } else {
             super.tick(state, worldIn, pos, random);
         }
-    }
+    }*/
 
     /**
      * Called periodically clientside on blocks near the player to show effects (like furnace fire particles). Note that
      * this method is unrelated to ? and ?, and will always be called regardless
      * of whether the block can receive random update ticks
      */
-    @Override
+    /*@Override
     public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         if (!isMimicNull(mimic)) {
@@ -265,14 +245,14 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         } else {
             super.animateTick(stateIn, worldIn, pos, rand);
         }
-    }
+    }*/
 
     /**
      * Called when a neighboring block was changed and marks that this state should perform any checks during a neighbor
      * change. Cases may include when redstone power is updated, cactus blocks popping off due to a neighboring solid
      * block, etc.
      */
-    @Override
+    /*@Override
     public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean p_220069_6_) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         if (!isMimicNull(mimic)) {
@@ -280,14 +260,14 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         } else {
             super.neighborChanged(state, worldIn, pos, blockIn, fromPos, p_220069_6_);
         }
-    }
+    }*/
 
     /**
      * Get the hardness of this Block relative to the ability of the given player
      * @deprecated call via {@link BlockState#getPlayerRelativeBlockHardness(PlayerEntity, IBlockReader, BlockPos)} whenever
      * possible. Implementing/overriding is fine.
      */
-    @Override
+    /*@Override
     public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         return !isMimicNull(mimic) ? mimic.getPlayerRelativeBlockHardness(player, worldIn, pos) : super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
@@ -297,12 +277,12 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         return ! isMimicNull(mimic) ? super.onBlockActivated(state, worldIn, pos, player, handIn, hit) : super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
-    }
+    }*/
 
     /**
      * Called when the given entity walks on this Block
      */
-    @Override
+    /*@Override
     public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         if (!isMimicNull(mimic)) {
@@ -327,40 +307,40 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         } else {
             super.onBlockClicked(state, worldIn, pos, player);
         }
-    }
+    }*/
 
     /**
      * @deprecated call via {@link BlockState#getWeakPower(IBlockReader, BlockPos, Direction)} whenever possible.
      * Implementing/overriding is fine.
      */
-    @Override
+    /*@Override
     public int getWeakPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
         BlockState mimic = getActualMimicBlock(blockAccess, pos);
         return !isMimicNull(mimic) ? mimic.getWeakPower(blockAccess, pos, side) : super.getWeakPower(blockState, blockAccess, pos, side);
-    }
+    }*/
 
     /**
      * @deprecated call via {@link BlockState#getStrongPower(IBlockReader, BlockPos, Direction)} whenever possible.
      * Implementing/overriding is fine.
      */
-    @Override
+    /*@Override
     public int getStrongPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
         BlockState mimic = getActualMimicBlock(blockAccess, pos);
         return !isMimicNull(mimic) ? mimic.getStrongPower(blockAccess, pos, side) : super.getStrongPower(blockState, blockAccess, pos, side);
-    }
+    }*/
 
     /**
      * @deprecated call via {@link BlockState#getPushReaction()} whenever possible. Implementing/overriding is fine.
      */
-    @Override
+    /*@Override
     public PushReaction getPushReaction(BlockState state) {
         return PushReaction.BLOCK;
-    }
+    }*/
 
     /**
      * Block's chance to react to a living entity falling on it.
      */
-    @Override
+    /*@Override
     public void onFallenUpon(World worldIn, BlockPos pos, Entity entityIn, float fallDistance) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         if (!isMimicNull(mimic)) {
@@ -368,12 +348,12 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         } else {
             super.onFallenUpon(worldIn, pos, entityIn, fallDistance);
         }
-    }
+    }*/
 
     /**
      * Called similar to random ticks, but only when it is raining.
      */
-    @Override
+    /*@Override
     public void fillWithRain(World worldIn, BlockPos pos) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         if (!isMimicNull(mimic)) {
@@ -381,7 +361,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         } else {
             super.fillWithRain(worldIn, pos);
         }
-    }
+    }*/
 
     /**
      * @deprecated call via whenever possible.
@@ -393,11 +373,11 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return !isMimicNull(mimic) ? mimic.getOffset(worldIn, pos) : super.getOffset(state, worldIn, pos);
     }
 
-    @Override
+    /*@Override
     public boolean canSustainPlant(BlockState state, IBlockReader world, BlockPos pos, Direction facing, IPlantable plantable) {
         BlockState mimic = getActualMimicBlock(world, pos);
         return !isMimicNull(mimic) ? mimic.canSustainPlant(world, pos, facing, plantable) : super.canSustainPlant(state, world, pos, facing, plantable);
-    }
+    }*/
 
     // Todo re-eval
    /* @Override
@@ -447,14 +427,4 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         }
         return 0.2f;
     }
-// fixme: removed as of 1.14?
-//    @Deprecated
-//    public float getAmbientOcclusionLightValue(BlockState state) {
-//        Boolean bright = state.get(ConstructionBlock.BRIGHT);
-//        Boolean neighborBrightness = state.get(ConstructionBlock.NEIGHBOR_BRIGHTNESS);
-//        if (bright || neighborBrightness) {
-//            return 1f;
-//        }
-//        return 0.2f;
-//    }
 }
