@@ -259,7 +259,9 @@ public class GadgetExchanger extends GadgetGeneric {
         if (useItemSuccess) {
             // Only do something if the use actually happened... How was this logic overlooked? #432
             this.applyDamage(tool, player);
-            currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
+
+            if( !player.capabilities.isCreativeMode )
+                currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
 
             world.spawnEntity(new BlockBuildEntity(world, pos, player, setBlock, 3, getToolActualBlock(tool), useConstructionPaste));
             return true;
