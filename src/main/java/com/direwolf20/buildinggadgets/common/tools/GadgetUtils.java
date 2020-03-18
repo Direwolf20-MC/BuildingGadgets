@@ -207,7 +207,7 @@ public class GadgetUtils {
 
     public static int getToolRange(ItemStack stack) {
         NBTTagCompound tagCompound = NBTTool.getOrNewTag(stack);
-        return MathHelper.clamp(tagCompound.getInteger("range"), 1, 15);
+        return MathHelper.clamp(tagCompound.getInteger("range"), 1, SyncedConfig.maxRange);
     }
 
     public static IBlockState rotateOrMirrorBlock(EntityPlayer player, PacketRotateMirror.Operation operation, IBlockState state) {
