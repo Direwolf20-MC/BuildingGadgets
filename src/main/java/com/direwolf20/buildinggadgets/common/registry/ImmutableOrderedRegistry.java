@@ -12,7 +12,7 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-final class ImmutableOrderedRegistry<T> implements IOrderedRegistry<T> {
+public final class ImmutableOrderedRegistry<T> {
     private final ImmutableBiMap<ResourceLocation, T> backingMap;
     private final ImmutableList<T> orderedValues;
 
@@ -21,44 +21,36 @@ final class ImmutableOrderedRegistry<T> implements IOrderedRegistry<T> {
         this.orderedValues = ImmutableList.copyOf(orderedValues);
     }
 
-    @Override
     @Nullable
     public T get(ResourceLocation key) {
         return backingMap.get(key);
     }
 
-    @Override
     public boolean contains(ResourceLocation key) {
         return backingMap.containsKey(key);
     }
 
-    @Override
     public ImmutableList<T> getValuesInOrder() {
         return orderedValues;
     }
 
-    @Override
     public Stream<T> values() {
         return orderedValues.stream();
     }
 
-    @Override
     public Iterator<T> iterator() {
         return orderedValues.iterator();
     }
 
-    @Override
     public void forEach(Consumer<? super T> action) {
         orderedValues.forEach(action);
     }
 
-    @Override
     public Spliterator<T> spliterator() {
         return orderedValues.spliterator();
     }
 
     @Nullable
-    @Override
     public ResourceLocation getKey(T value) {
         return backingMap.inverse().get(value);
     }

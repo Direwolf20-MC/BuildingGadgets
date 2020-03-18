@@ -25,6 +25,7 @@ public class PacketToggleBlockPlacement {
                 if (stack.getItem() instanceof GadgetBuilding)
                     GadgetBuilding.togglePlaceAtop(player, stack);
             });
+
             ctx.get().setPacketHandled(true);
         }
     }

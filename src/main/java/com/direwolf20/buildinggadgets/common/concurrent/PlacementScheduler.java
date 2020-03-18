@@ -17,10 +17,12 @@ import java.util.function.Consumer;
 public final class PlacementScheduler extends SteppedScheduler {
     public static PlacementScheduler schedulePlacement(IBuildView view, PlacementChecker checker, int steps) {
         Preconditions.checkArgument(steps > 0);
+
         PlacementScheduler res = new PlacementScheduler(
                 Objects.requireNonNull(view),
                 Objects.requireNonNull(checker),
                 steps);
+
         ServerTickingScheduler.runTicked(res);
         return res;
     }

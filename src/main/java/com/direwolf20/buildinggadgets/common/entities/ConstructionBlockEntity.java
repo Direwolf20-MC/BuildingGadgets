@@ -4,9 +4,9 @@ import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
-import com.direwolf20.buildinggadgets.common.registry.OurEntities;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityType;
 import net.minecraft.nbt.CompoundNBT;
@@ -18,8 +18,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraftforge.registries.ObjectHolder;
 
 public class ConstructionBlockEntity extends EntityBase {
+    @ObjectHolder(Reference.EntityReference.CONSTRUCTION_BLOCK_ENTITY)
+    public static EntityType<ConstructionBlockEntity> TYPE;
+
     private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BLOCK_POS);
     private static final DataParameter<Boolean> MAKING = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BOOLEAN);
 
@@ -28,7 +32,7 @@ public class ConstructionBlockEntity extends EntityBase {
     }
 
     public ConstructionBlockEntity(World world, BlockPos spawnPos, boolean makePaste) {
-        this(OurEntities.CONSTRUCTION_BLOCK, world);
+        this(TYPE, world);
         
         setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
         targetPos = spawnPos;

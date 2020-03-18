@@ -13,7 +13,6 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
-apply plugin: 'signing'
 apply plugin: 'net.minecraftforge.gradle'
 version = "$version"
 def env = System.getenv()
@@ -28,73 +27,78 @@ String forgeName = "$forge_base:$forgeVersion"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
-sourceSets {
-    main {
-        java {
-            'src/main/java'
-        }
-        resources {
-            'src/main/resources'
-        }
-    }
-    test {
-        java {
-            'src/test/java'
-        }
-        resources {
-            'src/test/resources'
-        }
-    }
-}
-
 minecraft {
     mappings channel: 'snapshot', version: "${mcp_mappings}"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     runs {
-        client = {
-            properties 'forge.logging.markers': 'FORGEMOD,REGISTRIES'
-            properties 'forge.logging.console.level': 'debug'
-            workingDirectory project.file('run').canonicalPath
-            sources sourceSets.main
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                buildinggadgets {
+                    source sourceSets.main
+                }
+            }
         }
-        server = {
-            properties 'forge.logging.markers': 'FORGEMOD,REGISTRIES'
-            properties 'forge.logging.console.level': 'debug'
-            workingDirectory project.file('run').canonicalPath
-            sources sourceSets.main
+
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                buildinggadgets {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+            args '--mod', 'buildinggadgets', '--all', '--output', file('src/generated/resources/')
+            mods {
+                buildinggadgets {
+                    source sourceSets.main
+                }
+            }
         }
     }
 }
-
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+repositories {
+    maven {
+        // JEI
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+    }
+    maven {
+        //JEI fallback
+        name = "ModMaven"
+        url = "https://modmaven.k-4u.nl"
+    }
+}
 dependencies {
     minecraft forgeName
-
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${project.junit_version}"
-    testImplementation "org.junit.jupiter:junit-jupiter:${project.junit_version}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${project.junit_version}"
+    //JEI
+    compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
     // deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
     // deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
     // runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
 }
 
-test {
-    useJUnitPlatform()
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-}
-
 // Processes main only resources
 processResources {
     inputs.property('version', project.version)
-    inputs.property('api_version', project.api_version)
     inputs.property('forge_major', project.forge_major)
     inputs.property('update_json', project.update_json)
 
     from(sourceSets.main.resources.srcDirs) {
         include 'META-INF/mods.toml'
-        expand 'version':project.version, 'api_version':project.api_version,'forge_major':project.forge_major,'update_json':project.update_json
+        expand 'version':project.version, 'forge_major':project.forge_major, 'update_json':project.update_json
     }
     
     from(sourceSets.main.resources.srcDirs) {

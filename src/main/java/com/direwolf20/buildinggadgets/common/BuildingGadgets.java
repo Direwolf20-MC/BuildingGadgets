@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
-import com.direwolf20.buildinggadgets.client.gui.GuiMod;
+import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
@@ -81,7 +81,7 @@ public final class BuildingGadgets {
         theMod = (BuildingGadgets) ModLoadingContext.get().getActiveContainer().getMod();
         CapabilityBlockProvider.register();
         CapabilityTemplate.register();
-        DeferredWorkQueue.runLater(PacketHandler::register);
+        PacketHandler.register();
     }
 
     private void registerRegistries(RegistryEvent.NewRegistry event) {

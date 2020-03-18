@@ -46,7 +46,7 @@ public final class SimpleBuildContext implements IBuildContext {
 
     private final ItemStack stack;
 
-    private SimpleBuildContext(@Nonnull IWorld world, @Nullable PlayerEntity buildingPlayer, @Nonnull ItemStack stack) {
+    public SimpleBuildContext(@Nonnull IWorld world, @Nullable PlayerEntity buildingPlayer, @Nonnull ItemStack stack) {
         this.world = world;
         this.buildingPlayer = buildingPlayer;
         this.stack = stack;

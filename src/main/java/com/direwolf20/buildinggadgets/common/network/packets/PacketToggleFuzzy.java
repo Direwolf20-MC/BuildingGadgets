@@ -29,6 +29,7 @@ public class PacketToggleFuzzy {
                         || (stack.getItem() instanceof GadgetDestruction && Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get()))
                     AbstractGadget.toggleFuzzy(player, stack);
             });
+
             ctx.get().setPacketHandled(true);
         }
     }

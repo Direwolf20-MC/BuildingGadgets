@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.items.gadgets;
 
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.modes.*;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
@@ -14,19 +13,18 @@ import com.direwolf20.buildinggadgets.common.concurrent.UndoScheduler;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.items.gadgets.modes.*;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.tools.CapabilityUtil.EnergyUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import net.minecraft.block.Block;
@@ -48,6 +46,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.DistExecutor;
@@ -123,23 +122,32 @@ public abstract class AbstractGadget extends Item {
 
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
-        return EnergyUtil.returnDoubleIfPresent(stack,
-                (energy -> 1D - (energy.getEnergyStored() / (double) energy.getMaxEnergyStored())),
-                () -> super.getDurabilityForDisplay(stack));
+        LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
+        if( !cap.isPresent() )
+            return super.getDurabilityForDisplay(stack);
+
+        IEnergyStorage energyStorage = cap.orElseThrow(CapabilityNotPresentException::new);
+        return 1D - (energyStorage.getEnergyStored() / (double) energyStorage.getMaxEnergyStored());
     }
 
     @Override
     public int getRGBDurabilityForDisplay(ItemStack stack) {
-        return EnergyUtil.returnIntIfPresent(stack,
-                (energy -> MathHelper.hsvToRGB(Math.max(0.0F, energy.getEnergyStored() / (float) energy.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F)),
-                () -> super.getRGBDurabilityForDisplay(stack));
+        LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
+        if( !cap.isPresent() )
+            return super.getRGBDurabilityForDisplay(stack);
+
+        IEnergyStorage energyStorage = cap.orElseThrow(CapabilityNotPresentException::new);
+        return MathHelper.hsvToRGB(Math.max(0.0F, energyStorage.getEnergyStored() / (float) energyStorage.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
     }
 
     @Override
     public boolean isDamaged(ItemStack stack) {
-        return EnergyUtil.returnBooleanIfPresent(stack,
-                energy -> energy.getEnergyStored() != energy.getMaxEnergyStored(),
-                () -> super.isDamaged(stack));
+        LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
+        if( !cap.isPresent() )
+            return super.isDamaged(stack);
+
+        IEnergyStorage energyStorage = cap.orElseThrow(CapabilityNotPresentException::new);
+        return energyStorage.getEnergyStored() != energyStorage.getMaxEnergyStored();
     }
 
     @Override
@@ -147,14 +155,17 @@ public abstract class AbstractGadget extends Item {
         if (stack.hasTag() && stack.getTag().contains(NBTKeys.CREATIVE_MARKER))
             return false;
 
-        return EnergyUtil.returnBooleanIfPresent(stack,
-                energy -> energy.getEnergyStored() != energy.getMaxEnergyStored(),
-                () -> super.showDurabilityBar(stack));
+        LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
+        if( !cap.isPresent() )
+            return super.showDurabilityBar(stack);
+
+        IEnergyStorage energyStorage = cap.orElseThrow(CapabilityNotPresentException::new);
+        return energyStorage.getEnergyStored() != energyStorage.getMaxEnergyStored();
     }
 
     @Override
     public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
-        return !EnergyUtil.hasCap(toRepair) && repair.getItem() == Items.DIAMOND;
+        return !toRepair.getCapability(CapabilityEnergy.ENERGY).isPresent() && repair.getItem() == Items.DIAMOND;
     }
 
     public boolean isAllowedBlock(Block block) {
@@ -186,7 +197,7 @@ public abstract class AbstractGadget extends Item {
         if (player.isCreative() || getEnergyMax() == 0)
             return true;
 
-        IEnergyStorage energy = EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
+        IEnergyStorage energy = tool.getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new);
         return getEnergyCost(tool) <= energy.getEnergyStored();
     }
 
@@ -194,7 +205,7 @@ public abstract class AbstractGadget extends Item {
         if (player.isCreative() || getEnergyMax() == 0)
             return;
 
-        ItemEnergyForge energy = (ItemEnergyForge) EnergyUtil.getCap(tool).orElseThrow(CapabilityNotPresentException::new);
+        ItemEnergyForge energy = (ItemEnergyForge) tool.getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new);
         energy.extractPower(getEnergyCost(tool), false);
     }
 
@@ -245,7 +256,7 @@ public abstract class AbstractGadget extends Item {
     }
 
     protected void onAnchorRemoved(ItemStack stack, PlayerEntity player) {
-        NBTHelper.getOrNewTag(stack).remove(NBTKeys.GADGET_ANCHOR);
+        stack.getOrCreateTag().remove(NBTKeys.GADGET_ANCHOR);
     }
 
     @Nullable
@@ -254,30 +265,30 @@ public abstract class AbstractGadget extends Item {
     }
 
     public static boolean getFuzzy(ItemStack stack) {
-        return NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_FUZZY);
+        return stack.getOrCreateTag().getBoolean(NBTKeys.GADGET_FUZZY);
     }
 
     public static void toggleFuzzy(PlayerEntity player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_FUZZY, !getFuzzy(stack));
+        stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_FUZZY, !getFuzzy(stack));
         player.sendStatusMessage(MessageTranslation.FUZZY_MODE.componentTranslation(getFuzzy(stack)).setStyle(Styles.AQUA), true);
     }
 
     public static boolean getConnectedArea(ItemStack stack) {
-        return !NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_UNCONNECTED_AREA);
+        return !stack.getOrCreateTag().getBoolean(NBTKeys.GADGET_UNCONNECTED_AREA);
     }
 
     public static void toggleConnectedArea(PlayerEntity player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_UNCONNECTED_AREA, getConnectedArea(stack));
+        stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_UNCONNECTED_AREA, getConnectedArea(stack));
         player.sendStatusMessage((stack.getItem() instanceof GadgetDestruction ? MessageTranslation.CONNECTED_AREA : MessageTranslation.CONNECTED_SURFACE)
                 .componentTranslation(getConnectedArea(stack)).setStyle(Styles.AQUA), true);
     }
 
     public static boolean shouldRayTraceFluid(ItemStack stack) {
-        return NBTHelper.getOrNewTag(stack).getBoolean(NBTKeys.GADGET_RAYTRACE_FLUID);
+        return stack.getOrCreateTag().getBoolean(NBTKeys.GADGET_RAYTRACE_FLUID);
     }
 
     public static void toggleRayTraceFluid(ServerPlayerEntity player, ItemStack stack) {
-        NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_RAYTRACE_FLUID, !shouldRayTraceFluid(stack));
+        stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_RAYTRACE_FLUID, !shouldRayTraceFluid(stack));
         player.sendStatusMessage(MessageTranslation.RAYTRACE_FLUID.componentTranslation(shouldRayTraceFluid(stack)).setStyle(Styles.AQUA), true);
     }
 
@@ -289,7 +300,7 @@ public abstract class AbstractGadget extends Item {
 
     //this should only be called Server-Side!!!
     public UUID getUUID(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (! nbt.hasUniqueId(NBTKeys.GADGET_UUID)) {
             UUID newId = getUndoSave().getFreeUUID();
             nbt.putUniqueId(NBTKeys.GADGET_UUID, newId);
@@ -298,20 +309,14 @@ public abstract class AbstractGadget extends Item {
         return nbt.getUniqueId(NBTKeys.GADGET_UUID);
     }
 
-    protected static String formatName(String name) {
-        return name.replaceAll("(?=[A-Z])", " ").trim();
-    }
-
     // Todo: tweak and fix.
-    public static int getRangeInBlocks(int range, IBuildingMode mode) {
+    public static int getRangeInBlocks(int range, AbstractMode mode) {
         if( mode instanceof StairMode ||
-                mode instanceof BuildingVerticalColumnMode ||
-                mode instanceof BuildingHorizontalColumnMode ||
-                mode instanceof ExchangingVerticalColumnMode ||
-                mode instanceof ExchangingHorizontalColumnMode)
+                mode instanceof VerticalColumnMode ||
+                mode instanceof HorizontalColumnMode)
             return range;
 
-        if( mode instanceof GridMode )
+        if( mode instanceof GridMode)
             return range < 7 ? 9 : range < 13 ? 11 * 11: 19 * 19;
 
         return range == 1 ? 1 : (range + 1) * (range + 1);

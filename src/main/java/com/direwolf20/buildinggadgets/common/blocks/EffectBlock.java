@@ -14,12 +14,14 @@ import net.minecraft.block.*;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootContext;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
 
 import javax.annotation.Nullable;
@@ -37,6 +39,9 @@ public class EffectBlock extends Block {
             @Override
             public void onBuilderRemoved(EffectBlockTileEntity builder) {
                 World world = builder.getWorld();
+                if( world == null )
+                    return;
+
                 BlockPos targetPos = builder.getPos();
                 BlockData targetBlock = builder.getRenderedBlock();
                 if (builder.isUsingPaste()) {
@@ -136,14 +141,14 @@ public class EffectBlock extends Block {
         return BlockRenderType.INVISIBLE;
     }
 
-    /**
-     * Gets the render layer this block will render on. SOLID for solid blocks, CUTOUT or CUTOUT_MIPPED for on-off
-     * transparency (glass, reeds), TRANSLUCENT for fully blended transparency (stained glass)
-     */
     @Override
-    public BlockRenderLayer getRenderLayer() {
-        // Since the effect block has no model rendering at all, which means we don't need blending, simply cutout is fine
-        return BlockRenderLayer.CUTOUT;
+    public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
+        return false;
+    }
+
+    @Override
+    public boolean isSideInvisible(BlockState p_200122_1_, BlockState p_200122_2_, Direction p_200122_3_) {
+        return true;
     }
 
     /**
@@ -163,4 +168,16 @@ public class EffectBlock extends Block {
     public PushReaction getPushReaction(BlockState state) {
         return PushReaction.BLOCK;
     }
+
+    @Override
+    public int getOpacity(BlockState state, IBlockReader worldIn, BlockPos pos) {
+        return 0;
+    }
+
+    @Override
+    @OnlyIn(Dist.CLIENT)
+    public float getAmbientOcclusionLightValue(BlockState state, IBlockReader worldIn, BlockPos pos) {
+        return 1.0f;
+    }
+
 }

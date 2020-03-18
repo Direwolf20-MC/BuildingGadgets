@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import static com.direwolf20.buildinggadgets.common.registry.OurBlocks.constructionBlock;
+
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public final class Registries {
     /**
@@ -54,8 +56,8 @@ public final class Registries {
 
     private static IForgeRegistry<ITileDataSerializer> tileDataSerializers = null;
     private static IForgeRegistry<IUniqueObjectSerializer> uniqueObjectSerializers = null;
-    private static IOrderedRegistry<ITileDataFactory> tileDataFactories = null;
-    private static IOrderedRegistry<IHandleProvider> handleProviders = null;
+    private static ImmutableOrderedRegistry<ITileDataFactory> tileDataFactories = null;
+    private static ImmutableOrderedRegistry<IHandleProvider> handleProviders = null;
 
     static {
         addDefaultOrdered();
@@ -70,15 +72,13 @@ public final class Registries {
     public static void setup() {
         OurItems.setup();
 
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-            OurEntities.registerModels();
-            OurBlocks.OurTileEntities.registerRenderers();
-        });
+        DistExecutor.runWhenOn(Dist.CLIENT, () ->
+                OurBlocks.OurTileEntities::registerRenderers);
     }
 
     public static void clientSetup() {
         OurContainers.registerContainerScreens();
-        OurBlocks.constructionBlock.initColorHandler(Minecraft.getInstance().getBlockColors());
+        constructionBlock.initColorHandler(Minecraft.getInstance().getBlockColors());
     }
 
     public static void onCreateRegistries() {
@@ -157,7 +157,7 @@ public final class Registries {
     public static final class TileEntityData {
         private TileEntityData() {}
 
-        public static IOrderedRegistry<ITileDataFactory> getTileDataFactories() {
+        public static ImmutableOrderedRegistry<ITileDataFactory> getTileDataFactories() {
             Preconditions
                     .checkState(tileDataFactories != null, "Attempted to retrieve TileDataFactoryRegistry before it was created!");
             return tileDataFactories;
@@ -173,7 +173,7 @@ public final class Registries {
     public static final class HandleProvider {
         private HandleProvider() {}
 
-        public static IOrderedRegistry<IHandleProvider> getHandleProviders() {
+        public static ImmutableOrderedRegistry<IHandleProvider> getHandleProviders() {
             Preconditions
                     .checkState(tileDataFactories != null, "Attempted to retrieve HandleProviderRegistry before it was created!");
             return handleProviders;

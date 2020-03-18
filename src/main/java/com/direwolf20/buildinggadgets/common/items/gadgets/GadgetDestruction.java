@@ -1,11 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.client.gui.GuiMod;
+import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.placement.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.common.building.placement.PlacementSequences.ConnectedSurface;
 import com.direwolf20.buildinggadgets.common.building.placement.SetBackedPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -16,7 +15,6 @@ import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
@@ -47,7 +45,6 @@ import net.minecraftforge.event.world.BlockEvent;
 import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -107,7 +104,7 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public static void setAnchorSide(ItemStack stack, Direction side) {
-        CompoundNBT tag = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tag = stack.getOrCreateTag();
         if (side == null)
             tag.remove(NBTKeys.GADGET_ANCHOR_SIDE);
         else
@@ -115,7 +112,7 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public static Direction getAnchorSide(ItemStack stack) {
-        CompoundNBT tag = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tag = stack.getOrCreateTag();
         String facing = tag.getString(NBTKeys.GADGET_ANCHOR_SIDE);
         if (facing.isEmpty())
             return null;
@@ -123,15 +120,15 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public static void setToolValue(ItemStack stack, int value, String valueName) {
-        NBTHelper.getOrNewTag(stack).putInt(valueName, value);
+        stack.getOrCreateTag().putInt(valueName, value);
     }
 
     public static int getToolValue(ItemStack stack, String valueName) {
-        return NBTHelper.getOrNewTag(stack).getInt(valueName);
+        return stack.getOrCreateTag().getInt(valueName);
     }
 
     public static boolean getOverlay(ItemStack stack) {
-        CompoundNBT tag = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tag = stack.getOrCreateTag();
         if (tag.contains(NBTKeys.GADGET_OVERLAY))
             return tag.getBoolean(NBTKeys.GADGET_OVERLAY);
 
@@ -141,7 +138,7 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public static void setOverlay(ItemStack stack, boolean showOverlay) {
-        NBTHelper.getOrNewTag(stack).putBoolean(NBTKeys.GADGET_OVERLAY, showOverlay);
+        stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_OVERLAY, showOverlay);
     }
 
     public static void switchOverlay(PlayerEntity player, ItemStack stack) {
@@ -157,7 +154,7 @@ public class GadgetDestruction extends AbstractGadget {
         player.setActiveHand(hand);
 
         if (!world.isRemote) {
-            if (! player.isSneaking()) {
+            if (! player.isShiftKeyDown()) {
                 BlockPos anchorPos = getAnchor(stack);
                 Direction anchorSide = getAnchorSide(stack);
                 if (anchorPos != null && anchorSide != null) {
@@ -175,7 +172,7 @@ public class GadgetDestruction extends AbstractGadget {
 
                 return new ActionResult<>(ActionResultType.FAIL, stack);
             }
-        } else if (player.isSneaking()) {
+        } else if (player.isShiftKeyDown()) {
             GuiMod.DESTRUCTION.openScreen(player);
         }
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
@@ -195,22 +192,17 @@ public class GadgetDestruction extends AbstractGadget {
 
     public static IPositionPlacementSequence getClearingPositions(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
         ItemStack tool = getGadget(player);
-        GadgetDestruction item = (GadgetDestruction) tool.getItem();
         int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
         if (tool.isEmpty() || depth == 0 || ! player.isAllowEdit())
             return CommonUtils.emptyPositionSequence();
 
         Region boundary = getClearingRegion(pos, incomingSide, player, stack);
-        BlockPos startPos = (item.getAnchor(stack) == null) ? pos : item.getAnchor(stack);
         boolean fuzzy = ! Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || AbstractGadget.getFuzzy(stack);
         BlockState stateTarget = fuzzy ? null : world.getBlockState(pos);
 
-        if (AbstractGadget.getConnectedArea(stack))
-            return ConnectedSurface.create(world, boundary, Function.identity(), startPos, null, (s, p) -> isValidBlock(world, p, player, s, fuzzy));
-        else
-            return new SetBackedPlacementSequence(boundary.stream()
-                    .filter(p -> isValidBlock(world, p, player, stateTarget, fuzzy))
-                    .collect(Collectors.toCollection(HashSet::new)), boundary);
+        return new SetBackedPlacementSequence(boundary.stream()
+                .filter(p -> isValidBlock(world, p, player, stateTarget, fuzzy))
+                .collect(Collectors.toCollection(HashSet::new)), boundary);
     }
 
     public static List<BlockPos> getClearingPositionsForRendering(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {

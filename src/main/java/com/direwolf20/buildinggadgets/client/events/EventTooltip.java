@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -47,6 +47,7 @@ public class EventTooltip {
             .<Multiset.Entry<IUniqueObject<?>>, Integer>comparing(Entry::getCount)
             .reversed()
             .thenComparing(e -> e.getElement().getObjectRegistryName());
+
     private static final int STACKS_PER_LINE = 8;
     private static RemoteInventoryCache cache = new RemoteInventoryCache(true);
 
@@ -57,20 +58,24 @@ public class EventTooltip {
     public static void addTemplatePadding(ItemStack stack, List<ITextComponent> tooltip) {
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
         Minecraft mc = Minecraft.getInstance();
-        if (mc.world == null) //populateSearchTreeManager...
+        if (mc.world == null || mc.player == null) //populateSearchTreeManager...
             return;
+
         mc.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(templateKey -> {
                 Template template = provider.getTemplateForKey(templateKey);
                 IItemIndex index = InventoryHelper.index(stack, mc.player);
+
                 IBuildContext buildContext = SimpleBuildContext.builder()
                         .usedStack(stack)
                         .buildingPlayer(mc.player)
                         .build(mc.world);
+
                 TemplateHeader header = template.getHeaderAndForceMaterials(buildContext);
                 MaterialList list = header.getRequiredItems();
                 if (list == null)
                     list = MaterialList.empty();
+
                 MatchResult match = index.tryMatch(list);
                 int count = match.isSuccess() ? match.getChosenOption().entrySet().size() : match.getChosenOption().entrySet().size() + 1;
                 if (count > 0 && Screen.hasShiftDown()) {
@@ -89,11 +94,16 @@ public class EventTooltip {
 
     @SubscribeEvent
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
-        if (! Screen.hasShiftDown())
+        if (!Screen.hasShiftDown())
             return;
+
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
         Minecraft mc = Minecraft.getInstance();
+
+        if( mc.world == null || mc.player == null )
+            return;
+
         mc.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(templateKey -> {
                 Template template = provider.getTemplateForKey(templateKey);
@@ -125,15 +135,15 @@ public class EventTooltip {
                 //add missing offset because the Stack is 16 by 16 as a render, not 9 by 9
                 //needs to be 8 instead of 7, so that there is a one pixel padding to the text, just as there is between stacks
                 by += 8;
-                GlStateManager.enableBlend();
-                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                RenderSystem.enableBlend();
+                RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                 for (Multiset.Entry<IUniqueObject<?>> entry : sortedEntries) {
                     int x = bx + (j % STACKS_PER_LINE) * 18;
                     int y = by + (j / STACKS_PER_LINE) * 20;
                     totalMissing += renderRequiredBlocks(entry.getElement().createStack(), x, y, existing.count(entry.getElement()), entry.getCount());
                     j++;
                 }
-                if (! match.isSuccess()) {
+                if (!match.isSuccess()) {
                     IUniqueObject<?> pasteItem = new UniqueItem(OurItems.constructionPaste);
                     Multiset<IUniqueObject<?>> pasteSet = ImmutableMultiset.<IUniqueObject<?>>builder()
                             .addCopies(pasteItem, totalMissing)
@@ -149,24 +159,27 @@ public class EventTooltip {
 
     private static int renderRequiredBlocks(ItemStack itemStack, int x, int y, int count, int req) {
         Minecraft mc = Minecraft.getInstance();
-        GlStateManager.disableDepthTest();
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(false);
+
         ItemRenderer render = mc.getItemRenderer();
-
-        net.minecraft.client.renderer.RenderHelper.enableGUIStandardItemLighting();
+        //The zLevel is the position that the item is drawn on. If too low, it'll draw behind other items in the GUI. Bump it up and then back down to draw this on top of everything else
+        render.zLevel += 500f;
+        net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
         render.renderItemIntoGUI(itemStack, x, y);
-
+        render.zLevel -= 500f;
         //String s1 = req == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
         String s1 = req == Integer.MAX_VALUE ? "\u221E" : Integer.toString(req);
         int w1 = mc.fontRenderer.getStringWidth(s1);
         int color = 0xFFFFFF;
 
         boolean hasReq = req > 0;
-
-        GlStateManager.pushMatrix();
-        GlStateManager.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 0);
-        GlStateManager.scalef(0.5F, 0.5F, 0.5F);
+        RenderSystem.pushMatrix();
+        //translating on the z axis here works like above. If too low, it'll draw the text behind items in the GUI. Items are drawn around zlevel 200 btw
+        RenderSystem.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 500);
+        RenderSystem.scalef(0.5F, 0.5F, 0.5F);
         mc.fontRenderer.drawStringWithShadow(s1, 0, 0, color);
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
 
         int missingCount = 0;
 
@@ -176,15 +189,16 @@ public class EventTooltip {
                 String s2 = "(" + fs + ")";
                 int w2 = mc.fontRenderer.getStringWidth(s2);
 
-                GlStateManager.pushMatrix();
-                GlStateManager.translatef(x + 8 - w2 / 4, y + 17, 0);
-                GlStateManager.scalef(0.5F, 0.5F, 0.5F);
+                RenderSystem.pushMatrix();
+                RenderSystem.translatef(x + 8 - w2 / 4, y + 17, 500);
+                RenderSystem.scalef(0.5F, 0.5F, 0.5F);
                 mc.fontRenderer.drawStringWithShadow(s2, 0, 0, 0xFF0000);
-                GlStateManager.popMatrix();
+                RenderSystem.popMatrix();
                 missingCount = (req - count);
             }
         }
-        GlStateManager.enableDepthTest();
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthMask(true);
         return missingCount;
     }
 }

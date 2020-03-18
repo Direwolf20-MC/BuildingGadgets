@@ -1,10 +1,13 @@
 package com.direwolf20.buildinggadgets.client;
 
+import com.direwolf20.buildinggadgets.common.items.TemplateItem;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Hand;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -47,8 +50,10 @@ public class KeyBindings {
     {
         @Override
         public boolean isActive() {
-            return !KeyConflictContext.GUI.isActive() && Minecraft.getInstance().player != null
-                    && !AbstractGadget.getGadget(Minecraft.getInstance().player).isEmpty();
+            PlayerEntity player = Minecraft.getInstance().player;
+            return !KeyConflictContext.GUI.isActive() && player != null
+                    && (!AbstractGadget.getGadget(player).isEmpty()
+                        || (player.getHeldItem(Hand.MAIN_HAND).getItem() instanceof TemplateItem || player.getHeldItem(Hand.OFF_HAND).getItem() instanceof TemplateItem));
         }
 
         @Override

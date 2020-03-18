@@ -1,18 +1,25 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
+import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.texture.AtlasTexture;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL14;
+import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.client.model.data.EmptyModelData;
 
-import javax.annotation.Nullable;
+import java.util.Random;
+
+import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 
 public class ConstructionBlockEntityRender extends EntityRenderer<ConstructionBlockEntity> {
 
@@ -22,36 +29,36 @@ public class ConstructionBlockEntityRender extends EntityRenderer<ConstructionBl
     }
 
     @Override
-    public void doRender(ConstructionBlockEntity entity, double x, double y, double z, float entityYaw, float partialTicks) {
+    public void render(ConstructionBlockEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
         BlockRendererDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        IVertexBuilder builder;
         Minecraft mc = Minecraft.getInstance();
-        GlStateManager.pushMatrix();
-        GlStateManager.enableBlend();
-        GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
-
-        mc.getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
-        int teCounter = entity.getTicksExisted();
-        int maxLife = entity.getMaxLife();
+        builder = buffer.getBuffer(MyRenderType.RenderBlock);
+        BlockState renderBlockState = OurBlocks.constructionBlockDense.getDefaultState();
+        int teCounter = entityIn.ticksExisted;
+        int maxLife = entityIn.getMaxLife();
         teCounter = teCounter > maxLife ? maxLife : teCounter;
         float scale = (float) (maxLife - teCounter) / maxLife;
-        if (entity.getMakingPaste())
+        if (entityIn.getMakingPaste())
             scale = (float) teCounter / maxLife;
-        GlStateManager.translated(x, y, z);
-        GlStateManager.translatef(-0.0005f, -0.0005f, -0.0005f);
-        GlStateManager.scalef(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
-        GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F);
-
-        GL14.glBlendColor(1F, 1F, 1F, scale); //Set the alpha of the blocks we are rendering
-        BlockState renderBlockState = OurBlocks.constructionBlockDense.getDefaultState();
-        blockrendererdispatcher.renderBlockBrightness(renderBlockState, 1f);
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GlStateManager.disableBlend();
-        GlStateManager.popMatrix();
+        matrixStackIn.push();
+        matrixStackIn.translate(-0.0005f, -0.0005f, -0.0005f);
+        matrixStackIn.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
+        BlockColors blockColors = Minecraft.getInstance().getBlockColors();
+        int color = blockColors.getColor(renderBlockState, mc.player.world, entityIn.getPosition(), 0);
+        float f = (float) (color >> 16 & 255) / 255.0F;
+        float f1 = (float) (color >> 8 & 255) / 255.0F;
+        float f2 = (float) (color & 255) / 255.0F;
+        IBakedModel ibakedmodel = blockrendererdispatcher.getModelForState(renderBlockState);
+        for (Direction direction : Direction.values()) {
+            renderModelBrightnessColorQuads(matrixStackIn.getLast(), builder, f, f1, f2, scale, ibakedmodel.getQuads(renderBlockState, direction, new Random(MathHelper.getPositionRandom(entityIn.getPosition())), EmptyModelData.INSTANCE), 15728640, 655360);
+        }
+        matrixStackIn.pop();
     }
 
-    @Nullable
     @Override
-    protected ResourceLocation getEntityTexture(ConstructionBlockEntity entity) {
+    public ResourceLocation getEntityTexture(ConstructionBlockEntity entity) {
         return null;
     }
 }

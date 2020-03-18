@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets;
 
-import com.direwolf20.buildinggadgets.client.gui.GuiMod;
+import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.placement.PlacementChecker;
@@ -29,7 +29,6 @@ import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
 import com.direwolf20.buildinggadgets.common.util.Additions;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
-import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.*;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
@@ -100,17 +99,13 @@ public class GadgetCopyPaste extends AbstractGadget {
             return id;
         }
 
-        public ToolMode next() {
-            return VALUES[(this.ordinal() + 1) % VALUES.length];
-        }
-
-        public String format(Object... args) {
-            return translation.format(args);
-        }
-
         @Nullable
         public static ToolMode ofId(byte id) {
             return BY_ID.get(id);
+        }
+
+        public ITranslationProvider getTranslation() {
+            return translation;
         }
     }
     private static final Joiner CHUNK_JOINER = Joiner.on("; ");
@@ -165,7 +160,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     public static void setRelativeVector(ItemStack stack, BlockPos vec) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (vec.equals(BlockPos.ZERO))
             nbt.remove(NBTKeys.GADGET_REL_POS);
         else
@@ -173,18 +168,18 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     public static BlockPos getRelativeVector(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         //if not present, then this will just return (0, 0, 0)
         return NBTUtil.readBlockPos(nbt.getCompound(NBTKeys.GADGET_REL_POS));
     }
 
     public static int getCopyCounter(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         return nbt.getInt(NBTKeys.TEMPLATE_COPY_COUNT); //returns 0 if not present
     }
 
     public static int getAndIncrementCopyCounter(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         int count = nbt.getInt(NBTKeys.TEMPLATE_COPY_COUNT); //returns 0 if not present
         nbt.putInt(NBTKeys.TEMPLATE_COPY_COUNT, count + 1);
         return count;
@@ -194,7 +189,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         BlockPos pos = ((AbstractGadget) stack.getItem()).getAnchor(stack);
         if (pos == null) {
             BlockRayTraceResult res = VectorHelper.getLookingAt(playerEntity, stack);
-            if (res.getType() == Type.MISS)
+            if (res == null || res.getType() == Type.MISS)
                 return Optional.empty();
             pos = res.getPos().offset(res.getFace());
         }
@@ -220,7 +215,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     public static void setUpperRegionBound(ItemStack stack, @Nullable BlockPos pos) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (pos != null)
             nbt.put(NBTKeys.GADGET_START_POS, NBTUtil.writeBlockPos(pos));
         else
@@ -228,7 +223,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     public static void setLowerRegionBound(ItemStack stack, @Nullable BlockPos pos) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (pos != null)
             nbt.put(NBTKeys.GADGET_END_POS, NBTUtil.writeBlockPos(pos));
         else
@@ -237,7 +232,7 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     @Nullable
     public static BlockPos getUpperRegionBound(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (nbt.contains(NBTKeys.GADGET_START_POS, NBT.TAG_COMPOUND))
             return NBTUtil.readBlockPos(nbt.getCompound(NBTKeys.GADGET_START_POS));
         return null;
@@ -245,19 +240,19 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     @Nullable
     public static BlockPos getLowerRegionBound(ItemStack stack) {
-        CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
+        CompoundNBT nbt = stack.getOrCreateTag();
         if (nbt.contains(NBTKeys.GADGET_END_POS, NBT.TAG_COMPOUND))
             return NBTUtil.readBlockPos(nbt.getCompound(NBTKeys.GADGET_END_POS));
         return null;
     }
 
     private static void setToolMode(ItemStack stack, ToolMode mode) {
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tagCompound = stack.getOrCreateTag();
         tagCompound.putByte(NBTKeys.GADGET_MODE, mode.getId());
     }
 
     public static ToolMode getToolMode(ItemStack stack) {
-        CompoundNBT tagCompound = NBTHelper.getOrNewTag(stack);
+        CompoundNBT tagCompound = stack.getOrCreateTag();
         ToolMode mode = ToolMode.COPY;
         if (! tagCompound.contains(NBTKeys.GADGET_MODE, NBT.TAG_BYTE)) {
             setToolMode(stack, mode);
@@ -291,7 +286,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         super.addInformation(stack, world, tooltip, flag);
         addEnergyInformation(tooltip, stack);
 
-        tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack).format()).setStyle(Styles.AQUA));
+        tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack).translation.format()).setStyle(Styles.AQUA));
         addInformationRayTraceFluid(tooltip, stack);
         GadgetUtils.addTooltipNameAndAuthor(stack, world, tooltip);
     }
@@ -308,25 +303,25 @@ public class GadgetCopyPaste extends AbstractGadget {
         player.setActiveHand(hand);
         BlockPos posLookingAt = VectorHelper.getPosLookingAt(player, stack);
         if (! world.isRemote()) {
-            if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, posLookingAt, false) == ActionResultType.SUCCESS)
+            if (player.isShiftKeyDown() && GadgetUtils.setRemoteInventory(stack, player, world, posLookingAt, false) == ActionResultType.SUCCESS)
                 return new ActionResult<>(ActionResultType.SUCCESS, stack);
 
             if (getToolMode(stack) == ToolMode.COPY) {
                 if (world.getBlockState(posLookingAt) != Blocks.AIR.getDefaultState())
                     setRegionAndCopy(stack, world, player, posLookingAt);
-            } else if (getToolMode(stack) == ToolMode.PASTE && ! player.isSneaking())
+            } else if (getToolMode(stack) == ToolMode.PASTE && ! player.isShiftKeyDown())
                 getActivePos(player, stack).ifPresent(pos -> build(stack, world, player, pos));
         } else {
-            if (player.isSneaking()) {
+            if (player.isShiftKeyDown()) {
                 if (Screen.hasControlDown())
                     PacketHandler.sendToServer(new PacketBindTool());
                 else if (GadgetUtils.getRemoteInventory(posLookingAt, world, NetworkIO.Operation.EXTRACT) != null)
                     return new ActionResult<>(ActionResultType.SUCCESS, stack);
             }
             if (getToolMode(stack) == ToolMode.COPY) {
-                if (player.isSneaking() && world.getBlockState(posLookingAt) == Blocks.AIR.getDefaultState())
+                if (player.isShiftKeyDown() && world.getBlockState(posLookingAt) == Blocks.AIR.getDefaultState())
                     GuiMod.COPY.openScreen(player);
-            } else if (player.isSneaking()) {
+            } else if (player.isShiftKeyDown()) {
                 GuiMod.PASTE.openScreen(player);
             } else {
                 BaseRenderer.updateInventoryCache();
@@ -336,7 +331,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void setRegionAndCopy(ItemStack stack, World world, PlayerEntity player, BlockPos lookedAt) {
-        if (player.isSneaking()) {
+        if (player.isShiftKeyDown()) {
             if (getLowerRegionBound(stack) != null && ! checkCopy(world, player, new Region(lookedAt, getLowerRegionBound(stack))))
                 return;
             setUpperRegionBound(stack, lookedAt);

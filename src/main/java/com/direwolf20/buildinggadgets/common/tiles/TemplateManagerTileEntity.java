@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.common.tiles;
 
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.ItemReference;
 import com.google.common.base.Preconditions;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,6 +16,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.Tag;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
@@ -25,17 +26,21 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class TemplateManagerTileEntity extends TileEntity implements INamedContainerProvider {
+    @ObjectHolder(Reference.TileEntityReference.TEMPLATE_MANAGER_TILE)
+    public static TileEntityType<TemplateManagerTileEntity> TYPE;
+
     public static final Tag<Item> TEMPLATE_CONVERTIBLES = new ItemTags.Wrapper(ItemReference.TAG_TEMPLATE_CONVERTIBLE);
 
     public static final int SIZE = 2;
 
     public TemplateManagerTileEntity() {
-        super(OurBlocks.OurTileEntities.TEMPLATE_MANAGER_TYPE);
+        super(TYPE);
     }
 
     // This item handler will hold our inventory slots
@@ -72,7 +77,7 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
 
     @Nullable
     @Override
-    public Container createMenu(int windowId, PlayerInventory playerInventory, PlayerEntity playerEntity) {
+    public Container createMenu(int windowId, @Nonnull PlayerInventory playerInventory, @Nonnull PlayerEntity playerEntity) {
         Preconditions.checkArgument(getWorld() != null);
         return new TemplateManagerContainer(windowId, playerInventory, this);
     }
@@ -84,13 +89,14 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
     }
 
     @Override
-    public void read(CompoundNBT compound) {
+    public void read(@Nonnull CompoundNBT compound) {
         super.read(compound);
 
         if (compound.contains(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
             itemStackHandler.deserializeNBT(compound.getCompound(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));
     }
 
+    @Nonnull
     @Override
     public CompoundNBT write(CompoundNBT compound) {
         compound.put(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS, itemStackHandler.serializeNBT());
@@ -116,9 +122,5 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
             handlerOpt.invalidate();
             handlerOpt = null;
         }
-    }
-
-    public TemplateManagerContainer getContainer(PlayerEntity playerIn) {
-        return new TemplateManagerContainer(0, playerIn.inventory, this);
     }
 }

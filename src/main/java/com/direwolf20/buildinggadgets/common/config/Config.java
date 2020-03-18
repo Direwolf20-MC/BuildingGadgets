@@ -31,7 +31,6 @@ public class Config {
     private static final Builder CLIENT_BUILDER = new Builder();
 
     public static final CategoryGeneral GENERAL = new CategoryGeneral();
-    public static final CategoryChargingStation CHARGING_STATION = new CategoryChargingStation();
     public static final CategoryGadgets GADGETS = new CategoryGadgets();
     public static final CategoryPasteContainers PASTE_CONTAINERS = new CategoryPasteContainers();
 
@@ -66,49 +65,6 @@ public class Config {
                             "False will only allow it to overwrite air blocks.")
                     .translation(LANG_KEY_GENERAL + ".allowOverwriteBlocks")
                     .define("Allow non-Air-Block-Overwrite", true);
-
-            CLIENT_BUILDER.pop();
-            SERVER_BUILDER.pop();
-        }
-    }
-
-    public static final class CategoryChargingStation {
-        public final IntValue capacity;
-        public final DoubleValue fuelUsage;
-        public final IntValue energyPerTick;
-        public final IntValue chargePerTick;
-        public final IntValue maxRecieve;
-        public final IntValue maxExtract;
-        public final BooleanValue renderSphere;
-
-        private CategoryChargingStation() {
-            SERVER_BUILDER.comment("Charging station settings")/*.translation(LANG_KEY_CHARGING_STATION)*/.push("charging_station");
-            CLIENT_BUILDER.comment("Charging station settings")/*.translation(LANG_KEY_CHARGING_STATION)*/.push("charging_station");
-
-            capacity = SERVER_BUILDER.comment("Define the maximum energy stored in the Charging Station.")
-                    .translation(LANG_KEY_CHARGING_STATION + ".capacity")
-                    .defineInRange("Energy capacity", 1000000, 1, Integer.MAX_VALUE);
-            fuelUsage = SERVER_BUILDER.comment("Define the speed factor, by which the fuel is going to be consumed.")
-                    .translation(LANG_KEY_CHARGING_STATION + ".consume")
-                    .defineInRange("Fuel Usage", 50, 0.00000001, Double.MAX_VALUE);
-            energyPerTick = SERVER_BUILDER.comment("Define the amount of energy produced per fuel tick.")
-                    .translation(LANG_KEY_CHARGING_STATION + ".fePerTick")
-                    .defineInRange("Energy Production", 750, 0, Integer.MAX_VALUE);
-            chargePerTick = SERVER_BUILDER.comment("Define how much the charging station attempts to charge per tick")
-                    .translation(LANG_KEY_CHARGING_STATION + ".chargePerTick")
-                    .defineInRange("Charge Energy", 2500, 0, Integer.MAX_VALUE);
-            maxRecieve = SERVER_BUILDER.comment("Define how much Energy can be accepted by the Charging Station per tick. Note that burning fuel counts towards this cap.")
-                    .translation(LANG_KEY_CHARGING_STATION + ".maxRecieve")
-                    .defineInRange("Max Energy Recieved", 750, 0, Integer.MAX_VALUE);
-            maxExtract = SERVER_BUILDER.comment("Define how much Energy can at most be extracted from the Charging Station per tick. Charging Items does not" +
-                    "count towards this cap!")
-                    .translation(LANG_KEY_CHARGING_STATION + ".maxExtract")
-                    .defineInRange("Max Energy Extracted", 0, 0, Integer.MAX_VALUE);
-            renderSphere = CLIENT_BUILDER.comment("Whether or not to render the Charging Sphere. Disabling rendering of the Charging Sphere will increase rendering" +
-                    "Performance, as it is the main throttle on the Charging Station render. Note that we are already doing what we can to make it as fast as possible " +
-                    "but a colour changing Sphere just needs to update relativingly often...")
-                    .translation(LANG_KEY_CHARGING_STATION + ".renderSphere")
-                    .define("Render Sphere", true);
 
             CLIENT_BUILDER.pop();
             SERVER_BUILDER.pop();
@@ -313,7 +269,7 @@ public class Config {
         BuildingGadgets.LOG.debug("Loaded {} config file {}", Reference.MODID, configEvent.getConfig().getFileName());
     }
 
-    public static void onFileChange(final ModConfig.ConfigReloading configEvent) {
+    public static void onFileChange(final ModConfig.Reloading configEvent) {
         BuildingGadgets.LOG.fatal(CORE, "{} config just got changed on the file system!", Reference.MODID);
     }
 }

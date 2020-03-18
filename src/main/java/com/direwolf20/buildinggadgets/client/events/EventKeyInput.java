@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
-import com.direwolf20.buildinggadgets.client.gui.GuiMod;
-import com.direwolf20.buildinggadgets.client.gui.ModeRadialMenu;
+import com.direwolf20.buildinggadgets.client.screen.GuiMod;
+import com.direwolf20.buildinggadgets.client.screen.ModeRadialMenu;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
@@ -25,13 +25,16 @@ public class EventKeyInput {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || event.phase == Phase.START)
             return;
+
         if (KeyBindings.materialList.isPressed()) {
             GuiMod.MATERIAL_LIST.openScreen(mc.player);
             return;
         }
+
         ItemStack tool = AbstractGadget.getGadget(mc.player);
         if (tool.isEmpty())
             return;
+
         KeyBinding mode = KeyBindings.menuSettings;
         if (!(mc.currentScreen instanceof ModeRadialMenu) && mode.isPressed() && ((mode.getKeyModifier() == KeyModifier.NONE
                 && KeyModifier.getActiveModifier() == KeyModifier.NONE) || mode.getKeyModifier() != KeyModifier.NONE)) {
