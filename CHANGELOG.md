@@ -1,7 +1,7 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
-## [2.8.2 - 1.12.2] - 2020-02-23
+## [2.8.2 - 1.12.2] - 2020-03-18
 Just some fixes, mostly for Dire's and all of our sanity. Modes are mostly fixed again...
 
 ### Changed
