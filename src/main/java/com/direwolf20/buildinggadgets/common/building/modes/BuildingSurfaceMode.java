@@ -33,11 +33,11 @@ public class BuildingSurfaceMode extends AtopSupportedMode {
 
     @Override
     public IPlacementSequence computeWithTransformed(EntityPlayer player, BlockPos transformed, BlockPos original, EnumFacing sideHit, ItemStack tool) {
-        int range = GadgetUtils.getToolRange(tool);
+        int range = GadgetUtils.getToolRange(tool) / 2;
         boolean fuzzy = GadgetGeneric.getFuzzy(tool);
         if (GadgetGeneric.getConnectedArea(tool))
-            return ConnectedSurface.create(player.world, transformed, sideHit.getOpposite(), range - 1, fuzzy);
-        return Surface.create(player.world, transformed, sideHit.getOpposite(), range - 1, fuzzy);
+            return ConnectedSurface.create(player.world, transformed, sideHit.getOpposite(), range , fuzzy);
+        return Surface.create(player.world, transformed, sideHit.getOpposite(), range, fuzzy);
     }
 
     @Override

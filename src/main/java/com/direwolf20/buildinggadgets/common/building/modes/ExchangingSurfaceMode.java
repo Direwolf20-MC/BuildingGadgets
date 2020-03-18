@@ -33,9 +33,9 @@ public class ExchangingSurfaceMode extends AbstractMode {
 
     @Override
     public IPlacementSequence computeCoordinates(EntityPlayer player, BlockPos hit, EnumFacing sideHit, ItemStack tool) {
-        int range = GadgetUtils.getToolRange(tool);
+        int range = GadgetUtils.getToolRange(tool) / 2;
         boolean fuzzy = GadgetGeneric.getFuzzy(tool);
-        Region region = Wall.clickedSide(hit, sideHit, range - 1).getBoundingBox();
+        Region region = Wall.clickedSide(hit, sideHit, range).getBoundingBox();
         if (GadgetGeneric.getConnectedArea(tool))
             return ConnectedSurface.create(player.world, region, pos -> pos, hit, sideHit, fuzzy);
         return Surface.create(player.world, hit, region, pos -> pos, fuzzy);
