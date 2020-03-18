@@ -5,10 +5,11 @@
     "2.7.2": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/2.7.2-1.12.x/CHANGELOG.md",
     "2.7.4": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/2.7.4-1.12.x/CHANGELOG.md",
     "2.8.0": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/2.8.0-1.12.x/CHANGELOG.md",
-    "2.8.1": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/2.8.1-1.12.x/CHANGELOG.md"
+    "2.8.1": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/2.8.1-1.12.x/CHANGELOG.md",
+    "2.8.2": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/2.8.2-1.12.x/CHANGELOG.md"
   },
   "promos": {
-    "1.12.2-latest": "2.8.0",
-    "1.12.2-recommended": "2.8.0"
+    "1.12.2-latest": "2.8.2",
+    "1.12.2-recommended": "2.8.2"
   }
 }

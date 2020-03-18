@@ -1,6 +1,17 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
+## [2.8.2 - 1.12.2] - 2020-02-23
+Just some fixes, mostly for Dire's and all of our sanity. Modes are mostly fixed again...
+
+### Changed
+- We no longer harvest blocks if in creative and instead just set them to air
+ 
+### Fixed
+- When in creative, blocks would drop on undo and build actions due to harvesting the block instead of setting to air
+- Range for the Builder and Exchanger surface modes now is capped correctly. 1 = 1, 2 = 3x3, 3=3x3, 4=5x5, 5=5x5 and so on.
+- The max range config is now respected instead of ignored when setting the range :D
+
 ## [2.8.1 - 1.12.2] - 2020-02-23
 Woops, I broke it. Dank Nulls now work again with some other nice improvements for one of the final `1.12.2` versions. This version comes with some rewrites on the inventory system so please post any issues to the [Building Gadgets Github](https://github.com/Direwolf20-MC/BuildingGadgets/issues/new/)
 
