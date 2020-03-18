@@ -1,6 +1,8 @@
 {
   "homepage": "https://minecraft.curseforge.com/projects/building-gadgets",
   "1.12.2": {
+    "2.8.2": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/CHANGELOG.md",
+    "2.8.1": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/CHANGELOG.md",
     "2.8.0": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/CHANGELOG.md",
     "2.7.4": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/CHANGELOG.md",
     "2.7.3": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/CHANGELOG.md",
@@ -25,8 +27,8 @@
     "3.1.0b": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/CHANGELOG.md"
   },
   "promos": {
-    "1.12.2-latest": "2.8.0",
-    "1.12.2-recommended": "2.8.0",
+    "1.12.2-latest": "2.8.2",
+    "1.12.2-recommended": "2.8.2",
     "1.14.4-latest": "3.1.0b",
     "1.14.4-recommended": "3.1.0b"
   }
