@@ -174,14 +174,6 @@ public abstract class AbstractGadget extends Item {
         return getWhiteList().contains(block);
     }
 
-    public boolean isAllowedBlock(Block block, @Nullable PlayerEntity notifiedPlayer) {
-        if (isAllowedBlock(block))
-            return true;
-        if (notifiedPlayer != null)
-            notifiedPlayer.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(block.getNameTextComponent()).setStyle(Styles.AQUA), true);
-        return false;
-    }
-
     public static ItemStack getGadget(PlayerEntity player) {
         ItemStack heldItem = player.getHeldItemMainhand();
         if (!(heldItem.getItem() instanceof AbstractGadget)) {

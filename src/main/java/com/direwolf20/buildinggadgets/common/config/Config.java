@@ -1,13 +1,10 @@
 package com.direwolf20.buildinggadgets.common.config;
 
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.config.ModConfig;
 
 import static net.minecraftforge.common.ForgeConfigSpec.*;
-import static net.minecraftforge.fml.Logging.CORE;
 
 @EventBusSubscriber
 public class Config {
@@ -264,12 +261,4 @@ public class Config {
     public static final ForgeConfigSpec COMMON_CONFIG = COMMON_BUILDER.build();
     public static final ForgeConfigSpec SERVER_CONFIG = SERVER_BUILDER.build();
     public static final ForgeConfigSpec CLIENT_CONFIG = CLIENT_BUILDER.build();
-
-    public static void onLoad(final ModConfig.Loading configEvent) {
-        BuildingGadgets.LOG.debug("Loaded {} config file {}", Reference.MODID, configEvent.getConfig().getFileName());
-    }
-
-    public static void onFileChange(final ModConfig.Reloading configEvent) {
-        BuildingGadgets.LOG.fatal(CORE, "{} config just got changed on the file system!", Reference.MODID);
-    }
 }

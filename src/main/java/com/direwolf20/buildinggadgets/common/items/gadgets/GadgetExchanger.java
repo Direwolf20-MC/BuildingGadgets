@@ -30,6 +30,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.google.common.collect.ImmutableMultiset;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.Screen;
@@ -155,7 +156,9 @@ public class GadgetExchanger extends AbstractGadget {
         player.setActiveHand(hand);
         if (!world.isRemote) {
             if (player.isShiftKeyDown()) {
-                selectBlock(itemstack, player);
+                ActionResult<Block> result = selectBlock(itemstack, player);
+                if( !result.getType().isSuccess() )
+                    player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
             } else if (player instanceof ServerPlayerEntity) {
                 exchange((ServerPlayerEntity) player, itemstack);
             }
