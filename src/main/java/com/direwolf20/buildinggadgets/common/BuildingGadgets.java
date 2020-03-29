@@ -64,8 +64,6 @@ public final class BuildingGadgets {
         eventBus.addListener(this::handleIMC);
         eventBus.addGenericListener(IRecipeSerializer.class, this::onRecipeRegister);
 
-        eventBus.addListener(Config::onLoad);
-        eventBus.addListener(Config::onFileChange);
         eventBus.addListener(this::onEnqueueIMC);
 
         // Client only registering

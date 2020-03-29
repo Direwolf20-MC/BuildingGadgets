@@ -21,6 +21,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
@@ -33,7 +34,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
@@ -191,21 +195,16 @@ public class GadgetUtils {
         ActionResultType result = setRemoteInventory(stack, player, world, lookingAt.getPos(), true);
     }
 
-    public static void selectBlock(ItemStack stack, PlayerEntity player) {
+    public static ActionResult<Block> selectBlock(ItemStack stack, PlayerEntity player) {
         // Used to find which block the player is looking at, and store it in NBT on the tool.
         World world = player.world;
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, AbstractGadget.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
-        if (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())
-            return;
+        if (world.isAirBlock(lookingAt.getPos()))
+            return ActionResult.resultFail(Blocks.AIR);
 
-
-        /*ActionResultType result = setRemoteInventory(stack, player, world, lookingAt.getPos(), true);
-        if (result == ActionResultType.SUCCESS)
-            return;
-*/
         BlockState state = world.getBlockState(lookingAt.getPos());
-        if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock(), player))
-            return;
+        if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock()))
+            return ActionResult.resultFail(state.getBlock());
 
         Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getPos(), player.getActiveHand());
         data.ifPresent(placeState -> {
@@ -215,6 +214,7 @@ public class GadgetUtils {
             setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));
         });
 
+        return ActionResult.resultSuccess(state.getBlock());
     }
 
     public static ActionResultType setRemoteInventory(ItemStack stack, PlayerEntity player, World world, BlockPos pos, boolean setTool) {
