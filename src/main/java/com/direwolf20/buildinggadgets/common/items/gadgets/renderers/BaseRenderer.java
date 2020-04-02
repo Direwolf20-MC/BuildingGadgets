@@ -2,9 +2,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.client.renderer.FakeTERWorld;
-import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
@@ -24,7 +22,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.LazyOptional;
@@ -91,7 +88,7 @@ public abstract class BaseRenderer {
         if (player.isCreative() || !energy.isPresent())
             return Integer.MAX_VALUE;
 
-        return energy.orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
+        return energy.map(IEnergyStorage::getEnergyStored).orElse(0);
     }
 
     /*protected BufferBuilder setupMissingRender() {
