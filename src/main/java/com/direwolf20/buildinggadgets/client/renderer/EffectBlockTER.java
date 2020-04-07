@@ -15,7 +15,6 @@ import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.model.data.EmptyModelData;
@@ -24,7 +23,7 @@ import java.util.Random;
 
 import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 
-public class EffectBlockTER<T extends TileEntity> extends TileEntityRenderer<EffectBlockTileEntity> {
+public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
 
     public EffectBlockTER(TileEntityRendererDispatcher rendererDispatcherIn) {
         super(rendererDispatcherIn);

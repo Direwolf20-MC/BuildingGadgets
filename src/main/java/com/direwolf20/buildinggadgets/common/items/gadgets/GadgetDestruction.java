@@ -206,20 +206,20 @@ public class GadgetDestruction extends AbstractGadget {
                 .offset(incomingSide.getOpposite(), depth - 1);
 
         return new Region(first, second).stream()
-                .filter(e -> isValidBlock(world, e, player, world.getBlockState(e), null, false))
+                .filter(e -> isValidBlock(world, e, player, world.getBlockState(e)))
                 .sorted(Comparator.comparing(player.getPosition()::distanceSq))
                 .collect(Collectors.toList());
     }
 
-    public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, BlockState currentBlock, @Nullable BlockState stateTarget, boolean fuzzy) {
-        if (currentBlock.getBlock().isAir(currentBlock, world, voidPos) ||
+    public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, BlockState currentBlock) {
+        if (world.isAirBlock(voidPos) ||
                 currentBlock.equals(OurBlocks.effectBlock.getDefaultState()) ||
                 currentBlock.getBlockHardness(world, voidPos) < 0 ||
-                (! fuzzy && currentBlock != stateTarget) ||
                 ! world.isBlockModifiable(player, voidPos)) return false;
 
         TileEntity te = world.getTileEntity(voidPos);
-        if ((te != null) && ! (te instanceof ConstructionBlockTileEntity)) return false;
+        if ((te != null) && ! (te instanceof ConstructionBlockTileEntity))
+            return false;
 
         if (! world.isRemote) {
             BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, voidPos);
