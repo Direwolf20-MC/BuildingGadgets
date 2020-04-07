@@ -32,6 +32,8 @@ public class SurfaceMode extends AbstractMode {
     public boolean validator(PlayerEntity player, BlockPos pos, UseContext context) {
         // Do our default checks, then do our more complex fuzzy aware checks.
         boolean topRow = super.validator(player, pos, context);
+        if( this.isExchanging() )
+            return topRow;
 
         BlockState startState = context.getWorldState(context.getStartPos());
         if( context.isFuzzy() )
