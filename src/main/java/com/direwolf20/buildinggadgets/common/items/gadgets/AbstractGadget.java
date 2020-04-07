@@ -29,11 +29,13 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tags.BlockTags.Wrapper;
 import net.minecraft.tags.Tag;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -107,6 +109,17 @@ public abstract class AbstractGadget extends Item {
         ImmutableList.Builder<ICapabilityProvider> providerBuilder = ImmutableList.builder();
         addCapabilityProviders(providerBuilder, stack, tag);
         return new MultiCapabilityProvider(providerBuilder.build());
+    }
+
+    @Override
+    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+        super.fillItemGroup(group, items);
+        if( !isInGroup(group) )
+            return;
+
+        ItemStack charged = new ItemStack(this);
+        charged.getOrCreateTag().putDouble(NBTKeys.ENERGY, this.getEnergyMax());
+        items.add(charged);
     }
 
     @Override
