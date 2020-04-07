@@ -157,8 +157,10 @@ public class GadgetExchanger extends AbstractGadget {
         if (!world.isRemote) {
             if (player.isShiftKeyDown()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
-                if( !result.getType().isSuccess() )
+                if( !result.getType().isSuccess() ) {
                     player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
+                    return super.onItemRightClick(world, player, hand);
+                }
             } else if (player instanceof ServerPlayerEntity) {
                 exchange((ServerPlayerEntity) player, itemstack);
             }

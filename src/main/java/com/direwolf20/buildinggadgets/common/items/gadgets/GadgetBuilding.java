@@ -146,8 +146,10 @@ public class GadgetBuilding extends AbstractGadget {
             //itemstack.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> e.receiveEnergy(15000000, false));
             if (player.isShiftKeyDown()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
-                if( !result.getType().isSuccess() )
+                if( !result.getType().isSuccess() ) {
                     player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
+                    return super.onItemRightClick(world, player, hand);
+                }
             } else if (player instanceof ServerPlayerEntity) {
                 build((ServerPlayerEntity) player, itemstack);
             }

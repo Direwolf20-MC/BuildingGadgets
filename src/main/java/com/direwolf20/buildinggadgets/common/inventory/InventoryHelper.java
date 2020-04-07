@@ -321,7 +321,7 @@ public class InventoryHelper {
     public static Optional<BlockData> getSafeBlockData(PlayerEntity player, BlockPos pos, BlockItemUseContext useContext) {
         World world = player.world;
         BlockState state = world.getBlockState(pos);
-        if (state.getBlock() instanceof FlowingFluidBlock || ! state.getFluidState().isEmpty())
+        if (state.getBlock() instanceof FlowingFluidBlock || ! state.getFluidState().isEmpty() )
             return Optional.empty();
         if (state.getBlock() == OurBlocks.constructionBlock) {
             TileEntity te = world.getTileEntity(pos);
