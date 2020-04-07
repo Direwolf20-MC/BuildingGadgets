@@ -85,9 +85,8 @@ public class BuildRender extends BaseRenderer {
         List<BlockPos> coordinates = anchor.orElseGet(() -> {
             AbstractMode mode = !this.isExchanger ? GadgetBuilding.getToolMode(heldItem).getMode() : GadgetExchanger.getToolMode(heldItem).getMode();
             return mode.getCollection(
-                    new AbstractMode.UseContext(player.world, renderBlockState, lookingAt.getPos(), heldItem, !this.isExchanger && GadgetBuilding.shouldPlaceAtop(heldItem)),
-                    player,
-                    lookingAt.getFace()
+                    new AbstractMode.UseContext(player.world, renderBlockState, lookingAt.getPos(), heldItem, lookingAt.getFace(), !this.isExchanger && GadgetBuilding.shouldPlaceAtop(heldItem)),
+                    player
             );
         });
 

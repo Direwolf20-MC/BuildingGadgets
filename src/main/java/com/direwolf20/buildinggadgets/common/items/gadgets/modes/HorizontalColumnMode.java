@@ -13,16 +13,16 @@ public class HorizontalColumnMode extends AbstractMode {
     }
 
     @Override
-    List<BlockPos> collect(PlayerEntity player, BlockPos playerPos, Direction side, int range, BlockPos start) {
+    List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
-        side = XYZ.isAxisY(side) ? player.getHorizontalFacing() : side.getOpposite();
+        Direction side = XYZ.isAxisY(context.getHitSide()) ? player.getHorizontalFacing() : context.getHitSide().getOpposite();
         if( !isExchanging() ) {
-            for (int i = 0; i < range; i++)
+            for (int i = 0; i < context.getRange(); i++)
                 coordinates.add(XYZ.extendPosSingle(i, start, side, XYZ.fromFacing(side)));
         } else {
             side = side.rotateY();
-            int halfRange = range / 2;
+            int halfRange = context.getRange() / 2;
             for (int i = -halfRange; i <= halfRange; i++)
                 coordinates.add(XYZ.extendPosSingle(i, start, side, XYZ.fromFacing(side)));
         }

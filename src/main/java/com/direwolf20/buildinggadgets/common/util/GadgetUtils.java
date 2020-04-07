@@ -255,11 +255,11 @@ public class GadgetUtils {
             return false;
 
         BlockData blockData = getToolBlock(stack);
-        AbstractMode.UseContext context = new AbstractMode.UseContext(player.world, blockData.getState(), startBlock, stack, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack));
+        AbstractMode.UseContext context = new AbstractMode.UseContext(player.world, blockData.getState(), startBlock, stack, sideHit, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack));
 
         List<BlockPos> coords = stack.getItem() instanceof GadgetBuilding
-                ? GadgetBuilding.getToolMode(stack).getMode().getCollection(context, player, sideHit)
-                : GadgetExchanger.getToolMode(stack).getMode().getCollection(context, player, sideHit);
+                ? GadgetBuilding.getToolMode(stack).getMode().getCollection(context, player)
+                : GadgetExchanger.getToolMode(stack).getMode().getCollection(context, player);
 
         setAnchor(stack, coords); //Set the anchor NBT
         player.sendStatusMessage(MessageTranslation.ANCHOR_SET.componentTranslation().setStyle(Styles.AQUA), true);

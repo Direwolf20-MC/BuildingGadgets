@@ -212,9 +212,8 @@ public class GadgetExchanger extends AbstractGadget {
                             world,
                             blockData.getState(),
                             lookingAt.getPos(),
-                            heldItem
-                    ), player,
-                    sideHit
+                            heldItem,
+                            sideHit), player
             );
         } else { //If we do have an anchor, erase it (Even if the build fails)
             setAnchor(stack);
