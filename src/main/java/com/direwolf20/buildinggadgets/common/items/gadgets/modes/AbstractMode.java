@@ -16,6 +16,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -75,7 +76,7 @@ public abstract class AbstractMode {
                 || worldBlockState == context.getSetState() )
             return false;
 
-        if (te != null && (!(te instanceof ConstructionBlockTileEntity) || ((ConstructionBlockTileEntity) te).getBlockState() == context.getSetState()))
+        if (te != null && (!(te instanceof ConstructionBlockTileEntity) || te.getBlockState() == context.getSetState()))
             return false;
 
         if (worldBlockState.getBlockHardness(context.getWorld(), pos) < 0)
@@ -88,7 +89,7 @@ public abstract class AbstractMode {
         boolean hasSingeValid = false;
         for(Direction direction : Direction.values()) {
             BlockPos offset = pos.offset(direction);
-            if( context.getWorld().isAirBlock(offset) ) {
+            if( context.getWorld().isAirBlock(offset) || context.getWorld().getBlockState(offset).getShape(context.getWorld(), offset) != VoxelShapes.fullCube()) {
                 hasSingeValid = true;
                 break;
             }
