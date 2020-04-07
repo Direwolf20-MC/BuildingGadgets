@@ -19,6 +19,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.World;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +47,7 @@ public abstract class AbstractMode {
         return collect(player, player.getPosition(), side, context.getRange(), startPos)
                 .stream()
                 .filter(e -> isExchanging ? this.exchangingValidator(e, lookingAtState, context) : this.validator(player, e, context))
+                .sorted(Comparator.comparing((BlockPos pos) -> player.getPosition().distanceSq(pos)))
                 .collect(Collectors.toList());
     }
 

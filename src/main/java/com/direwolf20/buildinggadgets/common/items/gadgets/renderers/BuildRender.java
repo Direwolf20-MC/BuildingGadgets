@@ -14,7 +14,6 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.gadgets.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
-import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -93,7 +92,7 @@ public class BuildRender extends BaseRenderer {
         });
 
         // Sort them on a new line for readability
-        coordinates = SortingHelper.Blocks.byDistance(coordinates, player);
+//        coordinates = SortingHelper.Blocks.byDistance(coordinates, player);
 
         // Figure out how many of the block we're rendering we have in the inventory of the player.
         IItemIndex index = new RecordingItemIndex(InventoryHelper.index(heldItem, player));

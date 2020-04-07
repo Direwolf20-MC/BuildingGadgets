@@ -47,9 +47,8 @@ public class DestructionRender extends BaseRenderer {
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         IVertexBuilder builder = buffer.getBuffer(MyRenderType.MissingBlockOverlay);
 
-        GadgetDestruction.getClearingPositionsForRendering(world, startBlock, facing, player, heldItem).forEach(coord ->
-                renderMissingBlock(stack.getLast().getMatrix(), builder, coord)
-        );
+        GadgetDestruction.getClearingPositions(world, startBlock, facing, player, heldItem)
+                .forEach(pos -> renderMissingBlock(stack.getLast().getMatrix(), builder, pos));
 
         stack.pop();
         RenderSystem.disableDepthTest();
