@@ -8,6 +8,7 @@ import com.direwolf20.buildinggadgets.common.building.modes.ExchangingGridMode;
 import com.direwolf20.buildinggadgets.common.building.modes.ExchangingHorizontalColumnMode;
 import com.direwolf20.buildinggadgets.common.building.modes.ExchangingSurfaceMode;
 import com.direwolf20.buildinggadgets.common.building.modes.ExchangingVerticalColumnMode;
+import com.direwolf20.buildinggadgets.common.config.SyncedConfig;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.state.IBlockState;
@@ -98,6 +99,10 @@ public enum ExchangingModes {
 
             // Only replace existing blocks, don't place more
             if (worldBlockState.getBlock().isAir(worldBlockState, world, pos))
+                return false;
+
+            // Messy, lovely.
+            if( SyncedConfig.blockBlacklist.contains(worldBlockState.getBlock().getDefaultState().getBlock()) )
                 return false;
 
             TileEntity tile = world.getTileEntity(pos);
