@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
+import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
@@ -203,7 +204,7 @@ public class GadgetUtils {
             return ActionResult.resultFail(Blocks.AIR);
 
         BlockState state = world.getBlockState(lookingAt.getPos());
-        if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock()))
+        if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock()) || state.getBlock() instanceof EffectBlock)
             return ActionResult.resultFail(state.getBlock());
 
         Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getPos(), player.getActiveHand());
@@ -254,11 +255,11 @@ public class GadgetUtils {
             return false;
 
         BlockData blockData = getToolBlock(stack);
-        AbstractMode.UseContext context = new AbstractMode.UseContext(player.world, blockData.getState(), startBlock, stack, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack));
+        AbstractMode.UseContext context = new AbstractMode.UseContext(player.world, blockData.getState(), startBlock, stack, sideHit, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack));
 
         List<BlockPos> coords = stack.getItem() instanceof GadgetBuilding
-                ? GadgetBuilding.getToolMode(stack).getMode().getCollection(context, player, sideHit)
-                : GadgetExchanger.getToolMode(stack).getMode().getCollection(context, player, sideHit);
+                ? GadgetBuilding.getToolMode(stack).getMode().getCollection(context, player)
+                : GadgetExchanger.getToolMode(stack).getMode().getCollection(context, player);
 
         setAnchor(stack, coords); //Set the anchor NBT
         player.sendStatusMessage(MessageTranslation.ANCHOR_SET.componentTranslation().setStyle(Styles.AQUA), true);

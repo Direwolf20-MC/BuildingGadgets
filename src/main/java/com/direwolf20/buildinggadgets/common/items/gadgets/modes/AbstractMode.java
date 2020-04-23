@@ -16,8 +16,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.World;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,23 +30,24 @@ public abstract class AbstractMode {
         this.isExchanging = isExchanging;
     }
 
-    abstract List<BlockPos> collect(PlayerEntity player, BlockPos playerPos, Direction side, int range, BlockPos start);
+    abstract List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start);
 
     /**
      * Gets the collection with filters applied stopping us having to handle the filters in the actual collection
      * method from having to handle the world etc.
      */
-    public List<BlockPos> getCollection(UseContext context, PlayerEntity player, Direction side) {
-        BlockPos startPos = this.withOffset(context.getStartPos(), side, context.isPlaceOnTop());
+    public List<BlockPos> getCollection(UseContext context, PlayerEntity player) {
+        BlockPos startPos = this.withOffset(context.getStartPos(), context.getHitSide(), context.isPlaceOnTop());
 
         // We don't need this unless we're using the exchanger but I also don't want to
         // have to remake the state for every block.
         BlockState lookingAtState = isExchanging() ? context.getWorldState(startPos) : null;
 
         // We alternate the validator as the exchanger requires a more in-depth validation process.
-        return collect(player, player.getPosition(), side, context.getRange(), startPos)
+        return collect(context, player, startPos)
                 .stream()
                 .filter(e -> isExchanging ? this.exchangingValidator(e, lookingAtState, context) : this.validator(player, e, context))
+                .sorted(Comparator.comparing((BlockPos pos) -> player.getPosition().distanceSq(pos)))
                 .collect(Collectors.toList());
     }
 
@@ -75,7 +78,7 @@ public abstract class AbstractMode {
                 || worldBlockState == context.getSetState() )
             return false;
 
-        if (te != null && (!(te instanceof ConstructionBlockTileEntity) || ((ConstructionBlockTileEntity) te).getBlockState() == context.getSetState()))
+        if (te != null && (!(te instanceof ConstructionBlockTileEntity) || te.getBlockState() == context.getSetState()))
             return false;
 
         if (worldBlockState.getBlockHardness(context.getWorld(), pos) < 0)
@@ -88,7 +91,7 @@ public abstract class AbstractMode {
         boolean hasSingeValid = false;
         for(Direction direction : Direction.values()) {
             BlockPos offset = pos.offset(direction);
-            if( context.getWorld().isAirBlock(offset) ) {
+            if( context.getWorld().isAirBlock(offset) || context.getWorld().getBlockState(offset).getShape(context.getWorld(), offset) != VoxelShapes.fullCube()) {
                 hasSingeValid = true;
                 break;
             }
@@ -109,13 +112,14 @@ public abstract class AbstractMode {
         private World world;
         private BlockState setState;
         private BlockPos startPos;
+        private Direction hitSide;
 
         private boolean isFuzzy;
         private boolean placeOnTop;
         private int range;
         private boolean rayTraceFluid;
 
-        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, boolean placeOnTop) {
+        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean placeOnTop) {
             this.world = world;
             this.setState = setState;
             this.startPos = startPos;
@@ -123,12 +127,13 @@ public abstract class AbstractMode {
             this.range = GadgetUtils.getToolRange(gadget);
             this.isFuzzy = AbstractGadget.getFuzzy(gadget);
             this.rayTraceFluid = AbstractGadget.shouldRayTraceFluid(gadget);
+            this.hitSide = hitSide;
 
             this.placeOnTop = placeOnTop;
         }
 
-        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget) {
-            this(world, setState, startPos, gadget, false);
+        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide) {
+            this(world, setState, startPos, gadget, hitSide, false);
         }
 
         public BlockItemUseContext createBlockUseContext(PlayerEntity player) {
@@ -171,6 +176,24 @@ public abstract class AbstractMode {
 
         public BlockPos getStartPos() {
             return startPos;
+        }
+
+        public Direction getHitSide() {
+            return this.hitSide;
+        }
+
+        @Override
+        public String toString() {
+            return "UseContext{" +
+                    "world=" + world +
+                    ", setState=" + setState +
+                    ", startPos=" + startPos +
+                    ", hitSide=" + hitSide +
+                    ", isFuzzy=" + isFuzzy +
+                    ", placeOnTop=" + placeOnTop +
+                    ", range=" + range +
+                    ", rayTraceFluid=" + rayTraceFluid +
+                    '}';
         }
     }
 }

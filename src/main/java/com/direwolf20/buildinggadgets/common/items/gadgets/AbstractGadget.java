@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
-import com.direwolf20.buildinggadgets.common.capability.ItemEnergyForge;
 import com.direwolf20.buildinggadgets.common.capability.provider.CapabilityProviderBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
@@ -19,7 +18,6 @@ import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.save.UndoWorldSave;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
@@ -31,11 +29,13 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tags.BlockTags.Wrapper;
 import net.minecraft.tags.Tag;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -50,6 +50,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.DistExecutor;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -111,6 +112,17 @@ public abstract class AbstractGadget extends Item {
     }
 
     @Override
+    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
+        super.fillItemGroup(group, items);
+        if( !isInGroup(group) )
+            return;
+
+        ItemStack charged = new ItemStack(this);
+        charged.getOrCreateTag().putDouble(NBTKeys.ENERGY, this.getEnergyMax());
+        items.add(charged);
+    }
+
+    @Override
     public boolean isDamageable() {
         return getMaxDamage() > 0;
     }
@@ -126,8 +138,8 @@ public abstract class AbstractGadget extends Item {
         if( !cap.isPresent() )
             return super.getDurabilityForDisplay(stack);
 
-        IEnergyStorage energyStorage = cap.orElseThrow(CapabilityNotPresentException::new);
-        return 1D - (energyStorage.getEnergyStored() / (double) energyStorage.getMaxEnergyStored());
+        Pair<Integer, Integer> energyStorage = cap.map(e -> Pair.of(e.getEnergyStored(), e.getMaxEnergyStored())).orElse(Pair.of(0, 0));
+        return 1D - (energyStorage.getLeft() / (double) energyStorage.getRight());
     }
 
     @Override
@@ -136,8 +148,8 @@ public abstract class AbstractGadget extends Item {
         if( !cap.isPresent() )
             return super.getRGBDurabilityForDisplay(stack);
 
-        IEnergyStorage energyStorage = cap.orElseThrow(CapabilityNotPresentException::new);
-        return MathHelper.hsvToRGB(Math.max(0.0F, energyStorage.getEnergyStored() / (float) energyStorage.getMaxEnergyStored()) / 3.0F, 1.0F, 1.0F);
+        Pair<Integer, Integer> energyStorage = cap.map(e -> Pair.of(e.getEnergyStored(), e.getMaxEnergyStored())).orElse(Pair.of(0, 0));
+        return MathHelper.hsvToRGB(Math.max(0.0F, energyStorage.getLeft() / (float) energyStorage.getRight()) / 3.0F, 1.0F, 1.0F);
     }
 
     @Override
@@ -146,8 +158,8 @@ public abstract class AbstractGadget extends Item {
         if( !cap.isPresent() )
             return super.isDamaged(stack);
 
-        IEnergyStorage energyStorage = cap.orElseThrow(CapabilityNotPresentException::new);
-        return energyStorage.getEnergyStored() != energyStorage.getMaxEnergyStored();
+        Pair<Integer, Integer> energyStorage = cap.map(e -> Pair.of(e.getEnergyStored(), e.getMaxEnergyStored())).orElse(Pair.of(0, 0));
+        return energyStorage.getLeft() != energyStorage.getRight();
     }
 
     @Override
@@ -159,8 +171,8 @@ public abstract class AbstractGadget extends Item {
         if( !cap.isPresent() )
             return super.showDurabilityBar(stack);
 
-        IEnergyStorage energyStorage = cap.orElseThrow(CapabilityNotPresentException::new);
-        return energyStorage.getEnergyStored() != energyStorage.getMaxEnergyStored();
+        Pair<Integer, Integer> energyStorage = cap.map(e -> Pair.of(e.getEnergyStored(), e.getMaxEnergyStored())).orElse(Pair.of(0, 0));
+        return energyStorage.getLeft() != energyStorage.getRight();
     }
 
     @Override
@@ -189,16 +201,14 @@ public abstract class AbstractGadget extends Item {
         if (player.isCreative() || getEnergyMax() == 0)
             return true;
 
-        IEnergyStorage energy = tool.getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new);
-        return getEnergyCost(tool) <= energy.getEnergyStored();
+        return getEnergyCost(tool) <= tool.getCapability(CapabilityEnergy.ENERGY).map(IEnergyStorage::getEnergyStored).orElse(0);
     }
 
     public void applyDamage(ItemStack tool, ServerPlayerEntity player) {
         if (player.isCreative() || getEnergyMax() == 0)
             return;
 
-        ItemEnergyForge energy = (ItemEnergyForge) tool.getCapability(CapabilityEnergy.ENERGY).orElseThrow(CapabilityNotPresentException::new);
-        energy.extractPower(getEnergyCost(tool), false);
+        tool.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> e.extractEnergy(getEnergyCost(tool), false));
     }
 
     protected void addEnergyInformation(List<ITextComponent> tooltip, ItemStack stack) {

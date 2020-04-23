@@ -4,8 +4,6 @@ import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.building.placement.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.common.building.placement.SetBackedPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
@@ -13,9 +11,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.Destruction
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.helpers.SortingHelper;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
@@ -43,7 +39,8 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
@@ -190,39 +187,39 @@ public class GadgetDestruction extends AbstractGadget {
         setAnchorSide(stack, null);
     }
 
-    public static IPositionPlacementSequence getClearingPositions(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
+    public static List<BlockPos> getClearingPositions(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
         ItemStack tool = getGadget(player);
         int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
+
         if (tool.isEmpty() || depth == 0 || ! player.isAllowEdit())
-            return CommonUtils.emptyPositionSequence();
+            return new ArrayList<>();
 
-        Region boundary = getClearingRegion(pos, incomingSide, player, stack);
-        boolean fuzzy = ! Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get() || AbstractGadget.getFuzzy(stack);
-        BlockState stateTarget = fuzzy ? null : world.getBlockState(pos);
+        boolean vertical = incomingSide.getAxis().isVertical();
+        Direction up = vertical ? player.getHorizontalFacing() : Direction.UP;
+        Direction down = up.getOpposite();
+        Direction right = vertical ? up.rotateY() : incomingSide.rotateYCCW();
+        Direction left = right.getOpposite();
 
-        return new SetBackedPlacementSequence(boundary.stream()
-                .filter(p -> isValidBlock(world, p, player, stateTarget, fuzzy))
-                .collect(Collectors.toCollection(HashSet::new)), boundary);
+        BlockPos first = pos.offset(left, getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT)).offset(up, getToolValue(stack, NBTKeys.GADGET_VALUE_UP));
+        BlockPos second = pos.offset(right, getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT))
+                .offset(down, getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN))
+                .offset(incomingSide.getOpposite(), depth - 1);
+
+        return new Region(first, second).stream()
+                .filter(e -> isValidBlock(world, e, player, world.getBlockState(e)))
+                .sorted(Comparator.comparing(player.getPosition()::distanceSq))
+                .collect(Collectors.toList());
     }
 
-    public static List<BlockPos> getClearingPositionsForRendering(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
-        return SortingHelper.Blocks.byDistance(getClearingPositions(world, pos, incomingSide, player, stack), player);
-    }
-
-    public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, @Nullable BlockState stateTarget, boolean fuzzy) {
-        BlockState currentBlock = world.getBlockState(voidPos);
-        return isValidBlock(world, voidPos, player, currentBlock, stateTarget, fuzzy);
-    }
-
-    public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, BlockState currentBlock, @Nullable BlockState stateTarget, boolean fuzzy) {
-        if (currentBlock.getBlock().isAir(currentBlock, world, voidPos) ||
+    public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, BlockState currentBlock) {
+        if (world.isAirBlock(voidPos) ||
                 currentBlock.equals(OurBlocks.effectBlock.getDefaultState()) ||
                 currentBlock.getBlockHardness(world, voidPos) < 0 ||
-                (! fuzzy && currentBlock != stateTarget) ||
                 ! world.isBlockModifiable(player, voidPos)) return false;
 
         TileEntity te = world.getTileEntity(voidPos);
-        if ((te != null) && ! (te instanceof ConstructionBlockTileEntity)) return false;
+        if ((te != null) && ! (te instanceof ConstructionBlockTileEntity))
+            return false;
 
         if (! world.isRemote) {
             BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, voidPos);
@@ -234,26 +231,10 @@ public class GadgetDestruction extends AbstractGadget {
         return true;
     }
 
-    public static Region getClearingRegion(BlockPos pos, Direction side, PlayerEntity player, ItemStack stack) {
-        Direction depth = side.getOpposite();
-        boolean vertical = side.getAxis().isVertical();
-        Direction up = vertical ? player.getHorizontalFacing() : Direction.UP;
-        Direction down = up.getOpposite();
-        Direction right = vertical ? up.rotateY() : side.rotateYCCW();
-        Direction left = right.getOpposite();
-
-        BlockPos first = pos.offset(left, getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT))
-                .offset(up, getToolValue(stack, NBTKeys.GADGET_VALUE_UP));
-        BlockPos second = pos.offset(right, getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT))
-                .offset(down, getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN))
-                .offset(depth, getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH) - 1);
-        // The number are not necessarily sorted min and max, but the constructor will do it for us
-        return new Region(first, second);
-    }
-
     public void clearArea(World world, BlockPos pos, Direction side, ServerPlayerEntity player, ItemStack stack) {
-        IPositionPlacementSequence positions = getClearingPositions(world, pos, side, player, stack);
+        List<BlockPos> positions = getClearingPositions(world, pos, side, player, stack);
         Undo.Builder builder = Undo.builder();
+
         for (BlockPos clearPos : positions) {
             BlockState state = world.getBlockState(clearPos);
             TileEntity te = world.getTileEntity(clearPos);
@@ -263,6 +244,7 @@ public class GadgetDestruction extends AbstractGadget {
                 destroyBlock(world, clearPos, player, builder);
             }
         }
+
         pushUndo(stack, builder.build(world.getDimension().getType()));
     }
 

@@ -11,14 +11,15 @@ public class StairMode extends AbstractMode {
     public StairMode() { super(false); }
 
     @Override
-    List<BlockPos> collect(PlayerEntity player, BlockPos playerPos, Direction side, int range, BlockPos start) {
+    List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
+        Direction side = context.getHitSide();
         if (XYZ.isAxisY(side))
             side = player.getHorizontalFacing().getOpposite();
 
         XYZ facingXYZ = XYZ.fromFacing(side);
-        for( int i = 0; i < range; i ++ ) {
+        for( int i = 0; i < context.getRange(); i ++ ) {
             // Check to see if we should build up or down from the player
             int tmp = start.getY() > player.getPosY() + 1 ? (i + 1) * -1 : i;
 

@@ -15,17 +15,17 @@ public class VerticalWallMode extends AbstractMode {
     public VerticalWallMode() { super(false); }
 
     @Override
-    List<BlockPos> collect(PlayerEntity player, BlockPos playerPos, Direction side, int range, BlockPos start) {
+    List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
         // Handle top and bottom
-        int halfRange = range / 2;
-        if( XYZ.isAxisY(side) ) {
+        int halfRange = context.getRange() / 2;
+        if( XYZ.isAxisY(context.getHitSide()) ) {
             // This allows us to figure out how to move the render
             XYZ xyz = XYZ.fromFacing(player.getHorizontalFacing().getOpposite());
-            for(int i = 0; i < range; i ++ ) {
+            for(int i = 0; i < context.getRange(); i ++ ) {
                 for(int j = -halfRange; j <= halfRange; j ++) {
-                    int value = XYZ.invertOnFace(side, i);
+                    int value = XYZ.invertOnFace(context.getHitSide(), i);
 
                     // Depending on the player view, change the expansion point.
                     coordinates.add(
@@ -40,7 +40,7 @@ public class VerticalWallMode extends AbstractMode {
         }
 
         // Handle sides. Half and half :D
-        XYZ xyz = XYZ.fromFacing(side);
+        XYZ xyz = XYZ.fromFacing(context.getHitSide());
         for (int i = -halfRange; i <= halfRange; i ++) {
             for(int j = -halfRange; j <= halfRange; j++)
                 coordinates.add(

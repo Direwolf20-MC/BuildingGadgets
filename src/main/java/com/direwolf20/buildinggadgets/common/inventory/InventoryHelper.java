@@ -17,7 +17,6 @@ import com.direwolf20.buildinggadgets.common.registry.TopologicalRegistryBuilder
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -40,6 +39,7 @@ import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -80,7 +80,7 @@ public class InventoryHelper {
     static Map<Class<?>, Map<Object, List<IObjectHandle<?>>>> indexMap(ItemStack tool, PlayerEntity player) {
         Map<Class<?>, Map<Object, List<IObjectHandle<?>>>> map = new HashMap<>();
         for (IItemHandler handler : getHandlers(tool, player)) {
-            if (handler != null)
+            if (handler != null && handler.getSlots() > 0)
                 ItemHandlerProvider.index(handler, map);
         }
         return map;
@@ -89,7 +89,7 @@ public class InventoryHelper {
     static List<IItemHandler> getHandlers(ItemStack stack, PlayerEntity player) {
         return Arrays.asList(
                 GadgetUtils.getRemoteInventory(stack, player.world),
-                player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new));
+                player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(new EmptyItemHandler()));
     }
 
     public static void registerHandleProviders() {
@@ -321,7 +321,7 @@ public class InventoryHelper {
     public static Optional<BlockData> getSafeBlockData(PlayerEntity player, BlockPos pos, BlockItemUseContext useContext) {
         World world = player.world;
         BlockState state = world.getBlockState(pos);
-        if (state.getBlock() instanceof FlowingFluidBlock || ! state.getFluidState().isEmpty())
+        if (state.getBlock() instanceof FlowingFluidBlock || ! state.getFluidState().isEmpty() )
             return Optional.empty();
         if (state.getBlock() == OurBlocks.constructionBlock) {
             TileEntity te = world.getTileEntity(pos);
@@ -346,5 +346,40 @@ public class InventoryHelper {
     //proper generics...
     private static <T extends Comparable<T>> BlockState applyProperty(BlockState state, BlockState from, IProperty<T> prop) {
         return state.with(prop, from.get(prop));
+    }
+
+    private static final class EmptyItemHandler implements IItemHandler {
+        @Override
+        public int getSlots() {
+            return 0;
+        }
+
+        @Nonnull
+        @Override
+        public ItemStack getStackInSlot(int slot) {
+            return ItemStack.EMPTY;
+        }
+
+        @Nonnull
+        @Override
+        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+            return ItemStack.EMPTY;
+        }
+
+        @Nonnull
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            return ItemStack.EMPTY;
+        }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return 0;
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+            return false;
+        }
     }
 }

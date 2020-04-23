@@ -146,8 +146,10 @@ public class GadgetBuilding extends AbstractGadget {
             //itemstack.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> e.receiveEnergy(15000000, false));
             if (player.isShiftKeyDown()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
-                if( !result.getType().isSuccess() )
+                if( !result.getType().isSuccess() ) {
                     player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
+                    return super.onItemRightClick(world, player, hand);
+                }
             } else if (player instanceof ServerPlayerEntity) {
                 build((ServerPlayerEntity) player, itemstack);
             }
@@ -198,9 +200,8 @@ public class GadgetBuilding extends AbstractGadget {
 
             Direction sideHit = lookingAt.getFace();
             coords = getToolMode(stack).getMode().getCollection(
-                    new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, placeAtop(stack)),
-                    player,
-                    sideHit
+                    new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, sideHit, placeAtop(stack)),
+                    player
             );
         }
         else  //If we do have an anchor, erase it (Even if the build fails)

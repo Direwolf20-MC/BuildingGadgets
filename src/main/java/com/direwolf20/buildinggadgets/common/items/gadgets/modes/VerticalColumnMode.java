@@ -13,26 +13,26 @@ public class VerticalColumnMode extends AbstractMode {
     }
 
     @Override
-    List<BlockPos> collect(PlayerEntity player, BlockPos playerPos, Direction side, int range, BlockPos start) {
+    List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
         // If up or down, full height from start block
-        int halfRange = range / 2;
+        int halfRange = context.getRange() / 2;
 
-        if( XYZ.isAxisY(side) ) {
+        if( XYZ.isAxisY(context.getHitSide()) ) {
             // The exchanger handles the Y completely differently :sad: means more code
             if( isExchanging() ) {
-                side = player.getHorizontalFacing();
+                Direction playerFacing = player.getHorizontalFacing();
                 for (int i = -halfRange; i <= halfRange; i++)
-                    coordinates.add(XYZ.extendPosSingle(i, start, side, XYZ.fromFacing(side)));
+                    coordinates.add(XYZ.extendPosSingle(i, start, playerFacing, XYZ.fromFacing(playerFacing)));
             } else {
-                for (int i = 0; i < range; i++)
-                    coordinates.add(XYZ.extendPosSingle(i, start, side, XYZ.Y));
+                for (int i = 0; i < context.getRange(); i++)
+                    coordinates.add(XYZ.extendPosSingle(i, start, context.getHitSide(), XYZ.Y));
             }
         // Else, half and half
         } else {
             for (int i = -halfRange; i <= halfRange; i++)
-                coordinates.add(XYZ.extendPosSingle(i, start, side, XYZ.Y));
+                coordinates.add(XYZ.extendPosSingle(i, start, context.getHitSide(), XYZ.Y));
         }
 
         return coordinates;

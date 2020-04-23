@@ -183,14 +183,14 @@ public class ModeRadialMenu extends Screen {
 
             return GadgetUtils.getAnchor(stack).isPresent();
         }));
-        if (!(tool.getItem() instanceof GadgetExchanger)) {
-            addButton(new PositionedIconActionable(RadialTranslation.UNDO, "undo", left, false, send -> {
-                if (send)
-                    PacketHandler.sendToServer(new PacketUndo());
 
-                return false;
-            }));
-        }
+        addButton(new PositionedIconActionable(RadialTranslation.UNDO, "undo", left, false, send -> {
+            if (send)
+                PacketHandler.sendToServer(new PacketUndo());
+
+            return false;
+        }));
+
         updateButtons(tool);
     }
 
