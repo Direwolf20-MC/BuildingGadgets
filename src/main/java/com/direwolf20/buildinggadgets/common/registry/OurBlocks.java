@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.registry;
 
-import com.direwolf20.buildinggadgets.client.renderer.EffectBlockTER;
 import com.direwolf20.buildinggadgets.common.blocks.*;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
@@ -14,15 +13,11 @@ import net.minecraft.block.material.MaterialColor;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntityType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.ObjectHolder;
 
@@ -80,14 +75,5 @@ public final class OurBlocks {
         registry.register(TileEntityType.Builder.create(EffectBlockTileEntity::new, effectBlock).build(null).setRegistryName(TileEntityReference.EFFECT_BLOCK_TILE_RL));
         registry.register(TileEntityType.Builder.create(ConstructionBlockTileEntity::new, constructionBlock).build(null).setRegistryName(TileEntityReference.CONSTRUCTION_TILE_RL));
         registry.register(TileEntityType.Builder.create(TemplateManagerTileEntity::new, templateManger).build(null).setRegistryName(TileEntityReference.TEMPLATE_MANAGER_TILE_RL));
-    }
-
-    public static final class OurTileEntities {
-        private OurTileEntities() {}
-
-        @OnlyIn(Dist.CLIENT)
-        static void registerRenderers() {
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(event -> ClientRegistry.bindTileEntityRenderer(EffectBlockTileEntity.TYPE, EffectBlockTER::new));
-        }
     }
 }

@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.registry;
 
+import com.direwolf20.buildinggadgets.client.renderer.EffectBlockTER;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataFactory;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
@@ -8,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.inventory.handle.IHandleProvider;
 import com.direwolf20.buildinggadgets.common.inventory.handle.IObjectHandle;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObjectSerializer;
 import com.direwolf20.buildinggadgets.common.template.SerialisationSupport;
+import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
@@ -20,6 +22,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.InterModComms;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -73,7 +76,7 @@ public final class Registries {
         OurItems.setup();
 
         DistExecutor.runWhenOn(Dist.CLIENT, () ->
-                OurBlocks.OurTileEntities::registerRenderers);
+                () -> ClientRegistry.bindTileEntityRenderer(EffectBlockTileEntity.TYPE, EffectBlockTER::new));
     }
 
     public static void clientSetup() {
