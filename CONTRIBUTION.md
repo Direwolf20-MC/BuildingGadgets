@@ -61,7 +61,7 @@ In general apply common sense to the Code you write. "Effective Java" is also al
 * Prefix Interfaces with `I` - like `ITemplate`.
 * `@SupressWarnings("...")` should be avoided in General:
     * If it needs to be applied, limit it to the smallest possible scope (and create a new variable for it if necessary).
-    * An Suppression should always have a comment stating why it is valid to suppress this warning here.
+    * A Suppression should always have a comment stating why it is valid to suppress this warning here.
     * In general only a `@SupressWarning("unchecked")` should ever be necessary - do not suppress deprecations!
 * Capitalize comments.
 * Use multiline comments where applicable, and single-line-comments only for single line comments.
