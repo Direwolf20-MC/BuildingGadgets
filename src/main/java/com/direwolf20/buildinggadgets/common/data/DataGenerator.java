@@ -10,6 +10,7 @@ public class DataGenerator {
     @SubscribeEvent
     public static void gatherData(GatherDataEvent event) {
         if( event.includeClient() ) {
+            event.getGenerator().addProvider(new ItemModelGenerator(event.getGenerator(), event.getExistingFileHelper()));
             event.getGenerator().addProvider(new LanguageGenerator(event.getGenerator()));
         }
     }
