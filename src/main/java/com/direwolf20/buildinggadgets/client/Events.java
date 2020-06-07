@@ -17,12 +17,12 @@ public class Events {
      * @param event the render event
      */
     @SubscribeEvent
-    private static void renderWorldLast(RenderWorldLastEvent event) {
+    public static void renderWorldLast(RenderWorldLastEvent event) {
 
     }
 
     @SubscribeEvent
-    private static void KeyInput(InputEvent.KeyInputEvent event) {
+    public static void KeyInput(InputEvent.KeyInputEvent event) {
         Minecraft mc = Minecraft.getInstance();
         if( mc.isGamePaused() || mc.player == null || event.isCanceled() ) {
             return;

@@ -51,7 +51,7 @@ public final class KeyBindings {
      * @param event key event
      */
     public static void onKeyPressed(InputEvent.KeyInputEvent event) {
-        System.out.println(event);
+        System.out.println(menuSettings.isPressed());
     }
 
     /**
