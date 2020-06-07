@@ -4,6 +4,8 @@ The format of this document is based on [Keep a Changelog](https://keepachangelo
 ## [3.3.5 - 1.15.2] - 2020-04-23
 ### Fixed
 - Fixed a crashing issue with some mods. (our registry was broken, whoops)
+- Fixed overlapping issue with JEI
+- Fixed exchanging gadgets being able to select the effect block.
 
 ## [3.1.1b - 1.14.4] - 2019-11-02
 A small note to this release: we know about chests not rendering in the in-game render. Please do not report this as it'll be fixed in the next version. Sorry about that.
