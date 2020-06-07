@@ -1,6 +1,9 @@
 {
   "category": "Building Gadgets",
   "item.buildinggadgets.building_gadget": "Building Gadget",
+  "item.buildinggadgets.copier_gadget": "Copier Gadget",
+  "item.buildinggadgets.destruction_gadget": "Destruction Gadget",
+  "item.buildinggadgets.exchanging_gadget": "Exchanging Gadget",
   "itemGroup.buildinggadgets": "Building Gadgets",
   "key.range": "Range",
   "key.settings_menu": "Gadget Settings",

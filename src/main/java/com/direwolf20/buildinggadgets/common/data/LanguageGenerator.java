@@ -25,5 +25,8 @@ public class LanguageGenerator extends LanguageProvider {
 
         // Items
         addItem(ModItems.BUILDING_GADGET, "Building Gadget");
+        addItem(ModItems.EXCHANGING_GADGET, "Exchanging Gadget");
+        addItem(ModItems.DESTRUCTION_GADGET, "Destruction Gadget");
+        addItem(ModItems.COPIER_GADGET, "Copier Gadget");
     }
 }

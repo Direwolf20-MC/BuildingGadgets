@@ -18,6 +18,9 @@ public class ItemModelGenerator extends ItemModelProvider {
     @Override
     protected void registerModels() {
         generateGadget(ModItems.BUILDING_GADGET);
+        generateGadget(ModItems.EXCHANGING_GADGET);
+        generateGadget(ModItems.DESTRUCTION_GADGET);
+        generateGadget(ModItems.COPIER_GADGET);
     }
 
     /**
