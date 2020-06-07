@@ -3,6 +3,7 @@
 # folders
 !/gradle
 !/src
+!/v3/
 
 # files
 !/.gitignore
@@ -17,5 +18,3 @@
 !/update.json
 !/CHANGELOG.md
 !/SPEC.md
-!/EclipseCodeStyle.xml
-!/IntelliJIdeaCodeStyle.xml
