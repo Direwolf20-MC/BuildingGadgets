@@ -1,5 +1,8 @@
 package com.direwolf20.buildinggadgets;
 
+import com.direwolf20.buildinggadgets.client.Events;
+import com.direwolf20.buildinggadgets.client.KeyBindings;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -23,17 +26,19 @@ public class BuildingGadgets
         eventBus.addListener(this::clientSetup);
         eventBus.addListener(this::enqueueIMC);
         eventBus.addListener(this::processIMC);
+
+        MinecraftForge.EVENT_BUS.register(Events.class);
     }
 
-    private void setup(final FMLCommonSetupEvent event)
-    {
+    private void setup(final FMLCommonSetupEvent event) {
 
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {
-
+        KeyBindings.init();
     }
 
+    // Todo: implement this
     private void enqueueIMC(final InterModEnqueueEvent event)
     {
 //        // some example code to dispatch IMC to another mod
