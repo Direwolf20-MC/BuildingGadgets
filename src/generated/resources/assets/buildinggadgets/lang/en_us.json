@@ -1,4 +1,8 @@
 {
   "category": "Building Gadgets",
+  "item.buildinggadgets.building_gadget": "Building Gadget",
+  "itemGroup.buildinggadgets": "Building Gadgets",
+  "key.range": "Range",
+  "key.settings_menu": "Gadget Settings",
   "name": "Building Gadgets"
 }

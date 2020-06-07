@@ -8,6 +8,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.client.settings.KeyConflictContext;
+import net.minecraftforge.fml.ForgeI18n;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import org.lwjgl.glfw.GLFW;
 
@@ -40,7 +41,7 @@ public final class KeyBindings {
      * @return     Registered Key Binding Object
      */
     private static KeyBinding createBinding(String name, int key) {
-        KeyBinding keyBinding = new KeyBinding(LangHelper.key(name), CONFLICT_CONTEXT, InputMappings.Type.KEYSYM.getOrMakeInput(key), LangHelper.key("category"));
+        KeyBinding keyBinding = new KeyBinding(String.format("key.%s", name), CONFLICT_CONTEXT, InputMappings.Type.KEYSYM.getOrMakeInput(key), "category");
         ClientRegistry.registerKeyBinding(keyBinding);
         return keyBinding;
     }
