@@ -2,6 +2,9 @@ package com.direwolf20.buildinggadgets;
 
 import com.direwolf20.buildinggadgets.client.Events;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
+import com.direwolf20.buildinggadgets.common.items.ModItems;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -19,6 +22,19 @@ public class BuildingGadgets
     public static final String MOD_ID = "buildinggadgets";
     public static final Logger LOGGER = LogManager.getLogger();
 
+    /**
+     * Used for the creative tab
+     */
+    public static ItemGroup itemGroup = new ItemGroup(BuildingGadgets.MOD_ID) {
+        @Override
+        public ItemStack createIcon() {
+            return new ItemStack(ModItems.BUILDING_GADGET.get());
+        }
+    };
+
+    /**
+     * Set the mod up
+     */
     public BuildingGadgets() {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -28,6 +44,8 @@ public class BuildingGadgets
         eventBus.addListener(this::processIMC);
 
         MinecraftForge.EVENT_BUS.register(Events.class);
+
+        ModItems.ITEMS.register(eventBus);
     }
 
     private void setup(final FMLCommonSetupEvent event) {
