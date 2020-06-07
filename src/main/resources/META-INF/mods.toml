@@ -1,0 +1,23 @@
+modLoader="javafml" #mandatory
+loaderVersion="[31,)" #mandatory This is typically bumped every Minecraft version by Forge. See our download page for lists of versions.
+issueTrackerURL="https://github.com/Direwolf20-MC/BuildingGadgets/issues" #optional
+[[mods]] #mandatory
+modId="buildinggadgets" #mandatory
+version="${file.jarVersion}" #mandatory
+displayName="Building Gadgets" #mandatory
+updateJSONURL="https://raw.githubusercontent.com/Direwolf20-MC/BuildingGadgets/master/update.json" #optional
+displayURL="https://github.com/Direwolf20-MC/BuildingGadgets" #optional
+logoFile="buildinggadgets_logo.png" #optional
+credits="The Forge and FML guys, McJty, Vazkii, CPW, and Pahimar for helping me learn java/forge modding. Rorax for the textures!" #optional
+authors="Direwolf20, ErrorMikey" #The man himself
+description='''
+Adds some gadgets to help you build!
+Building and Exchanging Gadget offer basic building & exchanging functionality for easily creating walls/columns etc.
+The Destruction Gadget will help you clear out large Areas for your complex builds which you can Copy and Paste at will with the Copy-Paste Gadget!
+'''
+[[dependencies.buildinggadgets]] #optional
+    modId="forge" #mandatory
+    mandatory=true #mandatory
+    versionRange="[31,)" #mandatory
+    ordering="NONE"
+    side="BOTH"
