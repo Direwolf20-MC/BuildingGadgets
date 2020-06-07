@@ -4,6 +4,7 @@
 !/gradle
 !/src
 !/v3/
+/v3/.idea
 
 # files
 !/.gitignore
