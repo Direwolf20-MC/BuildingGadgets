@@ -1,8 +1,21 @@
 package com.direwolf20.buildinggadgets.common.items;
 
-public class ExchangingGadget extends Gadget {
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.world.World;
+
+public class ExchangingGadget extends BuildingGadget {
 
     public ExchangingGadget() {
-        super(ModItems.ITEM_GROUP.maxDamage(0).setNoRepair());
+        super();
+    }
+
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
+        ActionResult<ItemStack> result = super.onItemRightClick(worldIn, playerIn, handIn);
+
+        return result;
     }
 }

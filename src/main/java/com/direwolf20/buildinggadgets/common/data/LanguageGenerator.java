@@ -1,9 +1,12 @@
 package com.direwolf20.buildinggadgets.common.data;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.LanguageProvider;
+
+import static com.direwolf20.buildinggadgets.common.helpers.LangHelper.*;
 
 public class LanguageGenerator extends LanguageProvider {
     public LanguageGenerator(DataGenerator gen) {
@@ -17,6 +20,7 @@ public class LanguageGenerator extends LanguageProvider {
         // Mod name / Generic
         add("name", modName);
         add("itemGroup.buildinggadgets", modName);
+        add(key("no-block-selected"), "No valid block found to select");
 
         // Key Bindings
         add("category", modName);
