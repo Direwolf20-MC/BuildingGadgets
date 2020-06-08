@@ -20,7 +20,8 @@ public class LanguageGenerator extends LanguageProvider {
         // Mod name / Generic
         add("name", modName);
         add("itemGroup.buildinggadgets", modName);
-        add(key("no-block-selected"), "No valid block found to select");
+        add(key("message.no-block-selected"), "No valid block found to select");
+        add(key("message.block-selected"), "%s Selected");
 
         // Key Bindings
         add("category", modName);

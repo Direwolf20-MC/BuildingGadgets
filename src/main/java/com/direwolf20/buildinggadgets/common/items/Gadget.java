@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.common.modes.Mode;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,9 +13,13 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public abstract class Gadget extends Item {
+    public List<Mode> modes = new ArrayList<>();
+
     public Gadget() {
         super(ModItems.ITEM_GROUP.maxStackSize(1).maxDamage(0).setNoRepair());
     }
@@ -43,14 +48,24 @@ public abstract class Gadget extends Item {
     }
 
     // NBT
-    public BlockState getBlock(ItemStack stack) {
+    public Optional<BlockState> getBlock(ItemStack stack) {
         if( stack.getOrCreateTag().contains("set-block") )
-            return NBTUtil.readBlockState(stack.getOrCreateTag());
+            return Optional.of(NBTUtil.readBlockState(stack.getOrCreateTag()));
 
-        return Blocks.AIR.getDefaultState();
+        return Optional.empty();
     }
 
     public void setBlock(ItemStack stack, @Nonnull BlockState state) {
+        stack.getOrCreateTag().put("set-block", NBTUtil.writeBlockState(state));
+    }
+
+//    public Optional<BlockState> getMode(ItemStack stack) {
+//        if( stack.getOrCreateTag().contains("mode") ) {
+//
+//        }
+//    }
+
+    public void setMode(ItemStack stack, @Nonnull BlockState state) {
         stack.getOrCreateTag().put("set-block", NBTUtil.writeBlockState(state));
     }
 }
