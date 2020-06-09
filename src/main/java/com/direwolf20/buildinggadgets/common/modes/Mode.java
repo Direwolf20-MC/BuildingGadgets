@@ -14,9 +14,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class Mode {
-    private boolean isExchanging;
+    private final String name;
+    private final boolean isExchanging;
 
-    public Mode(boolean isExchanging) {
+    public Mode(String name, boolean isExchanging) {
+        this.name = name;
         this.isExchanging = isExchanging;
     }
 
@@ -101,4 +103,7 @@ public abstract class Mode {
         return isExchanging;
     }
 
+    public String getName() {
+        return name;
+    }
 }

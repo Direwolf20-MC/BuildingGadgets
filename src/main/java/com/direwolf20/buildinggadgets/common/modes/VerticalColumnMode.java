@@ -9,7 +9,7 @@ import java.util.List;
 
 public class VerticalColumnMode extends Mode {
     public VerticalColumnMode(boolean isExchanging) {
-        super(isExchanging);
+        super("vertical_column", isExchanging);
     }
 
     // @todo: clean up

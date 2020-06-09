@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BuildToMeMode extends Mode {
-    public BuildToMeMode() { super(false); }
+    public BuildToMeMode() { super("build_to_me",false); }
 
     @Override
     public List<BlockPos> collect(ModeUseContext context, PlayerEntity player, BlockPos start) {

@@ -8,7 +8,7 @@ import java.util.List;
 
 public class GridMode extends Mode {
     public GridMode(boolean isExchanging) {
-        super(isExchanging);
+        super("grid", isExchanging);
     }
 
     @Override

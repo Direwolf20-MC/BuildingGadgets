@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StairMode extends Mode {
-    public StairMode() { super(false); }
+    public StairMode() { super("stairs", false); }
 
     @Override
     List<BlockPos> collect(ModeUseContext context, PlayerEntity player, BlockPos start) {

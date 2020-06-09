@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SurfaceMode extends Mode {
-    public SurfaceMode(boolean isExchanging) { super(isExchanging); }
+    public SurfaceMode(boolean isExchanging) { super("surface", isExchanging); }
 
     @Override
     List<BlockPos> collect(ModeUseContext context, PlayerEntity player, BlockPos start) {

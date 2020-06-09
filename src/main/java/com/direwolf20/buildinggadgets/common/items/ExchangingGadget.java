@@ -1,20 +1,27 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.common.modes.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class ExchangingGadget extends BuildingGadget {
+    private static final List<Mode> MODES = Arrays.asList(
+        new SurfaceMode(true),
+        new GridMode(true),
+        new VerticalColumnMode(true),
+        new HorizontalColumnMode(true)
+    );
 
     public ExchangingGadget() {
         super();
-    }
 
-    @Override
-    public void onCreated(ItemStack stack, World worldIn, PlayerEntity playerIn) {
-        super.onCreated(stack, worldIn, playerIn);
+        this.registerModes(MODES);
     }
 
     @Override

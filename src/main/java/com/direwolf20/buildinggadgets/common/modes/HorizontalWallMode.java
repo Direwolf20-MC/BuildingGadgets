@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HorizontalWallMode extends Mode {
-    public HorizontalWallMode() { super(false); }
+    public HorizontalWallMode() { super("horizontal_wall", false); }
 
     @Override
     List<BlockPos> collect(ModeUseContext context, PlayerEntity player, BlockPos start) {

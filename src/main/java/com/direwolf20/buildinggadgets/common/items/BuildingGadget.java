@@ -1,19 +1,36 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
+import com.direwolf20.buildinggadgets.common.modes.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class BuildingGadget extends Gadget {
+    private static final List<Mode> MODES = Arrays.asList(
+        new BuildToMeMode(),
+        new VerticalColumnMode(false),
+        new HorizontalColumnMode(false),
+        new VerticalWallMode(),
+        new HorizontalWallMode(),
+        new StairMode(),
+        new GridMode(false),
+        new SurfaceMode(false)
+    );
+
     public BuildingGadget() {
         super();
 
+        this.registerModes(MODES);
     }
 
     @Override
@@ -35,6 +52,13 @@ public class BuildingGadget extends Gadget {
             return ActionResult.resultPass(gadget);
 
         return super.onItemRightClick(worldIn, playerIn, handIn);
+    }
+
+    @Override
+    public boolean onBlockStartBreak(ItemStack itemstack, BlockPos pos, PlayerEntity player) {
+        String newMode = this.rotateModes(itemstack);
+        player.sendStatusMessage(new StringTextComponent("Mode changed to: " + newMode), true);
+        return super.onBlockStartBreak(itemstack, pos, player);
     }
 
     /**

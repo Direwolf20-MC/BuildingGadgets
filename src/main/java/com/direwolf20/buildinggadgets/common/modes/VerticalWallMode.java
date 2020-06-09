@@ -14,7 +14,7 @@ import java.util.List;
  * @todo clean up
  */
 public class VerticalWallMode extends Mode {
-    public VerticalWallMode() { super(false); }
+    public VerticalWallMode() { super("vertical_wall", false); }
 
     @Override
     List<BlockPos> collect(ModeUseContext context, PlayerEntity player, BlockPos start) {
