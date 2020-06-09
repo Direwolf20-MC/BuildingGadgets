@@ -29,8 +29,11 @@ public class BuildingGadget extends Gadget {
 
     public BuildingGadget() {
         super();
+    }
 
-        this.registerModes(MODES);
+    @Override
+    protected List<Mode> getModes() {
+        return MODES;
     }
 
     @Override

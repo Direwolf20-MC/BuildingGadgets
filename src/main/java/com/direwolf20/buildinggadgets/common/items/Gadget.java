@@ -15,30 +15,25 @@ import javax.annotation.Nonnull;
 import java.util.*;
 
 public abstract class Gadget extends Item {
-    // Used on all the gadgets to have a unified mode register
-    // Needs to be made public for other peoples mods at some point though
-    private List<Mode> modes = new ArrayList<>();
 
     public Gadget() {
         super(ModItems.ITEM_GROUP.maxStackSize(1).maxDamage(0).setNoRepair());
     }
 
     /**
-     * For readability on each gadget. I don't intend on this being modified dynamically so only call once
+     * Used to unify all gadgets to use the same mode logic
      */
-    public void registerModes(List<Mode> modes) {
-        this.modes.addAll(modes);
-    }
+    protected abstract List<Mode> getModes();
 
     /**
-     * Will be removed before release. Just a testing method to handle cycling though each gagdets modes
+     * Will be removed before release. Just a testing method to handle cycling though each gadgets modes
      */
     public String rotateModes(ItemStack stack) {
-        int currentIndex = this.modes.indexOf(this.getMode(stack));
-        int newIndex = (currentIndex + 1) > this.modes.size() ? 0 : (currentIndex + 1);
+        int currentIndex = this.getModes().indexOf(this.getMode(stack));
+        int newIndex = (currentIndex + 1) > this.getModes().size() - 1 ? 0 : (currentIndex + 1);
 
-        this.setMode(stack, this.modes.get(newIndex).getName());
-        return this.modes.get(newIndex).getName();
+        this.setMode(stack, this.getModes().get(newIndex).getName());
+        return this.getModes().get(newIndex).getName();
     }
 
     /**
@@ -81,14 +76,14 @@ public abstract class Gadget extends Item {
             String modeId = Objects.requireNonNull(stack.getOrCreateTag().get("mode")).getString();
 
             // Find the mode based on it's name or return the default one.
-            return this.modes.stream()
+            return this.getModes().stream()
                     .filter(e -> e.getName().equals(modeId))
                     .findFirst()
-                    .orElse(this.modes.get(0));
+                    .orElse(this.getModes().get(0));
         }
 
         // Not found, return default
-        return this.modes.get(0);
+        return this.getModes().get(0);
     }
 
     public void setMode(ItemStack stack, String mode) {

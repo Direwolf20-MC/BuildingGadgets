@@ -20,8 +20,11 @@ public class ExchangingGadget extends BuildingGadget {
 
     public ExchangingGadget() {
         super();
+    }
 
-        this.registerModes(MODES);
+    @Override
+    protected List<Mode> getModes() {
+        return MODES;
     }
 
     @Override
