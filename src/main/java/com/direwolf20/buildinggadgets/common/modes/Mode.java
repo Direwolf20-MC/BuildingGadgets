@@ -28,7 +28,7 @@ public abstract class Mode {
      * Gets the collection with filters applied stopping us having to handle the filters in the actual collection
      * method from having to handle the world etc.
      */
-    public List<BlockPos> getCollection(ModeUseContext context, PlayerEntity player) {
+    public List<BlockPos> getCollection(PlayerEntity player, ModeUseContext context) {
         BlockPos startPos = this.withOffset(context.getStartPos(), context.getHitSide(), context.isPlaceOnTop());
 
         // We don't need this unless we're using the exchanger but I also don't want to

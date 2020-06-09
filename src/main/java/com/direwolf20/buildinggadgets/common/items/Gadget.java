@@ -36,29 +36,6 @@ public abstract class Gadget extends Item {
         return this.getModes().get(newIndex).getName();
     }
 
-    /**
-     * Finds and returns the closest block to the player within X amount of blocks
-     *
-     * @param worldIn           Current world
-     * @param playerEntity      Current Player Entity
-     * @return                  Optional BlockState of what block the player is looking ats
-     */
-    public static Optional<BlockState> getLookingAt(World worldIn, PlayerEntity playerEntity, int range) {
-        RayTraceResult trace = playerEntity.pick(range, 0, false);
-
-        if( trace.getType() != RayTraceResult.Type.BLOCK ) {
-            return Optional.empty();
-        }
-
-        BlockPos lookAt = ((BlockRayTraceResult) trace).getPos();
-        BlockState state = worldIn.getBlockState(lookAt);
-        if( state.isAir(worldIn, lookAt) ) {
-            return Optional.empty();
-        }
-
-        return Optional.of(state);
-    }
-
     // NBT
     public Optional<BlockState> getBlock(ItemStack stack) {
         if( stack.getOrCreateTag().contains("set-block") )
