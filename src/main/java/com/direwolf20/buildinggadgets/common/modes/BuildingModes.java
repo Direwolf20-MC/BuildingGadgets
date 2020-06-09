@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.items.gadgets.modes;
+package com.direwolf20.buildinggadgets.common.modes;
 
 import java.util.Arrays;
 
@@ -12,14 +12,14 @@ public enum BuildingModes {
     GRID(new GridMode(false), "grid"),
     SURFACE(new SurfaceMode(false), "surface");
 
-    AbstractMode mode;
+    Mode mode;
     String name;
-    BuildingModes(AbstractMode mode, String name) {
+    BuildingModes(Mode mode, String name) {
         this.mode = mode;
         this.name = name;
     }
 
-    public AbstractMode getMode() {
+    public Mode getMode() {
         return mode;
     }
 
