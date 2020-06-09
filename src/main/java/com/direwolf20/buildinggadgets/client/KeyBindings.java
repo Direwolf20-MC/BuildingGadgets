@@ -41,7 +41,7 @@ public final class KeyBindings {
      * @return     Registered Key Binding Object
      */
     private static KeyBinding createBinding(String name, int key) {
-        KeyBinding keyBinding = new KeyBinding(String.format("key.%s", name), CONFLICT_CONTEXT, InputMappings.Type.KEYSYM.getOrMakeInput(key), "category");
+        KeyBinding keyBinding = new KeyBinding(LangHelper.key("key", name), CONFLICT_CONTEXT, InputMappings.Type.KEYSYM.getOrMakeInput(key), LangHelper.key("key", "category"));
         ClientRegistry.registerKeyBinding(keyBinding);
         return keyBinding;
     }

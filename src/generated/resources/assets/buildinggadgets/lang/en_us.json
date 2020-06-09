@@ -1,11 +1,13 @@
 {
-  "category": "Building Gadgets",
   "item.buildinggadgets.building_gadget": "Building Gadget",
   "item.buildinggadgets.copier_gadget": "Copier Gadget",
   "item.buildinggadgets.destruction_gadget": "Destruction Gadget",
   "item.buildinggadgets.exchanging_gadget": "Exchanging Gadget",
   "itemGroup.buildinggadgets": "Building Gadgets",
-  "key.range": "Range",
-  "key.settings_menu": "Gadget Settings",
+  "key.buildinggadgets.category": "Building Gadgets",
+  "key.buildinggadgets.range": "Range",
+  "key.buildinggadgets.settings_menu": "Gadget Settings",
+  "message.buildinggadgets.block-selected": "%s Selected",
+  "message.buildinggadgets.no-block-selected": "No valid block found to select",
   "name": "Building Gadgets"
 }

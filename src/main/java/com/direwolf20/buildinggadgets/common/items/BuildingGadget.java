@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
 import com.direwolf20.buildinggadgets.common.helpers.LookingHelper;
 import com.direwolf20.buildinggadgets.common.modes.*;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
@@ -77,14 +78,15 @@ public class BuildingGadget extends Gadget {
      */
     private ActionResult<ItemStack> selectBlock(World world, @Nullable BlockRayTraceResult trace, PlayerEntity playerIn, ItemStack gadget) {
         if( trace == null ) {
-            playerIn.sendStatusMessage(LangHelper.compMessage("message.no-block-selected"), true);
+            playerIn.sendStatusMessage(LangHelper.compMessage("message", "no-block-selected"), true);
             return ActionResult.resultFail(gadget);
         }
 
         BlockState state = world.getBlockState(trace.getPos());
+        System.out.println(state);
         this.setBlock(gadget, state);
 
-        playerIn.sendStatusMessage(LangHelper.compMessage("message.block-selected", state.getBlock().getNameTextComponent().getFormattedText()), true);
+        playerIn.sendStatusMessage(LangHelper.compMessage("message", "block-selected", state.getBlock().getNameTextComponent().getFormattedText()), true);
         return ActionResult.resultSuccess(gadget);
     }
 
@@ -97,6 +99,8 @@ public class BuildingGadget extends Gadget {
         Mode mode = this.getMode(gadget);
 
         List<BlockPos> blockCollection = mode.getCollection(playerIn, new ModeUseContext(worldIn, state, trace.getPos(), gadget, trace.getFace(), true));
-        System.out.println(blockCollection);
+        System.out.println(state);
+
+        blockCollection.forEach(e -> worldIn.setBlockState(e, state));
     }
 }

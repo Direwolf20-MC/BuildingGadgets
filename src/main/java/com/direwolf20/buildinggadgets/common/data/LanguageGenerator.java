@@ -20,13 +20,13 @@ public class LanguageGenerator extends LanguageProvider {
         // Mod name / Generic
         add("name", modName);
         add("itemGroup.buildinggadgets", modName);
-        add(key("message.no-block-selected"), "No valid block found to select");
-        add(key("message.block-selected"), "%s Selected");
+        add(key("message", "no-block-selected"), "No valid block found to select");
+        add(key("message", "block-selected"), "%s Selected");
 
         // Key Bindings
-        add("category", modName);
-        add("key.range", "Range");
-        add("key.settings_menu", "Gadget Settings");
+        add(key("key", "category"), modName);
+        add(key("key", "range"), "Range");
+        add(key("key", "settings_menu"), "Gadget Settings");
 
         // Items
         addItem(ModItems.BUILDING_GADGET, "Building Gadget");

@@ -73,7 +73,7 @@ public abstract class Mode {
 
         if (te != null
 //                && (!(te instanceof ConstructionBlockTileEntity) ||
-                || te.getBlockState() == context.getSetState()) //)
+                && te.getBlockState() == context.getSetState()) //)
             return false;
 
         if (worldBlockState.getBlockHardness(context.getWorld(), pos) < 0)

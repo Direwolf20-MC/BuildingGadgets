@@ -39,7 +39,7 @@ public abstract class Gadget extends Item {
     // NBT
     public Optional<BlockState> getBlock(ItemStack stack) {
         if( stack.getOrCreateTag().contains("set-block") )
-            return Optional.of(NBTUtil.readBlockState(stack.getOrCreateTag()));
+            return Optional.of(NBTUtil.readBlockState(stack.getOrCreateTag().getCompound("set-block")));
 
         return Optional.empty();
     }
