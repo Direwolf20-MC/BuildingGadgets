@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.client.Events;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.common.commands.SpawnBlocksCommand;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
+import com.direwolf20.buildinggadgets.common.packets.Packets;
 import net.minecraft.command.Commands;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -53,7 +54,7 @@ public class BuildingGadgets
     }
 
     private void setup(final FMLCommonSetupEvent event) {
-
+        Packets.register();
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {
