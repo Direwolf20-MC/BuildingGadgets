@@ -46,7 +46,7 @@ public class BuildingGadget extends Gadget {
     }
 
     @Override
-    protected List<Mode> getModes() {
+    public List<Mode> getModes() {
         return MODES;
     }
 
@@ -70,13 +70,6 @@ public class BuildingGadget extends Gadget {
             return ActionResult.resultPass(gadget);
 
         return super.onItemRightClick(worldIn, playerIn, handIn);
-    }
-
-    @Override
-    public boolean onBlockStartBreak(ItemStack itemstack, BlockPos pos, PlayerEntity player) {
-        String newMode = this.rotateModes(itemstack);
-        player.sendStatusMessage(new StringTextComponent("Mode changed to: " + newMode), true);
-        return super.onBlockStartBreak(itemstack, pos, player);
     }
 
     /**

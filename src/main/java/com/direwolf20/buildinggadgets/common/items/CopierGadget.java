@@ -22,7 +22,7 @@ public class CopierGadget extends Gadget {
     }
 
     @Override
-    protected List<Mode> getModes() {
+    public List<Mode> getModes() {
         return Collections.emptyList();
     }
 }

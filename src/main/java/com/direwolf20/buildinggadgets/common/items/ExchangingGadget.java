@@ -23,7 +23,7 @@ public class ExchangingGadget extends BuildingGadget {
     }
 
     @Override
-    protected List<Mode> getModes() {
+    public List<Mode> getModes() {
         return MODES;
     }
 

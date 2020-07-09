@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.modes;
 
+import com.direwolf20.buildinggadgets.common.items.Gadget;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
@@ -27,7 +28,8 @@ public class ModeUseContext {
         this.setState = setState;
         this.startPos = startPos;
 
-        this.range = 20; //GadgetUtils.getToolRange(gadget);
+        // TODO: 09/07/2020 this seems stupid to be casting the item to the gadget to then just use the gadget
+        this.range = ((Gadget) gadget.getItem()).getRange(gadget);
         this.isFuzzy = true; //AbstractGadget.getFuzzy(gadget);
         this.rayTraceFluid = false;//AbstractGadget.shouldRayTraceFluid(gadget);
         this.hitSide = hitSide;
