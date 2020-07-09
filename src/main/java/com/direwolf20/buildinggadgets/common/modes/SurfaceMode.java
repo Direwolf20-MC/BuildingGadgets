@@ -1,8 +1,9 @@
 package com.direwolf20.buildinggadgets.common.modes;
 
+import com.direwolf20.buildinggadgets.common.schema.BoundingBox;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,15 +17,19 @@ public class SurfaceMode extends Mode {
 
         int bound = context.getRange() / 2;
 
-// @todo: put back ->
-//        // Grow the area. getXOffset will invert some math for us
-//        Region area = new Region(start).expand(
-//                bound * (1 - Math.abs(context.getHitSide().getXOffset())),
-//                bound * (1 - Math.abs(context.getHitSide().getYOffset())),
-//                bound * (1 - Math.abs(context.getHitSide().getZOffset()))
-//        );
-//
-//        area.spliterator().forEachRemaining(coordinates::add);
+        System.out.println(bound);
+
+        BoundingBox region = new BoundingBox(start).expand(
+                bound * (1 - Math.abs(context.getHitSide().getXOffset())),
+                bound * (1 - Math.abs(context.getHitSide().getYOffset())),
+                bound * (1 - Math.abs(context.getHitSide().getZOffset()))
+        );
+
+        CubeCoordinateIterator iterator = new CubeCoordinateIterator(region.minX, region.minY, region.minZ, region.maxX, region.maxY, region.maxZ);
+        while( iterator.hasNext() ) {
+            coordinates.add(new BlockPos(iterator.getX(), iterator.getY(), iterator.getZ()));
+        }
+
         return coordinates;
     }
 
