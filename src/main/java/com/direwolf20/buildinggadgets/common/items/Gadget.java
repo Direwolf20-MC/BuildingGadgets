@@ -20,6 +20,10 @@ public abstract class Gadget extends Item {
         super(ModItems.ITEM_GROUP.maxStackSize(1).maxDamage(0).setNoRepair());
     }
 
+    public abstract void action();
+
+    public abstract void undo();
+
     /**
      * Used to unify all gadgets to use the same mode logic
      */

@@ -12,6 +12,16 @@ public class DestructionGadget extends Gadget {
     }
 
     @Override
+    public void action() {
+
+    }
+
+    @Override
+    public void undo() {
+
+    }
+
+    @Override
     protected List<Mode> getModes() {
         return Collections.emptyList();
     }

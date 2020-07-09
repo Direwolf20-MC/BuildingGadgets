@@ -2,7 +2,9 @@ package com.direwolf20.buildinggadgets;
 
 import com.direwolf20.buildinggadgets.client.Events;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
+import com.direwolf20.buildinggadgets.common.commands.SpawnBlocksCommand;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
+import net.minecraft.command.Commands;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -12,6 +14,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -43,6 +46,7 @@ public class BuildingGadgets
         eventBus.addListener(this::enqueueIMC);
         eventBus.addListener(this::processIMC);
 
+        MinecraftForge.EVENT_BUS.addListener(this::serverLoad);
         MinecraftForge.EVENT_BUS.register(Events.class);
 
         ModItems.ITEMS.register(eventBus);
@@ -54,6 +58,14 @@ public class BuildingGadgets
 
     private void clientSetup(final FMLClientSetupEvent event) {
         KeyBindings.init();
+    }
+
+    private void serverLoad(FMLServerStartingEvent event) {
+        LOGGER.debug("Registering commands");
+        event.getCommandDispatcher().register(
+                Commands.literal(MOD_ID)
+                        .then(SpawnBlocksCommand.register())
+        );
     }
 
     // Todo: implement this

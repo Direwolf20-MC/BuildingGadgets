@@ -46,4 +46,9 @@ public class ItemModelGenerator extends ItemModelProvider {
                     .end()
                 .end();
     }
+
+    @Override
+    public String getName() {
+        return "Item Model Generator";
+    }
 }
