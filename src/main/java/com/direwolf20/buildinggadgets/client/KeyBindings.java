@@ -1,6 +1,9 @@
 package com.direwolf20.buildinggadgets.client;
 
 import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
+import com.direwolf20.buildinggadgets.common.packets.Packets;
+import com.direwolf20.buildinggadgets.common.packets.SetModePacket;
+import com.direwolf20.buildinggadgets.common.packets.SetRangePacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
@@ -17,6 +20,7 @@ public final class KeyBindings {
     private static final KeyConflicts CONFLICT_CONTEXT = new KeyConflicts();
     public static KeyBinding menuSettings;
     public static KeyBinding range;
+    public static KeyBinding mode;
 
     /**
      * Register the keybindings we need for the mod.
@@ -24,6 +28,7 @@ public final class KeyBindings {
     public static void init() {
         menuSettings = createBinding("settings_menu", GLFW.GLFW_KEY_G);
         range = createBinding("range", GLFW.GLFW_KEY_R);
+        mode = createBinding("mode", GLFW.GLFW_KEY_V);
 
 //        undo = createBinding("undo", GLFW.GLFW_KEY_U);
 //        anchor = createBinding("anchor", GLFW.GLFW_KEY_H);
@@ -52,7 +57,13 @@ public final class KeyBindings {
      * @param event key event
      */
     public static void onKeyPressed(InputEvent.KeyInputEvent event) {
-//        System.out.println(menuSettings.isPressed());
+        if (range.isPressed()) {
+            Packets.sendToServer(new SetRangePacket());
+        }
+
+        if (mode.isPressed()) {
+            Packets.sendToServer(new SetModePacket());
+        }
     }
 
     /**

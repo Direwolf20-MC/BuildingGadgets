@@ -22,10 +22,13 @@ public class LanguageGenerator extends LanguageProvider {
         add("itemGroup.buildinggadgets", modName);
         add(key("message", "no-block-selected"), "No valid block found to select");
         add(key("message", "block-selected"), "%s Selected");
+        add(key("message", "range-updated"), "Range: %s");
+        add(key("message", "mode-updated"), "Mode: %s");
 
         // Key Bindings
         add(key("key", "category"), modName);
-        add(key("key", "range"), "Range");
+        add(key("key", "range"), "Range Cycle");
+        add(key("key", "mode"), "Mode Cycle");
         add(key("key", "settings_menu"), "Gadget Settings");
 
         // Items
@@ -33,5 +36,19 @@ public class LanguageGenerator extends LanguageProvider {
         addItem(ModItems.EXCHANGING_GADGET, "Exchanging Gadget");
         addItem(ModItems.DESTRUCTION_GADGET, "Destruction Gadget");
         addItem(ModItems.COPIER_GADGET, "Copier Gadget");
+
+        addMode("build_to_me", "Build to me");
+        addMode("grid", "Grid");
+        addMode("horizontal_column", "Horizontal Column");
+        addMode("horizontal_wall", "Horizontal Wall");
+        addMode("vertical_column", "Vertical Column");
+        addMode("vertical_wall", "Vertical Wall");
+        addMode("stairs", "Stairs");
+        addMode("surface", "Surface");
+
+    }
+
+    private void addMode(String mode, String text) {
+        add(key("mode", mode), text);
     }
 }
