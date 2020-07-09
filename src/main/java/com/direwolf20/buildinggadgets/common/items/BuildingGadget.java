@@ -1,5 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.construction.UndoBit;
+import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
 import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
 import com.direwolf20.buildinggadgets.common.helpers.LookingHelper;
 import com.direwolf20.buildinggadgets.common.modes.*;
@@ -11,13 +14,11 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class BuildingGadget extends Gadget {
     private static final List<Mode> MODES = Arrays.asList(
@@ -41,8 +42,28 @@ public class BuildingGadget extends Gadget {
     }
 
     @Override
-    public void undo() {
+    public void undo(ItemStack gadget, World world, PlayerEntity player) {
+        UndoWorldStore store = UndoWorldStore.get(world);
+        Optional<UUID> uuid = this.pollUndo(gadget);
 
+        if (!uuid.isPresent())
+            player.sendStatusMessage(new TranslationTextComponent("heashdoisahdoihasoidhasihdioasd"), true);
+
+        uuid.ifPresent(key -> {
+            List<UndoBit> bits = store.getUndoStack().get(key);
+
+            if (bits == null) {
+                BuildingGadgets.LOGGER.debug("Failed to get undo data :( " + uuid.toString());
+                return;
+            }
+
+            for (UndoBit bit : bits) {
+                world.setBlockState(bit.getPos(), Blocks.AIR.getDefaultState());
+            }
+
+            store.getUndoStack().remove(key);
+            store.markDirty();
+        });
     }
 
     @Override
@@ -100,10 +121,19 @@ public class BuildingGadget extends Gadget {
 
         // First, get the gadgets mode
         Mode mode = this.getMode(gadget);
-
         List<BlockPos> blockCollection = mode.getCollection(playerIn, new ModeUseContext(worldIn, state, trace.getPos(), gadget, trace.getFace(), true));
-        System.out.println(state);
 
-        blockCollection.forEach(e -> worldIn.setBlockState(e, state));
+        UndoWorldStore store = UndoWorldStore.get(worldIn);
+        List<UndoBit> bits = new ArrayList<>();
+        for (BlockPos e : blockCollection) {
+            if (worldIn.setBlockState(e, state)) {
+                bits.add(new UndoBit(e, state));
+            }
+        }
+
+        UUID uuid = UUID.randomUUID();
+        this.pushUndo(gadget, uuid);
+        store.getUndoStack().put(uuid, bits);
+        store.markDirty();
     }
 }

@@ -32,6 +32,7 @@ public class Packets {
 
         INSTANCE.registerMessage(id++, SetRangePacket.class, SetRangePacket::encode, SetRangePacket::decode, SetRangePacket.Handler::handle);
         INSTANCE.registerMessage(id++, SetModePacket.class, SetModePacket::encode, SetModePacket::decode, SetModePacket.Handler::handle);
+        INSTANCE.registerMessage(id++, UndoPacket.class, UndoPacket::encode, UndoPacket::decode, UndoPacket.Handler::handle);
     }
 
     public static void sendTo(Object msg, ServerPlayerEntity player) {

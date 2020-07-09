@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
 import com.direwolf20.buildinggadgets.common.packets.Packets;
 import com.direwolf20.buildinggadgets.common.packets.SetModePacket;
 import com.direwolf20.buildinggadgets.common.packets.SetRangePacket;
+import com.direwolf20.buildinggadgets.common.packets.UndoPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
@@ -21,6 +22,7 @@ public final class KeyBindings {
     public static KeyBinding menuSettings;
     public static KeyBinding range;
     public static KeyBinding mode;
+    public static KeyBinding undo;
 
     /**
      * Register the keybindings we need for the mod.
@@ -29,8 +31,8 @@ public final class KeyBindings {
         menuSettings = createBinding("settings_menu", GLFW.GLFW_KEY_G);
         range = createBinding("range", GLFW.GLFW_KEY_R);
         mode = createBinding("mode", GLFW.GLFW_KEY_V);
+        undo = createBinding("undo", GLFW.GLFW_KEY_U);
 
-//        undo = createBinding("undo", GLFW.GLFW_KEY_U);
 //        anchor = createBinding("anchor", GLFW.GLFW_KEY_H);
 //        fuzzy = createBinding("fuzzy", GLFW.GLFW_KEY_UNKNOWN);
 //        connectedArea = createBinding("connected_area", GLFW.GLFW_KEY_UNKNOWN);
@@ -63,6 +65,10 @@ public final class KeyBindings {
 
         if (mode.isPressed()) {
             Packets.sendToServer(new SetModePacket());
+        }
+
+        if (undo.isPressed()) {
+            Packets.sendToServer(new UndoPacket());
         }
     }
 

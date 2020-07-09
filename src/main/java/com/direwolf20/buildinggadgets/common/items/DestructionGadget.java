@@ -1,6 +1,9 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.common.modes.Mode;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +20,7 @@ public class DestructionGadget extends Gadget {
     }
 
     @Override
-    public void undo() {
+    public void undo(ItemStack gadget, World world, PlayerEntity player) {
 
     }
 

@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets;
 
 import com.direwolf20.buildinggadgets.client.Events;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
+import com.direwolf20.buildinggadgets.common.commands.ClearUndoStoreCommand;
 import com.direwolf20.buildinggadgets.common.commands.SpawnBlocksCommand;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.packets.Packets;
@@ -66,6 +67,7 @@ public class BuildingGadgets
         event.getCommandDispatcher().register(
                 Commands.literal(MOD_ID)
                         .then(SpawnBlocksCommand.register())
+                        .then(ClearUndoStoreCommand.register())
         );
     }
 
