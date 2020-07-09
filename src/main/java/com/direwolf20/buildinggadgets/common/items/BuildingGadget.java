@@ -93,7 +93,7 @@ public class BuildingGadget extends Gadget {
         return ActionResult.resultSuccess(gadget);
     }
 
-    private void collectAndBuild(World worldIn, @Nullable BlockRayTraceResult trace, PlayerEntity playerIn, ItemStack gadget, BlockState state) {
+    protected void collectAndBuild(World worldIn, @Nullable BlockRayTraceResult trace, PlayerEntity playerIn, ItemStack gadget, BlockState state) {
         if( trace == null ) {
             return;
         }

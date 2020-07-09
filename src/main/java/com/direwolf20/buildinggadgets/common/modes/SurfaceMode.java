@@ -16,9 +16,6 @@ public class SurfaceMode extends Mode {
         List<BlockPos> coordinates = new ArrayList<>();
 
         int bound = context.getRange() / 2;
-
-        System.out.println(bound);
-
         BoundingBox region = new BoundingBox(start).expand(
                 bound * (1 - Math.abs(context.getHitSide().getXOffset())),
                 bound * (1 - Math.abs(context.getHitSide().getYOffset())),
