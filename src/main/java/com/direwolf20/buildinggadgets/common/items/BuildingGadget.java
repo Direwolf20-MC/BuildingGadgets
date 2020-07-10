@@ -127,12 +127,12 @@ public class BuildingGadget extends Gadget {
         Mode mode = this.getMode(gadget);
         List<BlockPos> blockCollection = mode.getCollection(playerIn, new ModeUseContext(worldIn, state, trace.getPos(), gadget, trace.getFace(), true));
 
-        // Build and store to the undo worldStore 
+        // Build and store to the undo worldStore
         UndoWorldStore store = UndoWorldStore.get(worldIn);
         List<UndoBit> bits = new ArrayList<>();
         for (BlockPos e : blockCollection) {
             if (worldIn.setBlockState(e, state)) {
-                bits.add(new UndoBit(e, state));
+                bits.add(new UndoBit(e, state, worldIn.getDimension().getType()));
             }
         }
 

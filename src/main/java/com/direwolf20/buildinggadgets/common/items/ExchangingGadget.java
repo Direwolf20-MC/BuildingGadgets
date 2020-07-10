@@ -52,4 +52,7 @@ public class ExchangingGadget extends BuildingGadget {
 
         blockCollection.forEach(e -> worldIn.setBlockState(e, state));
     }
+
+    @Override
+    public void undo(ItemStack gadget, World world, PlayerEntity player) {}
 }
