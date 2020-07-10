@@ -41,6 +41,9 @@ public class BuildingGadget extends Gadget {
 
     }
 
+    /**
+     * Fetches the last UUID stored on the gadget, validates it then reverts the "bits"
+     */
     @Override
     public void undo(ItemStack gadget, World world, PlayerEntity player) {
         UndoWorldStore store = UndoWorldStore.get(world);
@@ -57,6 +60,7 @@ public class BuildingGadget extends Gadget {
                 return;
             }
 
+            // TODO: 10/07/2020 Add checking
             for (UndoBit bit : bits) {
                 world.setBlockState(bit.getPos(), Blocks.AIR.getDefaultState());
             }
@@ -123,6 +127,7 @@ public class BuildingGadget extends Gadget {
         Mode mode = this.getMode(gadget);
         List<BlockPos> blockCollection = mode.getCollection(playerIn, new ModeUseContext(worldIn, state, trace.getPos(), gadget, trace.getFace(), true));
 
+        // Build and store to the undo worldStore 
         UndoWorldStore store = UndoWorldStore.get(worldIn);
         List<UndoBit> bits = new ArrayList<>();
         for (BlockPos e : blockCollection) {

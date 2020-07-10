@@ -7,6 +7,10 @@ import net.minecraft.util.math.BlockPos;
 
 import javax.annotation.Nullable;
 
+/**
+ * An UndoBit identifies specific data about a action ("bit") which can be used to
+ * check and remove any action performed by a gadget.
+ */
 public class UndoBit {
     private BlockPos pos;
     private BlockState state;
@@ -26,6 +30,7 @@ public class UndoBit {
 
     @Nullable
     public static UndoBit deserialize(CompoundNBT compound) {
+        // Fail if we don't have a valid compound
         if (!compound.contains("pos") || !compound.contains("state"))
             return null;
 

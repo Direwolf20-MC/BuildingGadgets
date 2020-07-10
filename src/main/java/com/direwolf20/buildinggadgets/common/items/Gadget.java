@@ -32,7 +32,11 @@ public abstract class Gadget extends Item {
     public abstract List<Mode> getModes();
 
     /**
-     * Find the gadget from a players main hands
+     * Find the gadget from a players main hands,
+     *
+     * by design a gadget can only be operated one at a time thus the one in the
+     * offhand is checked for last to ensure that if there is one in both hands the one
+     * in the main hand will be retrieve first.
      */
     public static Optional<ItemStack> findGadget(PlayerEntity entity) {
         if (entity.getHeldItemMainhand().getItem() instanceof Gadget)
@@ -44,7 +48,21 @@ public abstract class Gadget extends Item {
         return Optional.empty();
     }
 
-    // NBT
+    /*
+        A bit part of the gadgets is storing data, everything beyond this point is for storing data as
+        nbt on the gadget. Nothing else. Please do not put non-nbt based methods below.
+
+        @implNote
+        These methods are available on all gadgets but only the Building and Exchanger gadget truly utilise all of them.
+
+        @implNote @MichaelHillcox
+        I am also aware that this should likely be a capability, I will move it all to a capability once
+        I know how to move it over properly.
+    */
+
+    /**
+     * Gets the current block to build with from the gadget
+     */
     public Optional<BlockState> getBlock(ItemStack stack) {
         if( stack.getOrCreateTag().contains("set-block") )
             return Optional.of(NBTUtil.readBlockState(stack.getOrCreateTag().getCompound("set-block")));
@@ -56,8 +74,12 @@ public abstract class Gadget extends Item {
         stack.getOrCreateTag().put("set-block", NBTUtil.writeBlockState(state));
     }
 
+    /**
+     * Used the Modes enum's name to store and retrieve the current mode from the gadget.
+     */
     public Mode getMode(ItemStack stack) {
         if( stack.getOrCreateTag().contains("mode") ) {
+            // Using requireNonNull here as the IDE does not know how the above contains check works.
             String modeId = Objects.requireNonNull(stack.getOrCreateTag().get("mode")).getString();
 
             // Find the mode based on it's name or return the default one.
@@ -96,8 +118,10 @@ public abstract class Gadget extends Item {
         return 1;
     }
 
-    // clamp the range.
-    // TODO: 09/07/2020 Add this to the config to make it simple to extend the max range
+    /**
+     * Sets the range on the gadget but clamps the range based on the max range for all gadgets
+     * TODO: 09/07/2020 Add this to the config to make it simple to extend the max range
+     */
     public void setRange(ItemStack stack, int range) {
         // if range > 15 then set to 15, otherwise, if range < 0 then set to 1, otherwise set to the configured range
         int localRange = range > 15 ? 15 : (range <= 0 ? 1 : range);
@@ -105,18 +129,25 @@ public abstract class Gadget extends Item {
         stack.getOrCreateTag().putInt("range", localRange);
     }
 
-    // TODO: 09/07/2020 add max range config
+    /**
+     * Cycles the range resetting to the first index and the last index on each overflow.
+     * TODO: 09/07/2020 add max range config
+     */
     public void cycleRange(ItemStack gadget, PlayerEntity entity) {
         int currentRange = ((Gadget) gadget.getItem()).getRange(gadget);
         int range = currentRange + (entity.isSneaking() ? -1 : 1);
 
-        range = range > 15 ? 15 : (range <= 0 ? 1 : range);
+        range = range > 15 ? 1 : (range <= 0 ? 15 : range);
         this.setRange(gadget, range);
 
         // notify the player
         entity.sendStatusMessage(LangHelper.compMessage("message", "range-updated", range), true);
     }
 
+    /**
+     * Undo's are stored on the world with a UUID to identify them. This pushes one of those UUID's
+     * to the gadget so we know what data we can undo.
+     */
     public void pushUndo(ItemStack stack, UUID uuid) {
         CompoundNBT compound = stack.getOrCreateTag();
 
@@ -128,6 +159,10 @@ public abstract class Gadget extends Item {
         compound.put("undo-list", list);
     }
 
+    /**
+     * Poll will retrieve then remove from the bottom of the list. The UUID is used
+     * as part of the undo system to remove from the list
+     */
     public Optional<UUID> pollUndo(ItemStack stack) {
         CompoundNBT compound = stack.getOrCreateTag();
 

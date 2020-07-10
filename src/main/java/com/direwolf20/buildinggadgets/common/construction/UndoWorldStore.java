@@ -14,10 +14,13 @@ import java.util.*;
  * Stores the undo data in a hash map stored as a list with the key as part of the compound and then put
  * back to the list using said key. It's not ideal but I want / need a way to remove and fetch from the stack
  * dynamically without having to loop through it :D Quick access basically.
+ *
+ * Most of the real leg work is handled by each gadgets individual implementations of undo to make them all
+ * unique in their actions.
  */
 public class UndoWorldStore extends WorldSavedData {
     private static final String NAME = BuildingGadgets.MOD_ID + "_undo_world_store";
-    private HashMap<UUID, List<UndoBit>> undoStack = new HashMap<>();
+    private final HashMap<UUID, List<UndoBit>> undoStack = new HashMap<>();
 
     public UndoWorldStore() {
         super(NAME);
@@ -42,9 +45,6 @@ public class UndoWorldStore extends WorldSavedData {
                     undoBits
             );
         }
-
-        BuildingGadgets.LOGGER.debug("Loaded world data");
-        BuildingGadgets.LOGGER.debug(getUndoStack());
     }
 
     @Override
@@ -65,8 +65,6 @@ public class UndoWorldStore extends WorldSavedData {
         }
 
         compound.put("undo-data", nbt);
-        BuildingGadgets.LOGGER.debug("Saved world data");
-        BuildingGadgets.LOGGER.debug(compound);
         return compound;
     }
 
