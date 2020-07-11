@@ -116,6 +116,7 @@ public class BuildingGadget extends Gadget {
             return;
         }
 
+        int count = 0;
         for (UndoBit bit : bits) {
             // Don't undo blocks we didn't place / that were replaced
             if (world.getBlockState(bit.getPos()).getBlock() != bit.getState().getBlock()) {
@@ -123,8 +124,10 @@ public class BuildingGadget extends Gadget {
             }
 
             world.setBlockState(bit.getPos(), Blocks.AIR.getDefaultState());
+            count ++;
         }
 
+        player.sendStatusMessage(MessageHelper.builder("message", "blocks-undo", count).success().build(), true);
         store.pop(uuid);
     }
 
