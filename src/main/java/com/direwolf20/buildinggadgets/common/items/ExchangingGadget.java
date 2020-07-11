@@ -1,7 +1,9 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.common.construction.Mode;
+import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
 import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
-import com.direwolf20.buildinggadgets.common.modes.*;
+import com.direwolf20.buildinggadgets.common.construction.modes.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;

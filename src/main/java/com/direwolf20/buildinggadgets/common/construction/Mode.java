@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.modes;
+package com.direwolf20.buildinggadgets.common.construction;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;

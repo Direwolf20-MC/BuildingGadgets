@@ -1,12 +1,13 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.construction.Mode;
+import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
 import com.direwolf20.buildinggadgets.common.construction.UndoBit;
-import com.direwolf20.buildinggadgets.common.construction.UndoStack;
 import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
 import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
 import com.direwolf20.buildinggadgets.common.helpers.LookingHelper;
-import com.direwolf20.buildinggadgets.common.modes.*;
+import com.direwolf20.buildinggadgets.common.construction.modes.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,9 +16,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import org.apache.commons.codec.language.bm.Lang;
 
 import javax.annotation.Nullable;
 import java.util.*;

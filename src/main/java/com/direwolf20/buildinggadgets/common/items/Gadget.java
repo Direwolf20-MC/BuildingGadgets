@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.construction.UndoStack;
 import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
 import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
-import com.direwolf20.buildinggadgets.common.modes.Mode;
+import com.direwolf20.buildinggadgets.common.construction.Mode;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,7 +15,6 @@ import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
@@ -26,7 +25,6 @@ import net.minecraftforge.fml.ForgeI18n;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.Predicate;
 
 public abstract class Gadget extends Item {
 

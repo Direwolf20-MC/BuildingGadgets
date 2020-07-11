@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.packets;
 
 import com.direwolf20.buildinggadgets.common.items.Gadget;
-import com.direwolf20.buildinggadgets.common.modes.Mode;
+import com.direwolf20.buildinggadgets.common.construction.Mode;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;

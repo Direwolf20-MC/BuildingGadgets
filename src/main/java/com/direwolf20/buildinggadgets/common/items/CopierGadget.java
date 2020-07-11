@@ -1,13 +1,13 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.common.construction.Mode;
 import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
-import com.direwolf20.buildinggadgets.common.modes.*;
+import com.direwolf20.buildinggadgets.common.construction.modes.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
