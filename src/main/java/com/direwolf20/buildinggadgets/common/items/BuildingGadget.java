@@ -58,7 +58,7 @@ public class BuildingGadget extends Gadget {
 
         for (UndoBit bit : bits) {
             // Don't undo blocks we didn't place / that were replaced
-            if (world.getBlockState(bit.getPos()) != bit.getState()) {
+            if (world.getBlockState(bit.getPos()).getBlockState() != bit.getState().getBlock().getDefaultState()) {
                 continue;
             }
 
@@ -129,7 +129,7 @@ public class BuildingGadget extends Gadget {
         UndoWorldStore store = UndoWorldStore.get(worldIn);
         List<UndoBit> bits = new ArrayList<>();
         for (BlockPos e : blockCollection) {
-            if (worldIn.setBlockState(e, state)) {
+            if (state.isValidPosition(worldIn, e) && worldIn.setBlockState(e, state)) {
                 bits.add(new UndoBit(e, state, worldIn.getDimension().getType()));
             }
         }

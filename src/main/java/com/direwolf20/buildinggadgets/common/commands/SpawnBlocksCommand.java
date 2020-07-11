@@ -57,6 +57,14 @@ public class SpawnBlocksCommand {
                 }
 
                 player.world.setBlockState(placePos, state);
+                player.world.setBlockState(placePos.east(), Blocks.BARRIER.getDefaultState());
+                player.world.setBlockState(placePos.north(), Blocks.BARRIER.getDefaultState());
+                player.world.setBlockState(placePos.south(), Blocks.BARRIER.getDefaultState());
+                player.world.setBlockState(placePos.south().east(), Blocks.BARRIER.getDefaultState());
+                player.world.setBlockState(placePos.south().west(), Blocks.BARRIER.getDefaultState());
+                player.world.setBlockState(placePos.north().west(), Blocks.BARRIER.getDefaultState());
+                player.world.setBlockState(placePos.north().east(), Blocks.BARRIER.getDefaultState());
+
                 x += 2;
                 if (x > pos.getX() + 40) {
                     x = pos.getX();

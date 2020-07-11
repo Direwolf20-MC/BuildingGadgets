@@ -13,7 +13,7 @@ public class LookingHelper {
         return player.world.rayTraceBlocks(new RayTraceContext(
                 player.getEyePosition(1.0f),                                                    // start pos
                 player.getEyePosition(1.0f).add(player.getLookVec().mul(range, range, range)),  // end pos
-                RayTraceContext.BlockMode.COLLIDER,
+                RayTraceContext.BlockMode.OUTLINE,
                 traceFluid ? FluidMode.ANY : FluidMode.NONE,
                 player
         ));
