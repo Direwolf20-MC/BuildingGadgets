@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
 import com.direwolf20.buildinggadgets.common.modes.Mode;
 import net.minecraft.block.BlockState;
@@ -9,7 +10,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.ForgeI18n;
 
@@ -147,34 +150,25 @@ public abstract class Gadget extends Item {
     /**
      * Undo's are stored on the world with a UUID to identify them. This pushes one of those UUID's
      * to the gadget so we know what data we can undo.
+     *
+     * The UndoStack handles the removal :D
      */
-    public void pushUndo(ItemStack stack, UUID uuid) {
+    public boolean pushUndo(ItemStack stack, UUID uuid, DimensionType type) {
+        ResourceLocation dimensionName = type.getRegistryName();
+        if (dimensionName == null) {
+            BuildingGadgets.LOGGER.fatal("Current dimension does not have registry name!");
+            return false;
+        }
+
         CompoundNBT compound = stack.getOrCreateTag();
 
         ListNBT list = compound.getList("undo-list", Constants.NBT.TAG_COMPOUND);
         CompoundNBT data = new CompoundNBT();
         data.putUniqueId("key", uuid);
+        data.putString("dimension", dimensionName.toString());
 
         list.add(data);
         compound.put("undo-list", list);
-    }
-
-    /**
-     * Poll will retrieve then remove from the bottom of the list. The UUID is used
-     * as part of the undo system to remove from the list
-     */
-    public Optional<UUID> pollUndo(ItemStack stack) {
-        CompoundNBT compound = stack.getOrCreateTag();
-
-        ListNBT list = compound.getList("undo-list", Constants.NBT.TAG_COMPOUND);
-        if ( list.size() == 0 ) {
-            return Optional.empty();
-        }
-
-        UUID uuid = list.getCompound(list.size() - 1).getUniqueId("key");
-        list.remove(list.size() - 1);
-        compound.put("undo-list", list);
-
-        return Optional.of(uuid);
+        return true;
     }
 }

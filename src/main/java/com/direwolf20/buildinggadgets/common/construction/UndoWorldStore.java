@@ -83,4 +83,9 @@ public class UndoWorldStore extends WorldSavedData {
     public HashMap<UUID, List<UndoBit>> getUndoStack() {
         return undoStack;
     }
+
+    public void push(UUID uuid, List<UndoBit> bits) {
+        this.undoStack.put(uuid, bits);
+        this.markDirty();
+    }
 }

@@ -24,6 +24,9 @@ public class LanguageGenerator extends LanguageProvider {
         add(key("message", "block-selected"), "%s Selected");
         add(key("message", "range-updated"), "Range: %s");
         add(key("message", "mode-updated"), "Mode: %s");
+        add(key("message", "undo-save-failure"), "Undo data lost! Failure to store undo...");
+        add(key("message", "undo-fetch-failure"), "Undo data not found! The world save may have been cleared...");
+        add(key("message", "undo-store-empty"), "No undo's left!");
 
         // Key Bindings
         add(key("key", "category"), modName);

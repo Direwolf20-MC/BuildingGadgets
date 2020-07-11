@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.construction;
 
+import com.direwolf20.buildinggadgets.BuildingGadgets;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -8,6 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.DimensionType;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * An UndoBit identifies specific data about a action ("bit") which can be used to
@@ -50,10 +52,16 @@ public class UndoBit {
     }
 
     public CompoundNBT serialize() {
+        ResourceLocation dimensionName = this.dimension.getRegistryName();
+        if (dimensionName == null) {
+            BuildingGadgets.LOGGER.fatal("Current dimension does not have a registry name!");
+            return new CompoundNBT();
+        }
+
         CompoundNBT compound = new CompoundNBT();
         compound.put("pos", NBTUtil.writeBlockPos(this.pos));
         compound.put("state", NBTUtil.writeBlockState(this.state));
-        compound.putString("dimension", this.dimension.toString());
+        compound.putString("dimension", dimensionName.toString());
         return compound;
     }
 }

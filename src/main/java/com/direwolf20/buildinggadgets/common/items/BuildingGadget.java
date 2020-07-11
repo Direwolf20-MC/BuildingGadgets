@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.construction.UndoBit;
+import com.direwolf20.buildinggadgets.common.construction.UndoStack;
 import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
 import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
 import com.direwolf20.buildinggadgets.common.helpers.LookingHelper;
@@ -16,6 +17,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import org.apache.commons.codec.language.bm.Lang;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -47,10 +49,15 @@ public class BuildingGadget extends Gadget {
     @Override
     public void undo(ItemStack gadget, World world, PlayerEntity player) {
         UndoWorldStore store = UndoWorldStore.get(world);
-        Optional<UUID> uuid = this.pollUndo(gadget);
+        UndoStack undoStack = new UndoStack(gadget);
 
-        if (!uuid.isPresent())
-            player.sendStatusMessage(new TranslationTextComponent("heashdoisahdoihasoidhasihdioasd"), true);
+        Optional<UUID> uuid = undoStack.pollBit(world.getDimension().getType());
+
+        if (!uuid.isPresent()) {
+            // Not perfect but it's alright for now :D
+            List<UUID> bitsByDimension = undoStack.getBitsByDimension(world.getDimension().getType());
+            player.sendStatusMessage(LangHelper.compMessage("message", bitsByDimension.size() == 0 ? "undo-store-empty" : "undo-fetch-failure"), true);
+        }
 
         uuid.ifPresent(key -> {
             List<UndoBit> bits = store.getUndoStack().get(key);
@@ -137,8 +144,10 @@ public class BuildingGadget extends Gadget {
         }
 
         UUID uuid = UUID.randomUUID();
-        this.pushUndo(gadget, uuid);
-        store.getUndoStack().put(uuid, bits);
-        store.markDirty();
+        if (this.pushUndo(gadget, uuid, worldIn.getDimension().getType())) {
+            store.push(uuid, bits);
+        } else {
+            playerIn.sendStatusMessage(LangHelper.compMessage("message", "undo-save-failure"), true);
+        }
     }
 }
