@@ -1,5 +1,6 @@
-package com.direwolf20.buildinggadgets.common.construction;
+package com.direwolf20.buildinggadgets.common.construction.modes;
 
+import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;

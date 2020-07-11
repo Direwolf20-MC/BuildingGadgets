@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.construction.Mode;
+import com.direwolf20.buildinggadgets.common.construction.modes.Mode;
 import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
 import com.direwolf20.buildinggadgets.common.construction.UndoBit;
 import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;

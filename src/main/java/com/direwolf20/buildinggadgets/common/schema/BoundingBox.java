@@ -37,28 +37,12 @@ public class BoundingBox {
     }
 
     /**
-     * @param x x-growth
-     * @param y y-growth
-     * @param z z-growth
      * @return A new Region who's max coordinates are increased by the given amount
      */
     public BoundingBox grow(int x, int y, int z) {
         return new BoundingBox(minX, minY, minZ, maxX + x, maxY + y, maxZ + z);
     }
-
-    /**
-     * Supplied by MC which this class is an extension of.
-     *
-     * @return MC designed MutableBoundingBox
-     */
-    public MutableBoundingBox toMutableBoundingBox() {
-        return new MutableBoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
-    }
-
-    public Stream<BlockPos> getBlocksPosWithin() {
-        return BlockPos.getAllInBox(this.toMutableBoundingBox());
-    }
-
+    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

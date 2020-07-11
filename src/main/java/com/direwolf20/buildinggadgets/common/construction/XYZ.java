@@ -10,8 +10,6 @@ import net.minecraft.util.math.BlockPos;
  *
  * Most of the cleverness to this class is the transform from Direction to an X, Y or Z.
  * I don't have a better name for this atm, soz :P
- *
- * @todo migrate into the default mode
  */
 public enum XYZ {
     X, Y, Z;
