@@ -1,5 +1,7 @@
-package com.direwolf20.buildinggadgets.common.modes;
+package com.direwolf20.buildinggadgets.common.construction.modes;
 
+import com.direwolf20.buildinggadgets.common.construction.Mode;
+import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
 import com.direwolf20.buildinggadgets.common.schema.BoundingBox;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
