@@ -1,16 +1,25 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
-import com.direwolf20.buildinggadgets.common.modes.Mode;
+import com.direwolf20.buildinggadgets.common.modes.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public class DestructionGadget extends Gadget {
+    private static final List<Mode> MODES = Arrays.asList(
+            new EmptyMode("custom_area"),
+            new HorizontalColumnMode(false),
+            new HorizontalWallMode(),
+            new VerticalColumnMode(false),
+            new VerticalWallMode(),
+            new GridMode(false)
+    );
 
     public DestructionGadget() {
         super();
@@ -33,6 +42,6 @@ public class DestructionGadget extends Gadget {
 
     @Override
     public List<Mode> getModes() {
-        return Collections.emptyList();
+        return MODES;
     }
 }

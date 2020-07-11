@@ -6,9 +6,9 @@ import net.minecraft.util.math.BlockPos;
 import java.util.Collections;
 import java.util.List;
 
-public class DestroyMode extends Mode {
-    public DestroyMode() {
-        super("destroy", false);
+public class EmptyMode extends Mode {
+    public EmptyMode(String name) {
+        super(name, false);
     }
 
     @Override
@@ -18,6 +18,6 @@ public class DestroyMode extends Mode {
 
     @Override
     public boolean validator(PlayerEntity player, BlockPos pos, ModeUseContext context) {
-        return super.validator(player, pos, context);
+        return true;
     }
 }

@@ -29,6 +29,10 @@ public class LanguageGenerator extends LanguageProvider {
         add(key("message", "undo-store-empty"), "No undo's left!");
         add(key("message", "build-successful"), "Blocks Built!");
 
+        add(key("tooltip", "energy"), "Energy: %s FE");
+        add(key("tooltip", "selected-block"), "Block: %s");
+        add(key("tooltip", "mode"), "Mode: %s");
+
         // Key Bindings
         add(key("key", "category"), modName);
         add(key("key", "range"), "Range Cycle");
@@ -49,6 +53,10 @@ public class LanguageGenerator extends LanguageProvider {
         addMode("vertical_wall", "Vertical Wall");
         addMode("stairs", "Stairs");
         addMode("surface", "Surface");
+        addMode("custom_area", "Custom Area");
+        addMode("cut", "Cut");
+        addMode("copy", "Copy");
+        addMode("paste", "Paste");
 
     }
 

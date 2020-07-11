@@ -16,6 +16,8 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.Constants;
@@ -34,9 +36,14 @@ public abstract class Gadget extends Item {
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        Gadget gadget = ((Gadget) stack.getItem());
+
         // Selected block
-        ((Gadget) stack.getItem()).getBlock(stack).ifPresent(block ->
-                tooltip.add(LangHelper.compMessage("tooltip", "selected-block", block.getBlock().getNameTextComponent().getFormattedText())));
+        gadget.getBlock(stack).ifPresent(block ->
+                tooltip.add(LangHelper.compMessage("tooltip", "selected-block", block.getBlock().getNameTextComponent().getFormattedText()).setStyle(new Style().setItalic(true).setColor(TextFormatting.GREEN))));
+
+        // Current Mode
+        tooltip.add(LangHelper.compMessage("tooltip", "mode", ForgeI18n.getPattern(LangHelper.key("mode", gadget.getMode(stack).getName()))).setStyle(new Style().setColor(TextFormatting.AQUA)));
 
         super.addInformation(stack, worldIn, tooltip, flagIn);
     }

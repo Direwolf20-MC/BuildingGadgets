@@ -1,16 +1,21 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
-import com.direwolf20.buildinggadgets.common.modes.Mode;
+import com.direwolf20.buildinggadgets.common.modes.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 public class CopierGadget extends Gadget {
+    private static final List<Mode> MODES = Arrays.asList(
+            new EmptyMode("copy"),
+            new EmptyMode("paste")
+    );
 
     public CopierGadget() {
         super();
@@ -23,7 +28,7 @@ public class CopierGadget extends Gadget {
 
     @Override
     public List<Mode> getModes() {
-        return Collections.emptyList();
+        return MODES;
     }
 
     @Override
