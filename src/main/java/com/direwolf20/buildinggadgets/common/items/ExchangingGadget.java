@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
 import com.direwolf20.buildinggadgets.common.modes.*;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,6 +14,7 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class ExchangingGadget extends BuildingGadget {
     private static final List<Mode> MODES = Arrays.asList(
@@ -53,6 +55,12 @@ public class ExchangingGadget extends BuildingGadget {
         blockCollection.forEach(e -> worldIn.setBlockState(e, state));
     }
 
+    /**
+     * This gadget can not undo so we disable the action and undo methods
+     */
     @Override
     public void undo(ItemStack gadget, World world, PlayerEntity player) {}
+
+    @Override
+    public void undoAction(UndoWorldStore store, UUID uuid, ItemStack gadget, World world, PlayerEntity playerEntity) {}
 }

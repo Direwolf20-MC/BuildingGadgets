@@ -88,4 +88,9 @@ public class UndoWorldStore extends WorldSavedData {
         this.undoStack.put(uuid, bits);
         this.markDirty();
     }
+
+    public void pop(UUID uuid) {
+        this.undoStack.remove(uuid);
+        this.markDirty();
+    }
 }

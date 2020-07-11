@@ -1,9 +1,12 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.construction.UndoStack;
+import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
 import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
 import com.direwolf20.buildinggadgets.common.modes.Mode;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -11,13 +14,17 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.ForgeI18n;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.*;
+import java.util.function.Predicate;
 
 public abstract class Gadget extends Item {
 
@@ -25,9 +32,33 @@ public abstract class Gadget extends Item {
         super(ModItems.ITEM_GROUP.maxStackSize(1).maxDamage(0).setNoRepair());
     }
 
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        // Selected block
+        ((Gadget) stack.getItem()).getBlock(stack).ifPresent(block ->
+                tooltip.add(LangHelper.compMessage("tooltip", "selected-block", block.getBlock().getNameTextComponent().getFormattedText())));
+
+        super.addInformation(stack, worldIn, tooltip, flagIn);
+    }
+
     public abstract void action();
 
-    public abstract void undo(ItemStack gadget, World world, PlayerEntity player);
+    public void undo(ItemStack gadget, World world, PlayerEntity player) {
+        UndoWorldStore store = UndoWorldStore.get(world);
+        UndoStack undoStack = new UndoStack(gadget);
+
+        Optional<UUID> uuid = undoStack.pollBit(world.getDimension().getType());
+
+        if (!uuid.isPresent()) {
+            // Not perfect but it's alright for now :D
+            List<UUID> bitsByDimension = undoStack.getBitsByDimension(world.getDimension().getType());
+            player.sendStatusMessage(LangHelper.compMessage("message", bitsByDimension.size() == 0 ? "undo-store-empty" : "undo-fetch-failure"), true);
+        }
+
+        uuid.ifPresent(key -> undoAction(store, key, gadget, world, player));
+    }
+
+    public abstract void undoAction(UndoWorldStore store, UUID uuid, ItemStack gadget, World world, PlayerEntity playerEntity);
 
     /**
      * Used to unify all gadgets to use the same mode logic

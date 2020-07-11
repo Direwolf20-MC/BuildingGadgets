@@ -44,37 +44,28 @@ public class BuildingGadget extends Gadget {
     }
 
     /**
-     * Fetches the last UUID stored on the gadget, validates it then reverts the "bits"
+     * What the undo will actually do :D
      */
     @Override
-    public void undo(ItemStack gadget, World world, PlayerEntity player) {
-        UndoWorldStore store = UndoWorldStore.get(world);
-        UndoStack undoStack = new UndoStack(gadget);
+    public void undoAction(UndoWorldStore store, UUID uuid, ItemStack gadget, World world, PlayerEntity player) {
+        List<UndoBit> bits = store.getUndoStack().get(uuid);
 
-        Optional<UUID> uuid = undoStack.pollBit(world.getDimension().getType());
-
-        if (!uuid.isPresent()) {
-            // Not perfect but it's alright for now :D
-            List<UUID> bitsByDimension = undoStack.getBitsByDimension(world.getDimension().getType());
-            player.sendStatusMessage(LangHelper.compMessage("message", bitsByDimension.size() == 0 ? "undo-store-empty" : "undo-fetch-failure"), true);
+        if (bits == null) {
+            BuildingGadgets.LOGGER.debug("Failed to get undo data :( " + uuid.toString());
+            player.sendStatusMessage(LangHelper.compMessage("message", "undo-fetch-failure"), true);
+            return;
         }
 
-        uuid.ifPresent(key -> {
-            List<UndoBit> bits = store.getUndoStack().get(key);
-
-            if (bits == null) {
-                BuildingGadgets.LOGGER.debug("Failed to get undo data :( " + uuid.toString());
-                return;
+        for (UndoBit bit : bits) {
+            // Don't undo blocks we didn't place / that were replaced
+            if (world.getBlockState(bit.getPos()) != bit.getState()) {
+                continue;
             }
 
-            // TODO: 10/07/2020 Add checking
-            for (UndoBit bit : bits) {
-                world.setBlockState(bit.getPos(), Blocks.AIR.getDefaultState());
-            }
+            world.setBlockState(bit.getPos(), Blocks.AIR.getDefaultState());
+        }
 
-            store.getUndoStack().remove(key);
-            store.markDirty();
-        });
+        store.pop(uuid);
     }
 
     @Override
@@ -142,6 +133,13 @@ public class BuildingGadget extends Gadget {
                 bits.add(new UndoBit(e, state, worldIn.getDimension().getType()));
             }
         }
+
+        // if there was no blocks places, do not store the undo
+        if (bits.size() == 0) {
+            return;
+        }
+
+        playerIn.sendStatusMessage(LangHelper.compMessage("message", "build-successful"), true);
 
         UUID uuid = UUID.randomUUID();
         if (this.pushUndo(gadget, uuid, worldIn.getDimension().getType())) {
