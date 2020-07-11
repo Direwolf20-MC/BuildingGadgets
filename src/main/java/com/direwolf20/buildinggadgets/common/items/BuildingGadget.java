@@ -1,9 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
-import com.direwolf20.buildinggadgets.common.construction.UndoBit;
-import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
+import com.direwolf20.buildinggadgets.common.construction.*;
 import com.direwolf20.buildinggadgets.common.construction.modes.*;
 import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
 import net.minecraft.block.BlockState;
@@ -92,10 +90,14 @@ public class BuildingGadget extends Gadget {
         }
 
         BlockState state = worldIn.getBlockState(rayTrace.getPos());
-        this.setBlock(gadget, state);
+        if (BlockAuthority.allowed(state)) {
+            this.setBlock(gadget, StateAuthority.pipe(state));
+            playerIn.sendStatusMessage(LangHelper.compMessage("message", "block-selected", state.getBlock().getNameTextComponent().getFormattedText()), true);
+            return ActionResult.resultSuccess(gadget);
+        }
 
-        playerIn.sendStatusMessage(LangHelper.compMessage("message", "block-selected", state.getBlock().getNameTextComponent().getFormattedText()), true);
-        return ActionResult.resultSuccess(gadget);
+        playerIn.sendStatusMessage(LangHelper.compMessage("message", "block-selection-banned", state.getBlock().getNameTextComponent().getFormattedText()), true);
+        return ActionResult.resultFail(gadget);
     }
 
     /**
@@ -113,7 +115,7 @@ public class BuildingGadget extends Gadget {
 
         for (UndoBit bit : bits) {
             // Don't undo blocks we didn't place / that were replaced
-            if (world.getBlockState(bit.getPos()).getBlockState() != bit.getState().getBlock().getDefaultState()) {
+            if (world.getBlockState(bit.getPos()).getBlock() != bit.getState().getBlock()) {
                 continue;
             }
 

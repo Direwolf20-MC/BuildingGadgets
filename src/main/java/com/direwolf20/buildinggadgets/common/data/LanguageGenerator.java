@@ -28,6 +28,7 @@ public class LanguageGenerator extends LanguageProvider {
         add(key("message", "undo-fetch-failure"), "Undo data not found! The world save may have been cleared...");
         add(key("message", "undo-store-empty"), "No undo's left!");
         add(key("message", "build-successful"), "Blocks Built!");
+        add(key("message", "block-selection-banned"), "%s is a banned block, you can't select this one.");
 
         add(key("tooltip", "energy"), "Energy: %s FE");
         add(key("tooltip", "selected-block"), "Block: %s");
