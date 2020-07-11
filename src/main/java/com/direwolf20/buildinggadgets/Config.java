@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets;
 
+import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -13,6 +14,7 @@ public final class Config {
     }
 
     public static class CommonConfig {
+        public static IntValue gadgetsMaxUndos;
         public final IntValue gadgetMaxRange;
         public final IntValue gadgetRayTraceRange;
         public final BooleanValue allowBlockOverwrite;
@@ -35,6 +37,10 @@ public final class Config {
             gadgetRayTraceRange = builder
                     .comment("Sets the max distance you can select and build blocks from. Default is 20.")
                     .defineInRange("gadgetRayTraceRange", 20, 1, 100);
+
+            gadgetsMaxUndos = builder
+                    .comment("Sets how much history a gadget can store.")
+                    .defineInRange("gadgetMaxUndos", 10, 1, 50);
 
             builder.pop();
         }

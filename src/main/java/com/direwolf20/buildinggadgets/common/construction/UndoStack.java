@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.construction;
 
+import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.Config;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
@@ -88,6 +90,42 @@ public class UndoStack {
         compound.put("undo-list", undoList);
 
         return Optional.of(uuid);
+    }
+
+    /**
+     * Undo's are stored on the world with a UUID to identify them. This pushes one of those UUID's
+     * to the gadget so we know what data we can undo.
+     *
+     * The UndoStack handles the removal :D
+     */
+    public boolean pushUndo(ItemStack stack, UUID uuid, DimensionType type) {
+        ResourceLocation dimensionName = type.getRegistryName();
+        if (dimensionName == null) {
+            BuildingGadgets.LOGGER.fatal("Current dimension does not have registry name!");
+            return false;
+        }
+
+        List<UUID> bitsByDimension = this.getBitsByDimension(type);
+
+        CompoundNBT compound = stack.getOrCreateTag();
+        ListNBT list = compound.getList("undo-list", Constants.NBT.TAG_COMPOUND);
+
+        CompoundNBT data = new CompoundNBT();
+        data.putUniqueId("key", uuid);
+        data.putString("dimension", dimensionName.toString());
+
+        // Pop off the last item from the dimension store if over the max undos
+        if (bitsByDimension.size() > Config.CommonConfig.gadgetsMaxUndos.get()) {
+            int idOfLastUuid = this.getIndexOfUUID(list, uuid);
+
+            if (idOfLastUuid != -1) {
+                list.remove(idOfLastUuid);
+            }
+        }
+
+        list.add(data);
+        compound.put("undo-list", list);
+        return true;
     }
 
     public int getIndexOfUUID(ListNBT undoList, UUID uuid) {

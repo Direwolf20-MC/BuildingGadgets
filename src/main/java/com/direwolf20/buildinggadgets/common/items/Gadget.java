@@ -206,29 +206,4 @@ public abstract class Gadget extends Item {
         // notify the player
         entity.sendStatusMessage(MessageHelper.builder("message", "range-updated", range).info().build(), true);
     }
-
-    /**
-     * Undo's are stored on the world with a UUID to identify them. This pushes one of those UUID's
-     * to the gadget so we know what data we can undo.
-     *
-     * The UndoStack handles the removal :D
-     */
-    public boolean pushUndo(ItemStack stack, UUID uuid, DimensionType type) {
-        ResourceLocation dimensionName = type.getRegistryName();
-        if (dimensionName == null) {
-            BuildingGadgets.LOGGER.fatal("Current dimension does not have registry name!");
-            return false;
-        }
-
-        CompoundNBT compound = stack.getOrCreateTag();
-
-        ListNBT list = compound.getList("undo-list", Constants.NBT.TAG_COMPOUND);
-        CompoundNBT data = new CompoundNBT();
-        data.putUniqueId("key", uuid);
-        data.putString("dimension", dimensionName.toString());
-
-        list.add(data);
-        compound.put("undo-list", list);
-        return true;
-    }
 }

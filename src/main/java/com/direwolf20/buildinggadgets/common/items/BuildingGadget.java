@@ -71,7 +71,7 @@ public class BuildingGadget extends Gadget {
         playerIn.sendStatusMessage(MessageHelper.builder("message", "build-successful").success().build(), true);
 
         UUID uuid = UUID.randomUUID();
-        if (this.pushUndo(gadget, uuid, worldIn.getDimension().getType())) {
+        if (new UndoStack(gadget).pushUndo(gadget, uuid, worldIn.getDimension().getType())) {
             store.push(uuid, bits);
         } else {
             playerIn.sendStatusMessage(MessageHelper.builder("message", "undo-save-failure").error().build(), true);
