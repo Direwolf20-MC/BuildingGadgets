@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.construction.modes;
 
+import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
@@ -57,7 +58,7 @@ public abstract class Mode {
         if (World.isOutsideBuildHeight(pos))
             return false;
 
-        boolean allowOverwrite = true; //Config.GENERAL.allowOverwriteBlocks.get();
+        boolean allowOverwrite = Config.COMMON_CONFIG.allowBlockOverwrite.get();
         return allowOverwrite
                 ? context.getWorldState(pos).getMaterial().isReplaceable()
                 : context.getWorldState(pos).getMaterial() != Material.AIR;

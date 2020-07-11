@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.helpers;
 
+import com.direwolf20.buildinggadgets.Config;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
@@ -8,7 +9,7 @@ import javax.annotation.Nullable;
 
 public class LookingHelper {
     public static RayTraceResult getResult(PlayerEntity player, boolean traceFluid) {
-        double range = 20; // @todo: add config for this.
+        double range = Config.COMMON_CONFIG.gadgetRayTraceRange.get();
 
         return player.world.rayTraceBlocks(new RayTraceContext(
                 player.getEyePosition(1.0f),                                                    // start pos

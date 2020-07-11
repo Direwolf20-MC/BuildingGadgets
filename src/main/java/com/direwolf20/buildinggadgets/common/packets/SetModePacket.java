@@ -53,10 +53,6 @@ public class SetModePacket {
 
                     gadget.setMode(itemStack, mode.getName());
                 });
-
-                // TODO: 09/07/2020 Add this back
-//                else if (stack.getItem() instanceof GadgetDestruction)
-//                    GadgetDestruction.switchOverlay(player, stack);
             });
 
             ctx.get().setPacketHandled(true);

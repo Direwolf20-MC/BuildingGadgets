@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.common.construction.UndoStack;
 import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
 import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
@@ -159,24 +160,24 @@ public abstract class Gadget extends Item {
 
     /**
      * Sets the range on the gadget but clamps the range based on the max range for all gadgets
-     * TODO: 09/07/2020 Add this to the config to make it simple to extend the max range
      */
     public void setRange(ItemStack stack, int range) {
         // if range > 15 then set to 15, otherwise, if range < 0 then set to 1, otherwise set to the configured range
-        int localRange = range > 15 ? 15 : (range <= 0 ? 1 : range);
+        int maxRange = Config.COMMON_CONFIG.gadgetMaxRange.get();
+        int localRange = range > maxRange ? maxRange : (range <= 0 ? 1 : range);
 
         stack.getOrCreateTag().putInt("range", localRange);
     }
 
     /**
      * Cycles the range resetting to the first index and the last index on each overflow.
-     * TODO: 09/07/2020 add max range config
      */
     public void cycleRange(ItemStack gadget, PlayerEntity entity) {
+        int maxRange = Config.COMMON_CONFIG.gadgetMaxRange.get();
         int currentRange = ((Gadget) gadget.getItem()).getRange(gadget);
         int range = currentRange + (entity.isSneaking() ? -1 : 1);
 
-        range = range > 15 ? 1 : (range <= 0 ? 15 : range);
+        range = range > maxRange ? 1 : (range <= 0 ? maxRange : range);
         this.setRange(gadget, range);
 
         // notify the player
