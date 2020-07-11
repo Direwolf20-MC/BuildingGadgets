@@ -88,7 +88,7 @@ public class BuildingGadget extends Gadget {
     @Override
     public ActionResult<ItemStack> sneakingAction(World worldIn, PlayerEntity playerIn, ItemStack gadget, @Nullable BlockRayTraceResult rayTrace) {
         if( rayTrace == null ) {
-            playerIn.sendStatusMessage(MessageHelper.builder("message", "no-block-selected").info().build(), true);
+            playerIn.sendStatusMessage(MessageHelper.builder("message", "no-block-selected").error().build(), true);
             return ActionResult.resultFail(gadget);
         }
 

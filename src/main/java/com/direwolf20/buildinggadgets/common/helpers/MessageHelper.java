@@ -40,17 +40,17 @@ public final class MessageHelper {
         }
 
         public Builder error() {
-            component.setStyle(new Style().setParentStyle(component.getStyle()).setColor(TextFormatting.RED));
+            component.setStyle(new Style().setParentStyle(component.getStyle()).setColor(TextFormatting.RED).setBold(true));
             return this;
         }
 
         public Builder success() {
-            component.setStyle(new Style().setParentStyle(component.getStyle()).setColor(TextFormatting.GREEN));
+            component.setStyle(new Style().setParentStyle(component.getStyle()).setColor(TextFormatting.GREEN).setBold(true));
             return this;
         }
 
         public Builder info() {
-            component.setStyle(new Style().setParentStyle(component.getStyle()).setColor(TextFormatting.BLUE));
+            component.setStyle(new Style().setParentStyle(component.getStyle()).setColor(TextFormatting.AQUA));
             return this;
         }
 

@@ -18,7 +18,8 @@ import static net.minecraft.block.Blocks.*;
  */
 public class BlockAuthority {
     public static final List<Block> BANNED_BLOCKS = Arrays.asList(
-            BEDROCK, END_PORTAL, NETHER_PORTAL, END_GATEWAY, BARRIER
+            BEDROCK, END_PORTAL, NETHER_PORTAL, END_GATEWAY, BARRIER,
+            PISTON_HEAD
     );
 
     public static final List<Class<? extends Block>> BANNED_BLOCK_CLASSES = Arrays.asList(

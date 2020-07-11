@@ -20,7 +20,7 @@ public class LanguageGenerator extends LanguageProvider {
         add("name", modName);
         add("itemGroup.buildinggadgets", modName);
 
-        addKeyed("message", "no-block-selected", "No valid block found to select");
+        addKeyed("message", "no-block-selected", "No block found to select...");
         addKeyed("message", "block-selected", "%s Selected");
         addKeyed("message", "range-updated", "Range: %s");
         addKeyed("message", "mode-updated", "Mode: %s");
