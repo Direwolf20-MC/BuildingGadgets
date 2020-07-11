@@ -5,8 +5,11 @@ import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
 import com.direwolf20.buildinggadgets.common.construction.modes.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -26,9 +29,15 @@ public class DestructionGadget extends Gadget {
     }
 
     @Override
-    public void action() {
-
+    public boolean action(World worldIn, PlayerEntity playerIn, ItemStack gadget, @Nullable BlockRayTraceResult rayTrace) {
+        return false;
     }
+
+    @Override
+    public ActionResult<ItemStack> sneakingAction(World worldIn, PlayerEntity playerIn, ItemStack gadget, @Nullable BlockRayTraceResult rayTrace) {
+        return ActionResult.resultSuccess(gadget);
+    }
+
 
     @Override
     public void undo(ItemStack gadget, World world, PlayerEntity player) {

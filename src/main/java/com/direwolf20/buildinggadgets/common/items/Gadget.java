@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.construction.UndoStack;
 import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
 import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
 import com.direwolf20.buildinggadgets.common.construction.modes.Mode;
+import com.direwolf20.buildinggadgets.common.helpers.LookingHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,7 +15,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
@@ -47,7 +52,26 @@ public abstract class Gadget extends Item {
         super.addInformation(stack, worldIn, tooltip, flagIn);
     }
 
-    public abstract void action();
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
+        if( worldIn.isRemote ) {
+            return super.onItemRightClick(worldIn, playerIn, handIn);
+        }
+
+        ItemStack gadget = playerIn.getHeldItem(handIn);
+        BlockRayTraceResult rayTrace = LookingHelper.getBlockResult(playerIn, false);
+        if( playerIn.isSneaking() ) {
+            return this.sneakingAction(worldIn, playerIn, gadget, rayTrace);
+        }
+
+        return this.action(worldIn, playerIn, gadget, rayTrace)
+                ? ActionResult.resultSuccess(gadget)
+                : super.onItemRightClick(worldIn, playerIn, handIn);
+    }
+
+    public abstract boolean action(World worldIn, PlayerEntity playerIn, ItemStack gadget, @Nullable BlockRayTraceResult rayTrace);
+
+    public abstract ActionResult<ItemStack> sneakingAction(World worldIn, PlayerEntity playerIn, ItemStack gadget, @Nullable BlockRayTraceResult rayTrace);
 
     public void undo(ItemStack gadget, World world, PlayerEntity player) {
         UndoWorldStore store = UndoWorldStore.get(world);

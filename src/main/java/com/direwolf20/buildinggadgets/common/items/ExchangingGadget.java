@@ -36,22 +36,15 @@ public class ExchangingGadget extends BuildingGadget {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        ActionResult<ItemStack> result = super.onItemRightClick(worldIn, playerIn, handIn);
-
-        return result;
-    }
-
-    @Override
-    protected void collectAndBuild(World worldIn, @Nullable BlockRayTraceResult trace, PlayerEntity playerIn, ItemStack gadget, BlockState state) {
-        if( trace == null ) {
+    protected void build(World worldIn, PlayerEntity playerIn, ItemStack gadget, @Nullable BlockRayTraceResult rayTrace, BlockState state) {
+        if( rayTrace == null ) {
             return;
         }
 
         // First, get the gadgets mode
         Mode mode = this.getMode(gadget);
 
-        List<BlockPos> blockCollection = mode.getCollection(playerIn, new ModeUseContext(worldIn, state, trace.getPos(), gadget, trace.getFace(), false));
+        List<BlockPos> blockCollection = mode.getCollection(playerIn, new ModeUseContext(worldIn, state, rayTrace.getPos(), gadget, rayTrace.getFace(), false));
         System.out.println(state);
 
         blockCollection.forEach(e -> worldIn.setBlockState(e, state));
