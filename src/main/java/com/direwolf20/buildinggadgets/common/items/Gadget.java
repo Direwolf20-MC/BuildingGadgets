@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.common.construction.UndoStack;
 import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
-import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
+import com.direwolf20.buildinggadgets.common.helpers.MessageHelper;
 import com.direwolf20.buildinggadgets.common.construction.modes.Mode;
 import com.direwolf20.buildinggadgets.common.helpers.LookingHelper;
 import net.minecraft.block.BlockState;
@@ -19,7 +19,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
@@ -44,10 +43,10 @@ public abstract class Gadget extends Item {
 
         // Selected block
         gadget.getBlock(stack).ifPresent(block ->
-                tooltip.add(LangHelper.compMessage("tooltip", "selected-block", block.getBlock().getNameTextComponent().getFormattedText()).setStyle(new Style().setItalic(true).setColor(TextFormatting.GREEN))));
+                tooltip.add(MessageHelper.translation("tooltip", "selected-block", MessageHelper.blockName(block.getBlock())).setStyle(new Style().setItalic(true).setColor(TextFormatting.GREEN))));
 
         // Current Mode
-        tooltip.add(LangHelper.compMessage("tooltip", "mode", ForgeI18n.getPattern(LangHelper.key("mode", gadget.getMode(stack).getName()))).setStyle(new Style().setColor(TextFormatting.AQUA)));
+        tooltip.add(MessageHelper.translation("tooltip", "mode", ForgeI18n.getPattern(MessageHelper.translationKey("mode", gadget.getMode(stack).getName()))).setStyle(new Style().setColor(TextFormatting.AQUA)));
 
         super.addInformation(stack, worldIn, tooltip, flagIn);
     }
@@ -82,7 +81,7 @@ public abstract class Gadget extends Item {
         if (!uuid.isPresent()) {
             // Not perfect but it's alright for now :D
             List<UUID> bitsByDimension = undoStack.getBitsByDimension(world.getDimension().getType());
-            player.sendStatusMessage(LangHelper.compMessage("message", bitsByDimension.size() == 0 ? "undo-store-empty" : "undo-fetch-failure"), true);
+            player.sendStatusMessage(MessageHelper.builder("message", bitsByDimension.size() == 0 ? "undo-store-empty" : "undo-fetch-failure").error().build(), true);
         }
 
         uuid.ifPresent(key -> undoAction(store, key, gadget, world, player));
@@ -172,7 +171,7 @@ public abstract class Gadget extends Item {
 
         // notify the player
         Mode mode = this.getModes().get(newIndex);
-        entity.sendStatusMessage(LangHelper.compMessage("message", "mode-updated", ForgeI18n.getPattern(LangHelper.key("mode", mode.getName()))), true);
+        entity.sendStatusMessage(MessageHelper.builder("message", "mode-updated", ForgeI18n.getPattern(MessageHelper.translationKey("mode", mode.getName()))).info().build(), true);
     }
 
     public int getRange(ItemStack stack) {
@@ -205,7 +204,7 @@ public abstract class Gadget extends Item {
         this.setRange(gadget, range);
 
         // notify the player
-        entity.sendStatusMessage(LangHelper.compMessage("message", "range-updated", range), true);
+        entity.sendStatusMessage(MessageHelper.builder("message", "range-updated", range).info().build(), true);
     }
 
     /**

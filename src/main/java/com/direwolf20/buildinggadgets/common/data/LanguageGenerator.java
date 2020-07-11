@@ -1,12 +1,11 @@
 package com.direwolf20.buildinggadgets.common.data;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.LanguageProvider;
 
-import static com.direwolf20.buildinggadgets.common.helpers.LangHelper.*;
+import static com.direwolf20.buildinggadgets.common.helpers.MessageHelper.*;
 
 public class LanguageGenerator extends LanguageProvider {
     public LanguageGenerator(DataGenerator gen) {
@@ -20,25 +19,25 @@ public class LanguageGenerator extends LanguageProvider {
         // Mod name / Generic
         add("name", modName);
         add("itemGroup.buildinggadgets", modName);
-        add(key("message", "no-block-selected"), "No valid block found to select");
-        add(key("message", "block-selected"), "%s Selected");
-        add(key("message", "range-updated"), "Range: %s");
-        add(key("message", "mode-updated"), "Mode: %s");
-        add(key("message", "undo-save-failure"), "Undo data lost! Failure to store undo...");
-        add(key("message", "undo-fetch-failure"), "Undo data not found! The world save may have been cleared...");
-        add(key("message", "undo-store-empty"), "No undo's left!");
-        add(key("message", "build-successful"), "Blocks Built!");
-        add(key("message", "block-selection-banned"), "%s is a banned block, you can't select this one.");
+        add(translationKey("message", "no-block-selected"), "No valid block found to select");
+        add(translationKey("message", "block-selected"), "%s Selected");
+        add(translationKey("message", "range-updated"), "Range: %s");
+        add(translationKey("message", "mode-updated"), "Mode: %s");
+        add(translationKey("message", "undo-save-failure"), "Undo data lost! Failure to store undo...");
+        add(translationKey("message", "undo-fetch-failure"), "Undo data not found! The world save may have been cleared...");
+        add(translationKey("message", "undo-store-empty"), "No undo's left!");
+        add(translationKey("message", "build-successful"), "Blocks Built!");
+        add(translationKey("message", "block-selection-banned"), "%s is a banned block, you can't select this one.");
 
-        add(key("tooltip", "energy"), "Energy: %s FE");
-        add(key("tooltip", "selected-block"), "Block: %s");
-        add(key("tooltip", "mode"), "Mode: %s");
+        add(translationKey("tooltip", "energy"), "Energy: %s FE");
+        add(translationKey("tooltip", "selected-block"), "Block: %s");
+        add(translationKey("tooltip", "mode"), "Mode: %s");
 
         // Key Bindings
-        add(key("key", "category"), modName);
-        add(key("key", "range"), "Range Cycle");
-        add(key("key", "mode"), "Mode Cycle");
-        add(key("key", "settings_menu"), "Gadget Settings");
+        add(translationKey("key", "category"), modName);
+        add(translationKey("key", "range"), "Range Cycle");
+        add(translationKey("key", "mode"), "Mode Cycle");
+        add(translationKey("key", "settings_menu"), "Gadget Settings");
 
         // Items
         addItem(ModItems.BUILDING_GADGET, "Building Gadget");
@@ -62,6 +61,6 @@ public class LanguageGenerator extends LanguageProvider {
     }
 
     private void addMode(String mode, String text) {
-        add(key("mode", mode), text);
+        add(translationKey("mode", mode), text);
     }
 }

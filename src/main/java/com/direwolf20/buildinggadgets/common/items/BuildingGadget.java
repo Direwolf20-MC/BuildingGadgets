@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.items;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.construction.*;
 import com.direwolf20.buildinggadgets.common.construction.modes.*;
-import com.direwolf20.buildinggadgets.common.helpers.LangHelper;
+import com.direwolf20.buildinggadgets.common.helpers.MessageHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,6 +11,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -62,16 +64,17 @@ public class BuildingGadget extends Gadget {
 
         // if there was no blocks places, do not store the undo
         if (bits.size() == 0) {
+            playerIn.sendStatusMessage(MessageHelper.builder("message", "no-blocks-placed").error().build(), true);
             return;
         }
 
-        playerIn.sendStatusMessage(LangHelper.compMessage("message", "build-successful"), true);
+        playerIn.sendStatusMessage(MessageHelper.builder("message", "build-successful").success().build(), true);
 
         UUID uuid = UUID.randomUUID();
         if (this.pushUndo(gadget, uuid, worldIn.getDimension().getType())) {
             store.push(uuid, bits);
         } else {
-            playerIn.sendStatusMessage(LangHelper.compMessage("message", "undo-save-failure"), true);
+            playerIn.sendStatusMessage(MessageHelper.builder("message", "undo-save-failure").error().build(), true);
         }
     }
 
@@ -85,18 +88,18 @@ public class BuildingGadget extends Gadget {
     @Override
     public ActionResult<ItemStack> sneakingAction(World worldIn, PlayerEntity playerIn, ItemStack gadget, @Nullable BlockRayTraceResult rayTrace) {
         if( rayTrace == null ) {
-            playerIn.sendStatusMessage(LangHelper.compMessage("message", "no-block-selected"), true);
+            playerIn.sendStatusMessage(MessageHelper.builder("message", "no-block-selected").info().build(), true);
             return ActionResult.resultFail(gadget);
         }
 
         BlockState state = worldIn.getBlockState(rayTrace.getPos());
         if (BlockAuthority.allowed(state)) {
             this.setBlock(gadget, StateAuthority.pipe(state));
-            playerIn.sendStatusMessage(LangHelper.compMessage("message", "block-selected", state.getBlock().getNameTextComponent().getFormattedText()), true);
+            playerIn.sendStatusMessage(MessageHelper.builder("message", "block-selected", MessageHelper.blockName(state.getBlock())).success().build(), true);
             return ActionResult.resultSuccess(gadget);
         }
 
-        playerIn.sendStatusMessage(LangHelper.compMessage("message", "block-selection-banned", state.getBlock().getNameTextComponent().getFormattedText()), true);
+        playerIn.sendStatusMessage(MessageHelper.builder("message", "block-selection-banned", MessageHelper.blockName(state.getBlock())).error().build(), true);
         return ActionResult.resultFail(gadget);
     }
 
@@ -109,7 +112,7 @@ public class BuildingGadget extends Gadget {
 
         if (bits == null) {
             BuildingGadgets.LOGGER.debug("Failed to get undo data :( " + uuid.toString());
-            player.sendStatusMessage(LangHelper.compMessage("message", "undo-fetch-failure"), true);
+            player.sendStatusMessage(MessageHelper.builder("message", "undo-fetch-failure").error().build(), true);
             return;
         }
 
