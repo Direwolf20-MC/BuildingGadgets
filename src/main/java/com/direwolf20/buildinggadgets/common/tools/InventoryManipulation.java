@@ -1,11 +1,13 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
+import com.direwolf20.buildinggadgets.common.integration.IItemAccess;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
 import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
 import com.google.common.collect.ImmutableSet;
+
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.minecraft.block.*;
@@ -121,7 +123,7 @@ public class InventoryManipulation {
 
         int amountLeft = amountRequired;
         for (Pair<InventoryType, IItemHandler> inv : collectInventories(GadgetGeneric.getGadget(player), player, world, NetworkIO.Operation.EXTRACT)) {
-            amountLeft -= extractFromInventory(inv.getValue(), target, amountLeft);
+            amountLeft -= extractFromInventory(inv.getValue(), target, amountLeft, player);
 
             if( amountLeft <= 0 )
                 return true;
@@ -130,11 +132,16 @@ public class InventoryManipulation {
         return amountLeft < amountRequired;
     }
 
-    private static int extractFromInventory(IItemHandler inventory, ItemStack target, int amountRequired) {
+    private static int extractFromInventory(IItemHandler inventory, ItemStack target, int amountRequired, EntityPlayer player) {
         int amountSaturated = 0;
         if( inventory == null )
             return amountSaturated;
 
+        if(inventory instanceof IItemAccess) {
+        	amountSaturated += ((IItemAccess) inventory).extractItems(target, amountRequired - amountSaturated, player);
+        	return amountSaturated;
+        }
+        
         for (int i = 0; i < inventory.getSlots(); i++) {
             ItemStack containerItem = inventory.getStackInSlot(i);
             if (containerItem.getItem() == target.getItem() && containerItem.getMetadata() == target.getMetadata()) {
@@ -199,6 +206,8 @@ public class InventoryManipulation {
     public static int countItem(ItemStack itemStack, EntityPlayer player, World world) {
         return countItem(itemStack, player, (tool, stack) -> {
             IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, player);
+            if(remoteInventory instanceof IItemAccess)
+    			return ((IItemAccess) remoteInventory).getItemsForExtraction(stack, player);
             return remoteInventory == null ? 0 : countInContainer(remoteInventory, stack.getItem(), stack.getMetadata());
         });
     }
@@ -221,7 +230,12 @@ public class InventoryManipulation {
 
         if (invContainers.size() > 0) {
             for (IItemHandler container : invContainers) {
-                count += countInContainer(container, itemStack.getItem(), itemStack.getMetadata());
+            	{
+            		if(container instanceof IItemAccess)
+            			count += ((IItemAccess) container).getItemsForExtraction(itemStack, player);
+            		else
+            			count += countInContainer(container, itemStack.getItem(), itemStack.getMetadata());
+            	}
             }
         }
 
