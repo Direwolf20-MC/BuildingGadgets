@@ -12,7 +12,7 @@ public interface IItemAccess extends IItemHandler {
 	 * @param player The player
 	 * @return The count of this item in the IItemHandler
 	 */
-	public int getItemCount(ItemStack toCount, EntityPlayer player);
+	public int getItemsForExtraction(ItemStack toCount, EntityPlayer player);
 
 	/**
 	 * Extracts the requested amount (or less) of the specified item from the {@link IItemHandler}.
