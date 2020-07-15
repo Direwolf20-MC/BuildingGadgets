@@ -21,7 +21,8 @@ public class DestructionGadget extends Gadget {
             new HorizontalWallMode(),
             new VerticalColumnMode(false),
             new VerticalWallMode(),
-            new GridMode(false)
+            new GridMode(false),
+            new CircleMode(false, true)
     );
 
     public DestructionGadget() {
