@@ -1,6 +1,15 @@
 # Building Gadgets Changelog
 The format of this document is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and should continue to adhere to the conventions outlined in the Keep a Changelog guidelines.
 
+## [2.8.4 - 1.12.2] - 2020-07-15
+Note: This is just a patch release, nothing has been changed dramtically but some mods will require it.
+
+### Added
+- Added an API like interface for mods (Like [Builder's Bags](https://www.curseforge.com/minecraft/mc-mods/builders-bag)) that require more control over the inventory management side of our systems. [#494](https://github.com/Direwolf20-MC/BuildingGadgets/pull/494) [@Tschipp](https://github.com/Tschipp)
+
+### Changed
+- Updated dependencies
+
 ## [3.3.5 - 1.15.2] - 2020-04-23
 ### Fixed
 - Fixed a crashing issue with some mods. (our registry was broken, whoops)
