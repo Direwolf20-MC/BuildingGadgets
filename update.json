@@ -1,4 +1,5 @@
 {
+  "note": "Only update the update.json on the master branch as that's the only one that's checked",
   "homepage": "https://minecraft.curseforge.com/projects/building-gadgets",
   "1.12.2": {
     "2.7.1": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/CHANGELOG.md",
