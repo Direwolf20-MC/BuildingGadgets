@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tools;
 
-import com.direwolf20.buildinggadgets.common.integration.IBlockProviderItemHandler;
+import com.direwolf20.buildinggadgets.common.integration.IItemAccess;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetGeneric;
@@ -137,8 +137,8 @@ public class InventoryManipulation {
         if( inventory == null )
             return amountSaturated;
 
-        if(inventory instanceof IBlockProviderItemHandler) {
-        	amountSaturated += ((IBlockProviderItemHandler) inventory).extractItems(target, amountRequired - amountSaturated, player);
+        if(inventory instanceof IItemAccess) {
+        	amountSaturated += ((IItemAccess) inventory).extractItems(target, amountRequired - amountSaturated, player);
         	return amountSaturated;
         }
         
@@ -206,8 +206,8 @@ public class InventoryManipulation {
     public static int countItem(ItemStack itemStack, EntityPlayer player, World world) {
         return countItem(itemStack, player, (tool, stack) -> {
             IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool, world, player);
-            if(remoteInventory instanceof IBlockProviderItemHandler)
-    			return ((IBlockProviderItemHandler) remoteInventory).getItemCount(stack, player);
+            if(remoteInventory instanceof IItemAccess)
+    			return ((IItemAccess) remoteInventory).getItemCount(stack, player);
             return remoteInventory == null ? 0 : countInContainer(remoteInventory, stack.getItem(), stack.getMetadata());
         });
     }
@@ -231,8 +231,8 @@ public class InventoryManipulation {
         if (invContainers.size() > 0) {
             for (IItemHandler container : invContainers) {
             	{
-            		if(container instanceof IBlockProviderItemHandler)
-            			count += ((IBlockProviderItemHandler) container).getItemCount(itemStack, player);
+            		if(container instanceof IItemAccess)
+            			count += ((IItemAccess) container).getItemCount(itemStack, player);
             		else
             			count += countInContainer(container, itemStack.getItem(), itemStack.getMetadata());
             	}
