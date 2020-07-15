@@ -43,7 +43,7 @@ repositories {
     }
     maven {
         name "Raoulvdberge Repo" // RS
-        url "https://repo.raoulvdberge.com/"
+        url "https://repo.refinedmods.com/"
     }
     maven {
         name = "DVS1 Maven" // AE2
