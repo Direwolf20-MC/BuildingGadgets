@@ -167,7 +167,7 @@ public abstract class AbstractGadget extends Item {
         if (isAllowedBlock(block))
             return true;
         if (notifiedPlayer != null)
-            notifiedPlayer.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(block.getNameTextComponent()).setStyle(Styles.AQUA), true);
+            notifiedPlayer.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(new TranslationTextComponent(block.getTranslationKey())).setStyle(Styles.AQUA), true);
         return false;
     }
 
