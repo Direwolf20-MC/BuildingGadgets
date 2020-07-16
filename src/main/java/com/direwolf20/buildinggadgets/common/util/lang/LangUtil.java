@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.util.lang;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.util.text.TranslationTextComponent;
 
 public final class LangUtil {
     private LangUtil() {}
