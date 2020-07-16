@@ -43,6 +43,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -110,7 +111,7 @@ public class GadgetBuilding extends AbstractGadget {
 
         tooltip.add(TooltipTranslation.GADGET_MODE
                 .componentTranslation((mode == BuildingModes.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
-                        .format(mode) : mode))
+                        .format(new TranslationTextComponent(mode.getTranslationKey())) : new TranslationTextComponent(mode.getTranslationKey())))
                 .setStyle(Styles.AQUA));
 
         tooltip.add(TooltipTranslation.GADGET_BLOCK

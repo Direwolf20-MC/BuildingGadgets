@@ -13,6 +13,7 @@ import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.items.gadgets.modes.AbstractMode;
+import com.direwolf20.buildinggadgets.common.items.gadgets.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.items.gadgets.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildRender;
@@ -54,6 +55,7 @@ import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
@@ -131,7 +133,7 @@ public class GadgetExchanger extends AbstractGadget {
         ExchangingModes mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
                 .componentTranslation((mode == ExchangingModes.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
-                        .format(mode) : mode))
+                        .format(new TranslationTextComponent(mode.getTranslationKey()).getUnformattedComponentText()) : new TranslationTextComponent(mode.getTranslationKey())))
                 .setStyle(Styles.AQUA));
 
         tooltip.add(TooltipTranslation.GADGET_BLOCK
