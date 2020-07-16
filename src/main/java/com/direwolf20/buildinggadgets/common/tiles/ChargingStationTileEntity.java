@@ -19,7 +19,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.item.BucketItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
@@ -85,6 +88,9 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
             @Override
             @Nonnull
             public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+                if (slot == FUEL_SLOT && stack.getItem() == Items.BUCKET)
+                    return super.insertItem(slot, stack, simulate);
+
                 if (slot == FUEL_SLOT && ForgeHooks.getBurnTime(stack) <= 0)
                     return stack;
                 else if (slot == CHARGE_SLOT && (! stack.getCapability(CapabilityEnergy.ENERGY).isPresent() || getStackInSlot(slot).getCount() > 0))
@@ -325,7 +331,13 @@ public class ChargingStationTileEntity extends TileEntity implements ITickableTi
         ItemStack stack = getFuelStack();
         int burnTime = ForgeHooks.getBurnTime(stack);
         if (burnTime > 0) {
+            Item fuelSlot = getItemStackHandler().getStackInSlot(0).getItem();
+
             getItemStackHandler().extractItem(0, 1, false);
+            if (fuelSlot instanceof BucketItem && fuelSlot != Items.BUCKET) {
+                getItemStackHandler().insertItem(0, new ItemStack(Items.BUCKET, 1), false);
+            }
+
             counter = (int) Math.floor(burnTime / Config.CHARGING_STATION.fuelUsage.get());
             maxBurn = counter;
             setLit(true);
