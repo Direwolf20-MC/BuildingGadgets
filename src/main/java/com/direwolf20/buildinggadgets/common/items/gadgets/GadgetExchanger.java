@@ -201,9 +201,9 @@ public class GadgetExchanger extends ModeGadget {
 //            BlockState setBlock = getToolBlock(stack);
             coords = ExchangingMode.collectPlacementPos(world, player, startBlock, sideHit, stack, startBlock);
         } else { //If we do have an anchor, erase it (Even if the build fails)
-            setAnchor(stack, new ArrayList<BlockPos>());
+            setAnchor(stack, new ArrayList<>());
         }
-        Set<BlockPos> coordinates = new HashSet<BlockPos>(coords);
+        Set<BlockPos> coordinates = new HashSet<>(coords);
 
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
@@ -212,6 +212,7 @@ public class GadgetExchanger extends ModeGadget {
         BlockData blockState = getToolBlock(heldItem);
         Undo.Builder builder = Undo.builder();
         IItemIndex index = InventoryHelper.index(stack, player);
+
         if (blockState.getState() != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             //TODO replace fakeWorld
             fakeWorld.setWorldAndState(player.world, blockState.getState(), coordinates); // Initialize the fake world's blocks
@@ -222,11 +223,12 @@ public class GadgetExchanger extends ModeGadget {
                 exchangeBlock(world, player, index, builder, coordinate, blockState);
             }
         }
+
         pushUndo(stack, builder.build(world.getDimension().getType()));
         return true;
     }
 
-    private boolean exchangeBlock(ServerWorld world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
+    private void exchangeBlock(ServerWorld world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
         BlockState currentBlock = world.getBlockState(pos);
         ITileEntityData data;
         TileEntity te = world.getTileEntity(pos);
@@ -237,47 +239,49 @@ public class GadgetExchanger extends ModeGadget {
             data = TileSupport.createTileData(world, pos);
         //ItemStack itemStack = setBlock.getBlock().getPickBlock(setBlock, null, world, pos, player);
 
-
         ItemStack tool = getGadget(player);
         if (tool.isEmpty())
-            return false;
-
+            return;
 
         IBuildContext buildContext = SimpleBuildContext.builder()
                 .usedStack(tool)
                 .buildingPlayer(player)
                 .build(world);
+
         MaterialList requiredItems = setBlock.getRequiredItems(buildContext, null, pos);
         MatchResult match = index.tryMatch(requiredItems);
         boolean useConstructionPaste = false;
         if (! match.isSuccess()) {
             if (setBlock.getState().hasTileEntity())
-                return false;
+                return;
             match = index.tryMatch(InventoryHelper.PASTE_LIST);
             if (! match.isSuccess())
-                return false;
+                return;
             else
                 useConstructionPaste = true;
         }
+
         if (! player.isAllowEdit())
-            return false;
+            return;
+
         if (! world.isBlockModifiable(player, pos))
-            return false;
+            return;
+
         BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP))
-            return false;
+            return;
+
         BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
         if (MinecraftForge.EVENT_BUS.post(e)) {
-            return false;
+            return;
         }
 
         if (!this.canUse(tool, player))
-            return false;
+            return;
 
         this.applyDamage(tool, player);
 
 //        currentBlock.getBlock().harvestBlock(world, player, pos, currentBlock, world.getTileEntity(pos), tool);
-
 
         if (index.applyMatch(match)) {
             ImmutableMultiset<IUniqueObject<?>> usedItems = match.getChosenOption();
@@ -286,14 +290,14 @@ public class GadgetExchanger extends ModeGadget {
                     currentBlock,
                     world.rayTraceBlocks(new RayTraceContext(player.getPositionVec(), new Vec3d(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
                     pos);
+
             Iterator<ImmutableMultiset<IUniqueObject<?>>> it = materials.iterator();
             ImmutableMultiset<IUniqueObject<?>> producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
             index.insert(producedItems);
             builder.record(world, pos, setBlock, usedItems, producedItems);
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.REPLACE, useConstructionPaste);
-            return true;
         }
-        return false;
+
     }
 
     public static ItemStack getGadget(PlayerEntity player) {

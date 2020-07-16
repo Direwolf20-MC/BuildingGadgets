@@ -113,16 +113,6 @@ public abstract class AbstractGadget extends Item {
     }
 
     @Override
-    public boolean isDamageable() {
-        return getMaxDamage() > 0;
-    }
-
-    /*@Override
-    public boolean isRepairable() {
-        return false;
-    }*/
-
-    @Override
     public double getDurabilityForDisplay(ItemStack stack) {
         return EnergyUtil.returnDoubleIfPresent(stack,
                 (energy -> 1D - (energy.getEnergyStored() / (double) energy.getMaxEnergyStored())),
@@ -161,14 +151,17 @@ public abstract class AbstractGadget extends Item {
     public boolean isAllowedBlock(Block block) {
         if (getWhiteList().getAllElements().isEmpty())
             return ! getBlackList().contains(block);
+
         return getWhiteList().contains(block);
     }
 
     public boolean isAllowedBlock(Block block, @Nullable PlayerEntity notifiedPlayer) {
         if (isAllowedBlock(block))
             return true;
+
         if (notifiedPlayer != null)
             notifiedPlayer.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(new TranslationTextComponent(block.getTranslationKey())).setStyle(Styles.AQUA), true);
+
         return false;
     }
 
@@ -288,7 +281,7 @@ public abstract class AbstractGadget extends Item {
                             .setStyle(Styles.BLUE));
     }
 
-    //this should only be called Server-Side!!!
+    // this should only be called Server-Side!!!
     public UUID getUUID(ItemStack stack) {
         CompoundNBT nbt = NBTHelper.getOrNewTag(stack);
         if (! nbt.hasUniqueId(NBTKeys.GADGET_UUID)) {
@@ -297,10 +290,6 @@ public abstract class AbstractGadget extends Item {
             return newId;
         }
         return nbt.getUniqueId(NBTKeys.GADGET_UUID);
-    }
-
-    protected static String formatName(String name) {
-        return name.replaceAll("(?=[A-Z])", " ").trim();
     }
 
     // Todo: tweak and fix.

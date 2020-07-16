@@ -12,7 +12,7 @@
   "tooltip.gadget.range": "距離",
   "message.gadget.invalidblock": "ブロクは無効です。",
   "message.gadget.toolmode": "モードのガジェット",
-  "message.gadget.toolrange": "距離のガジェッと",
+  "message.gadget.toolrange": "距離のガジェット",
   "message.gadget.anchorrender": "レンダーは固定です。",
   "message.gadget.anchorremove": "レンダーは固定じゃないです。",
   "message.gadget.nothingtoundo": "元に戻すことはありません。",
