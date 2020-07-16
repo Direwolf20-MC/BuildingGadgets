@@ -124,7 +124,7 @@ public class CopyGUI extends Screen {
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks) {
-        drawFieldLabel(GuiTranslation.FIELD_START.format() + " X", 175, -36);
+        drawFieldLabel(GuiTranslation.FIELD_START.format() + " X", -175, -36);
         drawFieldLabel("Y", -45, -36);
         drawFieldLabel("Z", 55, -36);
         drawFieldLabel(GuiTranslation.FIELD_END.format() + " X", 8 - 175, -11);
