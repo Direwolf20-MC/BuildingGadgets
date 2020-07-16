@@ -144,7 +144,7 @@ public class GadgetBuilding extends AbstractGadget {
         if (!world.isRemote) {
             // Debug code for free energy
             //itemstack.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> e.receiveEnergy(15000000, false));
-            if (player.isShiftKeyDown()) {
+            if (player.isSneaking()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
                 if( !result.getType().isSuccess() ) {
                     player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
@@ -154,7 +154,7 @@ public class GadgetBuilding extends AbstractGadget {
                 build((ServerPlayerEntity) player, itemstack);
             }
         } else {
-            if (!player.isShiftKeyDown()) {
+            if (!player.isSneaking()) {
                 BaseRenderer.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown())
@@ -174,7 +174,7 @@ public class GadgetBuilding extends AbstractGadget {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
         int changeAmount = (getToolMode(heldItem) != BuildingModes.SURFACE || (range % 2 == 0)) ? 1 : 2;
-        if (player.isShiftKeyDown())
+        if (player.isSneaking())
             range = (range == 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         else
             range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;

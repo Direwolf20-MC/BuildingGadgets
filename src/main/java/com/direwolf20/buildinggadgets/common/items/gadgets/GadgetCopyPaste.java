@@ -303,25 +303,25 @@ public class GadgetCopyPaste extends AbstractGadget {
         player.setActiveHand(hand);
         BlockPos posLookingAt = VectorHelper.getPosLookingAt(player, stack);
         if (! world.isRemote()) {
-            if (player.isShiftKeyDown() && GadgetUtils.setRemoteInventory(stack, player, world, posLookingAt, false) == ActionResultType.SUCCESS)
+            if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, posLookingAt, false) == ActionResultType.SUCCESS)
                 return new ActionResult<>(ActionResultType.SUCCESS, stack);
 
             if (getToolMode(stack) == ToolMode.COPY) {
                 if (world.getBlockState(posLookingAt) != Blocks.AIR.getDefaultState())
                     setRegionAndCopy(stack, world, player, posLookingAt);
-            } else if (getToolMode(stack) == ToolMode.PASTE && ! player.isShiftKeyDown())
+            } else if (getToolMode(stack) == ToolMode.PASTE && ! player.isSneaking())
                 getActivePos(player, stack).ifPresent(pos -> build(stack, world, player, pos));
         } else {
-            if (player.isShiftKeyDown()) {
+            if (player.isSneaking()) {
                 if (Screen.hasControlDown())
                     PacketHandler.sendToServer(new PacketBindTool());
                 else if (GadgetUtils.getRemoteInventory(posLookingAt, world, NetworkIO.Operation.EXTRACT) != null)
                     return new ActionResult<>(ActionResultType.SUCCESS, stack);
             }
             if (getToolMode(stack) == ToolMode.COPY) {
-                if (player.isShiftKeyDown() && world.getBlockState(posLookingAt) == Blocks.AIR.getDefaultState())
+                if (player.isSneaking() && world.getBlockState(posLookingAt) == Blocks.AIR.getDefaultState())
                     GuiMod.COPY.openScreen(player);
-            } else if (player.isShiftKeyDown()) {
+            } else if (player.isSneaking()) {
                 GuiMod.PASTE.openScreen(player);
             } else {
                 BaseRenderer.updateInventoryCache();
@@ -331,7 +331,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void setRegionAndCopy(ItemStack stack, World world, PlayerEntity player, BlockPos lookedAt) {
-        if (player.isShiftKeyDown()) {
+        if (player.isSneaking()) {
             if (getLowerRegionBound(stack) != null && ! checkCopy(world, player, new Region(lookedAt, getLowerRegionBound(stack))))
                 return;
             setUpperRegionBound(stack, lookedAt);

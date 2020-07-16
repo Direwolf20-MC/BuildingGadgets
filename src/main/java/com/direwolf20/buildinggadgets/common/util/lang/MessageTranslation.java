@@ -49,7 +49,9 @@ public enum MessageTranslation implements ITranslationProvider {
     RANGE_SET("range_set", 1),
     UNDO_FAILED("undo_failed"),
     UNDO_UNLOADED("undo_unloaded", 1),
-    UNDO_MISSING_ITEMS("undo_missing_items");
+    UNDO_MISSING_ITEMS("undo_missing_items"),
+    BOUND_TO_TILE("boundTE"),
+    UNBOUND_TO_TILE("unboundTE");
 
     private static final String PREFIX = Reference.MODID + ".message.";
     private final String key;

@@ -155,7 +155,7 @@ public class GadgetExchanger extends AbstractGadget {
         ItemStack itemstack = player.getHeldItem(hand);
         player.setActiveHand(hand);
         if (!world.isRemote) {
-            if (player.isShiftKeyDown()) {
+            if (player.isSneaking()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
                 if( !result.getType().isSuccess() ) {
                     player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
@@ -165,7 +165,7 @@ public class GadgetExchanger extends AbstractGadget {
                 exchange((ServerPlayerEntity) player, itemstack);
             }
         } else {
-            if (! player.isShiftKeyDown()) {
+            if (! player.isSneaking()) {
                 BaseRenderer.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown()) {
@@ -185,7 +185,7 @@ public class GadgetExchanger extends AbstractGadget {
     public static void rangeChange(PlayerEntity player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
         int changeAmount = (getToolMode(heldItem) == ExchangingModes.GRID || (range % 2 == 0)) ? 1 : 2;
-        if (player.isShiftKeyDown()) {
+        if (player.isSneaking()) {
             range = (range <= 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         } else {
             range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;

@@ -38,7 +38,7 @@ public class TemplateItem extends Item {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        if( !playerIn.isShiftKeyDown() )
+        if( !playerIn.isSneaking() )
             return super.onItemRightClick(worldIn, playerIn, handIn);
 
         return GuiMod.MATERIAL_LIST.openScreen(playerIn)

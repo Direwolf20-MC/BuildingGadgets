@@ -271,7 +271,7 @@ public class GadgetUtils {
         if (getRemoteInventory(pos, DimensionType.getKey(player.dimension), world) != null) {
             boolean same = pos.equals(getPOSFromNBT(tool, NBTKeys.REMOTE_INVENTORY_POS));
             writePOSToNBT(tool, same ? null : pos, NBTKeys.REMOTE_INVENTORY_POS, player.dimension);
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget." + (same ? "unboundTE" : "boundTE")).getUnformattedComponentText()), true);
+            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent(same ? MessageTranslation.UNBOUND_TO_TILE.getTranslationKey() : MessageTranslation.BOUND_TO_TILE.getTranslationKey()).getUnformattedComponentText()), true);
             return true;
         }
         return false;
