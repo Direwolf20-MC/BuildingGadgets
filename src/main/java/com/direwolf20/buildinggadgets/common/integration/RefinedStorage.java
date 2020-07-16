@@ -13,7 +13,6 @@ import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO.NetworkRefined
 import com.raoulvdberge.refinedstorage.api.network.INetwork;
 import com.raoulvdberge.refinedstorage.api.network.node.INetworkNodeProxy;
 */
-
 @IntegratedMod("refinedstorage")
 public class RefinedStorage implements IIntegratedMod {
     private static boolean isLoaded;

@@ -1,6 +1,6 @@
 modLoader="javafml" #mandatory
 loaderVersion="[${forge_major},)" #mandatory (25 is current forge version)
-updateJSONURL="${update_json}" #optional
+updateJSONURL="https://github.com/Direwolf20-MC/BuildingGadgets/raw/master/update.json" #optional
 issueTrackerURL="https://github.com/Direwolf20-MC/BuildingGadgets/issues" #optional
 displayURL="https://diresbg.com/" #optional
 logoFile="buildinggadgets_logo.png"
