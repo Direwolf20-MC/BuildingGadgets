@@ -16,6 +16,7 @@ public enum ModeTranslation implements ITranslationProvider{
     AXIS_CHASING("axis_chasing", 0),
     COPY("copy"),
     PASTE("paste");
+
     private static final String PREFIX = "modes."+ Reference.MODID+".";
     private final String key;
     private final int argCount;

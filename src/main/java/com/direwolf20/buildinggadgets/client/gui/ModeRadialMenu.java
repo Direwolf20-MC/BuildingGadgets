@@ -422,7 +422,7 @@ public class ModeRadialMenu extends Screen {
             else if( gadget instanceof GadgetExchanger )
                 mode = ExchangingMode.values()[slotSelected].toString();
             else
-                mode = GadgetCopyPaste.ToolMode.values()[slotSelected].toString();
+                mode = GadgetCopyPaste.ToolMode.values()[slotSelected].format();
 
             getMinecraft().player.sendStatusMessage(MessageTranslation.MODE_SET.componentTranslation(mode).setStyle(Styles.AQUA), true);
 
