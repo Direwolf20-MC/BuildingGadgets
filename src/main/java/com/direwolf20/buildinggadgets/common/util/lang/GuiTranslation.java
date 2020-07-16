@@ -16,6 +16,7 @@ public enum GuiTranslation implements ITranslationProvider {
     SINGLE_UP("destruction.field.up"),
     SINGLE_DOWN("destruction.field.down"),
     SINGLE_DEPTH("destruction.field.depth"),
+    SINGLE_RANGE("single.range"),
 
     BUTTON_LOAD("tm.button.load"),
     BUTTON_SAVE("tm.button.save"),

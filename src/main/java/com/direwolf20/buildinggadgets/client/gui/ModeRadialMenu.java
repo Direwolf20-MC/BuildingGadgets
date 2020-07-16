@@ -16,6 +16,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.registry.OurSounds;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.RadialTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
@@ -124,7 +125,7 @@ public class ModeRadialMenu extends Screen {
             conditionalButtons.add(button);
             if (!isDestruction) {
                 int widthSlider = 82;
-                sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, "Range ", "", 1, Config.GADGETS.maxRange.get(),
+                sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, GuiTranslation.SINGLE_RANGE.format() + " ", "", 1, Config.GADGETS.maxRange.get(),
                         GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
                     GuiSliderInt sliderI = (GuiSliderInt) slider;
                     sendRangeUpdate(sliderI.getValueInt());
