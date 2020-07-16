@@ -463,7 +463,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }
 
         if (! nameField.isFocused() && nameField.getText().isEmpty())
-            getMinecraft().fontRenderer.drawString("template name", nameField.x - guiLeft + 4, (nameField.y + 2) - guiTop, - 10197916);
+            getMinecraft().fontRenderer.drawString(GuiTranslation.TEMPLATE_PLACEHOLDER.format(), nameField.x - guiLeft + 4, (nameField.y + 2) - guiTop, - 10197916);
 
         if (buttonSave.isHovered() || buttonLoad.isHovered() || buttonPaste.isHovered())
             drawSlotOverlay(buttonLoad.isHovered() ? container.getSlot(0) : container.getSlot(1));

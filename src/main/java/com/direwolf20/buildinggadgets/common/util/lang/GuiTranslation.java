@@ -11,16 +11,26 @@ public enum GuiTranslation implements ITranslationProvider {
     SINGLE_CLOSE("single.close"),
     SINGLE_CLEAR("single.clear"),
     SINGLE_RESET("single.reset"),
+    SINGLE_LEFT("destruction.field.left"),
+    SINGLE_RIGHT("destruction.field.right"),
+    SINGLE_UP("destruction.field.up"),
+    SINGLE_DOWN("destruction.field.down"),
+    SINGLE_DEPTH("destruction.field.depth"),
 
     BUTTON_LOAD("tm.button.load"),
     BUTTON_SAVE("tm.button.save"),
     BUTTON_COPY("tm.button.copy"),
     BUTTON_PASTE("tm.button.paste"),
+
     TEMPLATE_NAME_TIP("tm.name_field.text"),
+    TEMPLATE_PLACEHOLDER("tm.field.placeholder"),
 
     COPY_BUTTON_ABSOLUTE("copy.button.absolute"),
     COPY_LABEL_HEADING("copy.label.heading"),
-    COPY_LABEL_SUBHEADING("copy.label.subheading");
+    COPY_LABEL_SUBHEADING("copy.label.subheading"),
+
+    FIELD_START("field.start"),
+    FIELD_END("field.end");
 
     private static final String PREFIX = "gui." + Reference.MODID + ".";
     private final String key;
