@@ -66,4 +66,16 @@ public class MyRenderType extends RenderType {
                     .cull(CULL_DISABLED)
                     .writeMask(COLOR_WRITE)
                     .build(false));
+
+    public static final RenderType BlockOverlay = makeType("BGBlockOverlay",
+            DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 256,
+            RenderType.State.getBuilder()
+                    .layer(PROJECTION_LAYERING)
+                    .transparency(TRANSLUCENT_TRANSPARENCY)
+                    .texture(NO_TEXTURE)
+                    .depthTest(DEPTH_LEQUAL)
+                    .cull(CULL_ENABLED)
+                    .lightmap(LIGHTMAP_DISABLED)
+                    .writeMask(COLOR_DEPTH_WRITE)
+                    .build(false));
 }
