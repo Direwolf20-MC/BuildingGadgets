@@ -23,10 +23,15 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -38,6 +43,7 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import org.lwjgl.opengl.GL14;
 
 import java.util.List;
 import java.util.Optional;
@@ -75,7 +81,6 @@ public class BuildRender extends BaseRenderer {
         if( startBlock == DEFAULT_EFFECT_BLOCK )
             return;
 
-        //TODO handle TileEntities
         BlockData data = getToolBlock(heldItem);
         BlockState renderBlockState = data.getState();
         if (renderBlockState == BaseRenderer.AIR)
@@ -108,7 +113,7 @@ public class BuildRender extends BaseRenderer {
         MatrixStack matrix = evt.getMatrixStack();
         matrix.push();
         matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
-        Random rand = new Random();
+
         BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
 
         for (BlockPos coordinate : coordinates) {
@@ -160,36 +165,31 @@ public class BuildRender extends BaseRenderer {
                 index.applyMatch(match); //notify the recording index that this counts
             }
         }
-        //TODO Bring Back TE Rendering.
-        /*if (state.hasTileEntity()) {
-            TileEntity te = getTileEntityWorld().getTE(state, world);
-            TileEntityRenderer<TileEntity> teRender = getTileEntityWorld().getTER(state, world);
+
+        if (state.hasTileEntity()) {
+            TileEntity te = getTileEntityWorld().getTE(state, player.world);
+            TileEntityRenderer<TileEntity> teRender = getTileEntityWorld().getTER(state, player.world);
 
             if (teRender != null && ! getInvalidTileEntities().contains(te)) {
                 for (BlockPos coordinate : coordinates) {
                     te.setPos(coordinate);
+
                     matrix.push();
                     matrix.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
-                    RenderSystem.multMatrix(matrix.getLast().getMatrix());
-                    RenderSystem.color4f(1F, 1F, 1F, 1F);
-                    RenderSystem.scalef(1.0f, 1.0f, 1.0f); //Block scale 1 = full sized block
-                    RenderSystem.enableBlend(); //We have to do this in the loop because the TE Render removes blend when its done
-                    RenderSystem.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
+                    matrix.translate(-.005f, -.005f, -.005f);
+                    matrix.scale(1.01f, 1.01f, 1.01f);
                     try {
-                        teRender.render(te, evt.getPartialTicks(), evt.getMatrixStack(), IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer()), 0, 0);
+                        teRender.render(te, evt.getPartialTicks(), matrix, buffer, 15728880, OverlayTexture.NO_OVERLAY);
                     } catch (Exception e) {
                         BuildingGadgets.LOG.warn("TER Exception with block type: " + state);
                         getInvalidTileEntities().add(te);
-                        RenderSystem.disableFog();
-                        RenderSystem.popMatrix();
                         break;
                     }
-                    RenderSystem.disableFog();
-                    RenderSystem.popMatrix();
                     matrix.pop();
                 }
             }
-        }*/
+        }
+
         matrix.pop();
         RenderSystem.disableDepthTest();
         buffer.finish();
