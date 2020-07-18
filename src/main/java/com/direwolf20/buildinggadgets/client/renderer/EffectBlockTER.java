@@ -1,7 +1,9 @@
 package com.direwolf20.buildinggadgets.client.renderer;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -11,11 +13,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
@@ -68,11 +74,27 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
             renderBlockState = OurBlocks.constructionBlockDense.getDefaultState();
 
         builder = buffer2.getBuffer(MyRenderType.RenderBlock);
-        IBakedModel ibakedmodel = dispatcher.getModelForState(renderBlockState);
-        for (Direction direction : Direction.values()) {
-            renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 1f, ibakedmodel.getQuads(renderBlockState, direction, new Random(MathHelper.getPositionRandom(tile.getPos())), EmptyModelData.INSTANCE), 15728640, 655360);
+        if (!renderData.getState().hasTileEntity()) {
+            IBakedModel ibakedmodel = dispatcher.getModelForState(renderBlockState);
+            for (Direction direction : Direction.values()) {
+                renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 1f, ibakedmodel.getQuads(renderBlockState, direction, new Random(MathHelper.getPositionRandom(tile.getPos())), EmptyModelData.INSTANCE), 15728640, 655360);
+            }
+            renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 1f, ibakedmodel.getQuads(renderBlockState, null, new Random(MathHelper.getPositionRandom(tile.getPos())), EmptyModelData.INSTANCE), 15728640, 655360);
+        } else {
+            TileEntity te = BaseRenderer.getTileEntityWorld().getTE(renderBlockState, tile.getWorld());
+            TileEntityRenderer<TileEntity> teRender = BaseRenderer.getTileEntityWorld().getTER(renderBlockState, tile.getWorld());
+
+            if (teRender != null) {
+                te.setPos(tile.getPos());
+                stack.push();
+                try {
+                    teRender.render(te, partialTicks, stack, buffer, 15728880, OverlayTexture.NO_OVERLAY);
+                } catch (Exception e) {
+                    BuildingGadgets.LOG.warn("TER Exception with block type: " + renderBlockState);
+                }
+                stack.pop();
+            }
         }
-        renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 1f, ibakedmodel.getQuads(renderBlockState, null, new Random(MathHelper.getPositionRandom(tile.getPos())), EmptyModelData.INSTANCE), 15728640, 655360);
 
         stack.pop();
         stack.push();

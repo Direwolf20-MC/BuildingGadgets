@@ -187,7 +187,7 @@ public abstract class BaseRenderer {
         return Minecraft.getInstance();
     }
 
-    static FakeTERWorld getTileEntityWorld() {
+    public static FakeTERWorld getTileEntityWorld() {
         return tileEntityWorld;
     }
 

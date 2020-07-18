@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
+import com.direwolf20.buildinggadgets.client.renderer.EffectBlockTER;
 import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
@@ -14,6 +15,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.Registries;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.save.TemplateSave;
+import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.command.Commands;
 import net.minecraft.item.crafting.IRecipeSerializer;
@@ -21,8 +23,10 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.*;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.*;
@@ -46,8 +50,6 @@ public final class BuildingGadgets {
         return theMod;
     }
 
-    private TemplateSave copyPasteSave;
-
     public BuildingGadgets() {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -58,21 +60,23 @@ public final class BuildingGadgets {
         MinecraftForge.EVENT_BUS.addListener(this::serverLoad);
         MinecraftForge.EVENT_BUS.addListener(this::serverLoaded);
         MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
+
         eventBus.addListener(this::registerRegistries);
         eventBus.addListener(this::setup);
+        eventBus.addListener(this::clientSetup);
         eventBus.addListener(this::loadComplete);
         eventBus.addListener(this::handleIMC);
-        eventBus.addGenericListener(IRecipeSerializer.class, this::onRecipeRegister);
 
+        eventBus.addGenericListener(IRecipeSerializer.class, this::onRecipeRegister);
         eventBus.addListener(this::onEnqueueIMC);
 
-        // Client only registering
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> {
-            eventBus.addListener((Consumer<FMLClientSetupEvent>) event -> ClientProxy.clientSetup(eventBus));
-            ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> GuiMod::openScreen);
-        });
-
         Registries.setup();
+    }
+
+    private void clientSetup(final FMLClientSetupEvent event) {
+        ClientRegistry.bindTileEntityRenderer(EffectBlockTileEntity.TYPE, EffectBlockTER::new);
+        ClientProxy.clientSetup(FMLJavaModLoadingContext.get().getModEventBus());
+        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> GuiMod::openScreen);
     }
 
     private void setup(final FMLCommonSetupEvent event) {
