@@ -93,28 +93,6 @@ public abstract class BaseRenderer {
         return energy.orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
     }
 
-    long playerHasBlocks(ItemStack stack, PlayerEntity player, BlockState state) {
-        long hasBlocks = InventoryHelper.countItem(stack, player, getCacheInventory());
-
-        if ( !state.hasTileEntity() )
-            hasBlocks = hasBlocks + InventoryHelper.countPaste(player);
-
-        return hasBlocks;
-    }
-
-    ItemStack getItemStackForRender(BlockState state, PlayerEntity player, IWorld world) {
-        ItemStack itemStack = ItemStack.EMPTY;
-
-        // Todo: use blockdata apparently
-//        if (state.getBlock().canSilkHarvest(state, world, BlockPos.ZERO, player))
-//            itemStack = InventoryHelper.getSilkTouchDrop(state);
-//        else
-        itemStack = state.getBlock().getPickBlock(state, null, world, BlockPos.ZERO, player);
-
-
-        return !itemStack.isEmpty() ? itemStack : state.getBlock().getPickBlock(state, null, world, BlockPos.ZERO, player);
-    }
-
     protected BufferBuilder setupMissingRender() {
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0001F);
