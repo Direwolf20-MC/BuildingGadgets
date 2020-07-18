@@ -123,8 +123,7 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
 
         if (alpha > 0.33f)
             alpha = 0.33f;
-
-        alpha = 0.125f;
+        
         Matrix4f matrix = stack.getLast().getMatrix();
 
         // Down
