@@ -12,12 +12,18 @@ import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
+import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
+import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerTemplateCreated;
 import com.direwolf20.buildinggadgets.common.registry.OurItems;
 import com.direwolf20.buildinggadgets.common.template.*;
 import com.direwolf20.buildinggadgets.common.template.ITemplateProvider.IUpdateListener;
 import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateParseException.IllegalMinecraftVersionException;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateParseException.UnknownTemplateVersionException;
@@ -29,7 +35,12 @@ import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.world.MockDelegationWorld;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multiset;
 import com.google.gson.JsonParseException;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -37,10 +48,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Matrix4f;
-import net.minecraft.client.renderer.Rectangle2d;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
@@ -60,7 +68,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
@@ -154,16 +167,16 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
             this.template = template;
 
-            IBuildView view = template.createViewInContext(
-                    SimpleBuildContext.builder()
-                            .buildingPlayer(getMinecraft().player)
-                            .usedStack(container.getSlot(0).getStack())
-                            .build(new MockDelegationWorld(getMinecraft().world)));
+//            IBuildView view = template.createViewInContext(
+//                    SimpleBuildContext.builder()
+//                            .buildingPlayer(getMinecraft().player)
+//                            .usedStack(container.getSlot(0).getStack())
+//                            .build(new MockDelegationWorld(getMinecraft().world)));
 
 //            int displayList = GLAllocation.generateDisplayLists(1);
 //            GlStateManager.newList(displayList, GL11.GL_COMPILE);
 
-            renderStructure(view, partialTicks);
+//            renderStructure(view, partialTicks);
 
 //            GlStateManager.endList();
 //            this.displayList = displayList;
@@ -200,7 +213,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 //                            renderer.render(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, - 1);
                     }
                     //remember vanilla Tiles rebinding the TextureAtlas
-                    getMinecraft().getTextureManager().bindTexture(AtlasTexture.LOCATION_BLOCKS_TEXTURE);
+                    getMinecraft().getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
                 } catch (Exception e) {
                     BuildingGadgets.LOG.error("Error rendering TileEntity", e);
                 }
@@ -231,40 +244,42 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 //        }
     }
 
-    // Todo: think about this better :P scale is a bitch
     private void renderRequirement() {
-//        MaterialList requirements = this.template.getHeaderAndForceMaterials(SimpleBuildContext.builder().build(getWorld())).getRequiredItems();
-//        if( requirements == null )
-//            return;
-//
-//        RenderHelper.enableGUIStandardItemLighting();
-//
-//        double scale = getMinecraft().mainWindow.getGuiScaleFactor();
-//        GlStateManager.pushMatrix();
-////        GlStateManager.scalef(.7f, .7f, .7f);
-////        GlStateManager.translated(1f * scale, 1f * scale, 0f);
-//        drawRightAlignedString(getMinecraft().fontRenderer, "Requirements", guiLeft + 14, guiTop + 5, Color.WHITE.getRGB());
-//
-//        int index = 0, column = 0;
-//        for(ImmutableMultiset<IUniqueObject<?>> e: requirements) {
-//            if( e.isEmpty() ) {
-//                return;
-//            }
-//
-//            for (IUniqueObject<?> a: e.elementSet()) {
-//                ItemStack stack = a.createStack(1);
-//                getMinecraft().getItemRenderer().renderItemIntoGUI(stack, guiLeft - (column * 20), (guiTop + 25) + (index * 20));
-//
-//                index ++;
-//                if( index % 12 == 0 ) {
-//                    column ++;
-//                    index = 0;
-//                }
-//            }
-//        }
-//
-//        GlStateManager.popMatrix();
-//        RenderHelper.disableStandardItemLighting();
+        MaterialList requirements = this.template.getHeaderAndForceMaterials(SimpleBuildContext.builder().build(getWorld())).getRequiredItems();
+        if( requirements == null )
+            return;
+
+        RenderHelper.enableStandardItemLighting();
+
+        RenderSystem.pushMatrix();
+        RenderSystem.translated(guiLeft - 32, guiTop - 5, 0);
+        RenderSystem.scalef(.8f, .8f, .8f);
+
+        drawRightAlignedString(getMinecraft().fontRenderer, "Requirements", 0, 0, Color.WHITE.getRGB());
+
+        // The things you have to do to get anything from this system is just stupid.
+        MatchResult list = InventoryHelper.CREATIVE_INDEX.tryMatch(requirements);
+        ImmutableMultiset<IUniqueObject<?>> foundItems = list.getFoundItems();
+
+        // Reverse sorted list of items required.
+        List<Multiset.Entry<IUniqueObject<?>>> sortedEntries = ImmutableList.sortedCopyOf(Comparator
+                .<Multiset.Entry<IUniqueObject<?>>, Integer>comparing(Multiset.Entry::getCount)
+                .reversed(), list.getChosenOption().entrySet());
+
+        int index = 0, column = 0;
+        for(Multiset.Entry<IUniqueObject<?>> e: sortedEntries) {
+                itemRenderer.renderItemAndEffectIntoGUI(this.minecraft.player, e.getElement().createStack(2), -20 - (column * 25), 25 + (index * 25));
+                itemRenderer.renderItemOverlayIntoGUI(Minecraft.getInstance().fontRenderer, e.getElement().createStack(2), -20 - (column * 25), 25 + (index * 25), GadgetUtils.withSuffix(foundItems.count(e.getElement())));
+                index ++;
+                if( index % 8 == 0 ) {
+                    column ++;
+                    index = 0;
+                }
+        }
+
+        RenderHelper.disableStandardItemLighting();
+        RenderSystem.popMatrix();
+
     }
 
     private void pasteTemplateToStack(World world, ItemStack stack, Template newTemplate, boolean replaced) {
