@@ -4,17 +4,16 @@ import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
 import com.direwolf20.buildinggadgets.common.schema.BoundingBox;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SurfaceMode extends Mode {
     public SurfaceMode(boolean isExchanging) { super("surface", isExchanging); }
 
     @Override
     List<BlockPos> collect(ModeUseContext context, PlayerEntity player, BlockPos start) {
-        List<BlockPos> coordinates = new ArrayList<>();
 
         int bound = context.getRange() / 2;
         BoundingBox region = new BoundingBox(start).expand(
@@ -23,12 +22,7 @@ public class SurfaceMode extends Mode {
                 bound * (1 - Math.abs(context.getHitSide().getZOffset()))
         );
 
-        CubeCoordinateIterator iterator = new CubeCoordinateIterator(region.minX, region.minY, region.minZ, region.maxX, region.maxY, region.maxZ);
-        while( iterator.hasNext() ) {
-            coordinates.add(new BlockPos(iterator.getX(), iterator.getY(), iterator.getZ()));
-        }
-
-        return coordinates;
+        return region.stream().collect(Collectors.toList());
     }
 
     @Override

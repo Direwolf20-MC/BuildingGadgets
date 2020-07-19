@@ -1,19 +1,22 @@
 package com.direwolf20.buildinggadgets.common.schema;
 
+import com.google.common.collect.AbstractIterator;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.util.math.CubeCoordinateIterator;
 import net.minecraft.util.math.Vec3i;
 
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
-public class BoundingBox {
-    public int minX;
-    public int minY;
-    public int minZ;
-    public int maxX;
-    public int maxY;
-    public int maxZ;
+public final class BoundingBox implements Iterable<BlockPos> {
+    private final int minX;
+    private final int minY;
+    private final int minZ;
+    private final int maxX;
+    private final int maxY;
+    private final int maxZ;
 
     public BoundingBox(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         this.minX = Math.min(minX, maxX);
@@ -32,6 +35,30 @@ public class BoundingBox {
         this(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
     }
 
+    public int getMinX() {
+        return minX;
+    }
+
+    public int getMinY() {
+        return minY;
+    }
+
+    public int getMinZ() {
+        return minZ;
+    }
+
+    public int getMaxX() {
+        return maxX;
+    }
+
+    public int getMaxY() {
+        return maxY;
+    }
+
+    public int getMaxZ() {
+        return maxZ;
+    }
+
     public BoundingBox expand(int x, int y, int z) {
         return new BoundingBox(minX - x, minY - y, minZ - z, maxX + x, maxY + y, maxZ + z);
     }
@@ -42,7 +69,28 @@ public class BoundingBox {
     public BoundingBox grow(int x, int y, int z) {
         return new BoundingBox(minX, minY, minZ, maxX + x, maxY + y, maxZ + z);
     }
-    
+
+    public CubeCoordinateIterator cubeIterator() {
+        return new CubeCoordinateIterator(minX, minY, minZ, maxX, maxY, maxZ);
+    }
+
+    @Override
+    public Iterator<BlockPos> iterator() {
+        return new AbstractIterator<BlockPos>() {
+            private final CubeCoordinateIterator it = cubeIterator();
+            @Override
+            protected BlockPos computeNext() {
+                if (!it.hasNext())
+                    return endOfData();
+                return new BlockPos(it.getX(), it.getY(), it.getZ());
+            }
+        };
+    }
+
+    public Stream<BlockPos> stream() {
+        return StreamSupport.stream(spliterator(), false);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
