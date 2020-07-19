@@ -36,6 +36,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.gson.JsonParseException;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -48,6 +49,8 @@ import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.monster.ZombieEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.PlayerContainer;
@@ -60,12 +63,18 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.ForgeI18n;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 
 public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
@@ -116,6 +125,10 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         super.render(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
 
+        if (this.template != null) {
+            renderRequirement(mouseX, mouseY);
+        }
+
         validateCache(partialTicks);
     }
 
@@ -139,7 +152,6 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         if( this.template != null ) {
             renderPanel();
-            renderRequirement();
         }
     }
 
@@ -236,7 +248,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 //        }
     }
 
-    private void renderRequirement() {
+    private void renderRequirement(int mouseX, int mouseY) {
         MaterialList requirements = this.template.getHeaderAndForceMaterials(SimpleBuildContext.builder().build(getWorld())).getRequiredItems();
         if( requirements == null )
             return;
@@ -244,10 +256,10 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         RenderHelper.enableStandardItemLighting();
 
         RenderSystem.pushMatrix();
-        RenderSystem.translated(guiLeft - 32, guiTop - 5, 0);
+        RenderSystem.translated(guiLeft - 30, guiTop - 5, 200);
         RenderSystem.scalef(.8f, .8f, .8f);
 
-        drawRightAlignedString(getMinecraft().fontRenderer, "Requirements", 0, 0, Color.WHITE.getRGB());
+        drawRightAlignedString(getMinecraft().fontRenderer, "Requirements", 5, 0, Color.WHITE.getRGB());
 
         // The things you have to do to get anything from this system is just stupid.
         MatchResult list = InventoryHelper.CREATIVE_INDEX.tryMatch(requirements);
@@ -260,13 +272,24 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         int index = 0, column = 0;
         for(Multiset.Entry<IUniqueObject<?>> e: sortedEntries) {
-                itemRenderer.renderItemAndEffectIntoGUI(this.minecraft.player, e.getElement().createStack(2), -20 - (column * 25), 25 + (index * 25));
-                itemRenderer.renderItemOverlayIntoGUI(Minecraft.getInstance().fontRenderer, e.getElement().createStack(2), -20 - (column * 25), 25 + (index * 25), GadgetUtils.withSuffix(foundItems.count(e.getElement())));
-                index ++;
-                if( index % 8 == 0 ) {
-                    column ++;
-                    index = 0;
-                }
+            ItemStack stack = e.getElement().createStack();
+            int x = (-20 - (column * 25)), y = (20 + (index * 25));
+
+            itemRenderer.renderItemAndEffectIntoGUI(this.minecraft.player, stack, x + 4, y + 4);
+            itemRenderer.renderItemOverlayIntoGUI(Minecraft.getInstance().fontRenderer, stack, x + 4, y + 4, GadgetUtils.withSuffix(foundItems.count(e.getElement())));
+
+            int space = (int) (25 - (.2f * 25));
+            int zoneX = ((guiLeft - 32) + (-15 - (column * space))), zoneY = (guiTop - 9) + (20 + (index * space));
+
+            if (mouseX > zoneX && mouseX < (zoneX + space) && mouseY > zoneY && mouseY < (zoneY + space)) {
+                renderTooltip(stack.getTooltip(this.minecraft.player, ITooltipFlag.TooltipFlags.NORMAL).stream().map(ITextComponent::getFormattedText).collect(Collectors.toList()), x + 15, y + 25);
+            }
+
+            index ++;
+            if( index % 8 == 0 ) {
+                column ++;
+                index = 0;
+            }
         }
 
         RenderHelper.disableStandardItemLighting();
@@ -458,9 +481,11 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void drawSlotOverlay(Slot slot) {
+        RenderSystem.pushMatrix();
         RenderSystem.translated(0, 0, 1000);
         fill(slot.xPos, slot.yPos, slot.xPos + 16, slot.yPos + 16, - 1660903937);
         RenderSystem.translated(0, 0, - 1000);
+        RenderSystem.popMatrix();
     }
 
     @Override
