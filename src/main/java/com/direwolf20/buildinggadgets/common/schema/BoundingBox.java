@@ -35,30 +35,6 @@ public final class BoundingBox implements Iterable<BlockPos> {
         this(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
     }
 
-    public int getMinX() {
-        return minX;
-    }
-
-    public int getMinY() {
-        return minY;
-    }
-
-    public int getMinZ() {
-        return minZ;
-    }
-
-    public int getMaxX() {
-        return maxX;
-    }
-
-    public int getMaxY() {
-        return maxY;
-    }
-
-    public int getMaxZ() {
-        return maxZ;
-    }
-
     public BoundingBox expand(int x, int y, int z) {
         return new BoundingBox(minX - x, minY - y, minZ - z, maxX + x, maxY + y, maxZ + z);
     }
@@ -89,6 +65,30 @@ public final class BoundingBox implements Iterable<BlockPos> {
 
     public Stream<BlockPos> stream() {
         return StreamSupport.stream(spliterator(), false);
+    }
+
+    public int getMinX() {
+        return minX;
+    }
+
+    public int getMinY() {
+        return minY;
+    }
+
+    public int getMinZ() {
+        return minZ;
+    }
+
+    public int getMaxX() {
+        return maxX;
+    }
+
+    public int getMaxY() {
+        return maxY;
+    }
+
+    public int getMaxZ() {
+        return maxZ;
     }
 
     @Override
