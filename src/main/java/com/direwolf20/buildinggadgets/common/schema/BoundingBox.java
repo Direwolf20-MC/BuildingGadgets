@@ -43,7 +43,7 @@ public final class BoundingBox {
     }
 
     public Stream<BlockPos> stream() {
-        return BlockPos.getAllInBox(minX, minY, minZ, maxX, maxY, maxZ);
+        return BlockPos.getAllInBox(minX, minY, minZ, maxX, maxY, maxZ).map(BlockPos::toImmutable);
     }
 
     public int getMinX() {
