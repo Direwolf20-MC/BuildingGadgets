@@ -2,12 +2,12 @@ package com.direwolf20.buildinggadgets.common.construction.modes;
 
 import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
 import com.direwolf20.buildinggadgets.common.schema.BoundingBox;
-import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SurfaceMode extends Mode {
     public SurfaceMode(boolean isExchanging) { super("surface", isExchanging); }
@@ -22,7 +22,7 @@ public class SurfaceMode extends Mode {
                 bound * (1 - Math.abs(context.getHitSide().getZOffset()))
         );
 
-        return ImmutableList.copyOf(region);
+        return region.stream().collect(Collectors.toList());
     }
 
     @Override

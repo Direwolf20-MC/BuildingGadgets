@@ -1,16 +1,12 @@
 package com.direwolf20.buildinggadgets.common.schema;
 
-import com.google.common.collect.AbstractIterator;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.CubeCoordinateIterator;
 import net.minecraft.util.math.Vec3i;
 
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-public final class BoundingBox implements Iterable<BlockPos> {
+public final class BoundingBox {
     private final int minX;
     private final int minY;
     private final int minZ;
@@ -46,25 +42,8 @@ public final class BoundingBox implements Iterable<BlockPos> {
         return new BoundingBox(minX, minY, minZ, maxX + x, maxY + y, maxZ + z);
     }
 
-    public CubeCoordinateIterator cubeIterator() {
-        return new CubeCoordinateIterator(minX, minY, minZ, maxX, maxY, maxZ);
-    }
-
-    @Override
-    public Iterator<BlockPos> iterator() {
-        return new AbstractIterator<BlockPos>() {
-            private final CubeCoordinateIterator it = cubeIterator();
-            @Override
-            protected BlockPos computeNext() {
-                if (!it.hasNext())
-                    return endOfData();
-                return new BlockPos(it.getX(), it.getY(), it.getZ());
-            }
-        };
-    }
-
     public Stream<BlockPos> stream() {
-        return StreamSupport.stream(spliterator(), false);
+        return BlockPos.getAllInBox(minX, minY, minZ, maxX, maxY, maxZ);
     }
 
     public int getMinX() {
