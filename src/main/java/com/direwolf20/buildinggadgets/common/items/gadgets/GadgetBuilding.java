@@ -75,7 +75,7 @@ public class GadgetBuilding extends ModeGadget implements IAtopPlacingGadget {
 
     @Override
     protected Supplier<BaseRenderer> createRenderFactory() {
-        return BuildingRender::new;
+        return () -> new BuildingRender(false);
     }
 
     @Override

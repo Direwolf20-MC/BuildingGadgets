@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.client.renderer.FakeTERWorld;
-import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
@@ -14,6 +14,7 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.AtlasTexture;
@@ -25,15 +26,17 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
 import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
 
 public abstract class BaseRenderer {
@@ -112,18 +115,40 @@ public abstract class BaseRenderer {
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
 
-    protected void renderMissingBlock(BufferBuilder bufferBuilder, BlockPos pos) {
-        float red = 1;
-        float green = 0;
-        float blue = 0;
-        float alpha = 0.55f;
+    protected void renderBlock(BlockRendererDispatcher dispatcher, BufferBuilder builder, BlockState state, BlockPos pos, World world, Random random) {
+        try {
+            dispatcher.renderBlock(state, pos, world, builder, random, EmptyModelData.INSTANCE);
+        } catch (Throwable t) {
+            BuildingGadgets.LOG.trace("Block at {} with state {} threw exception, whilst rendering", pos, state, t);
+        }
+    }
+
+    protected void renderBlockTile(BlockRendererDispatcher dispatcher, BlockState state) {
+        try {
+            dispatcher.renderBlockBrightness(state, 1f);
+        } catch (Throwable t) {
+            BuildingGadgets.LOG.trace("Block Tile with state {} threw exception, whilst rendering", state, t);
+        }
+    }
+
+    protected void renderBlockOverlay(BufferBuilder builder, BlockPos pos, float red, float green, float blue, float alpha) {
         double x = pos.getX() - 0.01;
         double y = pos.getY() - 0.01;
         double z = pos.getZ() - 0.01;
         double xEnd = pos.getX() + 1.01;
         double yEnd = pos.getY() + 1.01;
         double zEnd = pos.getZ() + 1.01;
-        renderBoxSolid(bufferBuilder, x, y, z, xEnd, yEnd, zEnd, red, green, blue, alpha);
+
+        renderBoxSolid(builder, x, y, z, xEnd, yEnd, zEnd, red, green, blue, alpha);
+    }
+
+    protected void renderMissingBlock(BufferBuilder bufferBuilder, BlockPos pos) {
+        float red = .69f;
+        float green = .18f;
+        float blue = .14f;
+        float alpha = 0.55f;
+
+        renderBlockOverlay(bufferBuilder, pos, red, green, blue, alpha);
     }
 
     protected void renderBoxSolid(BufferBuilder bufferBuilder, double x, double y, double z, double xEnd, double yEnd, double zEnd, float red, float green, float blue, float alpha) {

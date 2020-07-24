@@ -14,7 +14,7 @@ import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
-import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.ExchangerRender;
+import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildingRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.save.Undo;
@@ -87,7 +87,7 @@ public class GadgetExchanger extends ModeGadget {
 
     @Override
     protected Supplier<BaseRenderer> createRenderFactory() {
-        return ExchangerRender::new;
+        return () -> new BuildingRender(true);
     }
 
     @Override

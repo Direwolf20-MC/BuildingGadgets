@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.modes.BuildingMode;
+import com.direwolf20.buildinggadgets.common.building.modes.ExchangingMode;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
@@ -22,11 +23,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -38,16 +38,24 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
+import org.apache.commons.lang3.tuple.Pair;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL14;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getAnchor;
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getToolBlock;
 
 public class BuildingRender extends BaseRenderer {
+    private boolean isExchanger;
+
+    public BuildingRender(boolean isExchanger) {
+        this.isExchanger = isExchanger;
+    }
 
     @Override
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
@@ -72,9 +80,16 @@ public class BuildingRender extends BaseRenderer {
                     return;
                 }
                 List<BlockPos> renderCoordinates;
+
                 if (coordinates.size() == 0) { //Build a list of coordinates based on the tool mode and range
-                    coordinates = BuildingMode
-                            .collectPlacementPos(world, player, lookingAt.getPos(), lookingAt.getFace(), heldItem, lookingAt.getPos());
+                    if (isExchanger) {
+                        coordinates = ExchangingMode
+                                .collectPlacementPos(world, player, lookingAt.getPos(), lookingAt.getFace(), heldItem, lookingAt.getPos());
+                    } else {
+                        coordinates = BuildingMode
+                                .collectPlacementPos(world, player, lookingAt.getPos(), lookingAt.getFace(), heldItem, lookingAt.getPos());
+                    }
+
                     renderCoordinates = coordinates;
                 } else { //anchors need to be resorted
                     renderCoordinates = SortingHelper.Blocks.byDistance(coordinates, player);
@@ -84,6 +99,7 @@ public class BuildingRender extends BaseRenderer {
                         .usedStack(heldItem)
                         .buildingPlayer(player)
                         .build(world);
+
                 // Figure out how many of the block we're rendering we have in the inventory of the player.
                 IItemIndex index = new RecordingItemIndex(InventoryHelper.index(heldItem, player));
                 MaterialList materials = data.getRequiredItems(buildContext, null, null);
@@ -100,37 +116,33 @@ public class BuildingRender extends BaseRenderer {
                 GlStateManager.pushTextureAttributes();
                 //Enable Blending (So we can have transparent effect)
                 GlStateManager.enableBlend();
+
                 //This blend function allows you to use a constant alpha, which is defined later
                 GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
 
-                GlStateManager.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
-                BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-                bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.BLOCK);
-                Random rand = new Random();
-                BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
+                state = renderBlockState;
+                BlockRendererDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
+
                 for (BlockPos coordinate : renderCoordinates) {
-                    GlStateManager.pushMatrix();//Push matrix again just because
-                    GlStateManager.translatef(coordinate.getX(), coordinate.getY(), coordinate.getZ());//Now move the render position to the coordinates we want to render at
-                    GlStateManager.rotatef(-90.0F, 0.0F, 1.0F, 0.0F); //Rotate it because i'm not sure why but we need to
-                    GL14.glBlendColor(1F, 1F, 1F, 0.55f); //Set the alpha of the blocks we are rendering
-                    if (getBuilderWorld().getWorldType() != WorldType.DEBUG_ALL_BLOCK_STATES) { //Get the block state in the fake world
-                        try {
-                            state = renderBlockState;
-                        } catch (Exception ignored) {}
+                    GlStateManager.pushMatrix();
+                    GlStateManager.translatef(coordinate.getX() - 0.001f, coordinate.getY() - 0.001f, coordinate.getZ() - 0.001f);
+                    GlStateManager.rotatef(-90f, 0f, 1f, 0f);
+                    if (isExchanger) {
+                        GlStateManager.scalef(1.002f, 1.002f, 1.002f);
                     }
+                    GL14.glBlendColor(1F, 1F, 1F, 0.55f);
+
                     try {
-                        if (state.getRenderType() == BlockRenderType.MODEL)
-                            dispatcher.renderBlock(state, coordinate, world, bufferBuilder, rand, EmptyModelData.INSTANCE);
-                        else
-                            dispatcher.renderBlockBrightness(state, .1f);
+                        blockrendererdispatcher.renderBlockBrightness(state, 1.0f);
                     } catch (Throwable t) {
                         BuildingGadgets.LOG.trace("Block at {} with state {} threw exception, whilst rendering", coordinate, state, t);
                     }
-                    //Move the render position back to where it was
+
                     GlStateManager.popMatrix();
                 }
-                Tessellator.getInstance().draw();
-                bufferBuilder = setupMissingRender();
+
+                // Render missing and valid overlays
+                BufferBuilder bufferBuilder = setupMissingRender();
                 for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
 
                     if (energyCap.isPresent()) {
@@ -143,6 +155,7 @@ public class BuildingRender extends BaseRenderer {
                         renderMissingBlock(bufferBuilder, coordinate);
                     } else {
                         index.applyMatch(match); //notify the recording index that this counts
+                        renderBlockOverlay(bufferBuilder, coordinate, .97f, 1f, .99f, .1f);//(bufferBuilder, 0, 0, 0, 1, 1 ,1, 0, 1, 0, .3f);
                     }
                     //Move the render position back to where it was
                 }
