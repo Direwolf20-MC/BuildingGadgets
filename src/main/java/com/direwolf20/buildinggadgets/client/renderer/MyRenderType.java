@@ -1,9 +1,12 @@
 package com.direwolf20.buildinggadgets.client.renderer;
 
 
-import net.minecraft.client.renderer.RenderType;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 import java.util.OptionalDouble;
@@ -78,4 +81,108 @@ public class MyRenderType extends RenderType {
                     .lightmap(LIGHTMAP_DISABLED)
                     .writeMask(COLOR_DEPTH_WRITE)
                     .build(false));
+
+    /**
+     * This is used for rendering blocks with an alpha value as the alpha currently isn't
+     * supported by minecraft.
+     *
+     * Literally just raps the buffer so we can render a different RenderType
+     */
+    public static class MultiplyAlphaRenderTypeBuffer implements IRenderTypeBuffer
+    {
+        private final IRenderTypeBuffer inner;
+        private final float constantAlpha;
+
+        public MultiplyAlphaRenderTypeBuffer(IRenderTypeBuffer inner, float constantAlpha)
+        {
+            this.inner = inner;
+            this.constantAlpha = constantAlpha;
+        }
+
+        @Override
+        public IVertexBuilder getBuffer(RenderType type)
+        {
+            RenderType localType = type;
+            if (localType instanceof Type) {
+                ResourceLocation texture = ((Type) localType).renderState.texture.texture
+                        .orElse(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+
+                localType = getEntityTranslucentCull(texture);
+            }
+            else if (localType.toString().equals(Atlases.getCutoutBlockType().toString())) {
+                localType = Atlases.getTranslucentCullBlockType();
+            }
+
+            return new MultiplyAlphaVertexBuilder(inner.getBuffer(localType), this.constantAlpha);
+        }
+
+        /**
+         * Required for modifying the alpha value.
+         */
+        public static class MultiplyAlphaVertexBuilder implements IVertexBuilder
+        {
+            private final IVertexBuilder inner;
+            private final float constantAlpha;
+
+            public MultiplyAlphaVertexBuilder(IVertexBuilder inner, float constantAlpha)
+            {
+                this.inner = inner;
+                this.constantAlpha = constantAlpha;
+            }
+
+            @Override
+            public IVertexBuilder pos(double x, double y, double z)
+            {
+                return inner.pos(x,y,z);
+            }
+
+            @Override
+            public IVertexBuilder pos(Matrix4f matrixIn, float x, float y, float z)
+            {
+                return inner.pos(matrixIn, x, y, z);
+            }
+
+            @Override
+            public IVertexBuilder color(int red, int green, int blue, int alpha)
+            {
+                return inner.color(red,green,blue, (int) (alpha * constantAlpha));
+            }
+
+            @Override
+            public IVertexBuilder tex(float u, float v)
+            {
+                return inner.tex(u, v);
+            }
+
+            @Override
+            public IVertexBuilder overlay(int u, int v)
+            {
+                return inner.overlay(u, v);
+            }
+
+            @Override
+            public IVertexBuilder lightmap(int u, int v)
+            {
+                return inner.lightmap(u, v);
+            }
+
+            @Override
+            public IVertexBuilder normal(float x, float y, float z)
+            {
+                return inner.normal(x,y,z);
+            }
+
+            @Override
+            public IVertexBuilder normal(Matrix3f matrixIn, float x, float y, float z)
+            {
+                return inner.normal(matrixIn, x, y, z);
+            }
+
+            @Override
+            public void endVertex()
+            {
+                inner.endVertex();
+            }
+        }
+    }
 }

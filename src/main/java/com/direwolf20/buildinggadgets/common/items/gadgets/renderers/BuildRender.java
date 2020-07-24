@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
-import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
@@ -18,24 +17,14 @@ import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
@@ -43,19 +32,15 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import org.lwjgl.opengl.GL14;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
-import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getAnchor;
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getToolBlock;
 
 public class BuildRender extends BaseRenderer {
-    // @implNote: this'll only work for now as we only have the 2 gadgets.
-    private boolean isExchanger = false;
+    private final boolean isExchanger;
     private static final BlockState DEFAULT_EFFECT_BLOCK = OurBlocks.effectBlock.getDefaultState();
 
     public BuildRender(boolean isExchanger) {
@@ -65,20 +50,14 @@ public class BuildRender extends BaseRenderer {
     @Override
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
         super.render(evt, player, heldItem);
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
-        IVertexBuilder builder;
 
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
-        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
 
         BlockState state = AIR;
         Optional<List<BlockPos>> anchor = getAnchor(heldItem);
 
-        if( player.world.isAirBlock(lookingAt.getPos()) && !anchor.isPresent() )
-            return;
-
         BlockState startBlock = player.world.getBlockState(lookingAt.getPos());
-        if( startBlock == DEFAULT_EFFECT_BLOCK )
+        if( (player.world.isAirBlock(lookingAt.getPos()) && !anchor.isPresent()) || startBlock == DEFAULT_EFFECT_BLOCK )
             return;
 
         BlockData data = getToolBlock(heldItem);
@@ -98,18 +77,13 @@ public class BuildRender extends BaseRenderer {
         // Sort them on a new line for readability
 //        coordinates = SortingHelper.Blocks.byDistance(coordinates, player);
 
-        // Figure out how many of the block we're rendering we have in the inventory of the player.
-        IItemIndex index = new RecordingItemIndex(InventoryHelper.index(heldItem, player));
-        MaterialList materials = data.getRequiredItems(new SimpleBuildContext(player.world, player, heldItem), null, null);
-        int hasEnergy = getEnergy(player, heldItem);
-
-        LazyOptional<IEnergyStorage> energyCap = heldItem.getCapability(CapabilityEnergy.ENERGY);
-
         //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
         getBuilderWorld().setWorldAndState(player.world, renderBlockState, coordinates);
 
+        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+
         //Save the current position that is being rendered (I think)
-        builder = buffer.getBuffer(MyRenderType.RenderBlock);
         MatrixStack matrix = evt.getMatrixStack();
         matrix.push();
         matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
@@ -130,62 +104,41 @@ public class BuildRender extends BaseRenderer {
                 } catch (Exception ignored) {}
             }
 
-            IBakedModel ibakedmodel = dispatcher.getModelForState(state);
-            BlockColors blockColors = Minecraft.getInstance().getBlockColors();
-            int color = blockColors.getColor(renderBlockState, player.world, coordinate, 0);
-            float f = (float) (color >> 16 & 255) / 255.0F;
-            float f1 = (float) (color >> 8 & 255) / 255.0F;
-            float f2 = (float) (color & 255) / 255.0F;
-            try {
-                if (state.getRenderType() == BlockRenderType.MODEL) {
-                    for (Direction direction : Direction.values()) {
-                        renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(coordinate)), EmptyModelData.INSTANCE), 15728640, 655360);
-                    }
-                    renderModelBrightnessColorQuads(matrix.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(coordinate)), EmptyModelData.INSTANCE), 15728640, 655360);
-                }
-            } catch (Throwable t) {
-                BuildingGadgets.LOG.trace("Block at {} with state {} threw exception, whilst rendering", coordinate, state, t);
-            }
+            MyRenderType.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new MyRenderType.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().getRenderTypeBuffers().getBufferSource(), .55f);
+            dispatcher.renderBlock(
+                    state, matrix, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE
+            );
+
             //Move the render position back to where it was
             matrix.pop();
+            RenderSystem.disableDepthTest();
+            buffer.finish();
         }
 
+        // Don't even waste the time checking to see if we have the right energy, items, etc for creative mode
+        if (!player.isCreative()) {
+            IVertexBuilder builder;
 
-        for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
-            if (energyCap.isPresent())
-                hasEnergy -= ((AbstractGadget) heldItem.getItem()).getEnergyCost(heldItem);
+            // Figure out how many of the block we're rendering we have in the inventory of the player.
+            IItemIndex index = new RecordingItemIndex(InventoryHelper.index(heldItem, player));
+            MaterialList materials = data.getRequiredItems(new SimpleBuildContext(player.world, player, heldItem), null, null);
+            int hasEnergy = getEnergy(player, heldItem);
 
-            MatchResult match = index.tryMatch(materials);
-            if (! match.isSuccess())
-                match = index.tryMatch(InventoryHelper.PASTE_LIST);
-            if (! match.isSuccess() || hasEnergy < 0) {
+            LazyOptional<IEnergyStorage> energyCap = heldItem.getCapability(CapabilityEnergy.ENERGY);
+
+            for (BlockPos coordinate : coordinates) { //Now run through the UNSORTED list of coords, to show which blocks won't place if you don't have enough of them.
+                if (energyCap.isPresent())
+                    hasEnergy -= ((AbstractGadget) heldItem.getItem()).getEnergyCost(heldItem);
+
                 builder = buffer.getBuffer(MyRenderType.MissingBlockOverlay);
-                renderMissingBlock(matrix.getLast().getMatrix(), builder, coordinate);
-            } else {
-                index.applyMatch(match); //notify the recording index that this counts
-            }
-        }
-
-        if (state.hasTileEntity()) {
-            TileEntity te = getTileEntityWorld().getTE(state, player.world);
-            TileEntityRenderer<TileEntity> teRender = getTileEntityWorld().getTER(state, player.world);
-
-            if (teRender != null && ! getInvalidTileEntities().contains(te)) {
-                for (BlockPos coordinate : coordinates) {
-                    te.setPos(coordinate);
-
-                    matrix.push();
-                    matrix.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
-                    matrix.translate(-.005f, -.005f, -.005f);
-                    matrix.scale(1.01f, 1.01f, 1.01f);
-                    try {
-                        teRender.render(te, evt.getPartialTicks(), matrix, buffer, 15728880, OverlayTexture.NO_OVERLAY);
-                    } catch (Exception e) {
-                        BuildingGadgets.LOG.warn("TER Exception with block type: " + state);
-                        getInvalidTileEntities().add(te);
-                        break;
-                    }
-                    matrix.pop();
+                MatchResult match = index.tryMatch(materials);
+                if (!match.isSuccess())
+                    match = index.tryMatch(InventoryHelper.PASTE_LIST);
+                if (!match.isSuccess() || hasEnergy < 0) {
+                    renderMissingBlock(matrix.getLast().getMatrix(), builder, coordinate);
+                } else {
+                    index.applyMatch(match); //notify the recording index that this counts
+                    renderBoxSolid(matrix.getLast().getMatrix(), builder, coordinate, .97f, 1f, .99f, .1f);
                 }
             }
         }
@@ -199,4 +152,5 @@ public class BuildRender extends BaseRenderer {
     public boolean isLinkable() {
         return true;
     }
+
 }

@@ -113,10 +113,10 @@ public abstract class BaseRenderer {
     }*/
 
     protected static void renderMissingBlock(Matrix4f matrix, IVertexBuilder builder, BlockPos pos) {
-        renderBoxSolid(matrix, builder, pos, 1, 0, 0, 0.35f);
+        renderBoxSolid(matrix, builder, pos, 1f, 0f, 0f, 0.35f);
     }
 
-    protected static void renderBoxSolid(Matrix4f matrix, IVertexBuilder builder, BlockPos pos, int r, int g, int b, float alpha) {
+    protected static void renderBoxSolid(Matrix4f matrix, IVertexBuilder builder, BlockPos pos, float r, float g, float b, float alpha) {
         double x = pos.getX() - 0.001;
         double y = pos.getY() - 0.001;
         double z = pos.getZ() - 0.001;
