@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.client.renderer.FakeTERWorld;
-import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
+import com.direwolf20.buildinggadgets.client.renderer.ModRenderTypes;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
@@ -24,11 +24,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
-import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import org.lwjgl.opengl.GL14;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -77,7 +75,7 @@ public abstract class BaseRenderer {
         stack.translate(-renderPos.getX(), -renderPos.getY(), -renderPos.getZ());
         stack.scale(1.01f, 1.01f, 1.01f);
 
-        renderBoxSolid(stack.getLast().getMatrix(), buffer.getBuffer(MyRenderType.BlockOverlay), BlockPos.ZERO, 0, 1, 0, .35f);
+        renderBoxSolid(stack.getLast().getMatrix(), buffer.getBuffer(ModRenderTypes.BlockOverlay), BlockPos.ZERO, 0, 1, 0, .35f);
 
         stack.pop();
         RenderSystem.disableDepthTest();

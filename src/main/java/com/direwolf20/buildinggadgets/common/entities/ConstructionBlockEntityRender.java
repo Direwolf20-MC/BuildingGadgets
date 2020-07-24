@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
-import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
+import com.direwolf20.buildinggadgets.client.renderer.ModRenderTypes;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -34,7 +34,7 @@ public class ConstructionBlockEntityRender extends EntityRenderer<ConstructionBl
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         IVertexBuilder builder;
         Minecraft mc = Minecraft.getInstance();
-        builder = buffer.getBuffer(MyRenderType.RenderBlock);
+        builder = buffer.getBuffer(ModRenderTypes.RenderBlock);
         BlockState renderBlockState = OurBlocks.constructionBlockDense.getDefaultState();
         int teCounter = entityIn.ticksExisted;
         int maxLife = entityIn.getMaxLife();

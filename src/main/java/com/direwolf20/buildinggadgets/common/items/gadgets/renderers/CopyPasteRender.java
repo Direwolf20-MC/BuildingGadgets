@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
 import com.direwolf20.buildinggadgets.client.renderer.DireBufferBuilder;
 import com.direwolf20.buildinggadgets.client.renderer.DireVertexBuffer;
-import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
+import com.direwolf20.buildinggadgets.client.renderer.ModRenderTypes;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
@@ -96,7 +96,7 @@ public class CopyPasteRender extends BaseRenderer {
         int R = 255, G = 223, B = 127;
 
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
-        IVertexBuilder builder = buffer.getBuffer(MyRenderType.CopyGadgetLines);
+        IVertexBuilder builder = buffer.getBuffer(ModRenderTypes.CopyGadgetLines);
 
         Matrix4f lastMatrix = matrix.getLast().getMatrix();
         builder.pos(lastMatrix, x, y, z).color(G, G, G, 0.0F).endVertex();
@@ -191,8 +191,8 @@ public class CopyPasteRender extends BaseRenderer {
         renderBuffer = MultiVBORenderer.of((buffer) -> {
 //            System.out.println("Building again");
 
-            IVertexBuilder builder = buffer.getBuffer(MyRenderType.RenderBlock);
-            IVertexBuilder noDepthbuilder = buffer.getBuffer(MyRenderType.CopyPasteRenderBlock);
+            IVertexBuilder builder = buffer.getBuffer(ModRenderTypes.RenderBlock);
+            IVertexBuilder noDepthbuilder = buffer.getBuffer(ModRenderTypes.CopyPasteRenderBlock);
 
             BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
 

@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
-import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
+import com.direwolf20.buildinggadgets.client.renderer.ModRenderTypes;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
@@ -104,7 +104,7 @@ public class BuildRender extends BaseRenderer {
                 } catch (Exception ignored) {}
             }
 
-            MyRenderType.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new MyRenderType.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().getRenderTypeBuffers().getBufferSource(), .55f);
+            ModRenderTypes.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new ModRenderTypes.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().getRenderTypeBuffers().getBufferSource(), .55f);
             dispatcher.renderBlock(
                     state, matrix, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE
             );
@@ -130,7 +130,7 @@ public class BuildRender extends BaseRenderer {
                 if (energyCap.isPresent())
                     hasEnergy -= ((AbstractGadget) heldItem.getItem()).getEnergyCost(heldItem);
 
-                builder = buffer.getBuffer(MyRenderType.MissingBlockOverlay);
+                builder = buffer.getBuffer(ModRenderTypes.MissingBlockOverlay);
                 MatchResult match = index.tryMatch(materials);
                 if (!match.isSuccess())
                     match = index.tryMatch(InventoryHelper.PASTE_LIST);

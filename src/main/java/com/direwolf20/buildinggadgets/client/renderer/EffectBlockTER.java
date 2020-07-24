@@ -13,7 +13,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.Matrix4f;
-import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -21,7 +20,6 @@ import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
@@ -73,7 +71,7 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
         if (tile.isUsingPaste() && toolMode == EffectBlock.Mode.PLACE)
             renderBlockState = OurBlocks.constructionBlockDense.getDefaultState();
 
-        builder = buffer2.getBuffer(MyRenderType.RenderBlock);
+        builder = buffer2.getBuffer(ModRenderTypes.RenderBlock);
         if (!renderData.getState().hasTileEntity()) {
             IBakedModel ibakedmodel = dispatcher.getModelForState(renderBlockState);
             for (Direction direction : Direction.values()) {
@@ -99,7 +97,7 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
         stack.pop();
         stack.push();
 
-        builder = buffer.getBuffer(MyRenderType.MissingBlockOverlay);
+        builder = buffer.getBuffer(ModRenderTypes.MissingBlockOverlay);
 
         float x = 0,
                 y = 0,

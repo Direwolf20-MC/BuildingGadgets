@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items.gadgets.renderers;
 
-import com.direwolf20.buildinggadgets.client.renderer.MyRenderType;
+import com.direwolf20.buildinggadgets.client.renderer.ModRenderTypes;
 import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
@@ -45,7 +45,7 @@ public class DestructionRender extends BaseRenderer {
         stack.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
 
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
-        IVertexBuilder builder = buffer.getBuffer(MyRenderType.MissingBlockOverlay);
+        IVertexBuilder builder = buffer.getBuffer(ModRenderTypes.MissingBlockOverlay);
 
         GadgetDestruction.getClearingPositions(world, startBlock, facing, player, heldItem)
                 .forEach(pos -> renderMissingBlock(stack.getLast().getMatrix(), builder, pos));
