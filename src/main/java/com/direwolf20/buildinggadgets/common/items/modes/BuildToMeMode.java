@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.items.gadgets.modes;
+package com.direwolf20.buildinggadgets.common.items.modes;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
 import net.minecraft.entity.player.PlayerEntity;
