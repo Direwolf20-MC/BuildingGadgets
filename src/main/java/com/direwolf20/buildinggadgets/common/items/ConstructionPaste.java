@@ -10,8 +10,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
 public class ConstructionPaste extends Item {
-    public ConstructionPaste(Properties builder) {
-        super(builder);
+    public ConstructionPaste() {
+        super(OurItems.itemProperties());
     }
 
     @Override
@@ -20,5 +20,4 @@ public class ConstructionPaste extends Item {
         itemstack = InventoryHelper.addPasteToContainer(player, itemstack);
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
-
 }

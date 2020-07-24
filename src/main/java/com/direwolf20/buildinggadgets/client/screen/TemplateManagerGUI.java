@@ -21,7 +21,7 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManag
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.template.*;
 import com.direwolf20.buildinggadgets.common.template.ITemplateProvider.IUpdateListener;
-import com.direwolf20.buildinggadgets.common.entities.tiles.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateParseException.IllegalMinecraftVersionException;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateParseException.UnknownTemplateVersionException;
@@ -314,7 +314,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             return false;
 
         else if (TemplateManagerTileEntity.TEMPLATE_CONVERTIBLES.contains(stack.getItem())) {
-            container.putStackInSlot(1, new ItemStack(OurItems.template));
+            container.putStackInSlot(1, new ItemStack(OurItems.TEMPLATE_ITEM.get()));
             return true;
         }
 

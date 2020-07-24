@@ -24,8 +24,9 @@ public class ConstructionPasteContainer extends GenericPasteContainer {
 
     private IntSupplier maxCapacity;
 
-    public ConstructionPasteContainer(Properties builder, IntSupplier maxCapacity) {
-        super(builder);
+    public ConstructionPasteContainer(IntSupplier maxCapacity) {
+        super(OurItems.nonStackableItemProperties());
+
         this.maxCapacity = maxCapacity;
         addPropertyOverride(Reference.PROPERTY_OVERRIDE_LEVEL, (stack, world, entity) -> {
             float percent = ConstructionPasteContainer.getPasteAmount(stack) / (float) this.maxCapacity.getAsInt();

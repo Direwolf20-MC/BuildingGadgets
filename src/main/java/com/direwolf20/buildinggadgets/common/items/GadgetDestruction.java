@@ -10,12 +10,13 @@ import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.DestructionRender;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.save.Undo;
-import com.direwolf20.buildinggadgets.common.entities.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.google.common.collect.ImmutableMultiset;
 import net.minecraft.block.BlockState;
@@ -42,14 +43,17 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class GadgetDestruction extends AbstractGadget {
 
-    public GadgetDestruction(Properties builder, IntSupplier undoLengthSupplier, String undoName) {
-        super(builder, undoLengthSupplier, undoName, TagReference.WHITELIST_DESTRUCTION, TagReference.BLACKLIST_DESTRUCTION);
+    public GadgetDestruction() {
+        super(OurItems.nonStackableItemProperties().maxDamage(1),
+                Config.GADGETS.GADGET_DESTRUCTION.undoSize::get,
+                Reference.SaveReference.UNDO_DESTRUCTION,
+                TagReference.WHITELIST_DESTRUCTION,
+                TagReference.BLACKLIST_DESTRUCTION);
     }
 
     @Override
@@ -213,7 +217,7 @@ public class GadgetDestruction extends AbstractGadget {
 
     public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, BlockState currentBlock) {
         if (world.isAirBlock(voidPos) ||
-                currentBlock.equals(OurBlocks.effectBlock.getDefaultState()) ||
+                currentBlock.equals(OurBlocks.EFFECT_BLOCK.get().getDefaultState()) ||
                 currentBlock.getBlockHardness(world, voidPos) < 0 ||
                 ! world.isBlockModifiable(player, voidPos)) return false;
 
@@ -240,7 +244,7 @@ public class GadgetDestruction extends AbstractGadget {
             TileEntity te = world.getTileEntity(clearPos);
             if (!isAllowedBlock(state.getBlock()))
                 continue;
-            if (te == null || state.getBlock() == OurBlocks.constructionBlock && te instanceof ConstructionBlockTileEntity) {
+            if (te == null || state.getBlock() == OurBlocks.CONSTRUCTION_BLOCK.get() && te instanceof ConstructionBlockTileEntity) {
                 destroyBlock(world, clearPos, player, builder);
             }
         }

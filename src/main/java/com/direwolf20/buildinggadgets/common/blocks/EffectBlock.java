@@ -6,10 +6,12 @@ import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
-import com.direwolf20.buildinggadgets.common.entities.tiles.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.entities.tiles.EffectBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.EffectBlockTileEntity;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
@@ -44,7 +46,7 @@ public class EffectBlock extends Block {
                 BlockPos targetPos = builder.getPos();
                 BlockData targetBlock = builder.getRenderedBlock();
                 if (builder.isUsingPaste()) {
-                    world.setBlockState(targetPos, OurBlocks.constructionBlock.getDefaultState());
+                    world.setBlockState(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().getDefaultState());
                     TileEntity te = world.getTileEntity(targetPos);
                     if (te instanceof ConstructionBlockTileEntity) {
                         ((ConstructionBlockTileEntity) te).setBlockState(targetBlock, targetBlock);
@@ -80,6 +82,12 @@ public class EffectBlock extends Block {
         public abstract void onBuilderRemoved(EffectBlockTileEntity builder);
     }
 
+    /**
+     * As the effect block is effectively air it needs to have a material just like Air.
+     * We don't use Material.AIR as this is replaceable.
+     */
+    private static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MaterialColor.AIR).notSolid().build();
+
     public static void spawnUndoBlock(IBuildContext context, PlacementTarget target) {
         BlockState state = context.getWorld().getBlockState(target.getPos());
 
@@ -104,7 +112,7 @@ public class EffectBlock extends Block {
     }
 
     private static void spawnEffectBlock(@Nullable TileEntity curTe, BlockState curState, IWorld world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
-        BlockState state = OurBlocks.effectBlock.getDefaultState();
+        BlockState state = OurBlocks.EFFECT_BLOCK.get().getDefaultState();
         world.setBlockState(spawnPos, state, 3);
         assert world.getTileEntity(spawnPos) != null;
         ((EffectBlockTileEntity) world.getTileEntity(spawnPos)).initializeData(curState, curTe, spawnBlock, mode, usePaste);
@@ -113,8 +121,8 @@ public class EffectBlock extends Block {
             ((World) world).notifyBlockUpdate(spawnPos, state, state, Constants.BlockFlags.DEFAULT);
     }
 
-    public EffectBlock(Properties builder) {
-        super(builder);
+    public EffectBlock() {
+        super(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f).notSolid().noDrops());
     }
 
     @Override

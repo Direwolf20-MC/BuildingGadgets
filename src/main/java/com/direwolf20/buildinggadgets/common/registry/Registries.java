@@ -4,18 +4,12 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataFactory;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.containers.OurContainers;
 import com.direwolf20.buildinggadgets.common.inventory.handle.IHandleProvider;
 import com.direwolf20.buildinggadgets.common.inventory.handle.IObjectHandle;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObjectSerializer;
-import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.template.SerialisationSupport;
-import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
-import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -30,8 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
-
-import static com.direwolf20.buildinggadgets.common.blocks.OurBlocks.constructionBlock;
 
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public final class Registries {
@@ -54,15 +46,6 @@ public final class Registries {
         Preconditions
                 .checkState(uniqueObjectSerializers != null, "Attempted to retrieve UniqueObjectSerializerRegistry before registries were created!");
         return uniqueObjectSerializers;
-    }
-
-    public static void setup() {
-        OurItems.setup();
-    }
-
-    public static void clientSetup() {
-        OurContainers.registerContainerScreens();
-        constructionBlock.initColorHandler(Minecraft.getInstance().getBlockColors());
     }
 
     public static void onCreateRegistries() {

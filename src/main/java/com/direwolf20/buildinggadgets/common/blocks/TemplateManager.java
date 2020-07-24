@@ -1,10 +1,11 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.common.entities.tiles.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
@@ -29,8 +30,8 @@ import javax.annotation.Nullable;
 public class TemplateManager extends Block {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
-    public TemplateManager(Properties builder) {
-        super(builder);
+    public TemplateManager() {
+        super(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f));
         setDefaultState(getStateContainer().getBaseState().with(FACING, Direction.SOUTH));
     }
 

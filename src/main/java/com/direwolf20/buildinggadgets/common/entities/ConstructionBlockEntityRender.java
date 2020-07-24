@@ -35,7 +35,7 @@ public class ConstructionBlockEntityRender extends EntityRenderer<ConstructionBl
         IVertexBuilder builder;
         Minecraft mc = Minecraft.getInstance();
         builder = buffer.getBuffer(OurRenderTypes.RenderBlock);
-        BlockState renderBlockState = OurBlocks.constructionBlockDense.getDefaultState();
+        BlockState renderBlockState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
         int teCounter = entityIn.ticksExisted;
         int maxLife = entityIn.getMaxLife();
         teCounter = teCounter > maxLife ? maxLife : teCounter;

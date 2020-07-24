@@ -14,7 +14,7 @@ import com.direwolf20.buildinggadgets.common.items.GenericPasteContainer;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.registry.TopologicalRegistryBuilder;
-import com.direwolf20.buildinggadgets.common.entities.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -48,7 +48,7 @@ import java.util.function.Supplier;
  *  This entire class could do with some refactoring and cleaning :grin:
  */
 public class InventoryHelper {
-    public static final MaterialList PASTE_LIST = MaterialList.of(new UniqueItem(OurItems.constructionPaste));
+    public static final MaterialList PASTE_LIST = MaterialList.of(new UniqueItem(OurItems.CONSTRUCTION_PASTE_ITEM.get()));
     private static IProperty AXIS = EnumProperty.create("axis", Direction.Axis.class);
 
     private static final Set<IProperty> SAFE_PROPERTIES =
@@ -195,7 +195,7 @@ public class InventoryHelper {
 
         long count = 0;
         PlayerInventory inv = player.inventory;
-        Item item = OurItems.constructionPaste;
+        Item item = OurItems.CONSTRUCTION_PASTE_ITEM.get();
         List<Integer> slots = findItem(item, inv);
         if (slots.size() > 0) {
             for (int slot : slots) {
@@ -323,7 +323,7 @@ public class InventoryHelper {
         BlockState state = world.getBlockState(pos);
         if (state.getBlock() instanceof FlowingFluidBlock || ! state.getFluidState().isEmpty() )
             return Optional.empty();
-        if (state.getBlock() == OurBlocks.constructionBlock) {
+        if (state.getBlock() == OurBlocks.CONSTRUCTION_BLOCK.get()) {
             TileEntity te = world.getTileEntity(pos);
             if (te instanceof ConstructionBlockTileEntity) //should already be checked
                 return Optional.of(((ConstructionBlockTileEntity) te).getConstructionBlockData());

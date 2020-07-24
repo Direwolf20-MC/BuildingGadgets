@@ -3,15 +3,18 @@ package com.direwolf20.buildinggadgets.client;
 import com.direwolf20.buildinggadgets.client.cache.CacheTemplateProvider;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.models.ConstructionBakedModel;
+import com.direwolf20.buildinggadgets.client.screen.TemplateManagerGUI;
+import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
+import com.direwolf20.buildinggadgets.common.containers.OurContainers;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
-import com.direwolf20.buildinggadgets.common.registry.Registries;
-import com.direwolf20.buildinggadgets.common.entities.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.model.BakedQuad;
@@ -39,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+
 public class ClientProxy {
     public static final CacheTemplateProvider CACHE_TEMPLATE_PROVIDER = new CacheTemplateProvider();
     public static void clientSetup(final IEventBus eventBus) {
@@ -49,9 +53,10 @@ public class ClientProxy {
         MinecraftForge.EVENT_BUS.addListener(EventTooltip::onDrawTooltip);
         MinecraftForge.EVENT_BUS.addListener(ClientProxy::onPlayerLoggedOut);
 
-        // @michaelhillcox: I have questions on why this is here
-        Registries.clientSetup();
-        RenderTypeLookup.setRenderLayer(OurBlocks.constructionBlock, (RenderType) -> true);
+        ScreenManager.registerFactory(OurContainers.TEMPLATE_MANAGER_CONTAINER.get(), TemplateManagerGUI::new);
+        ((ConstructionBlock) OurBlocks.CONSTRUCTION_BLOCK.get()).initColorHandler(Minecraft.getInstance().getBlockColors());
+
+        RenderTypeLookup.setRenderLayer(OurBlocks.CONSTRUCTION_BLOCK.get(), (RenderType) -> true);
     }
 
     private static void registerSprites(TextureStitchEvent.Pre event) {
@@ -108,7 +113,7 @@ public class ClientProxy {
                 facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 RenderType layer = MinecraftForgeClient.getRenderLayer();
                 if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
-                    facadeState = OurBlocks.constructionBlockDense.getDefaultState();
+                    facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
                 if (layer != null && ! RenderTypeLookup.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
@@ -164,7 +169,7 @@ public class ClientProxy {
                 facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 RenderType layer = MinecraftForgeClient.getRenderLayer();
                 if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
-                    facadeState = OurBlocks.constructionBlockDense.getDefaultState();
+                    facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
                 if (layer != null && ! RenderTypeLookup.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }

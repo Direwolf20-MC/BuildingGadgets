@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.client.models;
 
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
-import com.direwolf20.buildinggadgets.common.entities.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -61,7 +61,7 @@ public class ConstructionBakedModel implements IDynamicBakedModel {
         facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
         RenderType layer = MinecraftForgeClient.getRenderLayer();
         if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
-            facadeState = OurBlocks.constructionBlockDense.getDefaultState();
+            facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
         if (layer != null && ! RenderTypeLookup.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
             return Collections.emptyList();
         }

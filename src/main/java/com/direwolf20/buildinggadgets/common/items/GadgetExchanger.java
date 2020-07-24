@@ -20,13 +20,14 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.save.Undo;
-import com.direwolf20.buildinggadgets.common.entities.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.google.common.collect.ImmutableMultiset;
@@ -66,7 +67,6 @@ import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
@@ -74,8 +74,12 @@ import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 public class GadgetExchanger extends AbstractGadget {
     private static final MockBuilderWorld fakeWorld = new MockBuilderWorld();
 
-    public GadgetExchanger(Properties builder, IntSupplier undoLengthSupplier, String undoName) {
-        super(builder, undoLengthSupplier, undoName, TagReference.WHITELIST_EXCHANGING, TagReference.BLACKLIST_EXCHANGING);
+    public GadgetExchanger() {
+        super(OurItems.nonStackableItemProperties().maxDamage(1),
+                Config.GADGETS.GADGET_EXCHANGER.undoSize::get,
+                Reference.SaveReference.UNDO_EXCHANGING,
+                TagReference.WHITELIST_EXCHANGING,
+                TagReference.BLACKLIST_EXCHANGING);
     }
 
     @Override

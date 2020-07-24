@@ -25,6 +25,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.google.common.collect.ImmutableMultiset;
@@ -60,8 +61,12 @@ public class GadgetBuilding extends AbstractGadget {
 
     private static final MockBuilderWorld fakeWorld = new MockBuilderWorld();
 
-    public GadgetBuilding(Properties builder, IntSupplier undoLengthSupplier, String undoName) {
-        super(builder, undoLengthSupplier, undoName, TagReference.WHITELIST_BUILDING, TagReference.BLACKLIST_BUILDING);
+    public GadgetBuilding() {
+        super(OurItems.nonStackableItemProperties().maxDamage(1),
+                Config.GADGETS.GADGET_BUILDING.undoSize::get,
+                Reference.SaveReference.UNDO_BUILDING,
+                TagReference.WHITELIST_BUILDING,
+                TagReference.BLACKLIST_BUILDING);
     }
 
     @Override

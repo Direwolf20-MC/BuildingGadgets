@@ -32,6 +32,7 @@ import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresen
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.*;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
 import com.google.common.base.Joiner;
@@ -110,8 +111,12 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
     private static final Joiner CHUNK_JOINER = Joiner.on("; ");
 
-    public GadgetCopyPaste(Properties builder, IntSupplier undoLengthSupplier, String undoName) {
-        super(builder, undoLengthSupplier, undoName, TagReference.WHITELIST_COPY_PASTE, TagReference.BLACKLIST_COPY_PASTE);
+    public GadgetCopyPaste() {
+        super(OurItems.nonStackableItemProperties().maxDamage(1),
+                Config.GADGETS.GADGET_COPY_PASTE.undoSize::get,
+                Reference.SaveReference.UNDO_COPY_PASTE,
+                TagReference.WHITELIST_COPY_PASTE,
+                TagReference.BLACKLIST_COPY_PASTE);
     }
 
     @Override

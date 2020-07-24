@@ -144,7 +144,7 @@ public class EventTooltip {
                     j++;
                 }
                 if (!match.isSuccess()) {
-                    IUniqueObject<?> pasteItem = new UniqueItem(OurItems.constructionPaste);
+                    IUniqueObject<?> pasteItem = new UniqueItem(OurItems.CONSTRUCTION_PASTE_ITEM.get());
                     Multiset<IUniqueObject<?>> pasteSet = ImmutableMultiset.<IUniqueObject<?>>builder()
                             .addCopies(pasteItem, totalMissing)
                             .build();

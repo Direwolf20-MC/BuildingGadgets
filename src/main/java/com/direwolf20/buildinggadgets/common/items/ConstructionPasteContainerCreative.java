@@ -11,8 +11,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ConstructionPasteContainerCreative extends GenericPasteContainer {
-    public ConstructionPasteContainerCreative(Properties builder) {
-        super(builder);
+    public ConstructionPasteContainerCreative() {
+        super(OurItems.nonStackableItemProperties());
     }
 
     @Override

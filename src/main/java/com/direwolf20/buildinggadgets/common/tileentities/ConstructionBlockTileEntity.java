@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.entities.tiles;
+package com.direwolf20.buildinggadgets.common.tileentities;
 
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;

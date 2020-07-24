@@ -1,7 +1,5 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
-import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
-import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.EntityReference;
 import net.minecraft.entity.EntityClassification;
@@ -13,11 +11,6 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 
-/**
- * @implNote This class does not require a builder like {@link OurItems} or {@link OurBlocks}
- *           as we only have a single entity so far with no plans to change this any time
- *           soon.
- */
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public class OurEntities {
     private OurEntities() {}

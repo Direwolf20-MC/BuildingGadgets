@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.items.modes;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
-import com.direwolf20.buildinggadgets.common.entities.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import net.minecraft.block.BlockState;
@@ -74,7 +74,7 @@ public abstract class AbstractMode {
         TileEntity te = context.getWorld().getTileEntity(pos);
 
         if ((worldBlockState != lookingAtState && !context.isFuzzy())
-                || worldBlockState == OurBlocks.effectBlock.getDefaultState()
+                || worldBlockState == OurBlocks.EFFECT_BLOCK.get().getDefaultState()
                 || worldBlockState == context.getSetState() )
             return false;
 

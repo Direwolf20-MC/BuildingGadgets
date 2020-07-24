@@ -11,6 +11,7 @@ import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.ISubtypeRegistration;
 import net.minecraft.client.renderer.Rectangle2d;
+import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 
 import java.util.ArrayList;
@@ -31,14 +32,14 @@ public class BuildingGadgetsJEI implements IModPlugin {
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {
-        List<AbstractGadget> gadgets = new ArrayList<AbstractGadget>(){{
-            add(OurItems.gadgetBuilding);
-            add(OurItems.gadgetExchanger);
-            add(OurItems.gadgetDestruction);
-            add(OurItems.gadgetCopyPaste);
+        List<Item> gadgets = new ArrayList<Item>(){{
+            add(OurItems.BUILDING_GADGET_ITEM.get());
+            add(OurItems.EXCHANGING_GADGET_ITEM.get());
+            add(OurItems.DESTRUCTION_GADGET_ITEM.get());
+            add(OurItems.COPY_PASTE_GADGET_ITEM.get());
         }};
 
-        for(AbstractGadget gadget : gadgets) {
+        for(Item gadget : gadgets) {
             registration.registerSubtypeInterpreter(gadget, itemStack -> {
                 if (!(itemStack.getItem() instanceof AbstractGadget))
                     return ISubtypeInterpreter.NONE;

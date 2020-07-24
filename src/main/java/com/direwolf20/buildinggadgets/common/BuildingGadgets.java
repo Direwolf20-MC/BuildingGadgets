@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common;
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.renderer.EffectBlockTER;
 import com.direwolf20.buildinggadgets.client.screen.GuiMod;
+import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
@@ -10,12 +11,14 @@ import com.direwolf20.buildinggadgets.common.commands.OverrideBuildSizeCommand;
 import com.direwolf20.buildinggadgets.common.commands.OverrideCopySizeCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.config.RecipeConstructionPaste.Serializer;
+import com.direwolf20.buildinggadgets.common.containers.OurContainers;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.Registries;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
-import com.direwolf20.buildinggadgets.common.entities.tiles.EffectBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.EffectBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.OurTileEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.command.Commands;
@@ -51,7 +54,7 @@ public final class BuildingGadgets {
     public static ItemGroup creativeTab = new ItemGroup(Reference.MODID) {
         @Override
         public ItemStack createIcon() {
-            ItemStack stack = new ItemStack(OurItems.gadgetBuilding);
+            ItemStack stack = new ItemStack(OurItems.BUILDING_GADGET_ITEM.get());
             stack.getOrCreateTag().putByte(NBTKeys.CREATIVE_MARKER, (byte) 0);
             return stack;
         }
@@ -66,6 +69,11 @@ public final class BuildingGadgets {
 
     public BuildingGadgets() {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        OurBlocks.BLOCKS.register(eventBus);
+        OurItems.ITEMS.register(eventBus);
+        OurTileEntities.TILE_ENTITIES.register(eventBus);
+        OurContainers.CONTAINERS.register(eventBus);
 
         ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
         ModLoadingContext.get().registerConfig(Type.COMMON, Config.COMMON_CONFIG);
@@ -83,8 +91,6 @@ public final class BuildingGadgets {
 
         eventBus.addGenericListener(IRecipeSerializer.class, this::onRecipeRegister);
         eventBus.addListener(this::onEnqueueIMC);
-
-        Registries.setup();
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {
@@ -95,6 +101,7 @@ public final class BuildingGadgets {
 
     private void setup(final FMLCommonSetupEvent event) {
         theMod = (BuildingGadgets) ModLoadingContext.get().getActiveContainer().getMod();
+
         CapabilityBlockProvider.register();
         CapabilityTemplate.register();
         PacketHandler.register();

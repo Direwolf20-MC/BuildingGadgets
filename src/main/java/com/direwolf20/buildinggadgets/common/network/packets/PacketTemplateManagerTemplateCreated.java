@@ -47,7 +47,7 @@ public final class PacketTemplateManagerTemplateCreated extends UUIDPacket {
                     TileEntity tileEntity = world.getTileEntity(pos);
                     if (tileEntity != null) {
                         tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
-                            ItemStack stack = new ItemStack(OurItems.template);
+                            ItemStack stack = new ItemStack(OurItems.TEMPLATE_ITEM.get());
                             ITemplateKey key = stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
                             UUID id = key.getTemplateId(this::getId);
                             if (! id.equals(getId()))

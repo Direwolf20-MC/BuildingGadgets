@@ -20,8 +20,8 @@ import java.util.List;
 
 public class TemplateItem extends Item {
 
-    public TemplateItem(Properties builder) {
-        super(builder.maxStackSize(1));
+    public TemplateItem() {
+        super(OurItems.itemProperties().maxStackSize(1));
     }
 
     @Nullable
