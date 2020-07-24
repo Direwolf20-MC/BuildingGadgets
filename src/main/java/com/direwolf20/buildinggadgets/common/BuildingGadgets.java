@@ -9,21 +9,22 @@ import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.commands.OverrideBuildSizeCommand;
 import com.direwolf20.buildinggadgets.common.commands.OverrideCopySizeCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.config.crafting.RecipeConstructionPaste.Serializer;
+import com.direwolf20.buildinggadgets.common.config.RecipeConstructionPaste.Serializer;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.Registries;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
-import com.direwolf20.buildinggadgets.common.save.TemplateSave;
-import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.entities.tiles.EffectBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.command.Commands;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.*;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -37,12 +38,25 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.function.Consumer;
-
 @Mod(value = Reference.MODID)
 public final class BuildingGadgets {
 
     public static Logger LOG = LogManager.getLogger();
+
+    /**
+     * Register our creative tab. Notice that we're also modifying the NBT data of the
+     * building gadget to remove the damage / energy indicator from the creative
+     * tabs icon.
+     */
+    public static ItemGroup creativeTab = new ItemGroup(Reference.MODID) {
+        @Override
+        public ItemStack createIcon() {
+            ItemStack stack = new ItemStack(OurItems.gadgetBuilding);
+            stack.getOrCreateTag().putByte(NBTKeys.CREATIVE_MARKER, (byte) 0);
+            return stack;
+        }
+    };
+
     private static BuildingGadgets theMod = null;
 
     public static BuildingGadgets getInstance() {

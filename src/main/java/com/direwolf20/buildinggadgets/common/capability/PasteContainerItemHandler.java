@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.capability;
 
-import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainerCreative;
-import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
-import com.direwolf20.buildinggadgets.common.registry.OurItems;
+import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainerCreative;
+import com.direwolf20.buildinggadgets.common.items.GenericPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.items.IItemHandlerModifiable;

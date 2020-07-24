@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.containers;
 
-import com.direwolf20.buildinggadgets.common.registry.OurContainers;
-import com.direwolf20.buildinggadgets.common.tiles.TemplateManagerTileEntity;
+import com.direwolf20.buildinggadgets.common.entities.tiles.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.PlayerEntity;

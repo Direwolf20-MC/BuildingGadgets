@@ -3,9 +3,9 @@ package com.direwolf20.buildinggadgets.client.renderer;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRenderer;
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
-import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
+import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
+import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
+import com.direwolf20.buildinggadgets.common.entities.tiles.EffectBlockTileEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.BlockState;
@@ -71,7 +71,7 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
         if (tile.isUsingPaste() && toolMode == EffectBlock.Mode.PLACE)
             renderBlockState = OurBlocks.constructionBlockDense.getDefaultState();
 
-        builder = buffer2.getBuffer(ModRenderTypes.RenderBlock);
+        builder = buffer2.getBuffer(OurRenderTypes.RenderBlock);
         if (!renderData.getState().hasTileEntity()) {
             IBakedModel ibakedmodel = dispatcher.getModelForState(renderBlockState);
             for (Direction direction : Direction.values()) {
@@ -97,7 +97,7 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
         stack.pop();
         stack.push();
 
-        builder = buffer.getBuffer(ModRenderTypes.MissingBlockOverlay);
+        builder = buffer.getBuffer(OurRenderTypes.MissingBlockOverlay);
 
         float x = 0,
                 y = 0,

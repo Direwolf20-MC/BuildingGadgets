@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.client.screen.components;
 
-import com.direwolf20.buildinggadgets.common.registry.OurSounds;
+import com.direwolf20.buildinggadgets.client.OurSounds;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;

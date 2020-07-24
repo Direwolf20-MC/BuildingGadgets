@@ -4,9 +4,11 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataFactory;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.common.containers.OurContainers;
 import com.direwolf20.buildinggadgets.common.inventory.handle.IHandleProvider;
 import com.direwolf20.buildinggadgets.common.inventory.handle.IObjectHandle;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObjectSerializer;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.template.SerialisationSupport;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -29,23 +31,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import static com.direwolf20.buildinggadgets.common.registry.OurBlocks.constructionBlock;
+import static com.direwolf20.buildinggadgets.common.blocks.OurBlocks.constructionBlock;
 
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public final class Registries {
-    /**
-     * Register our creative tab. Notice that we're also modifying the NBT data of the
-     * building gadget to remove the damage / energy indicator from the creative
-     * tabs icon.
-     */
-    public static ItemGroup creativeTab = new ItemGroup(Reference.MODID) {
-        @Override
-        public ItemStack createIcon() {
-            ItemStack stack = new ItemStack(OurItems.gadgetBuilding);
-            stack.getOrCreateTag().putByte(NBTKeys.CREATIVE_MARKER, (byte) 0);
-            return stack;
-        }
-    };
 
     private Registries() {}
 

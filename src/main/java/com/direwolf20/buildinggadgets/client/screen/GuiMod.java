@@ -1,9 +1,8 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
-import com.direwolf20.buildinggadgets.client.screen.materiallist.MaterialListGUI;
 import com.direwolf20.buildinggadgets.common.items.TemplateItem;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetDestruction;
+import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.items.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
