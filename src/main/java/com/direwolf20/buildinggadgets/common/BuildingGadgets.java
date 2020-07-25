@@ -93,7 +93,7 @@ public final class BuildingGadgets {
     }
 
     private void clientSetup(final FMLClientSetupEvent event) {
-        ClientRegistry.bindTileEntityRenderer(EffectBlockTileEntity.TYPE, EffectBlockTER::new);
+        ClientRegistry.bindTileEntityRenderer(OurTileEntities.EFFECT_BLOCK_TILE_ENTITY.get(), EffectBlockTER::new);
         ClientProxy.clientSetup(FMLJavaModLoadingContext.get().getModEventBus());
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> GuiMod::openScreen);
     }

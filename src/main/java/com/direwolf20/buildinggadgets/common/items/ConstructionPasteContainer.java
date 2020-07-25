@@ -17,6 +17,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.function.IntSupplier;
 
 public class ConstructionPasteContainer extends Item {
+    private static final ResourceLocation LEVEL = new ResourceLocation("level");
 
     private final IntSupplier maxCapacity;
     private final boolean isCreative;
@@ -39,7 +41,8 @@ public class ConstructionPasteContainer extends Item {
         this.isCreative = isCreative;
         this.maxCapacity = maxCapacity;
 
-        addPropertyOverride(Reference.PROPERTY_OVERRIDE_LEVEL, (stack, world, entity) -> {
+        // This is used for setting up the texture change :D
+        addPropertyOverride(LEVEL, (stack, world, entity) -> {
             float percent = ConstructionPasteContainer.getPasteAmount(stack) / (float) this.maxCapacity.getAsInt();
             return MathHelper.floor(percent * 4) / 4F;
         });
@@ -76,7 +79,7 @@ public class ConstructionPasteContainer extends Item {
         player.setActiveHand(hand);
         PlayerInventory inv = player.inventory;
         if (!world.isRemote) {
-            for (int i = 0; i < 36; ++i) {
+            for (int i = 0; i < 36; ++i) { // todo: this is awful. hardcoded int
                 ItemStack itemStack = inv.getStackInSlot(i);
                 if (itemStack.getItem() instanceof ConstructionPaste) {
                     InventoryHelper.addPasteToContainer(player, itemStack);
@@ -90,7 +93,7 @@ public class ConstructionPasteContainer extends Item {
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flag) {
         TranslationTextComponent key = isCreative
                 ? TooltipTranslation.PASTECONTAINER_CREATIVE_AMOUNT.componentTranslation()
-                : TooltipTranslation.PASTECONTAINER_AMOUNT.componentTranslation(getPasteCount(stack));
+                : TooltipTranslation.PASTECONTAINER_AMOUNT.componentTranslation(getPasteCount(stack), getMaxCapacity());
 
         list.add(key.setStyle(Styles.WHITE));
     }

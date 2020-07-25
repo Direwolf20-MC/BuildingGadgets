@@ -32,15 +32,12 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class TemplateManagerTileEntity extends TileEntity implements INamedContainerProvider {
-    @ObjectHolder(Reference.TileEntityReference.TEMPLATE_MANAGER_TILE)
-    public static TileEntityType<TemplateManagerTileEntity> TYPE;
-
     public static final Tag<Item> TEMPLATE_CONVERTIBLES = new ItemTags.Wrapper(ItemReference.TAG_TEMPLATE_CONVERTIBLE);
 
     public static final int SIZE = 2;
 
     public TemplateManagerTileEntity() {
-        super(TYPE);
+        super(OurTileEntities.TEMPLATE_MANAGER_TILE_ENTITY.get());
     }
 
     // This item handler will hold our inventory slots

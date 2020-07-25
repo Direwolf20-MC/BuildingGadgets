@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.OurTileEntities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -60,7 +61,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return ConstructionBlockTileEntity.TYPE.create();
+        return OurTileEntities.CONSTRUCTION_BLOCK_TILE_ENTITY.get().create();
     }
 
     public boolean isMimicNull(BlockState mimicBlock) {

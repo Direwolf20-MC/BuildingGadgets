@@ -22,7 +22,7 @@ public enum TooltipTranslation implements ITranslationProvider {
     GADGET_UNDO("gadget.undo", 0),
     GADGET_ROTATE("gadget.rotate", 0),
     GADGET_PALETTE_OVERFLOW("gadget.paletteOverflow", 0),
-    PASTECONTAINER_AMOUNT("pasteContainer.amount", 1),
+    PASTECONTAINER_AMOUNT("pasteContainer.amount", 2),
     PASTECONTAINER_CREATIVE_AMOUNT("pasteContainer.creative.amountMsg", 0),
     DONOTUSE_TEXT("donotuse", 0),
     TEMPLATE_NAME("template.name", 1),

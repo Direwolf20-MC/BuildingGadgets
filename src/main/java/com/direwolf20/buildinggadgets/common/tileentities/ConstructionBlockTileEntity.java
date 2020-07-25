@@ -17,15 +17,13 @@ import net.minecraftforge.registries.ObjectHolder;
 import javax.annotation.Nonnull;
 
 public class ConstructionBlockTileEntity extends TileEntity {
-    @ObjectHolder(Reference.TileEntityReference.CONSTRUCTION_TILE)
-    public static TileEntityType<ConstructionBlockTileEntity> TYPE;
 
     private BlockData blockState;
     private BlockData actualBlockState;
     public static final ModelProperty<BlockState> FACADE_STATE = new ModelProperty<>();
 
     public ConstructionBlockTileEntity() {
-        super(TYPE);
+        super(OurTileEntities.CONSTRUCTION_BLOCK_TILE_ENTITY.get());
     }
 
     public void setBlockState(BlockData state, BlockData actualState) {

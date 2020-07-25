@@ -19,9 +19,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class EffectBlockTileEntity extends TileEntity implements ITickableTileEntity {
-    @ObjectHolder(Reference.TileEntityReference.EFFECT_BLOCK_TILE)
-    public static TileEntityType<EffectBlockTileEntity> TYPE;
-
     /**
      * Even though this is called "rendered", is will be used for replacement under normal conditions.
      */
@@ -37,7 +34,7 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
     private int ticks;
 
     public EffectBlockTileEntity() {
-        super(TYPE);
+        super(OurTileEntities.EFFECT_BLOCK_TILE_ENTITY.get());
     }
 
     public void initializeData(BlockState curState, @Nullable TileEntity te, BlockData replacementBlock, Mode mode, boolean usePaste) {

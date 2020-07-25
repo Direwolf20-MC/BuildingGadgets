@@ -48,7 +48,7 @@
   "tooltip.gadget.connected": "Connected %s",
   "tooltip.gadget.connected_area": "Connected Area: %s",
   "tooltip.gadget.connected_surface": "Connected Surface",
-  "tooltip.pasteContainer.amount": "Amount: %d",
+  "tooltip.pasteContainer.amount": "Amount: %d / %d",
   "tooltip.pasteContainer.creative.amountMsg": "Amount: Infinite!",
   "tooltip.charger.energy": "Energy: %s FE",
   "tooltip.charger.burn_time": "Burn time left: %ss",
