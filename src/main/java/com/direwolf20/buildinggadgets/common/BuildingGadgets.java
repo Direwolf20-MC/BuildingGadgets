@@ -76,7 +76,6 @@ public final class BuildingGadgets {
         OurContainers.CONTAINERS.register(eventBus);
 
         ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
-        ModLoadingContext.get().registerConfig(Type.COMMON, Config.COMMON_CONFIG);
         ModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_CONFIG);
 
         MinecraftForge.EVENT_BUS.addListener(this::serverLoad);

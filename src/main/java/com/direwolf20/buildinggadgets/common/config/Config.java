@@ -13,7 +13,6 @@ public class Config {
 
     private static final String LANG_KEY_ROOT = "config." + Reference.MODID;
     private static final String LANG_KEY_GENERAL = LANG_KEY_ROOT + "." + CATEGORY_GENERAL;
-    private static final String LANG_KEY_CHARGING_STATION = LANG_KEY_ROOT + ".charging";
     private static final String LANG_KEY_BLACKLIST = LANG_KEY_ROOT + ".blacklist";
     private static final String LANG_KEY_GADGETS = LANG_KEY_ROOT + ".gadgets";
     private static final String LANG_KEY_PASTE_CONTAINERS = LANG_KEY_ROOT + ".pasteContainers";
@@ -23,7 +22,6 @@ public class Config {
     private static final String LANG_KEY_GADGET_DESTRUCTION = LANG_KEY_GADGETS + ".gadgetDestruction";
     private static final String LANG_KEY_GADGET_COPY_PASTE = LANG_KEY_GADGETS + ".gadgetCopyPaste";
 
-    private static final Builder COMMON_BUILDER = new Builder();
     private static final Builder SERVER_BUILDER = new Builder();
     private static final Builder CLIENT_BUILDER = new Builder();
 
@@ -40,8 +38,8 @@ public class Config {
         public final BooleanValue allowOverwriteBlocks;
 
         private CategoryGeneral() {
-            SERVER_BUILDER.comment("General mod settings")/*.translation(LANG_KEY_GENERAL)*/.push("general");
-            CLIENT_BUILDER.comment("General mod settings")/*.translation(LANG_KEY_GENERAL)*/.push("general");
+            SERVER_BUILDER.comment("General mod settings").translation(LANG_KEY_GENERAL).push("general");
+            CLIENT_BUILDER.comment("General mod settings").translation(LANG_KEY_GENERAL).push("general");
 
             allowAbsoluteCoords = SERVER_BUILDER
                     .comment("Defined whether or not a player can use Absolute Coords mode in the Copy Paste Gadget")
@@ -79,8 +77,7 @@ public class Config {
         public final CategoryGadgetCopyPaste GADGET_COPY_PASTE;
 
         private CategoryGadgets() {
-            SERVER_BUILDER.comment("Configure the Gadgets")/*.translation(LANG_KEY_GADGETS)*/.push("Gadgets");
-            COMMON_BUILDER.comment("Configure the Gadgets")/*.translation(LANG_KEY_GADGETS)*/.push("Gadgets");
+            SERVER_BUILDER.comment("Configure the Gadgets").translation(LANG_KEY_GADGETS).push("Gadgets");
             maxRange = SERVER_BUILDER
                     .comment("The max range of the Gadgets")
                     .translation(LANG_KEY_GADGETS + ".maxRange")
@@ -100,7 +97,6 @@ public class Config {
             GADGET_DESTRUCTION  = new CategoryGadgetDestruction();
             GADGET_COPY_PASTE   = new CategoryGadgetCopyPaste();
 
-            COMMON_BUILDER.pop();
             SERVER_BUILDER.pop();
         }
 
@@ -132,7 +128,7 @@ public class Config {
             public final IntValue undoSize;
 
             private CategoryGadgetBuilding() {
-                SERVER_BUILDER.comment("Energy Cost & Durability of the Building Gadget")/*.translation(LANG_KEY_GADGET_BUILDING)*/.push("Building Gadget");
+                SERVER_BUILDER.comment("Energy Cost & Durability of the Building Gadget").translation(LANG_KEY_GADGET_BUILDING).push("Building Gadget");
 
                 maxEnergy    = getMaxEnergy(500000);
                 energyCost   = getEnergyCost(50);
@@ -149,7 +145,7 @@ public class Config {
             public final IntValue undoSize;
 
             private CategoryGadgetExchanger() {
-                SERVER_BUILDER.comment("Energy Cost & Durability of the Exchanging Gadget")/*.translation(LANG_KEY_GADGET_EXCHANGER)*/.push("Exchanging Gadget");
+                SERVER_BUILDER.comment("Energy Cost & Durability of the Exchanging Gadget").translation(LANG_KEY_GADGET_EXCHANGER).push("Exchanging Gadget");
 
                 maxEnergy   = getMaxEnergy(500000);
                 energyCost  = getEnergyCost(100);
@@ -169,7 +165,10 @@ public class Config {
             public final BooleanValue nonFuzzyEnabled;
 
             private CategoryGadgetDestruction() {
-                SERVER_BUILDER.comment("Energy Cost, Durability & Maximum Energy of the Destruction Gadget")/*.translation(LANG_KEY_GADGET_DESTRUCTION)*/.push("Destruction Gadget");
+                SERVER_BUILDER
+                        .comment("Energy Cost, Durability & Maximum Energy of the Destruction Gadget")
+                        .translation(LANG_KEY_GADGET_DESTRUCTION)
+                        .push("Destruction Gadget");
 
                 maxEnergy   = getMaxEnergy(1000000);
                 energyCost  = getEnergyCost(200);
@@ -206,7 +205,10 @@ public class Config {
             public final IntValue maxBuildSize;
 
             private CategoryGadgetCopyPaste() {
-                SERVER_BUILDER.comment("Energy Cost & Durability of the Copy-Paste Gadget")/*.translation(LANG_KEY_GADGET_COPY_PASTE)*/.push("Copy-Paste Gadget");
+                SERVER_BUILDER
+                        .comment("Energy Cost & Durability of the Copy-Paste Gadget")
+                        .translation(LANG_KEY_GADGET_COPY_PASTE)
+                        .push("Copy-Paste Gadget");
 
                 maxEnergy   = getMaxEnergy(500000);
                 energyCost  = getEnergyCost(50);
@@ -241,7 +243,10 @@ public class Config {
         public final IntValue capacityT1, capacityT2, capacityT3;
 
         private CategoryPasteContainers() {
-            SERVER_BUILDER.comment("Configure the Paste Containers")/*.translation(LANG_KEY_PASTE_CONTAINERS)*/.push("Paste Containers");
+            SERVER_BUILDER
+                    .comment("Configure the Paste Containers")
+                    .translation(LANG_KEY_PASTE_CONTAINERS)
+                    .push("Paste Containers");
 
             capacityT1 = getMaxCapacity(1);
             capacityT2 = getMaxCapacity(2);
@@ -258,7 +263,6 @@ public class Config {
         }
     }
 
-    public static final ForgeConfigSpec COMMON_CONFIG = COMMON_BUILDER.build();
     public static final ForgeConfigSpec SERVER_CONFIG = SERVER_BUILDER.build();
     public static final ForgeConfigSpec CLIENT_CONFIG = CLIENT_BUILDER.build();
 }

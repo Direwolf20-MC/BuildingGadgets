@@ -1,1 +1,6 @@
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 package com.direwolf20.buildinggadgets.client.renderer;
+
+import mcp.MethodsReturnNonnullByDefault;
+import javax.annotation.ParametersAreNonnullByDefault;
