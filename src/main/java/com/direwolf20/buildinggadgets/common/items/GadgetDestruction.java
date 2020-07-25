@@ -191,7 +191,7 @@ public class GadgetDestruction extends AbstractGadget {
         setAnchorSide(stack, null);
     }
 
-    public static List<BlockPos> getClearingPositions(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
+    public static List<BlockPos> getArea(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
         ItemStack tool = getGadget(player);
         int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
 
@@ -236,7 +236,7 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public void clearArea(World world, BlockPos pos, Direction side, ServerPlayerEntity player, ItemStack stack) {
-        List<BlockPos> positions = getClearingPositions(world, pos, side, player, stack);
+        List<BlockPos> positions = getArea(world, pos, side, player, stack);
         Undo.Builder builder = Undo.builder();
 
         for (BlockPos clearPos : positions) {

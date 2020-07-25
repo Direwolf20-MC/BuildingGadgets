@@ -22,9 +22,7 @@ public class DireVertexBuffer implements AutoCloseable {
     }
 
     public void bindBuffer() {
-        RenderSystem.glBindBuffer(34962, () -> {
-            return this.glBufferId;
-        });
+        RenderSystem.glBindBuffer(34962, () -> this.glBufferId);
     }
 
     public void upload(DireBufferBuilder bufferIn) {
@@ -71,9 +69,7 @@ public class DireVertexBuffer implements AutoCloseable {
     }
 
     public static void unbindBuffer() {
-        RenderSystem.glBindBuffer(34962, () -> {
-            return 0;
-        });
+        RenderSystem.glBindBuffer(34962, () -> 0);
     }
 
     public void close() {

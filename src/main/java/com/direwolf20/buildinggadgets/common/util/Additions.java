@@ -79,7 +79,7 @@ public final class Additions {
         }
     }
 
-    //even though it's called sizeInvalid to hide it's purpose, it invokes the 9X9 easter egg
+    // even though it's called sizeInvalid to hide it's purpose, it invokes the 9X9 easter egg
     public static boolean sizeInvalid(PlayerEntity player, Region region) {
         BlockPos size = region.getMax().subtract(region.getMin());
         if (size.getX() == 8 && size.getZ() == 8) { //size is 8 if it's a 9X9

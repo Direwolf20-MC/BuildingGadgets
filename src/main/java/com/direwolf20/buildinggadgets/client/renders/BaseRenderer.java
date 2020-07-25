@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.client.renders;
 
 import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
-import com.direwolf20.buildinggadgets.client.renderer.FakeTERWorld;
+import com.direwolf20.buildinggadgets.common.world.MockTileEntityRenderWorld;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
@@ -34,7 +34,7 @@ import java.util.Set;
 public abstract class BaseRenderer {
     public static final BlockState AIR = Blocks.AIR.getDefaultState();
 
-    private static final FakeTERWorld tileEntityWorld = new FakeTERWorld();
+    private static final MockTileEntityRenderWorld tileEntityWorld = new MockTileEntityRenderWorld();
     private static final MockBuilderWorld builderWorld = new MockBuilderWorld();
     private static final Set<TileEntity> invalidTileEntities = new HashSet<>();
 
@@ -185,7 +185,7 @@ public abstract class BaseRenderer {
         return Minecraft.getInstance();
     }
 
-    public static FakeTERWorld getTileEntityWorld() {
+    public static MockTileEntityRenderWorld getTileEntityWorld() {
         return tileEntityWorld;
     }
 

@@ -30,7 +30,7 @@ public class DestructionRender extends BaseRenderer {
         World world = player.world;
         BlockPos anchor = ((AbstractGadget) heldItem.getItem()).getAnchor(heldItem);
 
-        if ((lookingAt == null || (world.getBlockState(VectorHelper.getLookingAt(player, heldItem).getPos()) == AIR)) && anchor == null)
+        if (world.getBlockState(VectorHelper.getLookingAt(player, heldItem).getPos()) == AIR && anchor == null)
             return;
 
         BlockPos startBlock = (anchor == null) ? lookingAt.getPos() : anchor;
@@ -47,7 +47,7 @@ public class DestructionRender extends BaseRenderer {
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         IVertexBuilder builder = buffer.getBuffer(OurRenderTypes.MissingBlockOverlay);
 
-        GadgetDestruction.getClearingPositions(world, startBlock, facing, player, heldItem)
+        GadgetDestruction.getArea(world, startBlock, facing, player, heldItem)
                 .forEach(pos -> renderMissingBlock(stack.getLast().getMatrix(), builder, pos));
 
         stack.pop();

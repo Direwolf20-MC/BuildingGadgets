@@ -98,25 +98,25 @@ public class CopyPasteRender extends BaseRenderer {
         IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         IVertexBuilder builder = buffer.getBuffer(OurRenderTypes.CopyGadgetLines);
 
-        Matrix4f lastMatrix = matrix.getLast().getMatrix();
-        builder.pos(lastMatrix, x, y, z).color(G, G, G, 0.0F).endVertex();
-        builder.pos(lastMatrix, x, y, z).color(G, G, G, R).endVertex();
-        builder.pos(lastMatrix, dx, y, z).color(G, B, B, R).endVertex();
-        builder.pos(lastMatrix, dx, y, dz).color(G, G, G, R).endVertex();
-        builder.pos(lastMatrix, x, y, dz).color(G, G, G, R).endVertex();
-        builder.pos(lastMatrix, x, y, z).color(B, B, G, R).endVertex();
-        builder.pos(lastMatrix, x, dy, z).color(B, G, B, R).endVertex();
-        builder.pos(lastMatrix, dx, dy, z).color(G, G, G, R).endVertex();
-        builder.pos(lastMatrix, dx, dy, dz).color(G, G, G, R).endVertex();
-        builder.pos(lastMatrix, x, dy, dz).color(G, G, G, R).endVertex();
-        builder.pos(lastMatrix, x, dy, z).color(G, G, G, R).endVertex();
-        builder.pos(lastMatrix, x, dy, dz).color(G, G, G, R).endVertex();
-        builder.pos(lastMatrix, x, y, dz).color(G, G, G, R).endVertex();
-        builder.pos(lastMatrix, dx, y, dz).color(G, G, G, R).endVertex();
-        builder.pos(lastMatrix, dx, dy, dz).color(G, G, G, R).endVertex();
-        builder.pos(lastMatrix, dx, dy, z).color(G, G, G, R).endVertex();
-        builder.pos(lastMatrix, dx, y, z).color(G, G, G, R).endVertex();
-        builder.pos(lastMatrix, dx, y, z).color(G, G, G, 0.0F).endVertex();
+        Matrix4f matrix4f = matrix.getLast().getMatrix();
+        builder.pos(matrix4f, x, y, z).color(G, G, G, 0.0F).endVertex();
+        builder.pos(matrix4f, x, y, z).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, y, z).color(G, B, B, R).endVertex();
+        builder.pos(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, x, y, z).color(B, B, G, R).endVertex();
+        builder.pos(matrix4f, x, dy, z).color(B, G, B, R).endVertex();
+        builder.pos(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, x, dy, z).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, y, z).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, y, z).color(G, G, G, 0.0F).endVertex();
 
         buffer.finish();
     }

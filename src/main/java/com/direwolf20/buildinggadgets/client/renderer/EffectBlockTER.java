@@ -79,8 +79,8 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
             }
             renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 1f, ibakedmodel.getQuads(renderBlockState, null, new Random(MathHelper.getPositionRandom(tile.getPos())), EmptyModelData.INSTANCE), 15728640, 655360);
         } else {
-            TileEntity te = BaseRenderer.getTileEntityWorld().getTE(renderBlockState, tile.getWorld());
-            TileEntityRenderer<TileEntity> teRender = BaseRenderer.getTileEntityWorld().getTER(renderBlockState, tile.getWorld());
+            TileEntity te = BaseRenderer.getTileEntityWorld().getTileEntity(renderBlockState);
+            TileEntityRenderer<TileEntity> teRender = BaseRenderer.getTileEntityWorld().getTileEntityRender(renderBlockState);
 
             if (teRender != null) {
                 te.setPos(tile.getPos());

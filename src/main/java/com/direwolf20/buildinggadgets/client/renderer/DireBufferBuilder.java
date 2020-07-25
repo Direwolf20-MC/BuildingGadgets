@@ -23,7 +23,6 @@ import java.nio.FloatBuffer;
 import java.util.BitSet;
 import java.util.List;
 
-
 public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVertexConsumer {
     private static final Logger LOGGER = LogManager.getLogger();
     private ByteBuffer byteBuffer;
