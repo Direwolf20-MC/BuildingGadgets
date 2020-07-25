@@ -7,6 +7,8 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.particle.DiggingParticle;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,8 +18,7 @@ import net.minecraft.state.IProperty;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -29,6 +30,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
 //@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
 public class ConstructionBlock extends Block /*implements IFacade*/ {
@@ -211,161 +213,6 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return !isMimicNull(mimic) ? mimic.propagatesSkylightDown(reader, pos) : super.propagatesSkylightDown(state, reader, pos);
     }
 
-    /*@Override
-    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        BlockState mimic = getActualMimicBlock(world, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.randomTick(world, pos, random);
-        } else {
-            super.randomTick(state, world, pos, random);
-        }
-    }
-
-    @Override
-    public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.getBlock().tick(state, worldIn, pos, random);
-        } else {
-            super.tick(state, worldIn, pos, random);
-        }
-    }*/
-
-    /**
-     * Called periodically clientside on blocks near the player to show effects (like furnace fire particles). Note that
-     * this method is unrelated to ? and ?, and will always be called regardless
-     * of whether the block can receive random update ticks
-     */
-    /*@Override
-    public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            try {
-                mimic.getBlock().animateTick(stateIn, worldIn, pos, rand);
-            } catch (Exception var8) {
-                super.animateTick(stateIn, worldIn, pos, rand);
-            }
-        } else {
-            super.animateTick(stateIn, worldIn, pos, rand);
-        }
-    }*/
-
-    /**
-     * Called when a neighboring block was changed and marks that this state should perform any checks during a neighbor
-     * change. Cases may include when redstone power is updated, cactus blocks popping off due to a neighboring solid
-     * block, etc.
-     */
-    /*@Override
-    public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean p_220069_6_) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.neighborChanged(worldIn, pos, blockIn, fromPos, p_220069_6_);
-        } else {
-            super.neighborChanged(state, worldIn, pos, blockIn, fromPos, p_220069_6_);
-        }
-    }*/
-
-    /**
-     * Get the hardness of this Block relative to the ability of the given player
-     * @deprecated call via {@link BlockState#getPlayerRelativeBlockHardness(PlayerEntity, IBlockReader, BlockPos)} whenever
-     * possible. Implementing/overriding is fine.
-     */
-    /*@Override
-    public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        return !isMimicNull(mimic) ? mimic.getPlayerRelativeBlockHardness(player, worldIn, pos) : super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
-    }
-
-    @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        return ! isMimicNull(mimic) ? super.onBlockActivated(state, worldIn, pos, player, handIn, hit) : super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
-    }*/
-
-    /**
-     * Called when the given entity walks on this Block
-     */
-    /*@Override
-    public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.getBlock().onEntityWalk(worldIn, pos, entityIn);
-        } else {
-            super.onEntityWalk(worldIn, pos, entityIn);
-        }
-    }
-
-    @Nullable
-    @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        return super.getStateForPlacement(context);
-    }
-
-    @Override
-    public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            super.onBlockClicked(state, worldIn, pos, player);
-            //mimic.onBlockClicked(worldIn, pos, player);
-        } else {
-            super.onBlockClicked(state, worldIn, pos, player);
-        }
-    }*/
-
-    /**
-     * @deprecated call via {@link BlockState#getWeakPower(IBlockReader, BlockPos, Direction)} whenever possible.
-     * Implementing/overriding is fine.
-     */
-    /*@Override
-    public int getWeakPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-        BlockState mimic = getActualMimicBlock(blockAccess, pos);
-        return !isMimicNull(mimic) ? mimic.getWeakPower(blockAccess, pos, side) : super.getWeakPower(blockState, blockAccess, pos, side);
-    }*/
-
-    /**
-     * @deprecated call via {@link BlockState#getStrongPower(IBlockReader, BlockPos, Direction)} whenever possible.
-     * Implementing/overriding is fine.
-     */
-    /*@Override
-    public int getStrongPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-        BlockState mimic = getActualMimicBlock(blockAccess, pos);
-        return !isMimicNull(mimic) ? mimic.getStrongPower(blockAccess, pos, side) : super.getStrongPower(blockState, blockAccess, pos, side);
-    }*/
-
-    /**
-     * @deprecated call via {@link BlockState#getPushReaction()} whenever possible. Implementing/overriding is fine.
-     */
-    /*@Override
-    public PushReaction getPushReaction(BlockState state) {
-        return PushReaction.BLOCK;
-    }*/
-
-    /**
-     * Block's chance to react to a living entity falling on it.
-     */
-    /*@Override
-    public void onFallenUpon(World worldIn, BlockPos pos, Entity entityIn, float fallDistance) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.getBlock().onFallenUpon(worldIn, pos, entityIn, fallDistance);
-        } else {
-            super.onFallenUpon(worldIn, pos, entityIn, fallDistance);
-        }
-    }*/
-
-    /**
-     * Called similar to random ticks, but only when it is raining.
-     */
-    /*@Override
-    public void fillWithRain(World worldIn, BlockPos pos) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.getBlock().fillWithRain(worldIn, pos);
-        } else {
-            super.fillWithRain(worldIn, pos);
-        }
-    }*/
-
     /**
      * @deprecated call via whenever possible.
      * Implementing/overriding is fine.
@@ -375,12 +222,6 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
         return !isMimicNull(mimic) ? mimic.getOffset(worldIn, pos) : super.getOffset(state, worldIn, pos);
     }
-
-    /*@Override
-    public boolean canSustainPlant(BlockState state, IBlockReader world, BlockPos pos, Direction facing, IPlantable plantable) {
-        BlockState mimic = getActualMimicBlock(world, pos);
-        return !isMimicNull(mimic) ? mimic.canSustainPlant(world, pos, facing, plantable) : super.canSustainPlant(state, world, pos, facing, plantable);
-    }*/
 
     // Todo re-eval
    /* @Override
@@ -405,7 +246,6 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
             return true;
         }
     }*/
-
 
     @Override
     public boolean isNormalCube(BlockState state, IBlockReader world, BlockPos pos) {
