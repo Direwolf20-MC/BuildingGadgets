@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.config;
 
-import com.direwolf20.buildinggadgets.common.items.GenericPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
 import com.google.gson.JsonObject;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
@@ -24,10 +24,10 @@ public class RecipeConstructionPaste extends ShapedRecipe {
             int totalPaste = 0;
             for (int i = 0; i < craftingInventory.getSizeInventory(); i++) { // For each slot in the crafting inventory,
                 final ItemStack ingredient = craftingInventory.getStackInSlot(i); // Get the ingredient in the slot
-                if (ingredient.getItem() instanceof GenericPasteContainer) // If it's a Paste Container,
-                    totalPaste += GenericPasteContainer.getPasteAmount(ingredient);
+                if (ingredient.getItem() instanceof ConstructionPasteContainer) // If it's a Paste Container,
+                    totalPaste += ConstructionPasteContainer.getPasteAmount(ingredient);
             }
-            GenericPasteContainer.setPasteAmount(output, totalPaste);
+            ConstructionPasteContainer.setPasteAmount(output, totalPaste);
         }
         return output; // Return the modified output
     }

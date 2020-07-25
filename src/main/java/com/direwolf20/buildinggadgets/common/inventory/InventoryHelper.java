@@ -7,12 +7,8 @@ import com.direwolf20.buildinggadgets.common.inventory.handle.IObjectHandle;
 import com.direwolf20.buildinggadgets.common.inventory.handle.ItemHandlerProvider;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
-import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
-import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainerCreative;
-import com.direwolf20.buildinggadgets.common.items.GenericPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.*;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
-import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.registry.TopologicalRegistryBuilder;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.CommonUtils;
@@ -204,12 +200,12 @@ public class InventoryHelper {
             }
         }
 
-        List<Integer> containerSlots = findItemClass(GenericPasteContainer.class, inv);
+        List<Integer> containerSlots = findItemClass(ConstructionPasteContainer.class, inv);
         if (containerSlots.size() > 0) {
             for (int slot : containerSlots) {
                 ItemStack stackInSlot = inv.getStackInSlot(slot);
-                if (stackInSlot.getItem() instanceof GenericPasteContainer) {
-                    count = count + GenericPasteContainer.getPasteAmount(stackInSlot);
+                if (stackInSlot.getItem() instanceof ConstructionPasteContainer) {
+                    count = count + ConstructionPasteContainer.getPasteAmount(stackInSlot);
                 }
             }
         }
@@ -229,16 +225,18 @@ public class InventoryHelper {
         if (!(itemStack.getItem() instanceof ConstructionPaste)) {
             return itemStack;
         }
+
         PlayerInventory inv = player.inventory;
-        List<Integer> slots = findItemClass(GenericPasteContainer.class, inv);
+        List<Integer> slots = findItemClass(ConstructionPasteContainer.class, inv);
         if (slots.size() == 0) {
             return itemStack;
         }
 
         Map<Integer, Integer> slotMap = new HashMap<>();
         for (int slot : slots) {
-            slotMap.put(slot, GenericPasteContainer.getPasteAmount(inv.getStackInSlot(slot)));
+            slotMap.put(slot, ConstructionPasteContainer.getPasteAmount(inv.getStackInSlot(slot)));
         }
+
         List<Map.Entry<Integer, Integer>> list = new ArrayList<>(slotMap.entrySet());
         Comparator<Map.Entry<Integer, Integer>> comparator = Map.Entry.comparingByValue();
         comparator = comparator.reversed();
@@ -247,19 +245,23 @@ public class InventoryHelper {
 
         for (Map.Entry<Integer, Integer> entry : list) {
             ItemStack containerStack = inv.getStackInSlot(entry.getKey());
-            GenericPasteContainer item = ((GenericPasteContainer) containerStack.getItem());
+            ConstructionPasteContainer item = ((ConstructionPasteContainer) containerStack.getItem());
+
             int maxAmount = item.getMaxCapacity();
-            int pasteInContainer = GenericPasteContainer.getPasteAmount(containerStack);
-            int freeSpace = item instanceof ConstructionPasteContainerCreative ? Integer.MAX_VALUE : maxAmount - pasteInContainer;
+            int pasteInContainer = ConstructionPasteContainer.getPasteAmount(containerStack);
+            int freeSpace = item.isCreative() ? Integer.MAX_VALUE : maxAmount - pasteInContainer;
             int stackSize = itemStack.getCount();
+
             int remainingPaste = stackSize - freeSpace;
             if (remainingPaste < 0) {
                 remainingPaste = 0;
             }
+
             int usedPaste = Math.abs(stackSize - remainingPaste);
             itemStack.setCount(remainingPaste);
-            GenericPasteContainer.setPasteAmount(containerStack, pasteInContainer + usedPaste);
+            ConstructionPasteContainer.setPasteAmount(containerStack, pasteInContainer + usedPaste);
         }
+
         return itemStack;
     }
 

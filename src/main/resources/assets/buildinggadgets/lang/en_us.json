@@ -198,5 +198,5 @@
   "gui.buildinggadgets.help.button.help.exit": "Exit help mode",
   "gui.buildinggadgets.help.button.load": "Loads data onto a gadget/template from a template",
   "gui.buildinggadgets.help.button.paste": "Pastes data on your computer's clipboard to a pre-existing template, or to a piece of paper, creating a template",
-  "gui.buildinggadgets.help.button.save": "Saves the data in the gadget/template to a pre-existing template, or to a piece of paper, creating a template",
+  "gui.buildinggadgets.help.button.save": "Saves the data in the gadget/template to a pre-existing template, or to a piece of paper, creating a template"
 }

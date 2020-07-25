@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.capability;
 
-import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainerCreative;
-import com.direwolf20.buildinggadgets.common.items.GenericPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
@@ -11,11 +10,11 @@ import javax.annotation.Nonnull;
 
 public final class PasteContainerItemHandler implements IItemHandlerModifiable {
     private final ItemStack container;
-    private boolean isCreative;
+    private final boolean isCreative;
 
     public PasteContainerItemHandler(ItemStack container) {
         this.container = container;
-        this.isCreative = getContainerItem() instanceof ConstructionPasteContainerCreative;
+        this.isCreative = getContainerItem().isCreative();
     }
 
     @Override
@@ -85,8 +84,8 @@ public final class PasteContainerItemHandler implements IItemHandlerModifiable {
         return getContainerItem().getPasteCount(container);
     }
 
-    private GenericPasteContainer getContainerItem() {
-        return ((GenericPasteContainer) container.getItem());
+    private ConstructionPasteContainer getContainerItem() {
+        return ((ConstructionPasteContainer) container.getItem());
     }
 
     private int setCount(int count, boolean simulate) {

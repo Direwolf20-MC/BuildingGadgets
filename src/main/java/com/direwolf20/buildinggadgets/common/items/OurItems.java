@@ -23,13 +23,13 @@ public final class OurItems {
 
     // Construction Paste Containers
     public static final RegistryObject<Item> PASTE_CONTAINER_T1_ITEM
-            = ITEMS.register("construction_paste_container_t1", () -> new ConstructionPasteContainer(Config.PASTE_CONTAINERS.capacityT1::get));
+            = ITEMS.register("construction_paste_container_t1", () -> new ConstructionPasteContainer(false, Config.PASTE_CONTAINERS.capacityT1::get));
     public static final RegistryObject<Item> PASTE_CONTAINER_T2_ITEM
-            = ITEMS.register("construction_paste_container_t2", () -> new ConstructionPasteContainer(Config.PASTE_CONTAINERS.capacityT2::get));
+            = ITEMS.register("construction_paste_container_t2", () -> new ConstructionPasteContainer(false, Config.PASTE_CONTAINERS.capacityT2::get));
     public static final RegistryObject<Item> PASTE_CONTAINER_T3_ITEM
-            = ITEMS.register("construction_paste_container_t3", () -> new ConstructionPasteContainer(Config.PASTE_CONTAINERS.capacityT3::get));
+            = ITEMS.register("construction_paste_container_t3", () -> new ConstructionPasteContainer(false, Config.PASTE_CONTAINERS.capacityT3::get));
     public static final RegistryObject<Item> PASTE_CONTAINER_CREATIVE_ITEM
-            = ITEMS.register("construction_paste_container_creative", ConstructionPasteContainerCreative::new);
+            = ITEMS.register("construction_paste_container_creative", () -> new ConstructionPasteContainer(true));
 
     // Construction Paste
     public static final RegistryObject<Item> CONSTRUCTION_PASTE_ITEM = ITEMS.register("construction_paste", ConstructionPaste::new);
