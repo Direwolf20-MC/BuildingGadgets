@@ -72,7 +72,7 @@ public final class PlayerItemIndex implements IItemIndex {
 
     private int insertIntoProviders(ItemStack stack, int remainingCount, boolean simulate) {
         for (IInsertProvider insertProvider : insertProviders) {
-            remainingCount = insertProvider.insert(stack, remainingCount, simulate);
+            remainingCount -= insertProvider.insert(stack, remainingCount, simulate);
             if (remainingCount <= 0)
                 return 0;
         }
