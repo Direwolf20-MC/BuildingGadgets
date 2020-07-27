@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.client.cache;
 
-import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper.IRemoteInventoryProvider;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketSetRemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -19,7 +18,7 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class RemoteInventoryCache implements IRemoteInventoryProvider {
+public class RemoteInventoryCache {
     private boolean isCopyPaste, forceUpdate;
     private Pair<ResourceLocation, BlockPos> locCached;
     private Multiset<UniqueItem> cache;
@@ -37,7 +36,6 @@ public class RemoteInventoryCache implements IRemoteInventoryProvider {
         forceUpdate = true;
     }
 
-    @Override
     public int countItem(ItemStack tool, ItemStack stack) {
         Pair<ResourceLocation, BlockPos> loc = getInventoryLocation(tool);
         if (isCacheOld(loc))

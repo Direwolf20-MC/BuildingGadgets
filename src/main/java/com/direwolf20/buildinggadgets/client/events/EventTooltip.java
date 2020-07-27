@@ -153,7 +153,13 @@ public class EventTooltip {
                     int hasAmt = index.tryMatch(pasteSet).getFoundItems().count(pasteItem);
                     int x = bx + (j % STACKS_PER_LINE) * 18;
                     int y = by + (j / STACKS_PER_LINE) * 20;
-                    renderRequiredBlocks(matrices, pasteItem.createStack(), x, y, hasAmt, InventoryHelper.longToInt(totalMissing));
+
+                    int required = Integer.MAX_VALUE;
+                    try {
+                        required = Math.toIntExact(totalMissing);
+                    } catch (ArithmeticException ignored) {}
+
+                    renderRequiredBlocks(matrices, pasteItem.createStack(), x, y, hasAmt, required);
                 }
             });
         });

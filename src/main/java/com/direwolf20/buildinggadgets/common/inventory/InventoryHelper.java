@@ -84,9 +84,10 @@ public class InventoryHelper {
     }
 
     static List<IItemHandler> getHandlers(ItemStack stack, PlayerEntity player) {
-        return Arrays.asList(
-                GadgetUtils.getRemoteInventory(stack, player.world),
-                player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(new EmptyItemHandler()));
+        List<IItemHandler> handlers = new ArrayList<>();
+        handlers.add(GadgetUtils.getRemoteInventory(stack, player.world));
+        player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handlers::add);
+        return handlers;
     }
 
     public static void registerHandleProviders() {
@@ -156,70 +157,6 @@ public class InventoryHelper {
         }
         ItemStack giveItemStack = itemStack.copy();
         return inv.addItemStackToInventory(giveItemStack);
-    }
-
-    public interface IRemoteInventoryProvider {
-        int countItem(ItemStack tool, ItemStack stack);
-    }
-
-    public static int countItem(ItemStack itemStack, PlayerEntity player, IRemoteInventoryProvider remoteInventory) {
-        if (player.isCreative())
-            return Integer.MAX_VALUE;
-
-        long count = remoteInventory.countItem(AbstractGadget.getGadget(player), itemStack);
-        PlayerInventory inv = player.inventory;
-        List<Integer> slots = findItem(itemStack.getItem(), inv);
-        List<IItemHandler> invContainers = findInvContainers(inv);
-        if (slots.size() == 0 && invContainers.size() == 0 && count == 0) {
-            return 0;
-        }
-        if (invContainers.size() > 0) {
-            for (IItemHandler container : invContainers) {
-                count += countInContainer(container, itemStack.getItem());
-            }
-        }
-
-        for (int slot : slots) {
-            ItemStack stackInSlot = inv.getStackInSlot(slot);
-            count += stackInSlot.getCount();
-        }
-        return longToInt(count);
-    }
-
-    public static int countPaste(PlayerEntity player) {
-        if (player.isCreative())
-            return Integer.MAX_VALUE;
-
-        long count = 0;
-        PlayerInventory inv = player.inventory;
-        Item item = OurItems.CONSTRUCTION_PASTE_ITEM.get();
-        List<Integer> slots = findItem(item, inv);
-        if (slots.size() > 0) {
-            for (int slot : slots) {
-                ItemStack stackInSlot = inv.getStackInSlot(slot);
-                count += stackInSlot.getCount();
-            }
-        }
-
-        List<Integer> containerSlots = findItemClass(ConstructionPasteContainer.class, inv);
-        if (containerSlots.size() > 0) {
-            for (int slot : containerSlots) {
-                ItemStack stackInSlot = inv.getStackInSlot(slot);
-                if (stackInSlot.getItem() instanceof ConstructionPasteContainer) {
-                    count = count + ConstructionPasteContainer.getPasteAmount(stackInSlot);
-                }
-            }
-        }
-        return longToInt(count);
-    }
-
-    public static int longToInt(long count)
-    {
-        try {
-            return Math.toIntExact(count);
-        } catch (ArithmeticException e) {
-            return Integer.MAX_VALUE;
-        }
     }
 
     public static ItemStack addPasteToContainer(PlayerEntity player, ItemStack itemStack) {
@@ -349,40 +286,5 @@ public class InventoryHelper {
     //proper generics...
     private static <T extends Comparable<T>> BlockState applyProperty(BlockState state, BlockState from, Property<T> prop) {
         return state.with(prop, from.get(prop));
-    }
-
-    private static final class EmptyItemHandler implements IItemHandler {
-        @Override
-        public int getSlots() {
-            return 0;
-        }
-
-        @Nonnull
-        @Override
-        public ItemStack getStackInSlot(int slot) {
-            return ItemStack.EMPTY;
-        }
-
-        @Nonnull
-        @Override
-        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-            return ItemStack.EMPTY;
-        }
-
-        @Nonnull
-        @Override
-        public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            return ItemStack.EMPTY;
-        }
-
-        @Override
-        public int getSlotLimit(int slot) {
-            return 0;
-        }
-
-        @Override
-        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-            return false;
-        }
     }
 }
