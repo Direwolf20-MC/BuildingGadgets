@@ -249,7 +249,7 @@ public class GadgetDestruction extends AbstractGadget {
             }
         }
 
-        pushUndo(stack, builder.build(world.getDimension()));
+        pushUndo(stack, builder.build(world));
     }
 
     private boolean destroyBlock(World world, BlockPos voidPos, ServerPlayerEntity player, Undo.Builder builder) {

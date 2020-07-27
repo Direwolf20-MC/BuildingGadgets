@@ -39,13 +39,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -269,9 +269,9 @@ public class GadgetUtils {
     }
 
     public static boolean setRemoteInventory(PlayerEntity player, ItemStack tool, BlockPos pos, World world) {
-        if (getRemoteInventory(pos, DimensionType.getKey(player.dimension), world) != null) {
+        if (getRemoteInventory(pos, player.world.getDimensionRegistryKey().getRegistryName(), world) != null) {
             boolean same = pos.equals(getPOSFromNBT(tool, NBTKeys.REMOTE_INVENTORY_POS));
-            writePOSToNBT(tool, same ? null : pos, NBTKeys.REMOTE_INVENTORY_POS, player.dimension);
+            writePOSToNBT(tool, same ? null : pos, NBTKeys.REMOTE_INVENTORY_POS, player.world.getDimensionRegistryKey());
             player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent(same ? MessageTranslation.UNBOUND_TO_TILE.getTranslationKey() : MessageTranslation.BOUND_TO_TILE.getTranslationKey()).getUnformattedComponentText()), true);
             return true;
         }
@@ -298,11 +298,17 @@ public class GadgetUtils {
 
     @Nullable
     public static IItemHandler getRemoteInventory(BlockPos pos, ResourceLocation dimName, World world, NetworkIO.Operation operation) {
-        DimensionType dim = DimensionType.byName(dimName);
-        if (dim == null) return null;
         MinecraftServer server = world.getServer();
-        if (server == null) return null;
-        World worldServer = server.getWorld(dim);
+
+        if (server == null) {
+            return null;
+        }
+
+        RegistryKey<World> dimReg = RegistryKey.of(Registry.field_239699_ae_, dimName);
+        World worldServer = server.getWorld(dimReg);
+        if (worldServer == null) {
+            return null;
+        }
 
         return getRemoteInventory(pos, worldServer, operation);
     }
@@ -344,7 +350,7 @@ public class GadgetUtils {
         stack.setTag(tagCompound);
     }
 
-    public static void writePOSToNBT(ItemStack stack, @Nullable BlockPos pos, String tagName, DimensionType dimension) {
+    public static void writePOSToNBT(ItemStack stack, @Nullable BlockPos pos, String tagName, RegistryKey<DimensionType> dimension) {
         CompoundNBT tagCompound = stack.getTag();
         if (tagCompound == null) {
             tagCompound = new CompoundNBT();
@@ -356,7 +362,7 @@ public class GadgetUtils {
             return;
         }
         CompoundNBT posTag = NBTUtil.writeBlockPos(pos);
-        posTag.putString(NBTKeys.GADGET_DIM, DimensionType.getKey(dimension).toString());
+        posTag.putString(NBTKeys.GADGET_DIM, dimension.getRegistryName().toString());
         tagCompound.put(tagName, posTag);
         stack.setTag(tagCompound);
     }

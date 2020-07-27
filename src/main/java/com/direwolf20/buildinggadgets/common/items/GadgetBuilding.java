@@ -52,7 +52,6 @@ import net.minecraftforge.event.ForgeEventFactory;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
@@ -225,7 +224,7 @@ public class GadgetBuilding extends AbstractGadget {
                 placeBlock(world, player, index, builder, coordinate, blockData);
             }
         }
-        pushUndo(stack, builder.build(world.getDimension()));
+        pushUndo(stack, builder.build(world));
     }
 
     private void placeBlock(World world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {

@@ -61,7 +61,7 @@ public class MockDelegationWorld implements IWorld {
 
     public void addBlock(@Nullable IBuildContext context, @Nonnull BlockPos pos, BlockData data) {
         if (data != null)
-            data.placeIn(SimpleBuildContext.builderOf(context).build(this), pos);
+            data.placeIn(SimpleBuildContext.builderOf(context).build(this.getWorld()), pos);
     }
 
     public IWorld getDelegate() {

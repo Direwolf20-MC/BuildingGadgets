@@ -143,7 +143,7 @@ public class CopyPasteRender extends BaseRenderer {
                     IBuildContext context = SimpleBuildContext.builder()
                             .buildingPlayer(player)
                             .usedStack(heldItem)
-                            .build(fakeWorld);
+                            .build(fakeWorld.getWorld());
 
                     // Get the template and move it to the start pos (player.pick())
                     IBuildView view = provider.getTemplateForKey(key).createViewInContext(context);

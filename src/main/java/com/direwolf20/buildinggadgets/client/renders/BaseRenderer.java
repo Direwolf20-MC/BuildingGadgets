@@ -19,13 +19,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Dimension;
 import net.minecraft.world.DimensionType;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -63,8 +63,7 @@ public abstract class BaseRenderer {
         if (dim == null || pos == null)
             return;
 
-        DimensionType dimension = Dimension. DimensionType.byName(dim);
-        if (dimension == null || player.world.getDimension() != dimension)
+        if (player.world.getDimensionRegistryKey().getRegistryName() != dim)
             return;
 
         Vector3d renderPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView()

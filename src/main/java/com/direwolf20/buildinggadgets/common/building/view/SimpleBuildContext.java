@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.building.view;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -40,13 +41,13 @@ public final class SimpleBuildContext implements IBuildContext {
     }
 
     @Nonnull
-    private final IWorld world;
+    private final World world;
     @Nullable
     private final PlayerEntity buildingPlayer;
 
     private final ItemStack stack;
 
-    public SimpleBuildContext(@Nonnull IWorld world, @Nullable PlayerEntity buildingPlayer, @Nonnull ItemStack stack) {
+    public SimpleBuildContext(@Nonnull World world, @Nullable PlayerEntity buildingPlayer, @Nonnull ItemStack stack) {
         this.world = world;
         this.buildingPlayer = buildingPlayer;
         this.stack = stack;
@@ -56,7 +57,7 @@ public final class SimpleBuildContext implements IBuildContext {
      * @return The {@link IWorld} of this {@code SimpleBuildContext}. Will not be null.
      */
     @Override
-    public IWorld getWorld() {
+    public World getWorld() {
         return world;
     }
 
@@ -79,7 +80,7 @@ public final class SimpleBuildContext implements IBuildContext {
      */
     public static final class Builder {
         @Nullable
-        private IWorld world;
+        private World world;
         @Nullable
         private PlayerEntity buildingPlayer;
         @Nonnull
@@ -97,7 +98,7 @@ public final class SimpleBuildContext implements IBuildContext {
          * @return The {@code Builder} itself
          * @see SimpleBuildContext#getWorld()
          */
-        public Builder world(@Nonnull IWorld world) {
+        public Builder world(@Nonnull World world) {
             this.world = world;
             return this;
         }
@@ -135,7 +136,7 @@ public final class SimpleBuildContext implements IBuildContext {
         /**
          * Creates a new {@link SimpleBuildContext} using the world previously set on this {@code Builder}.
          * @return A new {@link SimpleBuildContext} with the values specified in this {@code Builder}.
-         * @see #build(IWorld)
+         * @see #build(World)
          */
         public SimpleBuildContext build() {
             return build(null);
@@ -145,9 +146,9 @@ public final class SimpleBuildContext implements IBuildContext {
          * Creates a new {@link SimpleBuildContext} using the specified world. If the given world is null, the world in this {@code Builder} will be used.
          * @param world The {@link IWorld} to use. If null this {@code SimpleBuilder}'s world will be used.
          * @return A new {@link SimpleBuildContext} with the values specified in this {@code SimpleBuilder}.
-         * @throws NullPointerException if both the {@link IWorld} passed in and the {@link IWorld} of this {@code Builder} are null.
+         * @throws NullPointerException if both the {@link World} passed in and the {@link World} of this {@code Builder} are null.
          */
-        public SimpleBuildContext build(@Nullable IWorld world) {
+        public SimpleBuildContext build(@Nullable World world) {
             return new SimpleBuildContext(world != null ? world : Objects.requireNonNull(this.world), buildingPlayer, stack);
         }
     }

@@ -69,7 +69,6 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
 public class GadgetCopyPaste extends AbstractGadget {
@@ -457,7 +456,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                 true);
         PlacementScheduler.schedulePlacement(view, checker, Config.GADGETS.placeSteps.get())
                 .withFinisher(p -> {
-                    pushUndo(stack, p.getUndoBuilder().build(view.getContext().getWorld().getDimension()));
+                    pushUndo(stack, p.getUndoBuilder().build(view.getContext().getWorld()));
                     onBuildFinished(stack, player, view.getBoundingBox());
                 });
     }

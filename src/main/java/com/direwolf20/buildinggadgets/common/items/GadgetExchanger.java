@@ -237,7 +237,7 @@ public class GadgetExchanger extends AbstractGadget {
                 exchangeBlock(world, player, index, builder, coordinate, blockData);
             }
         }
-        pushUndo(stack, builder.build(world.getDimension()));
+        pushUndo(stack, builder.build(world));
         return true;
     }
 

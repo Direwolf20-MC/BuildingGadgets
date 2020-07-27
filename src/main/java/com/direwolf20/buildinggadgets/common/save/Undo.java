@@ -25,11 +25,14 @@ import com.google.common.collect.Multisets;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.*;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import java.util.Collections;
@@ -85,7 +88,8 @@ public final class Undo {
                 (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_BLOCK_LIST), new HashMap<>(),
                 inbt -> NBTUtil.readBlockPos((CompoundNBT) inbt),
                 inbt -> BlockInfo.deserialize((CompoundNBT) inbt, dataReverseObjectIncrementer, itemSetReverseObjectIncrementer));
-        DimensionType dim = DimensionType.byName(new ResourceLocation(nbt.getString(NBTKeys.WORLD_SAVE_DIM)));
+
+        RegistryKey<DimensionType> dim = RegistryKey.of(Registry.DIMENSION_TYPE_KEY, new ResourceLocation(nbt.getString(NBTKeys.WORLD_SAVE_DIM)));
         Region bounds = Region.deserializeFrom(nbt.getCompound(NBTKeys.WORLD_SAVE_UNDO_BOUNDS));
         return new Undo(dim, map, bounds);
     }
@@ -102,11 +106,11 @@ public final class Undo {
         return new Builder();
     }
 
-    private DimensionType dim;
+    private RegistryKey<DimensionType> dim;
     private Map<BlockPos, BlockInfo> dataMap;
     private Region boundingBox;
 
-    public Undo(DimensionType dim, Map<BlockPos, BlockInfo> dataMap, Region boundingBox) {
+    public Undo(RegistryKey<DimensionType> dim, Map<BlockPos, BlockInfo> dataMap, Region boundingBox) {
         this.dim = dim;
         this.dataMap = dataMap;
         this.boundingBox = boundingBox;
@@ -223,8 +227,8 @@ public final class Undo {
             return this;
         }
 
-        public Undo build(DimensionType dim) {
-            return new Undo(dim, mapBuilder.build(), regionBuilder != null ? regionBuilder.build() : Region.singleZero());
+        public Undo build(World dim) {
+            return new Undo(dim.getDimensionRegistryKey(), mapBuilder.build(), regionBuilder != null ? regionBuilder.build() : Region.singleZero());
         }
     }
 }

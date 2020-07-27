@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.template.Template;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
@@ -15,7 +16,7 @@ public interface IBuildContext {
     /**
      * @return An {@link IWorld} in which an {@link Template} might be build.
      */
-    IWorld getWorld();
+    World getWorld();
 
     /**
      * @return The {@link PlayerEntity} who would perform a build. This is optional and therefore may be null.
