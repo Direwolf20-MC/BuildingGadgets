@@ -49,7 +49,7 @@ public interface ITileEntityData {
     default MaterialList getRequiredItems(IBuildContext context, BlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
         ItemStack stack = null;
         try {
-            stack = state.getBlock().getPickBlock(state, target, context.getWorld(), pos, context.getBuildingPlayer());
+            stack = state.getBlock().getPickBlock(state, target, context.getWorld(), pos, context.getPlayer());
         } catch (Exception e) {
             BuildingGadgets.LOG.trace("Failed to retrieve pickBlock for {}.", state, e);
         }

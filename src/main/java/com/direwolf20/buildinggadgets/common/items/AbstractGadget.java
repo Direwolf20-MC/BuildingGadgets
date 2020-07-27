@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.capability.provider.CapabilityProviderBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapabilityProvider;
@@ -345,9 +345,9 @@ public abstract class AbstractGadget extends Item {
                     return;
                 }
             }
-            IBuildContext buildContext = SimpleBuildContext.builder()
-                    .buildingPlayer(player)
-                    .usedStack(stack)
+            IBuildContext buildContext = BuildContext.builder()
+                    .player(player)
+                    .stack(stack)
                     .build(world);
             UndoScheduler.scheduleUndo(undo, index, buildContext, Config.GADGETS.placeSteps.get());
         } else

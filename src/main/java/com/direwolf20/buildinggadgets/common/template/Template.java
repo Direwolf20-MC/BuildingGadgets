@@ -77,8 +77,8 @@ public final class Template {
             MaterialList materialList = CommonUtils.estimateRequiredItems(
                     createViewInContext(context),
                     context,
-                    context.getBuildingPlayer() != null ?
-                            context.getBuildingPlayer().getPositionVec().add(0, context.getBuildingPlayer().getEyeHeight(), 0) :
+                    context.getPlayer() != null ?
+                            context.getPlayer().getPositionVec().add(0, context.getPlayer().getEyeHeight(), 0) :
                             null);
             header = TemplateHeader.builderOf(header).requiredItems(materialList).build();
         }

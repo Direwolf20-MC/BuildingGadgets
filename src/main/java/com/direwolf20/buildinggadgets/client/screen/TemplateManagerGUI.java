@@ -9,7 +9,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
@@ -168,8 +168,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
 //            IBuildView view = template.createViewInContext(
 //                    SimpleBuildContext.builder()
-//                            .buildingPlayer(getMinecraft().player)
-//                            .usedStack(container.getSlot(0).getStack())
+//                            .player(getMinecraft().player)
+//                            .stack(container.getSlot(0).getStack())
 //                            .build(new MockDelegationWorld(getMinecraft().world)));
 
 //            int displayList = GLAllocation.generateDisplayLists(1);
@@ -244,7 +244,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void renderRequirement(MatrixStack matrices, int mouseX, int mouseY) {
-        MaterialList requirements = this.template.getHeaderAndForceMaterials(SimpleBuildContext.builder().build(getWorld())).getRequiredItems();
+        MaterialList requirements = this.template.getHeaderAndForceMaterials(BuildContext.builder().build(getWorld())).getRequiredItems();
         if( requirements == null )
             return;
 
@@ -578,9 +578,9 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                     PlayerEntity player = getMinecraft().player;
                     assert player != null;
 
-                    IBuildContext buildContext = SimpleBuildContext.builder()
-                            .buildingPlayer(player)
-                            .usedStack(stack)
+                    IBuildContext buildContext = BuildContext.builder()
+                            .player(player)
+                            .stack(stack)
                             .build(getWorld());
                     try {
                         Template template = provider.getTemplateForKey(key);

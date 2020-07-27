@@ -4,17 +4,14 @@ import com.direwolf20.buildinggadgets.client.renderer.DireBufferBuilder;
 import com.direwolf20.buildinggadgets.client.renderer.DireVertexBuffer;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.world.MockDelegationWorld;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -42,7 +39,6 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.io.Closeable;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
@@ -51,10 +47,6 @@ public class CopyPasteRender extends BaseRenderer {
     private MultiVBORenderer renderBuffer;
     private int tickTrack = 0;
 
-    private final Cache<BlockData, Boolean> erroredCache = CacheBuilder
-            .newBuilder()
-            .expireAfterAccess(1, TimeUnit.MINUTES)
-            .build();
 
     @Override
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
@@ -62,18 +54,18 @@ public class CopyPasteRender extends BaseRenderer {
         super.render(evt, player, heldItem);
 
         // Provide this as both renders require the data.
-        Vector3d projectedView = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+        Vector3d cameraView = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
 
         // translate the matric to the projected view
         MatrixStack stack = evt.getMatrixStack(); //Get current matrix position from the evt call
         stack.push(); //Save the render position from RenderWorldLast
-        stack.translate(-projectedView.getX(), -projectedView.getY(), -projectedView.getZ()); //Sets render position to 0,0,0
+        stack.translate(-cameraView.getX(), -cameraView.getY(), -cameraView.getZ()); //Sets render position to 0,0,0
 
         if (GadgetCopyPaste.getToolMode(heldItem) == GadgetCopyPaste.ToolMode.COPY) {
             GadgetCopyPaste.getSelectedRegion(heldItem).ifPresent(region ->
                     renderCopy(stack, region));
         } else
-            renderPaste(stack, projectedView, player, heldItem);
+            renderPaste(stack, cameraView, player, heldItem);
 
         stack.pop();
     }
@@ -121,46 +113,32 @@ public class CopyPasteRender extends BaseRenderer {
         buffer.draw(); // @mcp: draw = finish
     }
 
-    /**
-     * todo: eval how much load the caps add template fetching put on the render
-     *
-     * @implNote @michaelhillcox
-     * @since 1.14 - 3.2.0b
-     */
-    private void renderPaste(MatrixStack matrix, Vector3d projectedView, PlayerEntity player, ItemStack heldItem) {
+    private void renderPaste(MatrixStack matrices, Vector3d cameraView, PlayerEntity player, ItemStack heldItem) {
         World world = player.world;
 
         // Check the template cap from the world
-        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+        // Fetch the template key (because for some reason this is it's own cap)
+        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> heldItem.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+            // Finally get the data from the render.
+            GadgetCopyPaste.getActivePos(player, heldItem).ifPresent(startPos -> {
+                MockDelegationWorld fakeWorld = new MockDelegationWorld(world);
 
-            // Fetch the template key (because for some reason this is it's own cap)
-            heldItem.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                IBuildContext context = BuildContext.builder().player(player).stack(heldItem).build(fakeWorld);
 
-                // Finally get the data from the render.
-                GadgetCopyPaste.getActivePos(player, heldItem).ifPresent(startPos -> {
-                    MockDelegationWorld fakeWorld = new MockDelegationWorld(world);
+                // Get the template and move it to the start pos (player.pick())
+                IBuildView view = provider.getTemplateForKey(key).createViewInContext(context);
 
-                    IBuildContext context = SimpleBuildContext.builder()
-                            .buildingPlayer(player)
-                            .usedStack(heldItem)
-                            .build(fakeWorld.getWorld());
-
-                    // Get the template and move it to the start pos (player.pick())
-                    IBuildView view = provider.getTemplateForKey(key).createViewInContext(context);
-                    //view.translateTo(startPos);
-
-                    // Sort the render
-                    //RenderSorter sorter = new RenderSorter(player, view.estimateSize());
-                    List<PlacementTarget> targets = new ArrayList<>(view.estimateSize());
-                    for (PlacementTarget target : view) {
-                        if (target.placeIn(context))
-                            targets.add(target);
+                // Sort the render
+                List<PlacementTarget> targets = new ArrayList<>(view.estimateSize());
+                for (PlacementTarget target : view) {
+                    if (target.placeIn(context)) {
+                        targets.add(target);
                     }
+                }
 
-                    renderTargets(matrix, projectedView, context, targets, startPos);
-                });
+                renderTargets(matrices, cameraView, context, targets, startPos);
             });
-        });
+        }));
     }
 
     private void renderTargets(MatrixStack matrix, Vector3d projectedView, IBuildContext context, List<PlacementTarget> targets, BlockPos startPos) {
@@ -238,13 +216,13 @@ public class CopyPasteRender extends BaseRenderer {
             }
             stack.pop(); //Load after loop
         });
-        try {
+//        try {
             Vector3d projectedView2 = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
             Vector3d startPosView = new Vector3d(startPos.getX(), startPos.getY(), startPos.getZ());
             projectedView2 = projectedView2.subtract(startPosView);
             renderBuffer.sort((float) projectedView2.getX(), (float) projectedView2.getY(), (float) projectedView2.getZ());
-        } catch (Exception ignored) {
-        }
+//        } catch (Exception ignored) {
+//        }
         matrix.translate(startPos.getX(), startPos.getY(), startPos.getZ());
         renderBuffer.render(matrix.peek().getModel()); //Actually draw whats in the buffer
     }
@@ -254,6 +232,9 @@ public class CopyPasteRender extends BaseRenderer {
         return true;
     }
 
+    /**
+     * Vertex Buffer Object for caching the render. Pretty similar to how the chunk caching works
+     */
     public static class MultiVBORenderer implements Closeable {
         private static final int BUFFER_SIZE = 2 * 1024 * 1024 * 3;
 
@@ -263,7 +244,7 @@ public class CopyPasteRender extends BaseRenderer {
             vertexProducer.accept(rt -> builders.computeIfAbsent(rt, (_rt) -> {
                 DireBufferBuilder builder = new DireBufferBuilder(BUFFER_SIZE);
                 builder.begin(_rt.getDrawMode(), _rt.getVertexFormat());
-//                System.out.println("Created new builder for RT=" + _rt);
+
                 return builder;
             }));
 
@@ -272,12 +253,10 @@ public class CopyPasteRender extends BaseRenderer {
                 Objects.requireNonNull(rt);
                 Objects.requireNonNull(builder);
                 sortCaches.put(rt, builder.getVertexState());
-//                System.out.println("Finishing builder for RT=" + rt);
+
                 builder.finishDrawing();
                 VertexFormat fmt = rt.getVertexFormat();
                 DireVertexBuffer vbo = new DireVertexBuffer(fmt);
-//                BlockPos playerPos = getMc().player.getPosition();
-                //builder.sortVertexData((float) playerPos.getX(), (float) playerPos.getY(), (float) playerPos.getZ());//This sorts the buffer relative to the player's camera
 
                 vbo.upload(builder);
                 return vbo;
@@ -327,26 +306,4 @@ public class CopyPasteRender extends BaseRenderer {
             buffers.values().forEach(DireVertexBuffer::close);
         }
     }
-
-// todo: unused: check for need
-// @since 1.14
-//    private static boolean isVanillaISTER(ItemStack stack) {
-//        Item item = stack.getItem();
-//        if (item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof BedBlock)
-//            return true;
-//        else if (item instanceof BlockItem && ((BlockItem) item).getBlock() instanceof AbstractSkullBlock)
-//            return true;
-//        else if (item instanceof BlockItem && ((BlockItem) item).getBlock() == Blocks.CONDUIT)
-//            return true;
-//        else if (item == Blocks.ENDER_CHEST.asItem())
-//            return true;
-//        else if (item == Blocks.TRAPPED_CHEST.asItem())
-//            return true;
-//        else if (Block.getBlockFromItem(item) instanceof ShulkerBoxBlock)
-//            return true;
-//        else if (Block.getBlockFromItem(item) instanceof ChestBlock)
-//            return true;
-//        else
-//            return false;
-//    }
 }

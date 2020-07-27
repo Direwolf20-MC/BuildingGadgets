@@ -53,7 +53,7 @@ public final class PlacementChecker {
             return new CheckResult(MatchResult.failure(), ImmutableMultiset.of(), false, false);
         int energy = energyFun.applyAsInt(target);
         Multiset<IUniqueObject<?>> insertedItems = ImmutableMultiset.of();
-        boolean isCreative = context.getBuildingPlayer() != null && context.getBuildingPlayer().isCreative();
+        boolean isCreative = context.getPlayer() != null && context.getPlayer().isCreative();
 
         // We're using the IPrivateEnergy interface to get around the simulated power class
         IPrivateEnergy storage = (IPrivateEnergy) energyCap.orElseThrow(CapabilityNotPresentException::new);
@@ -61,8 +61,8 @@ public final class PlacementChecker {
             return new CheckResult(MatchResult.failure(), insertedItems, false, false);
 
         RayTraceResult targetRayTrace = null;
-        if (context.getBuildingPlayer() != null) {
-            PlayerEntity player = context.getBuildingPlayer();
+        if (context.getPlayer() != null) {
+            PlayerEntity player = context.getPlayer();
             targetRayTrace = CommonUtils.fakeRayTrace(player.getPositionVec(), target.getPos());
         }
         MaterialList materials = target.getRequiredMaterials(context, targetRayTrace);
@@ -76,13 +76,13 @@ public final class PlacementChecker {
         }
         BlockSnapshot blockSnapshot = BlockSnapshot.create(context.getWorld(), target.getPos());
         boolean isAir = blockSnapshot.getCurrentBlock().isAir(context.getWorld(), target.getPos());
-        if (firePlaceEvents && ForgeEventFactory.onBlockPlace(context.getBuildingPlayer(), blockSnapshot, Direction.UP))
+        if (firePlaceEvents && ForgeEventFactory.onBlockPlace(context.getPlayer(), blockSnapshot, Direction.UP))
             return new CheckResult(match, insertedItems, false, usePaste);
         if (! isAir) {
             if (firePlaceEvents) {
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(context.getWorld().getWorld(),
                         target.getPos(), blockSnapshot.getCurrentBlock(),
-                        context.getBuildingPlayer());
+                        context.getPlayer());
                 if (MinecraftForge.EVENT_BUS.post(e))
                     return new CheckResult(match, insertedItems, false, usePaste);
             }

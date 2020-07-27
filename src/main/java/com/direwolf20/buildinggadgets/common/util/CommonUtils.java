@@ -149,7 +149,7 @@ public final class CommonUtils {
     }
 
     public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, IBuildContext context) {
-        PlayerEntity player = context.getBuildingPlayer();
+        PlayerEntity player = context.getPlayer();
         return estimateRequiredItems(buildView, context, player != null ? player.getPositionVec() : null);
     }
 

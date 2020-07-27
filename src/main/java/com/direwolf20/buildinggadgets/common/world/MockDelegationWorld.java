@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.world;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.google.common.base.Preconditions;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
@@ -61,7 +61,7 @@ public class MockDelegationWorld implements IWorld {
 
     public void addBlock(@Nullable IBuildContext context, @Nonnull BlockPos pos, BlockData data) {
         if (data != null)
-            data.placeIn(SimpleBuildContext.builderOf(context).build(this.getWorld()), pos);
+            data.placeIn(BuildContext.builderOf(context).build(this.getWorld()), pos);
     }
 
     public IWorld getDelegate() {

@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
@@ -67,9 +67,9 @@ public class EventTooltip {
                 Template template = provider.getTemplateForKey(templateKey);
                 IItemIndex index = InventoryHelper.index(stack, mc.player);
 
-                IBuildContext buildContext = SimpleBuildContext.builder()
-                        .usedStack(stack)
-                        .buildingPlayer(mc.player)
+                IBuildContext buildContext = BuildContext.builder()
+                        .stack(stack)
+                        .player(mc.player)
                         .build(mc.world);
 
                 TemplateHeader header = template.getHeaderAndForceMaterials(buildContext);
@@ -110,9 +110,9 @@ public class EventTooltip {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(templateKey -> {
                 Template template = provider.getTemplateForKey(templateKey);
                 IItemIndex index = InventoryHelper.index(stack, mc.player);
-                IBuildContext buildContext = SimpleBuildContext.builder()
-                        .usedStack(stack)
-                        .buildingPlayer(mc.player)
+                IBuildContext buildContext = BuildContext.builder()
+                        .stack(stack)
+                        .player(mc.player)
                         .build(mc.world);
                 TemplateHeader header = template.getHeaderAndForceMaterials(buildContext);
                 MaterialList list = header.getRequiredItems();

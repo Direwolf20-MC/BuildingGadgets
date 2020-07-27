@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.tileentities.EffectBlockTileEntity;
@@ -58,7 +58,7 @@ public class EffectBlock extends Block {
                     if( targetBlock.getState().getBlock() instanceof LeavesBlock)
                         targetBlock = new BlockData(targetBlock.getState().with(LeavesBlock.PERSISTENT, true), targetBlock.getTileData());
 
-                    targetBlock.placeIn(SimpleBuildContext.builder().build(world), targetPos);
+                    targetBlock.placeIn(BuildContext.builder().build(world), targetPos);
                     BlockPos upPos = targetPos.up();
                     world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos, false);
                 }

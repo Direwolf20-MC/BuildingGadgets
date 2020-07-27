@@ -44,8 +44,8 @@ public final class UndoScheduler extends SteppedScheduler {
 
     private UndoScheduler(Undo undo, IItemIndex index, IBuildContext context, int steps) {
         super(steps);
-        assert context.getBuildingPlayer() != null;
-        assert ! context.getUsedStack().isEmpty();
+        assert context.getPlayer() != null;
+        assert ! context.getStack().isEmpty();
 
         this.spliterator = undo.getUndoData().entrySet().spliterator();
         this.index = index;
@@ -73,7 +73,7 @@ public final class UndoScheduler extends SteppedScheduler {
             return;
         }
         if (! state.isAir(context.getWorld(), entry.getKey())) {
-            BreakEvent event = new BreakEvent(context.getWorld().getWorld(), entry.getKey(), state, context.getBuildingPlayer());
+            BreakEvent event = new BreakEvent(context.getWorld().getWorld(), entry.getKey(), state, context.getPlayer());
             if (MinecraftForge.EVENT_BUS.post(event)) {
                 lastWasSuccess = false;
                 return;

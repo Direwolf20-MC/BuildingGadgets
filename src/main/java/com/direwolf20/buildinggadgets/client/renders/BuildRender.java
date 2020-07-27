@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.client.renders;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
@@ -122,7 +122,7 @@ public class BuildRender extends BaseRenderer {
 
             // Figure out how many of the block we're rendering we have in the inventory of the player.
             IItemIndex index = new RecordingItemIndex(InventoryHelper.index(heldItem, player));
-            MaterialList materials = data.getRequiredItems(new SimpleBuildContext(player.world, player, heldItem), null, null);
+            MaterialList materials = data.getRequiredItems(new BuildContext(player.world, player, heldItem), null, null);
             int hasEnergy = getEnergy(player, heldItem);
 
             LazyOptional<IEnergyStorage> energyCap = heldItem.getCapability(CapabilityEnergy.ENERGY);

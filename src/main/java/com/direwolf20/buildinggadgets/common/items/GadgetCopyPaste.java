@@ -6,7 +6,7 @@ import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.placement.PlacementChecker;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.WorldBuildView;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.capability.provider.TemplateKeyProvider;
@@ -351,9 +351,9 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void tryCopy(ItemStack stack, World world, PlayerEntity player, Region region) {
-        SimpleBuildContext context = SimpleBuildContext.builder()
-                .buildingPlayer(player)
-                .usedStack(stack)
+        BuildContext context = BuildContext.builder()
+                .player(player)
+                .stack(stack)
                 .build(world);
         WorldBuildView buildView = WorldBuildView.create(context, region,
                 (c, p) -> InventoryHelper.getSafeBlockData(player, p, player.getActiveHand()));
@@ -384,8 +384,8 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     private void performCopy(ItemStack stack, WorldBuildView buildView) {
         IBuildContext context = buildView.getContext();
-        assert context.getBuildingPlayer() != null;
-        PlayerEntity player = context.getBuildingPlayer();
+        assert context.getPlayer() != null;
+        PlayerEntity player = context.getPlayer();
         CopyScheduler.scheduleCopy((map, region) -> {
             Template newTemplate = new Template(map,
                     TemplateHeader.builder(region)
@@ -408,9 +408,9 @@ public class GadgetCopyPaste extends AbstractGadget {
         world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 Template template = provider.getTemplateForKey(key);
-                IBuildContext buildContext = SimpleBuildContext.builder()
-                        .usedStack(stack)
-                        .buildingPlayer(player)
+                IBuildContext buildContext = BuildContext.builder()
+                        .stack(stack)
+                        .player(player)
                         .build(world);
                 IBuildView view = template.createViewInContext(buildContext);
                 view.translateTo(pos);

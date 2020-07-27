@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.common.template.Template;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
@@ -16,16 +15,16 @@ public interface IBuildContext {
     /**
      * @return An {@link IWorld} in which an {@link Template} might be build.
      */
-    World getWorld();
+    IWorld getWorld();
 
     /**
      * @return The {@link PlayerEntity} who would perform a build. This is optional and therefore may be null.
      */
     @Nullable
-    PlayerEntity getBuildingPlayer();
+    PlayerEntity getPlayer();
 
     /**
      * @return The {@link net.minecraft.item.Item} used in this Build in the Form of an {@link ItemStack}
      */
-    ItemStack getUsedStack();
+    ItemStack getStack();
 }

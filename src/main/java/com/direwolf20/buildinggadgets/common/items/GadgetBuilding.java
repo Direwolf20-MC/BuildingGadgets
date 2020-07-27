@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.items;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
@@ -237,7 +237,7 @@ public class GadgetBuilding extends AbstractGadget {
 
         boolean useConstructionPaste = false;
 
-        IBuildContext buildContext = new SimpleBuildContext(world, player, heldItem);
+        IBuildContext buildContext = new BuildContext(world, player, heldItem);
         MaterialList requiredItems = setBlock.getRequiredItems(buildContext, null, pos);
 
         // #majorcode
