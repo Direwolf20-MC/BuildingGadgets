@@ -7,14 +7,13 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SurfaceMode extends AbstractMode {
     public SurfaceMode(boolean isExchanging) { super(isExchanging); }
 
     @Override
     List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
-        List<BlockPos> coordinates = new ArrayList<>();
-
         int bound = context.getRange() / 2;
 
         // Grow the area. getXOffset will invert some math for us
@@ -24,8 +23,7 @@ public class SurfaceMode extends AbstractMode {
                 bound * (1 - Math.abs(context.getHitSide().getZOffset()))
         );
 
-        area.spliterator().forEachRemaining(coordinates::add);
-        return coordinates;
+        return area.stream().collect(Collectors.toList());
     }
 
     @Override

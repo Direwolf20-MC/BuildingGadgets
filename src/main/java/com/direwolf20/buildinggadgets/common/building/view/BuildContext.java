@@ -35,10 +35,6 @@ public final class BuildContext implements IBuildContext {
         return builder.world(context.getWorld()).player(context.getPlayer()).stack(context.getStack());
     }
 
-    public static BuildContext copyOf(@Nullable IBuildContext context) {
-        return builderOf(context).build();
-    }
-
     @Nonnull
     private final IWorld world;
     @Nullable

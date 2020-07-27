@@ -52,7 +52,7 @@ public final class WorldBuildView implements IBuildView {
 
     @Override
     public Spliterator<PlacementTarget> spliterator() {
-        return new WorldBackedSpliterator(getBoundingBox().spliterator(), translation, dataFactory, getContext());
+        return new WorldBackedSpliterator(getBoundingBox().stream().spliterator(), translation, dataFactory, getContext());
     }
 
     @Override
@@ -79,11 +79,6 @@ public final class WorldBuildView implements IBuildView {
     @Override
     public Region getBoundingBox() {
         return region;
-    }
-
-    @Override
-    public boolean mayContain(int x, int y, int z) {
-        return region.mayContain(x, y, z) && dataFactory.apply(getContext(), new BlockPos(x, y, z)).isPresent();
     }
 
     private static final class WorldBackedSpliterator extends DelegatingSpliterator<BlockPos, PlacementTarget> {
