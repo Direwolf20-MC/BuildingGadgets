@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.renderer.EffectBlockTER;
 import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
-import com.direwolf20.buildinggadgets.common.capability.CapabilityBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.commands.OverrideBuildSizeCommand;
@@ -17,7 +16,6 @@ import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.registry.Registries;
 import com.direwolf20.buildinggadgets.common.save.SaveManager;
-import com.direwolf20.buildinggadgets.common.tileentities.EffectBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.tileentities.OurTileEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -29,7 +27,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.*;
+import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.InterModComms;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig.Type;
@@ -101,7 +101,6 @@ public final class BuildingGadgets {
     private void setup(final FMLCommonSetupEvent event) {
         theMod = (BuildingGadgets) ModLoadingContext.get().getActiveContainer().getMod();
 
-        CapabilityBlockProvider.register();
         CapabilityTemplate.register();
         PacketHandler.register();
     }

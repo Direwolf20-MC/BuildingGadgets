@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
-import com.direwolf20.buildinggadgets.common.capability.provider.CapabilityProviderBlockProvider;
 import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.concurrent.UndoScheduler;
@@ -100,7 +99,6 @@ public abstract class AbstractGadget extends Item {
 
     protected void addCapabilityProviders(ImmutableList.Builder<ICapabilityProvider> providerBuilder, ItemStack stack, @Nullable CompoundNBT tag) {
         providerBuilder.add(new CapabilityProviderEnergy(stack, this::getEnergyMax));
-        providerBuilder.add(new CapabilityProviderBlockProvider(stack));
     }
 
     @Override

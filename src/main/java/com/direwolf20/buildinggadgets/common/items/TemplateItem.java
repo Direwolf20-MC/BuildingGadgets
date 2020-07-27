@@ -46,10 +46,7 @@ public class TemplateItem extends Item {
                 : super.onItemRightClick(worldIn, playerIn, handIn);
     }
 
-    /**
-     * Awful name :+1:
-     */
-    public static ItemStack getHeldCapItem(PlayerEntity player) {
+    public static ItemStack getTemplateItem(PlayerEntity player) {
         ItemStack mainhand = player.getHeldItemMainhand();
         if (mainhand.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
             return mainhand;
