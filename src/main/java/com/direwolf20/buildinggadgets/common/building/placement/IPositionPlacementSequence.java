@@ -21,7 +21,6 @@ public interface IPositionPlacementSequence extends IPlacementSequence<BlockPos>
      * {@inheritDoc}
      * <p>
      * In general it is not necessary to make any considerations whether a given position is suitable for placement, however an implementation may make exceptions from this rule.
-     * See {@link PlacementSequences.ConnectedSurface ConnectedSurface} for further information.
      */
     @Override
     Iterator<BlockPos> iterator();
