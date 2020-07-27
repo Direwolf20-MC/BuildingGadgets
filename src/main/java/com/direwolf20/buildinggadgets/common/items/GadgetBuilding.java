@@ -152,7 +152,7 @@ public class GadgetBuilding extends AbstractGadget {
             //itemstack.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> e.receiveEnergy(15000000, false));
             if (player.isSneaking()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
-                if( !result.getType().isSuccess() ) {
+                if( !result.getType().isAccepted() ) {
                     player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
                     return super.onItemRightClick(world, player, hand);
                 }
@@ -225,11 +225,11 @@ public class GadgetBuilding extends AbstractGadget {
                 placeBlock(world, player, index, builder, coordinate, blockData);
             }
         }
-        pushUndo(stack, builder.build(world.getDimension().getType()));
+        pushUndo(stack, builder.build(world.getDimension()));
     }
 
     private void placeBlock(World world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
-        if ((pos.getY() > world.getMaxHeight() || pos.getY() < 0) || !player.isAllowEdit())
+        if ((pos.getY() > world.getHeight() || pos.getY() < 0) || !player.isAllowEdit())
             return;
 
         ItemStack heldItem = getGadget(player);
@@ -253,7 +253,7 @@ public class GadgetBuilding extends AbstractGadget {
                 useConstructionPaste = true;
         }
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(world, pos);
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP) || ! world.isBlockModifiable(player, pos) || !this.canUse(heldItem, player))
             return;
 

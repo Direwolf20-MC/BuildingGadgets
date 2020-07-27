@@ -53,7 +53,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
@@ -162,7 +162,7 @@ public class GadgetExchanger extends AbstractGadget {
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
-                if( !result.getType().isSuccess() ) {
+                if( !result.getType().isAccepted() ) {
                     player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
                     return super.onItemRightClick(world, player, hand);
                 }
@@ -237,7 +237,7 @@ public class GadgetExchanger extends AbstractGadget {
                 exchangeBlock(world, player, index, builder, coordinate, blockData);
             }
         }
-        pushUndo(stack, builder.build(world.getDimension().getType()));
+        pushUndo(stack, builder.build(world.getDimension()));
         return true;
     }
 
@@ -280,7 +280,7 @@ public class GadgetExchanger extends AbstractGadget {
         if (! world.isBlockModifiable(player, pos))
             return false;
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, pos);
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(world, pos);
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP))
             return false;
 
@@ -299,7 +299,7 @@ public class GadgetExchanger extends AbstractGadget {
             MaterialList materials = te instanceof ConstructionBlockTileEntity ? InventoryHelper.PASTE_LIST : data.getRequiredItems(
                     buildContext,
                     currentBlock,
-                    world.rayTraceBlocks(new RayTraceContext(player.getPositionVec(), new Vec3d(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
+                    world.rayTraceBlocks(new RayTraceContext(player.getPositionVec(), Vector3d.of(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
                     pos);
 
             Iterator<ImmutableMultiset<IUniqueObject<?>>> it = materials.iterator();

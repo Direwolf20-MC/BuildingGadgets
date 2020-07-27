@@ -7,6 +7,8 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Matrix3f;
+import net.minecraft.util.math.vector.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import java.util.OptionalDouble;
@@ -19,67 +21,67 @@ public class OurRenderTypes extends RenderType {
 
     private static final LineState THICK_LINES = new LineState(OptionalDouble.of(3.0D));
 
-    public static final RenderType RenderBlock = makeType("GadgetRenderBlock",
+    public static final RenderType RenderBlock = of("GadgetRenderBlock",
             DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 256,
-            RenderType.State.getBuilder()
-                    .shadeModel(SHADE_ENABLED)
-                    .lightmap(LIGHTMAP_ENABLED)
-                    .texture(BLOCK_SHEET_MIPPED)
-                    .layer(PROJECTION_LAYERING)
+            RenderType.State.builder()
+                    .shadeModel(SMOOTH_SHADE_MODEL)
+                    .lightmap(ENABLE_LIGHTMAP)
+                    .texture(MIPMAP_BLOCK_ATLAS_TEXTURE) //BLOCK_SHEET_MIPPED (mcp) = MIPMAP_BLOCK_ATLAS_TEXTURE (yarn)
+                    .layering(VIEW_OFFSET_Z_LAYERING)
                     .transparency(TRANSLUCENT_TRANSPARENCY)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_DISABLED)
-                    .writeMask(COLOR_DEPTH_WRITE)
+                    .depthTest(LEQUAL_DEPTH_TEST)
+                    .cull(DISABLE_CULLING)
+                    .writeMaskState(ALL_MASK)
                     .build(false));
 
-    public static final RenderType MissingBlockOverlay = makeType("GadgetMissingBlockOverlay",
+    public static final RenderType MissingBlockOverlay = of("GadgetMissingBlockOverlay",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 256,
-            RenderType.State.getBuilder()
-                    .layer(PROJECTION_LAYERING)
+            RenderType.State.builder()
+                    .layering(VIEW_OFFSET_Z_LAYERING)
                     .transparency(TRANSLUCENT_TRANSPARENCY)
                     .texture(NO_TEXTURE)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_DISABLED)
-                    .lightmap(LIGHTMAP_DISABLED)
-                    .writeMask(COLOR_WRITE)
+                    .depthTest(LEQUAL_DEPTH_TEST)
+                    .cull(DISABLE_CULLING)
+                    .lightmap(DISABLE_LIGHTMAP)
+                    .writeMaskState(COLOR_MASK)
                     .build(false));
 
-    public static final RenderType CopyGadgetLines = makeType("GadgetCopyLines",
+    public static final RenderType CopyGadgetLines = of("GadgetCopyLines",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINE_STRIP, 256,
-            RenderType.State.getBuilder()
-                    .line(new LineState(OptionalDouble.of(2.0D)))
-                    .layer(PROJECTION_LAYERING)
+            RenderType.State.builder()
+                    .lineWidth(new LineState(OptionalDouble.of(2.0D)))
+                    .layering(VIEW_OFFSET_Z_LAYERING)
                     .transparency(TRANSLUCENT_TRANSPARENCY)
                     .texture(NO_TEXTURE)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_DISABLED)
-                    .lightmap(LIGHTMAP_DISABLED)
-                    .writeMask(COLOR_WRITE)
+                    .depthTest(LEQUAL_DEPTH_TEST)
+                    .cull(DISABLE_CULLING)
+                    .lightmap(DISABLE_LIGHTMAP)
+                    .writeMaskState(COLOR_MASK)
                     .build(false));
 
-    public static final RenderType CopyPasteRenderBlock = makeType("CopyPasteRenderBlock",
+    public static final RenderType CopyPasteRenderBlock = of("CopyPasteRenderBlock",
             DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 256,
-            RenderType.State.getBuilder()
-                    .shadeModel(SHADE_ENABLED)
-                    .lightmap(LIGHTMAP_ENABLED)
-                    .texture(BLOCK_SHEET_MIPPED)
-                    .layer(PROJECTION_LAYERING)
+            RenderType.State.builder()
+                    .shadeModel(SMOOTH_SHADE_MODEL)
+                    .lightmap(ENABLE_LIGHTMAP)
+                    .texture(MIPMAP_BLOCK_ATLAS_TEXTURE) //BLOCK_SHEET_MIPPED (mcp) = MIPMAP_BLOCK_ATLAS_TEXTURE (yarn)
+                    .layering(VIEW_OFFSET_Z_LAYERING)
                     .transparency(TRANSLUCENT_TRANSPARENCY)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_DISABLED)
-                    .writeMask(COLOR_WRITE)
+                    .depthTest(LEQUAL_DEPTH_TEST)
+                    .cull(DISABLE_CULLING)
+                    .writeMaskState(COLOR_MASK)
                     .build(false));
 
-    public static final RenderType BlockOverlay = makeType("BGBlockOverlay",
+    public static final RenderType BlockOverlay = of("BGBlockOverlay",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 256,
-            RenderType.State.getBuilder()
-                    .layer(PROJECTION_LAYERING)
+            RenderType.State.builder()
+                    .layering(VIEW_OFFSET_Z_LAYERING)
                     .transparency(TRANSLUCENT_TRANSPARENCY)
                     .texture(NO_TEXTURE)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_ENABLED)
-                    .lightmap(LIGHTMAP_DISABLED)
-                    .writeMask(COLOR_DEPTH_WRITE)
+                    .depthTest(LEQUAL_DEPTH_TEST)
+                    .cull(ENABLE_CULLING)
+                    .lightmap(DISABLE_LIGHTMAP)
+                    .writeMaskState(ALL_MASK)
                     .build(false));
 
     /**
@@ -104,13 +106,14 @@ public class OurRenderTypes extends RenderType {
         {
             RenderType localType = type;
             if (localType instanceof Type) {
-                ResourceLocation texture = ((Type) localType).renderState.texture.texture
-                        .orElse(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+                // all of this requires a lot of AT's so be aware of that on ports
+                ResourceLocation texture = ((Type) localType).phases.texture.id
+                        .orElse(PlayerContainer.BLOCK_ATLAS_TEXTURE);
 
                 localType = getEntityTranslucentCull(texture);
             }
-            else if (localType.toString().equals(Atlases.getCutoutBlockType().toString())) {
-                localType = Atlases.getTranslucentCullBlockType();
+            else if (localType.toString().equals(Atlases.getEntityCutout().toString())) {
+                localType = Atlases.getEntityTranslucentCull();
             }
 
             return new MultiplyAlphaVertexBuilder(inner.getBuffer(localType), this.constantAlpha);
@@ -131,15 +134,15 @@ public class OurRenderTypes extends RenderType {
             }
 
             @Override
-            public IVertexBuilder pos(double x, double y, double z)
+            public IVertexBuilder vertex(double x, double y, double z)
             {
-                return inner.pos(x,y,z);
+                return inner.vertex(x,y,z);
             }
 
             @Override
-            public IVertexBuilder pos(Matrix4f matrixIn, float x, float y, float z)
+            public IVertexBuilder vertex(Matrix4f matrixIn, float x, float y, float z)
             {
-                return inner.pos(matrixIn, x, y, z);
+                return inner.vertex(matrixIn, x, y, z);
             }
 
             @Override
@@ -149,9 +152,8 @@ public class OurRenderTypes extends RenderType {
             }
 
             @Override
-            public IVertexBuilder tex(float u, float v)
-            {
-                return inner.tex(u, v);
+            public IVertexBuilder texture(float u, float v) {
+                return inner.texture(u, v);
             }
 
             @Override
@@ -160,10 +162,11 @@ public class OurRenderTypes extends RenderType {
                 return inner.overlay(u, v);
             }
 
+
             @Override
-            public IVertexBuilder lightmap(int u, int v)
+            public IVertexBuilder light(int u, int v)
             {
-                return inner.lightmap(u, v);
+                return inner.light(u, v);
             }
 
             @Override

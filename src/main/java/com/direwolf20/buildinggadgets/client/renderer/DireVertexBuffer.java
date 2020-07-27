@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.client.renderer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.util.math.vector.Matrix4f;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;

@@ -26,7 +26,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ILightReader;
+import net.minecraft.world.IBlockDisplayReader;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -41,7 +41,6 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-
 
 public class ClientProxy {
     public static final CacheTemplateProvider CACHE_TEMPLATE_PROVIDER = new CacheTemplateProvider();
@@ -93,7 +92,7 @@ public class ClientProxy {
             }
 
             @Override
-            public boolean func_230044_c_() {
+            public boolean isSideLit() {
                 return false;
             }
 
@@ -135,7 +134,7 @@ public class ClientProxy {
 
             @Nonnull
             @Override
-            public IModelData getModelData(@Nonnull ILightReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+            public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
                 return tileData;
             }
         };
@@ -149,7 +148,7 @@ public class ClientProxy {
             }
 
             @Override
-            public boolean func_230044_c_() {
+            public boolean isSideLit() {
                 return false;
             }
 
@@ -191,7 +190,7 @@ public class ClientProxy {
 
             @Nonnull
             @Override
-            public IModelData getModelData(@Nonnull ILightReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+            public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
                 return tileData;
             }
         };

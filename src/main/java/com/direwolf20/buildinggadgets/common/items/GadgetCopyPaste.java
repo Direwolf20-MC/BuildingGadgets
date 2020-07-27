@@ -457,7 +457,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                 true);
         PlacementScheduler.schedulePlacement(view, checker, Config.GADGETS.placeSteps.get())
                 .withFinisher(p -> {
-                    pushUndo(stack, p.getUndoBuilder().build(view.getContext().getWorld().getDimension().getType()));
+                    pushUndo(stack, p.getUndoBuilder().build(view.getContext().getWorld().getDimension()));
                     onBuildFinished(stack, player, view.getBoundingBox());
                 });
     }

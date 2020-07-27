@@ -8,7 +8,7 @@ import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -78,7 +78,7 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget> {
      * @param simulatePos nullable BlockPos used to simulate
      * @return A {@link MaterialList} representing the Item Requirements to build this {@code IBuildView}.
      */
-    default MaterialList estimateRequiredItems(@Nullable Vec3d simulatePos) {
+    default MaterialList estimateRequiredItems(@Nullable Vector3d simulatePos) {
         return CommonUtils.estimateRequiredItems(this, this.getContext(), simulatePos);
     }
 

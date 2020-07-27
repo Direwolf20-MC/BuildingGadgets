@@ -49,7 +49,7 @@ public final class PlacementChecker {
      * @implNote This code is so god damn messy. Good luck understanding it.
      */
     public CheckResult checkPositionWithResult(IBuildContext context, PlacementTarget target, boolean giveBackItems) {
-        if (target.getPos().getY() > context.getWorld().getMaxHeight() || target.getPos().getY() < 0 || ! placeCheck.test(context, target))
+        if (target.getPos().getY() > context.getWorld().getHeight() || target.getPos().getY() < 0 || ! placeCheck.test(context, target))
             return new CheckResult(MatchResult.failure(), ImmutableMultiset.of(), false, false);
         int energy = energyFun.applyAsInt(target);
         Multiset<IUniqueObject<?>> insertedItems = ImmutableMultiset.of();
@@ -74,7 +74,7 @@ public final class PlacementChecker {
                 return new CheckResult(match, insertedItems, false, false);
             usePaste = true;
         }
-        BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(context.getWorld(), target.getPos());
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(context.getWorld(), target.getPos());
         boolean isAir = blockSnapshot.getCurrentBlock().isAir(context.getWorld(), target.getPos());
         if (firePlaceEvents && ForgeEventFactory.onBlockPlace(context.getBuildingPlayer(), blockSnapshot, Direction.UP))
             return new CheckResult(match, insertedItems, false, usePaste);

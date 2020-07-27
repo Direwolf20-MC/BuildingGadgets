@@ -15,7 +15,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 
@@ -38,20 +38,20 @@ public class DestructionRender extends BaseRenderer {
         if (world.getBlockState(startBlock) == OurBlocks.EFFECT_BLOCK.get().getDefaultState())
             return;
 
-        Vec3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+        Vector3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
 
         MatrixStack stack = evt.getMatrixStack();
         stack.push();
         stack.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
 
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getBufferBuilders().getEntityVertexConsumers();
         IVertexBuilder builder = buffer.getBuffer(OurRenderTypes.MissingBlockOverlay);
 
         GadgetDestruction.getArea(world, startBlock, facing, player, heldItem)
-                .forEach(pos -> renderMissingBlock(stack.getLast().getMatrix(), builder, pos));
+                .forEach(pos -> renderMissingBlock(stack.peek().getModel(), builder, pos));
 
         stack.pop();
         RenderSystem.disableDepthTest();
-        buffer.finish();
+        buffer.draw(); // @mcp: draw = finish
     }
 }

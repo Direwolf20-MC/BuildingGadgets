@@ -33,8 +33,8 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tags.BlockTags.Wrapper;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ITag;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -63,27 +63,27 @@ import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
 public abstract class AbstractGadget extends Item {
     private BaseRenderer renderer;
-    private final Tag<Block> whiteList;
-    private final Tag<Block> blackList;
+    private final ITag.INamedTag<Block> whiteList;
+    private final ITag.INamedTag<Block> blackList;
     private Supplier<UndoWorldSave> saveSupplier;
 
     public AbstractGadget(Properties builder, IntSupplier undoLengthSupplier, String undoName, ResourceLocation whiteListTag, ResourceLocation blackListTag) {
         super(builder);
 
         renderer = DistExecutor.runForDist(this::createRenderFactory, () -> () -> null);
-        this.whiteList = new Wrapper(whiteListTag);
-        this.blackList = new Wrapper(blackListTag);
+        this.whiteList = BlockTags.makeWrapperTag(whiteListTag.toString());
+        this.blackList = BlockTags.makeWrapperTag(blackListTag.toString());
         saveSupplier = SaveManager.INSTANCE.registerUndoSave(w -> SaveManager.getUndoSave(w, undoLengthSupplier, undoName));
     }
 
     public abstract int getEnergyMax();
     public abstract int getEnergyCost(ItemStack tool);
 
-    public Tag<Block> getWhiteList() {
+    public ITag.INamedTag<Block> getWhiteList() {
         return whiteList;
     }
 
-    public Tag<Block> getBlackList() {
+    public ITag.INamedTag<Block> getBlackList() {
         return blackList;
     }
 
@@ -181,7 +181,7 @@ public abstract class AbstractGadget extends Item {
     }
 
     public boolean isAllowedBlock(Block block) {
-        if (getWhiteList().getAllElements().isEmpty())
+        if (getWhiteList().values().isEmpty())
             return ! getBlackList().contains(block);
         return getWhiteList().contains(block);
     }

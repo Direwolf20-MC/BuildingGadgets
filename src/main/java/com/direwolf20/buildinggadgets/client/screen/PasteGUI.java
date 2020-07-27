@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.client.screen.components.GuiIncrementer;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketPasteGUI;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.AbstractButton;
@@ -38,12 +39,12 @@ public class PasteGUI extends Screen {
         fields.add(Z = new GuiIncrementer(x + (GuiIncrementer.WIDTH / 2) + 10, y - 10, -16, 16, this::onChange));
 
         List<AbstractButton> buttons = new ArrayList<AbstractButton>() {{
-            add(new CopyGUI.CenteredButton(y + 20, 70, GuiTranslation.SINGLE_CONFIRM, (button) -> {
+            add(new CopyGUI.CenteredButton(y + 20, 70, GuiTranslation.SINGLE_CONFIRM.componentTranslation(), (button) -> {
                 PacketHandler.sendToServer(new PacketPasteGUI(X.getValue(), Y.getValue(), Z.getValue()));
                 onClose();
             }));
 
-            add(new CopyGUI.CenteredButton(y + 20, 40, GuiTranslation.SINGLE_RESET, (button) -> {
+            add(new CopyGUI.CenteredButton(y + 20, 40, GuiTranslation.SINGLE_RESET.componentTranslation(), (button) -> {
                 X.setValue(0);
                 Y.setValue(0);
                 Z.setValue(0);
@@ -83,17 +84,17 @@ public class PasteGUI extends Screen {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        drawLabel("X", -75);
-        drawLabel("Y", 0);
-        drawLabel("Z", 75);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
+        drawLabel(matrices, "X", -75);
+        drawLabel(matrices, "Y", 0);
+        drawLabel(matrices, "Z", 75);
 
-        drawCenteredString(Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), (int)(width / 2f), (int)(height / 2f) - 60, 0xFFFFFF);
+        drawCenteredString(matrices, Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), (int)(width / 2f), (int)(height / 2f) - 60, 0xFFFFFF);
 
-        super.render(mouseX, mouseY, partialTicks);
+        super.render(matrices, mouseX, mouseY, partialTicks);
     }
 
-    private void drawLabel(String name, int x) {
-        font.drawStringWithShadow(name, (width / 2f) + x, (height / 2f) - 30, 0xFFFFFF);
+    private void drawLabel(MatrixStack matrices, String name, int x) {
+        textRenderer.drawWithShadow(matrices, name, (width / 2f) + x, (height / 2f) - 30, 0xFFFFFF);
     }
 }

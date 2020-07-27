@@ -10,6 +10,7 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.CommandSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.Map;
 import java.util.UUID;
@@ -72,8 +73,8 @@ final class AllowPlayerOverrideManager {
 
     int executeList(CommandContext<CommandSource> context) {
         for (Map.Entry<UUID, Boolean> entry : allowPlayerOverrideCache.asMap().entrySet()) {
-            ITextComponent component = listTranslation.componentTranslation(entry.getKey(), entry.getValue());
-            component = entry.getValue() ? component.setStyle(Styles.BLUE) : component.setStyle(Styles.DK_GREEN);
+            TranslationTextComponent component = listTranslation.componentTranslation(entry.getKey(), entry.getValue());
+            component = (TranslationTextComponent) (entry.getValue() ? component.setStyle(Styles.BLUE) : component.setStyle(Styles.DK_GREEN));
             context.getSource().sendFeedback(component, true);
         }
         return 1;

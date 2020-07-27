@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.common.tileentities;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.ItemReference;
 import com.google.common.base.Preconditions;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,12 +12,11 @@ import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.Tag;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.capabilities.Capability;
@@ -26,13 +24,12 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class TemplateManagerTileEntity extends TileEntity implements INamedContainerProvider {
-    public static final Tag<Item> TEMPLATE_CONVERTIBLES = new ItemTags.Wrapper(ItemReference.TAG_TEMPLATE_CONVERTIBLE);
+    public static final ITag.INamedTag<Item> TEMPLATE_CONVERTIBLES = ItemTags.makeWrapperTag(ItemReference.TAG_TEMPLATE_CONVERTIBLE.toString());
 
     public static final int SIZE = 2;
 
@@ -86,11 +83,11 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
     }
 
     @Override
-    public void read(@Nonnull CompoundNBT compound) {
-        super.read(compound);
+    public void deserializeNBT(CompoundNBT nbt) {
+        super.deserializeNBT(nbt);
 
-        if (compound.contains(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
-            itemStackHandler.deserializeNBT(compound.getCompound(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));
+        if (nbt.contains(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
+            itemStackHandler.deserializeNBT(nbt.getCompound(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));
     }
 
     @Nonnull
@@ -102,7 +99,7 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
 
     public boolean canInteractWith(PlayerEntity playerIn) {
         // If we are too far away (>4 blocks) from this tile entity you cannot use it
-        return ! isRemoved() && playerIn.getDistanceSq(new Vec3d(pos).add(0.5D, 0.5D, 0.5D)) <= 64D;
+        return ! isRemoved() && playerIn.getDistanceSq(Vector3d.of(pos).add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
     @Nonnull

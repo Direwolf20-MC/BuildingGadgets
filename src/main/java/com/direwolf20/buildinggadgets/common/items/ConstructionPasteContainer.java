@@ -42,10 +42,11 @@ public class ConstructionPasteContainer extends Item {
         this.maxCapacity = maxCapacity;
 
         // This is used for setting up the texture change :D
-        addPropertyOverride(LEVEL, (stack, world, entity) -> {
-            float percent = ConstructionPasteContainer.getPasteAmount(stack) / (float) this.maxCapacity.getAsInt();
-            return MathHelper.floor(percent * 4) / 4F;
-        });
+        // TODO ADD BACK 1.16
+//        addPropertyOverride(LEVEL, (stack, world, entity) -> {
+//            float percent = ConstructionPasteContainer.getPasteAmount(stack) / (float) this.maxCapacity.getAsInt();
+//            return MathHelper.floor(percent * 4) / 4F;
+//        });
     }
 
     public ConstructionPasteContainer(boolean isCreative) {

@@ -28,8 +28,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import java.util.Collections;
@@ -130,8 +130,8 @@ public final class Undo {
         ListNBT infoList = NBTHelper.serializeMap(dataMap, NBTUtil::writeBlockPos, i -> i.serialize(dataObjectIncrementer, itemObjectIncrementer));
         ListNBT dataList = dataObjectIncrementer.write(d -> d.serialize(serializerObjectIncrementer, true));
         ListNBT itemSetList = itemObjectIncrementer.write(ms -> NBTHelper.writeIterable(ms.entrySet(), entry -> writeEntry(entry, itemSerializerIncrementer)));
-        ListNBT dataSerializerList = serializerObjectIncrementer.write(ts -> StringNBT.valueOf(ts.getRegistryName().toString()));
-        ListNBT itemSerializerList = itemSerializerIncrementer.write(s -> StringNBT.valueOf(s.getRegistryName().toString()));
+        ListNBT dataSerializerList = serializerObjectIncrementer.write(ts -> StringNBT.of(ts.getRegistryName().toString()));
+        ListNBT itemSerializerList = itemSerializerIncrementer.write(s -> StringNBT.of(s.getRegistryName().toString()));
 
         res.putString(NBTKeys.WORLD_SAVE_DIM, dim.getRegistryName().toString());
         res.put(NBTKeys.WORLD_SAVE_UNDO_BLOCK_LIST, infoList);

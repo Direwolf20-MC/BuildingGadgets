@@ -16,9 +16,9 @@ import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerTemplateCreated;
-import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.template.*;
 import com.direwolf20.buildinggadgets.common.template.ITemplateProvider.IUpdateListener;
 import com.direwolf20.buildinggadgets.common.tileentities.TemplateManagerTileEntity;
@@ -36,6 +36,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.gson.JsonParseException;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -43,7 +44,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.BlockRendererDispatcher;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Rectangle2d;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -57,6 +61,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
@@ -67,7 +72,6 @@ import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
@@ -100,13 +104,13 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     @Override
     public void init() {
         super.init();
-        this.nameField = new TextFieldWidget(this.font, (this.guiLeft - 20) + 8, guiTop - 5, xSize - 16, this.font.FONT_HEIGHT + 3, GuiTranslation.TEMPLATE_NAME_TIP.format());
+        this.nameField = new TextFieldWidget(this.textRenderer, (this.guiLeft - 20) + 8, guiTop - 5, xSize - 16, this.textRenderer.FONT_HEIGHT + 3, GuiTranslation.TEMPLATE_NAME_TIP.componentTranslation());
 
         int x = (guiLeft - 20) + 180;
-        buttonSave = addButton(new Button(x, guiTop + 17, 60, 20, GuiTranslation.BUTTON_SAVE.format(), b -> onSave()));
-        buttonLoad = addButton(new Button(x,guiTop + 39, 60, 20, GuiTranslation.BUTTON_LOAD.format(), b -> onLoad()));
-        buttonCopy = addButton(new Button(x, guiTop + 66, 60, 20, GuiTranslation.BUTTON_COPY.format(), b -> onCopy()));
-        buttonPaste = addButton(new Button(x, guiTop + 89, 60, 20, GuiTranslation.BUTTON_PASTE.format(), b -> onPaste()));
+        buttonSave = addButton(new Button(x, guiTop + 17, 60, 20, GuiTranslation.BUTTON_SAVE.componentTranslation(), b -> onSave()));
+        buttonLoad = addButton(new Button(x,guiTop + 39, 60, 20, GuiTranslation.BUTTON_LOAD.componentTranslation(), b -> onLoad()));
+        buttonCopy = addButton(new Button(x, guiTop + 66, 60, 20, GuiTranslation.BUTTON_COPY.componentTranslation(), b -> onCopy()));
+        buttonPaste = addButton(new Button(x, guiTop + 89, 60, 20, GuiTranslation.BUTTON_PASTE.componentTranslation(), b -> onPaste()));
 
         this.nameField.setMaxStringLength(50);
         this.nameField.setVisible(true);
@@ -114,34 +118,32 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        super.render(mouseX, mouseY, partialTicks);
-        this.renderHoveredToolTip(mouseX, mouseY);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
+        super.render(matrices, mouseX, mouseY, partialTicks);
+        this.drawMouseoverTooltip(matrices, mouseX, mouseY);
 
         if (this.template != null) {
-            renderRequirement(mouseX, mouseY);
+            renderRequirement(matrices, mouseX, mouseY);
         }
 
         validateCache(partialTicks);
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
-        this.renderBackground();
-
+    protected void drawBackground(MatrixStack matrices, float partialTicks, int mouseX, int mouseY) {
         getMinecraft().getTextureManager().bindTexture(background);
-        blit(guiLeft - 20, guiTop - 12, 0, 0, xSize, ySize + 25);
-        blit((guiLeft - 20) + xSize, guiTop + 8, xSize + 3, 30, 71, ySize);
+        drawTexture(matrices, guiLeft - 20, guiTop - 12, 0, 0, xSize, ySize + 25);
+        drawTexture(matrices, (guiLeft - 20) + xSize, guiTop + 8, xSize + 3, 30, 71, ySize);
 
         if (! buttonCopy.isHovered() && ! buttonPaste.isHovered()) {
             if( buttonLoad.isHovered() )
-                blit((guiLeft + xSize) - 44, guiTop + 38, xSize, 0, 17, 24);
+                drawTexture(matrices, (guiLeft + xSize) - 44, guiTop + 38, xSize, 0, 17, 24);
             else
-                blit((guiLeft + xSize) - 44, guiTop + 38, xSize + 17, 0, 16, 24);
+                drawTexture(matrices, (guiLeft + xSize) - 44, guiTop + 38, xSize + 17, 0, 16, 24);
         }
 
-        this.nameField.render(mouseX, mouseY, partialTicks);
-        fill(guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
+        this.nameField.render(matrices, mouseX, mouseY, partialTicks);
+        fill(matrices, guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
 
         if( this.template != null ) {
             renderPanel();
@@ -210,7 +212,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 //                            renderer.render(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, - 1);
                     }
                     //remember vanilla Tiles rebinding the TextureAtlas
-                    getMinecraft().getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+                    getMinecraft().getTextureManager().bindTexture(PlayerContainer.BLOCK_ATLAS_TEXTURE);
                 } catch (Exception e) {
                     BuildingGadgets.LOG.error("Error rendering TileEntity", e);
                 }
@@ -241,18 +243,18 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 //        }
     }
 
-    private void renderRequirement(int mouseX, int mouseY) {
+    private void renderRequirement(MatrixStack matrices, int mouseX, int mouseY) {
         MaterialList requirements = this.template.getHeaderAndForceMaterials(SimpleBuildContext.builder().build(getWorld())).getRequiredItems();
         if( requirements == null )
             return;
 
-        RenderHelper.enableStandardItemLighting();
+        RenderHelper.enableGuiDepthLighting();
 
         RenderSystem.pushMatrix();
         RenderSystem.translated(guiLeft - 30, guiTop - 5, 200);
         RenderSystem.scalef(.8f, .8f, .8f);
 
-        drawRightAlignedString(getMinecraft().fontRenderer, "Requirements", 5, 0, Color.WHITE.getRGB());
+        drawCenteredString(matrices, getMinecraft().fontRenderer, "Requirements", 5, 0, Color.WHITE.getRGB());
 
         // The things you have to do to get anything from this system is just stupid.
         MatchResult list = InventoryHelper.CREATIVE_INDEX.tryMatch(requirements);
@@ -268,14 +270,14 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             ItemStack stack = e.getElement().createStack();
             int x = (-20 - (column * 25)), y = (20 + (index * 25));
 
-            itemRenderer.renderItemAndEffectIntoGUI(this.minecraft.player, stack, x + 4, y + 4);
+            itemRenderer.renderItemAndEffectIntoGUI(this.getMinecraft().player, stack, x + 4, y + 4);
             itemRenderer.renderItemOverlayIntoGUI(Minecraft.getInstance().fontRenderer, stack, x + 4, y + 4, GadgetUtils.withSuffix(foundItems.count(e.getElement())));
 
             int space = (int) (25 - (.2f * 25));
             int zoneX = ((guiLeft - 32) + (-15 - (column * space))), zoneY = (guiTop - 9) + (20 + (index * space));
 
             if (mouseX > zoneX && mouseX < (zoneX + space) && mouseY > zoneY && mouseY < (zoneY + space)) {
-                renderTooltip(stack.getTooltip(this.minecraft.player, ITooltipFlag.TooltipFlags.NORMAL).stream().map(ITextComponent::getFormattedText).collect(Collectors.toList()), x + 15, y + 25);
+                renderTooltip(matrices, stack.getTooltip(this.getMinecraft().player, ITooltipFlag.TooltipFlags.NORMAL), x + 15, y + 25);
             }
 
             index ++;
@@ -334,7 +336,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void renderPanel() {
-        double scale = getMinecraft().getMainWindow().getGuiScaleFactor();
+        double scale = getMinecraft().getWindow().getGuiScaleFactor();
 
         BlockPos startPos = template.getHeader().getBoundingBox().getMin();
         BlockPos endPos = template.getHeader().getBoundingBox().getMax();
@@ -368,7 +370,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         RenderSystem.multMatrix(Matrix4f.perspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000));
         RenderSystem.matrixMode(GL11.GL_MODELVIEW);
         RenderSystem.viewport((int) Math.round((guiLeft + panel.getX()) * scale),
-                (int) Math.round(getMinecraft().getMainWindow().getFramebufferHeight() - (guiTop + panel.getY() + panel.getHeight()) * scale),
+                (int) Math.round(getMinecraft().getWindow().getFramebufferHeight() - (guiTop + panel.getY() + panel.getHeight()) * scale),
                 (int) Math.round(panel.getWidth() * scale),
                 (int) Math.round(panel.getHeight() * scale));
 
@@ -389,7 +391,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         RenderSystem.rotatef(rotY, 0, 1, 0);
         RenderSystem.translated(((startPos.getX() - endPos.getX()) / 2f), ((startPos.getY() - endPos.getY()) / 2f), ((startPos.getZ() - endPos.getZ()) / 2f));
 
-        getMinecraft().getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+        getMinecraft().getTextureManager().bindTexture(PlayerContainer.BLOCK_ATLAS_TEXTURE);
 
 //        RenderSystem.callList(displayList);
 
@@ -397,7 +399,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         RenderSystem.matrixMode(GL11.GL_PROJECTION);
         RenderSystem.popMatrix();
         RenderSystem.matrixMode(GL11.GL_MODELVIEW);
-        RenderSystem.viewport(0, 0, getMinecraft().getMainWindow().getFramebufferWidth(), getMinecraft().getMainWindow().getFramebufferHeight());
+        RenderSystem.viewport(0, 0, getMinecraft().getWindow().getFramebufferWidth(), getMinecraft().getWindow().getFramebufferHeight());
     }
 
     private void resetViewport() {
@@ -445,7 +447,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(int j, int i) {
+    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
         if (panelClicked) {
             if (clickButton == 0) {
                 float prevRotX = rotX;
@@ -467,16 +469,16 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         momentumY *= momentumDampening;
 
         if (! nameField.isFocused() && nameField.getText().isEmpty())
-            getMinecraft().fontRenderer.drawString(GuiTranslation.TEMPLATE_PLACEHOLDER.format(), nameField.x - guiLeft + 4, (nameField.y + 2) - guiTop, - 10197916);
+            getMinecraft().fontRenderer.draw(matrices, GuiTranslation.TEMPLATE_PLACEHOLDER.format(), nameField.x - guiLeft + 4, (nameField.y + 2) - guiTop, - 10197916);
 
         if (buttonSave.isHovered() || buttonLoad.isHovered() || buttonPaste.isHovered())
-            drawSlotOverlay(buttonLoad.isHovered() ? container.getSlot(0) : container.getSlot(1));
+            drawSlotOverlay(matrices, buttonLoad.isHovered() ? container.getSlot(0) : container.getSlot(1));
     }
 
-    private void drawSlotOverlay(Slot slot) {
+    private void drawSlotOverlay(MatrixStack matrices, Slot slot) {
         RenderSystem.pushMatrix();
         RenderSystem.translated(0, 0, 1000);
-        fill(slot.xPos, slot.yPos, slot.xPos + 16, slot.yPos + 16, - 1660903937);
+        fill(matrices, slot.xPos, slot.yPos, slot.xPos + 16, slot.yPos + 16, - 1660903937);
         RenderSystem.translated(0, 0, - 1000);
         RenderSystem.popMatrix();
     }

@@ -105,13 +105,13 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
     }
 
     @Override
-    public void handleUpdateTag(CompoundNBT tag) {
-        read(tag);
+    public void handleUpdateTag(BlockState state, CompoundNBT tag) {
+        deserializeNBT(tag);
     }
 
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-        read(pkt.getNbtCompound());
+        deserializeNBT(pkt.getNbtCompound());
     }
 
     @Nonnull
@@ -128,8 +128,8 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
     }
 
     @Override
-    public void read(@Nonnull CompoundNBT compound) {
-        super.read(compound);
+    public void deserializeNBT(CompoundNBT compound) {
+        super.deserializeNBT(compound);
 
         if (compound.contains(NBTKeys.GADGET_TICKS, NBT.TAG_INT) &&
                 compound.contains(NBTKeys.GADGET_MODE, NBT.TAG_INT) &&
@@ -144,4 +144,5 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
             usePaste = compound.getBoolean(NBTKeys.GADGET_USE_PASTE);
         }
     }
+
 }

@@ -109,7 +109,7 @@ public class GadgetDestruction extends AbstractGadget {
         if (side == null)
             tag.remove(NBTKeys.GADGET_ANCHOR_SIDE);
         else
-            tag.putString(NBTKeys.GADGET_ANCHOR_SIDE, side.getName());
+            tag.putString(NBTKeys.GADGET_ANCHOR_SIDE, side.getName2());
     }
 
     public static Direction getAnchorSide(ItemStack stack) {
@@ -211,7 +211,7 @@ public class GadgetDestruction extends AbstractGadget {
 
         return new Region(first, second).stream()
                 .filter(e -> isValidBlock(world, e, player, world.getBlockState(e)))
-                .sorted(Comparator.comparing(player.getPosition()::distanceSq))
+                .sorted(Comparator.comparing(player.getBlockPos()::distanceSq))
                 .collect(Collectors.toList());
     }
 
@@ -226,7 +226,7 @@ public class GadgetDestruction extends AbstractGadget {
             return false;
 
         if (! world.isRemote) {
-            BlockSnapshot blockSnapshot = BlockSnapshot.getBlockSnapshot(world, voidPos);
+            BlockSnapshot blockSnapshot = BlockSnapshot.create(world, voidPos);
             if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP))
                 return false;
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);
@@ -249,7 +249,7 @@ public class GadgetDestruction extends AbstractGadget {
             }
         }
 
-        pushUndo(stack, builder.build(world.getDimension().getType()));
+        pushUndo(stack, builder.build(world.getDimension()));
     }
 
     private boolean destroyBlock(World world, BlockPos voidPos, ServerPlayerEntity player, Undo.Builder builder) {

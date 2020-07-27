@@ -16,7 +16,7 @@ public final class LangUtil {
     }
 
     public static String getFormattedBlockName(Block block) {
-        return block.getNameTextComponent().getFormattedText();
+        return block.getName().getString();
     }
 
 }

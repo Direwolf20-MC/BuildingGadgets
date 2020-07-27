@@ -126,7 +126,7 @@ public final class BuildingGadgets {
     }
 
     private void serverLoad(FMLServerStartingEvent event) {
-        event.getCommandDispatcher().register(
+        event.getServer().getCommandManager().getDispatcher().register(
                 Commands.literal(Reference.MODID)
                         .then(OverrideBuildSizeCommand.registerToggle())
                         .then(OverrideCopySizeCommand.registerToggle())

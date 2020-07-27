@@ -14,13 +14,13 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
@@ -122,7 +122,7 @@ public class EffectBlock extends Block {
     }
 
     public EffectBlock() {
-        super(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f).notSolid().noDrops());
+        super(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f).nonOpaque().noDrops());
     }
 
     @Override
@@ -149,11 +149,6 @@ public class EffectBlock extends Block {
     }
 
     @Override
-    public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
-        return false;
-    }
-
-    @Override
     public boolean isSideInvisible(BlockState p_200122_1_, BlockState p_200122_2_, Direction p_200122_3_) {
         return true;
     }
@@ -161,10 +156,10 @@ public class EffectBlock extends Block {
     /**
      * This gets a complete list of items dropped from this block.
      *
-     * @param state Current state
+     * @param BlockState Current state
      */
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder loot) {
+    public List<ItemStack> getDrops(BlockState p_220076_1_, LootContext.Builder p_220076_2_) {
         return new ArrayList<>();
     }
 

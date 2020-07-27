@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.inventory;
 
+import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.inventory.handle.IHandleProvider;
@@ -7,8 +8,10 @@ import com.direwolf20.buildinggadgets.common.inventory.handle.IObjectHandle;
 import com.direwolf20.buildinggadgets.common.inventory.handle.ItemHandlerProvider;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
-import com.direwolf20.buildinggadgets.common.items.*;
-import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
+import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
+import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.registry.TopologicalRegistryBuilder;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.CommonUtils;
@@ -23,10 +26,9 @@ import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.IProperty;
+import net.minecraft.state.Property;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
@@ -45,16 +47,15 @@ import java.util.function.Supplier;
  */
 public class InventoryHelper {
     public static final MaterialList PASTE_LIST = MaterialList.of(new UniqueItem(OurItems.CONSTRUCTION_PASTE_ITEM.get()));
-    private static IProperty AXIS = EnumProperty.create("axis", Direction.Axis.class);
 
-    private static final Set<IProperty> SAFE_PROPERTIES =
-            ImmutableSet.of(SlabBlock.TYPE, StairsBlock.HALF, LogBlock.AXIS, AXIS, DirectionalBlock.FACING, StairsBlock.FACING, TrapDoorBlock.HALF, TrapDoorBlock.OPEN, StairsBlock.SHAPE, LeverBlock.POWERED, RepeaterBlock.DELAY, PaneBlock.EAST, PaneBlock.WEST, PaneBlock.NORTH, PaneBlock.SOUTH);
+    private static final Set<Property<?>> SAFE_PROPERTIES =
+            ImmutableSet.of(SlabBlock.TYPE, StairsBlock.HALF, BlockStateProperties.AXIS, DirectionalBlock.FACING, StairsBlock.FACING, TrapDoorBlock.HALF, TrapDoorBlock.OPEN, StairsBlock.SHAPE, LeverBlock.POWERED, RepeaterBlock.DELAY, PaneBlock.EAST, PaneBlock.WEST, PaneBlock.NORTH, PaneBlock.SOUTH);
 
-    private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE =
-            ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).add(RailBlock.SHAPE, PoweredRailBlock.SHAPE, ChestBlock.TYPE).build();
+    private static final Set<Property<?>> SAFE_PROPERTIES_COPY_PASTE =
+            ImmutableSet.<Property<?>>builder().addAll(SAFE_PROPERTIES).add(RailBlock.SHAPE, PoweredRailBlock.SHAPE, ChestBlock.TYPE).build();
 
-    private static final Set<IProperty<?>> UNSAFE_PROPERTIES =
-            ImmutableSet.<IProperty<?>>builder().add(CropsBlock.AGE).build();
+    private static final Set<Property<?>> UNSAFE_PROPERTIES =
+            ImmutableSet.<Property<?>>builder().add(CropsBlock.AGE).build();
 
     public static final CreativeItemIndex CREATIVE_INDEX = new CreativeItemIndex();
 
@@ -338,7 +339,7 @@ public class InventoryHelper {
         }
         if (placeState == null)
             placeState = state.getBlock().getDefaultState();
-        for (IProperty<?> prop : placeState.getProperties()) {
+        for (Property<?> prop : placeState.getProperties()) {
             if (! UNSAFE_PROPERTIES.contains(prop))
                 placeState = applyProperty(placeState, state, prop);
         }
@@ -346,7 +347,7 @@ public class InventoryHelper {
     }
 
     //proper generics...
-    private static <T extends Comparable<T>> BlockState applyProperty(BlockState state, BlockState from, IProperty<T> prop) {
+    private static <T extends Comparable<T>> BlockState applyProperty(BlockState state, BlockState from, Property<T> prop) {
         return state.with(prop, from.get(prop));
     }
 

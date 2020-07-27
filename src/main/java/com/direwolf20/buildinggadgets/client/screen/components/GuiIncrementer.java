@@ -1,9 +1,11 @@
 package com.direwolf20.buildinggadgets.client.screen.components;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.Widget;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.StringTextComponent;
 
 import javax.annotation.Nullable;
 
@@ -24,7 +26,7 @@ public class GuiIncrementer extends Widget {
     private DireButton plusButton;
 
     public GuiIncrementer(int x, int y, int min, int max, @Nullable IIncrementerChanged onChange) {
-        super(x, y, WIDTH, 20, "");
+        super(x, y, WIDTH, 20, StringTextComponent.EMPTY);
 
         this.x = x;
         this.y = y;
@@ -33,9 +35,9 @@ public class GuiIncrementer extends Widget {
         this.value = 0;
         this.onChange = onChange;
 
-        this.minusButton = new DireButton(this.x, this.y - 1, 12, 17, "-", (button) -> this.updateValue(true));
+        this.minusButton = new DireButton(this.x, this.y - 1, 12, 17, new StringTextComponent("-"), (button) -> this.updateValue(true));
         this.field = new GuiTextFieldBase(Minecraft.getInstance().fontRenderer, x + 13, y, 40).setDefaultInt(this.value).restrictToNumeric();
-        this.plusButton = new DireButton(this.x + 40 + 14, this.y - 1, 12, 17, "+", (button) -> this.updateValue(false));
+        this.plusButton = new DireButton(this.x + 40 + 14, this.y - 1, 12, 17, new StringTextComponent("+"), (button) -> this.updateValue(false));
 
         this.field.setText(String.valueOf(this.value));
     }
@@ -70,10 +72,10 @@ public class GuiIncrementer extends Widget {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTick) {
-        this.plusButton.render(mouseX, mouseY, partialTick);
-        this.minusButton.render(mouseX, mouseY, partialTick);
-        this.field.render(mouseX, mouseY, partialTick);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTick) {
+        this.plusButton.render(matrices, mouseX, mouseY, partialTick);
+        this.minusButton.render(matrices, mouseX, mouseY, partialTick);
+        this.field.render(matrices, mouseX, mouseY, partialTick);
     }
 
     @Override

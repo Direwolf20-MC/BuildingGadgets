@@ -43,6 +43,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.LazyOptional;
@@ -201,11 +202,11 @@ public class GadgetUtils {
         World world = player.world;
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, AbstractGadget.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
         if (world.isAirBlock(lookingAt.getPos()))
-            return ActionResult.resultFail(Blocks.AIR);
+            return ActionResult.fail(Blocks.AIR);
 
         BlockState state = world.getBlockState(lookingAt.getPos());
         if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock()) || state.getBlock() instanceof EffectBlock)
-            return ActionResult.resultFail(state.getBlock());
+            return ActionResult.fail(state.getBlock());
 
         Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getPos(), player.getActiveHand());
         data.ifPresent(placeState -> {
@@ -215,7 +216,7 @@ public class GadgetUtils {
             setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));
         });
 
-        return ActionResult.resultSuccess(state.getBlock());
+        return ActionResult.success(state.getBlock());
     }
 
     public static ActionResultType setRemoteInventory(ItemStack stack, PlayerEntity player, World world, BlockPos pos, boolean setTool) {

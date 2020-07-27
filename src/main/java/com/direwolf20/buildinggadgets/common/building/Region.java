@@ -10,7 +10,8 @@ import com.google.common.collect.PeekingIterator;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IWorldReader;
 
 import java.io.Serializable;
@@ -82,11 +83,11 @@ public final class Region implements IPositionPlacementSequence, Serializable {
         this.maxZ = Math.max(minZ, maxZ);
     }
 
-    public Region(Vec3i vertex) {
+    public Region(Vector3i vertex) {
         this(vertex, vertex);
     }
 
-    public Region(Vec3i min, Vec3i max) {
+    public Region(Vector3i min, Vector3i max) {
         this(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
     }
 
@@ -108,11 +109,11 @@ public final class Region implements IPositionPlacementSequence, Serializable {
      * @param direction Direction to translate to
      * @return {@link Region}
      */
-    public Region translate(Vec3i direction) {
+    public Region translate(Vector3i direction) {
         return this.translate(direction.getX(), direction.getY(), direction.getZ());
     }
 
-    public Region inverseTranslate(Vec3i direction) {
+    public Region inverseTranslate(Vector3i direction) {
         return this.translate(- direction.getX(), - direction.getY(), - direction.getZ());
     }
 
@@ -192,7 +193,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
         return new Region(minX - x, minY - y, minZ - z, maxX + x, maxY + y, maxZ + z);
     }
 
-    public Region expand(Vec3i vec) {
+    public Region expand(Vector3i vec) {
         return expand(vec.getX(), vec.getY(), vec.getZ());
     }
 
@@ -224,11 +225,11 @@ public final class Region implements IPositionPlacementSequence, Serializable {
     }
 
     /**
-     * @see #collapse(int, int, int) - read x, y, and z from the {@link Vec3i}.
-     * @param vec Vec3i to collapse to
+     * @see #collapse(int, int, int) - read x, y, and z from the {@link Vector3i}.
+     * @param vec Vector3i to collapse to
      * @return {@link Region}
      */
-    public Region collapse(Vec3i vec) {
+    public Region collapse(Vector3i vec) {
         return collapse(vec.getX(), vec.getY(), vec.getZ());
     }
 
@@ -355,7 +356,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
         return containsX(x) && containsY(y) && containsZ(z);
     }
 
-    public boolean contains(Vec3i vec) {
+    public boolean contains(Vector3i vec) {
         return mayContain(vec.getX(), vec.getY(), vec.getZ());
     }
 
@@ -499,10 +500,10 @@ public final class Region implements IPositionPlacementSequence, Serializable {
          *
          * @param iterable The iterable who's contents shall be in the resulting Region
          * @return The {@code Builder} to allow for Method chaining
-         * @see #enclose(Vec3i)
+         * @see #enclose(Vector3i)
          */
-        public Builder encloseAll(Iterable<? extends Vec3i> iterable) {
-            for (Vec3i vec : iterable) {
+        public Builder encloseAll(Iterable<? extends Vector3i> iterable) {
+            for (Vector3i vec : iterable) {
                 enclose(vec);
             }
             return this;
@@ -520,7 +521,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
          *
          * @return {@link Builder}
          */
-        public Builder enclose(Vec3i vec) {
+        public Builder enclose(Vector3i vec) {
             return enclose(vec.getX(), vec.getY(), vec.getZ());
         }
 

@@ -61,8 +61,8 @@ public class ConstructionBlockTileEntity extends TileEntity {
     }
 
     @Override
-    public void read(@Nonnull CompoundNBT compound) {
-        super.read(compound);
+    public void deserializeNBT(CompoundNBT compound) {
+        super.deserializeNBT(compound);
         blockState = BlockData.tryDeserialize(compound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE), true);
         actualBlockState = BlockData.tryDeserialize(compound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL), true);
         markDirtyClient();
@@ -107,7 +107,7 @@ public class ConstructionBlockTileEntity extends TileEntity {
         BlockData oldMimicBlock = getConstructionBlockData();
         CompoundNBT tagCompound = packet.getNbtCompound();
         super.onDataPacket(net, packet);
-        read(tagCompound);
+        deserializeNBT(tagCompound);
 
         if (world != null && world.isRemote) {
             // If needed send a render update.

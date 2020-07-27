@@ -19,6 +19,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class DestructionGUI extends Screen {
         int x = width / 2;
         int y = height / 2;
 
-        this.addButton(new Button((x - 30) + 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeySingle("confirm")), b -> {
+        this.addButton(new Button((x - 30) + 32, y + 60, 60, 20, new TranslationTextComponent(GuiMod.getLangKeySingle("confirm")), b -> {
             if (isWithinBounds()) {
                 PacketHandler.sendToServer(new PacketDestructionGUI(left.getValueInt(), right.getValueInt(), up.getValueInt(), down.getValueInt(), depth.getValueInt()));
                 this.onClose();
@@ -55,7 +56,7 @@ public class DestructionGUI extends Screen {
                 Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.DESTRCUT_TOO_LARGE.componentTranslation(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), true);
         }));
 
-        this.addButton(new Button((x - 30) - 32, y + 60, 60, 20, I18n.format(GuiMod.getLangKeySingle("cancel")), b -> onClose()));
+        this.addButton(new Button((x - 30) - 32, y + 60, 60, 20, new TranslationTextComponent(GuiMod.getLangKeySingle("cancel")), b -> onClose()));
 
         List<GuiDestructionSlider> sliders = new ArrayList<>();
 
@@ -92,7 +93,7 @@ public class DestructionGUI extends Screen {
 
         GuiDestructionSlider(int x, int y, String prefix, int current) {
             super(
-                    x, y, width, height, String.format("%s ", prefix), "", min, max, current, false, true, Color.DARK_GRAY, null,
+                    x, y, width, height, new StringTextComponent(String.format("%s ", prefix)), new StringTextComponent(""), min, max, current, false, true, Color.DARK_GRAY, null,
                     (slider, amount) -> {
                         slider.setValue(MathHelper.clamp(slider.getValueInt() + amount, min, max));
                         slider.updateSlider();

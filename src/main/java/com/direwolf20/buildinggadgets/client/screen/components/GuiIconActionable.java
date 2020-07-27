@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.client.screen.components;
 
 import com.direwolf20.buildinggadgets.client.OurSounds;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
@@ -9,6 +10,7 @@ import net.minecraft.client.audio.SimpleSound;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
 
 import java.awt.*;
 import java.util.function.Predicate;
@@ -30,7 +32,7 @@ public class GuiIconActionable extends Button {
     private ResourceLocation selectedTexture;
     private ResourceLocation deselectedTexture;
 
-    public GuiIconActionable(int x, int y, String texture, String message, boolean isSelectable, Predicate<Boolean> action) {
+    public GuiIconActionable(int x, int y, String texture, ITextComponent message, boolean isSelectable, Predicate<Boolean> action) {
         super(x, y, 25, 25, message, (b) -> {});
         this.activeColor = deselectedColor;
         this.isSelectable = isSelectable;
@@ -49,7 +51,7 @@ public class GuiIconActionable extends Button {
      * If yo do not need to be able to select / toggle something then use this constructor as
      * you'll hit missing texture issues if you don't have an active (_selected) texture.
      */
-    public GuiIconActionable(int x, int y, String texture, String message, Predicate<Boolean> action) {
+    public GuiIconActionable(int x, int y, String texture, ITextComponent message, Predicate<Boolean> action) {
         this(x, y, texture, message, false, action);
     }
 
@@ -82,7 +84,7 @@ public class GuiIconActionable extends Button {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTick) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTick) {
         if( !visible )
             return;
 
@@ -92,14 +94,14 @@ public class GuiIconActionable extends Button {
 
         RenderSystem.disableTexture();
         RenderSystem.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, .15f);
-        blit(this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
+        drawTexture(matrices, this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
         RenderSystem.enableTexture();
 
         RenderSystem.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, alpha);
         Minecraft.getInstance().getTextureManager().bindTexture(selected ? selectedTexture : deselectedTexture);
-        blit(this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
+        drawTexture(matrices, this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
 
         if( mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height )
-            drawString(Minecraft.getInstance().fontRenderer, this.getMessage(), mouseX > (Minecraft.getInstance().getMainWindow().getScaledWidth() / 2) ?  mouseX + 2 : mouseX - Minecraft.getInstance().fontRenderer.getStringWidth(getMessage()), mouseY - 10, activeColor.getRGB());
+            drawStringWithShadow(matrices, Minecraft.getInstance().fontRenderer, this.getMessage().getString(), mouseX > (Minecraft.getInstance().getWindow().getScaledWidth() / 2) ?  mouseX + 2 : mouseX - Minecraft.getInstance().fontRenderer.getStringWidth(getMessage().getString()), mouseY - 10, activeColor.getRGB());
     }
 }

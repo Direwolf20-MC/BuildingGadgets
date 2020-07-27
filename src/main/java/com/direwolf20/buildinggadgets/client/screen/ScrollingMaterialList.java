@@ -11,6 +11,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Multiset;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.list.ExtendedList;
@@ -81,27 +82,27 @@ class ScrollingMaterialList extends EntryList<Entry> {
     }
 
     @Override
-    protected int getScrollbarPosition() {
+    protected int getScrollbarPositionX() {
         return getRight() - MARGIN - SCROLL_BAR_WIDTH;
     }
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
         if (keyCode == GLFW.GLFW_KEY_E) {
-            assert minecraft.player != null;
+            assert Minecraft.getInstance().player != null;
 
-            minecraft.player.closeScreen();
+            Minecraft.getInstance().player.closeScreen();
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
         if (lastUpdate + UPDATE_MILLIS < System.currentTimeMillis())
             updateEntries();
 
-        super.render(mouseX, mouseY, partialTicks);
+        super.render(matrices, mouseX, mouseY, partialTicks);
     }
 
     public void reset() {
@@ -137,7 +138,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
         }
 
         @Override
-        public void render(int index, int topY, int leftX, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float particleTicks) {
+        public void render(MatrixStack matrices, int index, int topY, int leftX, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float particleTicks) {
             // Weird render issue with GuiSlot where the right border is slightly offset
             // MARGIN * 2 is just a magic number that made it look nice
             int right = leftX + entryWidth - MARGIN * 2;
@@ -148,15 +149,15 @@ class ScrollingMaterialList extends EntryList<Entry> {
             int slotY = topY + MARGIN;
 
             drawIcon(stack, slotX, slotY);
-            drawTextOverlay(right, topY, bottom, slotX);
+            drawTextOverlay(matrices, right, topY, bottom, slotX);
             drawHoveringText(stack, slotX, slotY, mouseX, mouseY);
         }
 
-        private void drawTextOverlay(int right, int top, int bottom, int slotX) {
+        private void drawTextOverlay(MatrixStack matrices, int right, int top, int bottom, int slotX) {
             int itemNameX = slotX + SLOT_SIZE + MARGIN;
             // -1 because the bottom x coordinate is exclusive
-            renderTextVerticalCenter(itemName, itemNameX, top, bottom, Color.WHITE.getRGB());
-            renderTextHorizontalRight(amount, right, getYForAlignedCenter(top, bottom, Minecraft.getInstance().fontRenderer.FONT_HEIGHT), getTextColor());
+            renderTextVerticalCenter(matrices, itemName, itemNameX, top, bottom, Color.WHITE.getRGB());
+            renderTextHorizontalRight(matrices, amount, right, getYForAlignedCenter(top, bottom, Minecraft.getInstance().fontRenderer.FONT_HEIGHT), getTextColor());
 
             drawGuidingLine(right, top, bottom, itemNameX, widthItemName, widthAmount);
         }
@@ -188,7 +189,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
 
         private void drawIcon(ItemStack item, int slotX, int slotY) {
             RenderSystem.pushMatrix();
-            RenderHelper.enableStandardItemLighting();
+            RenderHelper.enableGuiDepthLighting();
             Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(item, slotX, slotY);
             RenderSystem.disableLighting();
             RenderSystem.color3f(1, 1, 1);
@@ -283,6 +284,10 @@ class ScrollingMaterialList extends EntryList<Entry> {
 
         public String getLocalizedName() {
             return translationProvider.format();
+        }
+
+        public ITranslationProvider getTranslationProvider() {
+            return translationProvider;
         }
 
         public SortingModes next() {

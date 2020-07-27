@@ -15,8 +15,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3i;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -28,10 +28,10 @@ import java.util.stream.StreamSupport;
 public final class CommonUtils {
     private CommonUtils() {}
 
-    public static final Comparator<Vec3i> POSITION_COMPARATOR = Comparator
-            .comparingInt(Vec3i::getX)
-            .thenComparingInt(Vec3i::getY)
-            .thenComparingInt(Vec3i::getZ);
+    public static final Comparator<Vector3i> POSITION_COMPARATOR = Comparator
+            .comparingInt(Vector3i::getX)
+            .thenComparingInt(Vector3i::getY)
+            .thenComparingInt(Vector3i::getZ);
 
     public static <T> IPlacementSequence<T> filterSequence(IPlacementSequence<T> sequence, Predicate<T> filter) {
         return filterSequence(sequence, Function.identity(), filter);
@@ -142,8 +142,8 @@ public final class CommonUtils {
         };
     }
 
-    public static BlockRayTraceResult fakeRayTrace(Vec3d simulatePos, BlockPos pos) {
-        Vec3d simVec = new Vec3d(pos).subtract(simulatePos);
+    public static BlockRayTraceResult fakeRayTrace(Vector3d simulatePos, BlockPos pos) {
+        Vector3d simVec = Vector3d.of(pos).subtract(simulatePos);
         Direction dir = Direction.getFacingFromVector(simVec.getX(), simVec.getY(), simVec.getZ());
         return new BlockRayTraceResult(simVec, dir, pos, false);
     }
@@ -153,7 +153,7 @@ public final class CommonUtils {
         return estimateRequiredItems(buildView, context, player != null ? player.getPositionVec() : null);
     }
 
-    public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, IBuildContext context, @Nullable Vec3d simulatePos) {
+    public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, IBuildContext context, @Nullable Vector3d simulatePos) {
         MaterialList.SubEntryBuilder builder = MaterialList.andBuilder();
         for (PlacementTarget placementTarget : buildView) {
             BlockRayTraceResult target = simulatePos != null ? CommonUtils.fakeRayTrace(simulatePos, placementTarget.getPos()) : null;

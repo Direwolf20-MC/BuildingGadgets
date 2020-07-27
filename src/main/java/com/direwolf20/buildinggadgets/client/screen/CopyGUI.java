@@ -8,6 +8,7 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.AbstractButton;
@@ -15,6 +16,7 @@ import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 
 import java.util.ArrayList;
@@ -65,7 +67,7 @@ public class CopyGUI extends Screen {
         updateTextFields();
 
         List<AbstractButton> buttons = new ArrayList<AbstractButton>() {{
-            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CONFIRM, (button) -> {
+            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CONFIRM.componentTranslation(), (button) -> {
                 if (absoluteCoords) {
                     startPos = new BlockPos(startX.getValue(), startY.getValue(), startZ.getValue());
                     endPos = new BlockPos(endX.getValue(), endY.getValue(), endZ.getValue());
@@ -75,14 +77,14 @@ public class CopyGUI extends Screen {
                 }
                 PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
             }));
-            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLOSE, (button) -> onClose()));
-            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLEAR, (button) -> {
+            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLOSE.componentTranslation(), (button) -> onClose()));
+            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLEAR.componentTranslation(), (button) -> {
                 PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ZERO, BlockPos.ZERO));
                 onClose();
             }));
 
             if( Config.GENERAL.allowAbsoluteCoords.get() ) {
-                add(new CenteredButton(y + 20, 120, GuiTranslation.COPY_BUTTON_ABSOLUTE, (button) -> {
+                add(new CenteredButton(y + 20, 120, GuiTranslation.COPY_BUTTON_ABSOLUTE.componentTranslation(), (button) -> {
                     coordsModeSwitch();
                     updateTextFields();
                 }));
@@ -93,8 +95,8 @@ public class CopyGUI extends Screen {
         buttons.forEach(this::addButton);
     }
 
-    private void drawFieldLabel(String name, int x, int y) {
-        font.drawStringWithShadow(name, this.x + x, this.y + y, 0xFFFFFF);
+    private void drawFieldLabel(MatrixStack matrices, String name, int x, int y) {
+        textRenderer.drawWithShadow(matrices, name, this.x + x, this.y + y, 0xFFFFFF);
     }
 
     private void coordsModeSwitch() {
@@ -123,18 +125,18 @@ public class CopyGUI extends Screen {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
-        drawFieldLabel(GuiTranslation.FIELD_START.format() + " X", -175, -36);
-        drawFieldLabel("Y", -45, -36);
-        drawFieldLabel("Z", 55, -36);
-        drawFieldLabel(GuiTranslation.FIELD_END.format() + " X", 8 - 175, -11);
-        drawFieldLabel("Y", -45, -11);
-        drawFieldLabel("Z", 55, -11);
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
+        drawFieldLabel(matrices, GuiTranslation.FIELD_START.format() + " X", -175, -36);
+        drawFieldLabel(matrices, "Y", -45, -36);
+        drawFieldLabel(matrices, "Z", 55, -36);
+        drawFieldLabel(matrices, GuiTranslation.FIELD_END.format() + " X", 8 - 175, -11);
+        drawFieldLabel(matrices, "Y", -45, -11);
+        drawFieldLabel(matrices, "Z", 55, -11);
 
-        drawCenteredString(Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), this.x, this.y - 80, 0xFFFFFF);
-        drawCenteredString(Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_SUBHEADING.getTranslationKey()), this.x, this.y - 68, 0xFFFFFF);
+        drawCenteredString(matrices, Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), this.x, this.y - 80, 0xFFFFFF);
+        drawCenteredString(matrices, Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_SUBHEADING.getTranslationKey()), this.x, this.y - 68, 0xFFFFFF);
 
-        super.render(mouseX, mouseY, partialTicks);
+        super.render(matrices, mouseX, mouseY, partialTicks);
     }
 
     @Override
@@ -155,8 +157,8 @@ public class CopyGUI extends Screen {
     }
 
     static class CenteredButton extends Button {
-        CenteredButton(int y, int width, ITranslationProvider text, IPressable onPress) {
-            super(0, y, width, 20, I18n.format(text.getTranslationKey()), onPress);
+        CenteredButton(int y, int width, ITextComponent text, IPressable onPress) {
+            super(0, y, width, 20, text, onPress);
         }
 
         static void centerButtonList(List<AbstractButton> buttons, int startX) {

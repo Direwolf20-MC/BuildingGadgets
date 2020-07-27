@@ -66,8 +66,12 @@ minecraft {
         }
     }
 }
+
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 repositories {
+    maven {
+        url "https://maven.tterrag.com/"
+    }
     maven {
         // JEI
         name = "Progwml6 maven"

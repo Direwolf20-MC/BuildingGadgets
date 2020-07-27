@@ -25,7 +25,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
@@ -35,7 +34,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Matrix4f;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
@@ -62,7 +62,7 @@ public class CopyPasteRender extends BaseRenderer {
         super.render(evt, player, heldItem);
 
         // Provide this as both renders require the data.
-        Vec3d projectedView = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+        Vector3d projectedView = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
 
         // translate the matric to the projected view
         MatrixStack stack = evt.getMatrixStack(); //Get current matrix position from the evt call
@@ -95,30 +95,30 @@ public class CopyPasteRender extends BaseRenderer {
 
         int R = 255, G = 223, B = 127;
 
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getBufferBuilders().getEntityVertexConsumers();
         IVertexBuilder builder = buffer.getBuffer(OurRenderTypes.CopyGadgetLines);
 
-        Matrix4f matrix4f = matrix.getLast().getMatrix();
-        builder.pos(matrix4f, x, y, z).color(G, G, G, 0.0F).endVertex();
-        builder.pos(matrix4f, x, y, z).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, y, z).color(G, B, B, R).endVertex();
-        builder.pos(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, x, y, z).color(B, B, G, R).endVertex();
-        builder.pos(matrix4f, x, dy, z).color(B, G, B, R).endVertex();
-        builder.pos(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, x, dy, z).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, y, z).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, y, z).color(G, G, G, 0.0F).endVertex();
+        Matrix4f matrix4f = matrix.peek().getModel();
+        builder.vertex(matrix4f, x, y, z).color(G, G, G, 0.0F).endVertex();
+        builder.vertex(matrix4f, x, y, z).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, y, z).color(G, B, B, R).endVertex();
+        builder.vertex(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, x, y, z).color(B, B, G, R).endVertex();
+        builder.vertex(matrix4f, x, dy, z).color(B, G, B, R).endVertex();
+        builder.vertex(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, x, dy, z).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, y, z).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, y, z).color(G, G, G, 0.0F).endVertex();
 
-        buffer.finish();
+        buffer.draw(); // @mcp: draw = finish
     }
 
     /**
@@ -127,7 +127,7 @@ public class CopyPasteRender extends BaseRenderer {
      * @implNote @michaelhillcox
      * @since 1.14 - 3.2.0b
      */
-    private void renderPaste(MatrixStack matrix, Vec3d projectedView, PlayerEntity player, ItemStack heldItem) {
+    private void renderPaste(MatrixStack matrix, Vector3d projectedView, PlayerEntity player, ItemStack heldItem) {
         World world = player.world;
 
         // Check the template cap from the world
@@ -163,13 +163,13 @@ public class CopyPasteRender extends BaseRenderer {
         });
     }
 
-    private void renderTargets(MatrixStack matrix, Vec3d projectedView, IBuildContext context, List<PlacementTarget> targets, BlockPos startPos) {
+    private void renderTargets(MatrixStack matrix, Vector3d projectedView, IBuildContext context, List<PlacementTarget> targets, BlockPos startPos) {
         tickTrack++;
         if (renderBuffer != null && tickTrack < 300) {
             if (tickTrack % 30 == 0) {
                 try {
-                    Vec3d projectedView2 = projectedView;
-                    Vec3d startPosView = new Vec3d(startPos.getX(), startPos.getY(), startPos.getZ());
+                    Vector3d projectedView2 = projectedView;
+                    Vector3d startPosView = new Vector3d(startPos.getX(), startPos.getY(), startPos.getZ());
                     projectedView2 = projectedView2.subtract(startPosView);
                     renderBuffer.sort((float) projectedView2.getX(), (float) projectedView2.getY(), (float) projectedView2.getZ());
                 } catch (Exception ignored) {
@@ -177,7 +177,7 @@ public class CopyPasteRender extends BaseRenderer {
             }
 
             matrix.translate(startPos.getX(), startPos.getY(), startPos.getZ());
-            renderBuffer.render(matrix.getLast().getMatrix()); //Actually draw whats in the buffer
+            renderBuffer.render(matrix.peek().getModel()); //Actually draw whats in the buffer
             return;
         }
 
@@ -219,16 +219,16 @@ public class CopyPasteRender extends BaseRenderer {
                         for (Direction direction : Direction.values()) {
                             if (Block.shouldSideBeRendered(state, context.getWorld(), targetPos, direction) && !(context.getWorld().getBlockState(targetPos.offset(direction)).getBlock().equals(state.getBlock()))) {
                                 if (state.getMaterial().isOpaque()) {
-                                    renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                                    renderModelBrightnessColorQuads(stack.peek(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                                 } else {
-                                    renderModelBrightnessColorQuads(stack.getLast(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                                    renderModelBrightnessColorQuads(stack.peek(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                                 }
                             }
                         }
                         if (state.getMaterial().isOpaque())
-                            renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                            renderModelBrightnessColorQuads(stack.peek(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                         else
-                            renderModelBrightnessColorQuads(stack.getLast(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                            renderModelBrightnessColorQuads(stack.peek(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                     }
                 } catch (Exception e) {
                     BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
@@ -239,14 +239,14 @@ public class CopyPasteRender extends BaseRenderer {
             stack.pop(); //Load after loop
         });
         try {
-            Vec3d projectedView2 = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
-            Vec3d startPosView = new Vec3d(startPos.getX(), startPos.getY(), startPos.getZ());
+            Vector3d projectedView2 = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+            Vector3d startPosView = new Vector3d(startPos.getX(), startPos.getY(), startPos.getZ());
             projectedView2 = projectedView2.subtract(startPosView);
             renderBuffer.sort((float) projectedView2.getX(), (float) projectedView2.getY(), (float) projectedView2.getZ());
         } catch (Exception ignored) {
         }
         matrix.translate(startPos.getX(), startPos.getY(), startPos.getZ());
-        renderBuffer.render(matrix.getLast().getMatrix()); //Actually draw whats in the buffer
+        renderBuffer.render(matrix.peek().getModel()); //Actually draw whats in the buffer
     }
 
     @Override
@@ -313,13 +313,13 @@ public class CopyPasteRender extends BaseRenderer {
             buffers.forEach((rt, vbo) -> {
                 VertexFormat fmt = rt.getVertexFormat();
 
-                rt.setupRenderState();
+                rt.startDrawing();
                 vbo.bindBuffer();
-                fmt.setupBufferState(0L);
+                fmt.startDrawing(0L);
                 vbo.draw(matrix, rt.getDrawMode());
                 DireVertexBuffer.unbindBuffer();
-                fmt.clearBufferState();
-                rt.clearRenderState();
+                fmt.endDrawing();
+                rt.endDrawing();
             });
         }
 

@@ -17,7 +17,7 @@ public class BuildToMeMode extends AbstractMode {
         XYZ facingXYZ = XYZ.fromFacing(context.getHitSide());
 
         int startCoord = XYZ.posToXYZ(start, facingXYZ);
-        int playerCoord = XYZ.posToXYZ(player.getPosition(), facingXYZ);
+        int playerCoord = XYZ.posToXYZ(player.getBlockPos(), facingXYZ);
 
         // Clamp the value to the max range of the gadgets raytrace
         double difference = Math.max(0, Math.min(Config.GENERAL.rayTraceRange.get(), Math.abs(startCoord - playerCoord)));
