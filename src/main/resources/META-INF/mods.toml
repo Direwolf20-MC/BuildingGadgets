@@ -6,7 +6,7 @@ displayURL="https://diresbg.com/" #optional
 logoFile="buildinggadgets_logo.png"
 credits="The Forge and FML guys, McJty, Vazkii, CPW, and Pahimar for helping me learn java/forge modding. Rorax for the textures!" #optional
 authors="Direwolf20" #The man himself
-license='MIT (https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/LICENSE.md)'
+license="MIT (https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/LICENSE.md)"
 [[mods]] #mandatory
     modId="buildinggadgets" #mandatory
     version="${version}" #mandatory
