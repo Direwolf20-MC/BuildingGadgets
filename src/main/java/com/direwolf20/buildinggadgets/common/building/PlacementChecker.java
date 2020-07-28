@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.building.placement;
+package com.direwolf20.buildinggadgets.common.building;
 
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;

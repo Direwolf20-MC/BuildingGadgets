@@ -76,7 +76,6 @@ public final class WorldBuildView implements IBuildView {
         return context;
     }
 
-    @Override
     public Region getBoundingBox() {
         return region;
     }

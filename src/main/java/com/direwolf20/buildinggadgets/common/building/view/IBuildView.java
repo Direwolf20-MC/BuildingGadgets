@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.building.view;
 
-import com.direwolf20.buildinggadgets.common.building.IPlacementSequence;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
@@ -14,7 +13,6 @@ import javax.annotation.Nullable;
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.stream.Stream;
 
 /**
  * A "snapshot" view of a specific buildable TemplateItem providing the ability to iterate over the represented {@link PlacementTarget}'s.
@@ -31,20 +29,7 @@ import java.util.stream.Stream;
  * @implSpec Notice that no guarantees are made for the order in which {@link PlacementTarget}'s are produced by this {@code IBuildView}.
  * Order may be arbitrary or sorted, consult the documentation of the implementation you are currently faced with for information about traversal order.
  */
-public interface IBuildView extends IPlacementSequence<PlacementTarget> {
-    /**
-     * Creates a {@link Stream} backed by the {@link #spliterator()} of this {@code IBuildView}.
-     *
-     * @return A {@link Stream} representing all positions produced by this {@code IBuildView}.
-     * @implSpec The {@link Stream} produced by this method must not be parallel. A user wishing for parallel traversal
-     * should take a look at {@link java.util.stream.StreamSupport#stream(Spliterator, boolean)}.
-     * @implNote The default implementation is equivalent to calling {@code StreamSupport.stream(view.spliterator(), false);}.
-     * @see IPlacementSequence#stream()
-     */
-    default Stream<PlacementTarget> stream() {
-        return IPlacementSequence.super.stream();
-    }
-
+public interface IBuildView extends Iterable<PlacementTarget> {
     /**
      * @return An {@link Iterator} over the {@link PlacementTarget}'s of this {@code IBuildView}.
      * @implNote The default implementation is equivalent to calling {@code Spliterators.iterator(view.spliterator());}.
@@ -119,7 +104,6 @@ public interface IBuildView extends IPlacementSequence<PlacementTarget> {
      *
      * @return A full copy of this {@code TemplateView}. Iterating over the whole {@code TemplateView} if necessary.
      */
-    @Override
     IBuildView copy();
 
     IBuildContext getContext();
