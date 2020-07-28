@@ -4,9 +4,9 @@ updateJSONURL="https://github.com/Direwolf20-MC/BuildingGadgets/raw/master/updat
 issueTrackerURL="https://github.com/Direwolf20-MC/BuildingGadgets/issues" #optional
 displayURL="https://diresbg.com/" #optional
 logoFile="buildinggadgets_logo.png"
-credits="The Forge and FML guys, McJty, Vazkii, CPW, and Pahimar for helping me learn java/forge modding.  Rorax for the textures!" #optional
+credits="The Forge and FML guys, McJty, Vazkii, CPW, and Pahimar for helping me learn java/forge modding. Rorax for the textures!" #optional
 authors="Direwolf20" #The man himself
-
+license='MIT (https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/LICENSE.md)'
 [[mods]] #mandatory
     modId="buildinggadgets" #mandatory
     version="${version}" #mandatory
