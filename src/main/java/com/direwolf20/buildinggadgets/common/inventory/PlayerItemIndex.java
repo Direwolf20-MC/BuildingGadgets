@@ -62,11 +62,14 @@ public final class PlayerItemIndex implements IItemIndex {
         int remainingCount = insertIntoProviders(stack, count, simulate);
         if (remainingCount == 0)
             return 0;
-        remainingCount = insertIntoEmptyHandles(stack, remainingCount, simulate);
+
+        remainingCount -= insertIntoEmptyHandles(stack, remainingCount, simulate);
         if (remainingCount == 0)
             return 0;
+
         if (! simulate)
             spawnRemainder(stack, remainingCount);
+
         return 0;
     }
 
@@ -83,19 +86,22 @@ public final class PlayerItemIndex implements IItemIndex {
         List<IObjectHandle<?>> emptyHandles = handleMap
                 .computeIfAbsent(Item.class, c -> new HashMap<>())
                 .getOrDefault(Items.AIR, ImmutableList.of());
-        for (Iterator<IObjectHandle<?>> it = emptyHandles.iterator(); it.hasNext() && remainingCount >= 0; ) {
-            IObjectHandle<?> handle = it.next();
+
+        for (IObjectHandle<?> handle : emptyHandles) {
             UniqueItem item = UniqueItem.ofStack(stack);
+
             int match = handle.insert(item, remainingCount, simulate);
             if (match > 0)
                 remainingCount -= match;
-            it.remove();
-            handleMap.get(Item.class)
-                    .computeIfAbsent(item.getIndexObject(), i -> new ArrayList<>())
-                    .add(handle);
+
+//            handleMap.get(Item.class)
+//                    .computeIfAbsent(item.getIndexObject(), i -> new ArrayList<>())
+//                    .add(handle);
+
             if (remainingCount <= 0)
                 return 0;
         }
+
         return remainingCount;
     }
 
@@ -114,6 +120,7 @@ public final class PlayerItemIndex implements IItemIndex {
         List<IObjectHandle<?>> handles = handleMap
                 .getOrDefault(obj.getIndexClass(), ImmutableMap.of())
                 .getOrDefault(obj.getIndexObject(), ImmutableList.of());
+
         for (Iterator<IObjectHandle<?>> it = handles.iterator(); it.hasNext() && remainingCount >= 0; ) {
             IObjectHandle<?> handle = it.next();
             int match = handle.insert(obj, remainingCount, simulate);
