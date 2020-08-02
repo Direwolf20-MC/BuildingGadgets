@@ -323,6 +323,11 @@ public abstract class AbstractGadget extends Item {
     }
 
     protected void pushUndo(ItemStack stack, Undo undo) {
+        // Don't save if there is nothing to undo...
+        if (undo.getUndoData().isEmpty()) {
+            return;
+        }
+
         UndoWorldSave save = getUndoSave();
         save.insertUndo(getUUID(stack), undo);
     }
