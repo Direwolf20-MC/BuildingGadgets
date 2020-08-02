@@ -254,7 +254,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         RenderSystem.translated(guiLeft - 30, guiTop - 5, 200);
         RenderSystem.scalef(.8f, .8f, .8f);
 
-        drawCenteredString(matrices, getMinecraft().fontRenderer, "Requirements", 5, 0, Color.WHITE.getRGB());
+        String title = "Requirements"; // Todo lang;
+        drawStringWithShadow(matrices, getMinecraft().fontRenderer, title, 5 - (textRenderer.getStringWidth(title)), 0, Color.WHITE.getRGB());
 
         // The things you have to do to get anything from this system is just stupid.
         MatchResult list = InventoryHelper.CREATIVE_INDEX.tryMatch(requirements);

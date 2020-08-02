@@ -125,7 +125,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         GuiUtils.drawTexturedModalRect(backgroundX, backgroundY, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, 0F);
 
         scrollingList.render(matrices, mouseX, mouseY, particleTicks);
-        drawCenteredString(matrices, textRenderer, title, titleLeft, titleTop, Color.WHITE.getRGB());
+        drawStringWithShadow(matrices, textRenderer, title, titleLeft, titleTop, Color.WHITE.getRGB());
         super.render(matrices, mouseX, mouseY, particleTicks);
 
         if (buttonCopyList.isMouseOver(mouseX, mouseY)) {
