@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 public final class TemplateHeader {
     public static final String VERSION = "2-beta";
-    private static final String MC_VERSION = "1.15.2";
+    private static final String MC_VERSION = "1.16.1";
     
     private static final ComparableVersion COMP_VERSION = new ComparableVersion(VERSION);
 

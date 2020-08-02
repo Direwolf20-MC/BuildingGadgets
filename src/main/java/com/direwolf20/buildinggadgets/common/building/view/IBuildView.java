@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.building.view;
 
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.template.Template;
@@ -105,6 +106,8 @@ public interface IBuildView extends Iterable<PlacementTarget> {
      * @return A full copy of this {@code TemplateView}. Iterating over the whole {@code TemplateView} if necessary.
      */
     IBuildView copy();
+
+    Region getBoundingBox();
 
     IBuildContext getContext();
 }

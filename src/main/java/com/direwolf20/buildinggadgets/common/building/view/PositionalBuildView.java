@@ -91,6 +91,11 @@ public final class PositionalBuildView implements IBuildView {
     }
 
     @Override
+    public Region getBoundingBox() {
+        return this.boundingBox;
+    }
+
+    @Override
     public IBuildContext getContext() {
         return context;
     }
