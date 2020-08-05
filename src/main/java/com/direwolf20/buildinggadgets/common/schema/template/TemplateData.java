@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.schema;
+package com.direwolf20.buildinggadgets.common.schema.template;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
