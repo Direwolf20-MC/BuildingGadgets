@@ -11,8 +11,8 @@ import java.util.function.Consumer;
 public interface ITemplateProvider {
 
     /**
-     * Attempts to retrieve the current {@link Template} if already present. Does not query the other side if the
-     * {@link Template} is not present.
+     * Attempts to retrieve the current {@link Template} if already present. Queries the other side if the
+     * {@link Template} is not present, but does not wait for the result.
      *
      * @param uuid The id for which to retrieve a
      * @return An {@link Optional} containing the {@link Template} corresponding to {@code id} if present or
