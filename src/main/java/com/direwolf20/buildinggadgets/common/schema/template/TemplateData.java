@@ -59,7 +59,7 @@ public final class TemplateData {
 
         if (! pos.equals(that.pos)) return false;
         if (! state.equals(that.state)) return false;
-        return tileNbt != null ? tileNbt.equals(that.tileNbt) : that.tileNbt == null;
+        return Objects.equals(tileNbt, that.tileNbt);
     }
 
     @Override
