@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.world_save;
+package com.direwolf20.buildinggadgets.common.schema.template.provider;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.schema.template.Template;
@@ -15,18 +15,18 @@ import java.util.UUID;
 
 public final class TemplateWorldSave extends WorldSavedData {
     public static TemplateWorldSave getInstance(ServerWorld world) {
-        return null;//TODO: evaluate correct load Method
+        return world.getSavedData().getOrCreate(TemplateWorldSave::new, NAME);
     }
 
     private static final String NAME = BuildingGadgets.MOD_ID + "_template_data";
     private static final String KEY_TEMPLATE_LIST = "templates";
     private static final String KEY_ID = "id";
     private static final String KEY_DATA = "data";
-    private final Map<UUID, Template> loadedTemplates;
+    private final Map<UUID, Template> templates;
 
     public TemplateWorldSave() {
         super(NAME);
-        this.loadedTemplates = new HashMap<>();
+        this.templates = new HashMap<>();
     }
 
     @Override
@@ -41,9 +41,13 @@ public final class TemplateWorldSave extends WorldSavedData {
         for (INBT templateNBT : templates) {
             CompoundNBT templateCompound = (CompoundNBT) templateNBT;
             UUID id = templateCompound.getUniqueId(KEY_ID);
-            if (Template.deserializeNBT(templateCompound.getCompound(KEY_DATA))
-                    .map(t -> {loadedTemplates.put(id, t); return false; })
-                    .orElse(Boolean.TRUE)) // did it error?
+            boolean deserializeError = Template.deserializeNBT(templateCompound.getCompound(KEY_DATA))
+                    .map(t -> {
+                        this.templates.put(id, t);
+                        return Boolean.FALSE;
+                    })
+                    .orElse(Boolean.TRUE);
+            if (deserializeError)
                 BuildingGadgets.LOGGER.error("Could not load Template with id {}. Discarding.", id);
             else
                 loadCount++;
@@ -59,9 +63,9 @@ public final class TemplateWorldSave extends WorldSavedData {
 
     @Override
     public CompoundNBT write(CompoundNBT compound) {
-        BuildingGadgets.LOGGER.debug("Saving {} template{}.", loadedTemplates.size(), getSExtension(loadedTemplates.size()));
+        BuildingGadgets.LOGGER.debug("Saving {} template{}.", templates.size(), getSExtension(templates.size()));
         ListNBT templateList = new ListNBT();
-        for (Map.Entry<UUID, Template> entry : loadedTemplates.entrySet()) {
+        for (Map.Entry<UUID, Template> entry : templates.entrySet()) {
             CompoundNBT templateCompound = new CompoundNBT();
             templateCompound.putUniqueId(KEY_ID, entry.getKey());
             templateCompound.put(KEY_DATA, entry.getValue().serializeNBT());

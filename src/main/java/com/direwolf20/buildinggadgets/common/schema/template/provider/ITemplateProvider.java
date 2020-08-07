@@ -18,12 +18,12 @@ public interface ITemplateProvider {
      * @return An {@link Optional} containing the {@link Template} corresponding to {@code id} if present or
      * {@link Optional#empty()} else.
      */
-    Optional<Template> getTemplateIfAvailable(UUID uuid); //Paste-Render
+    Optional<Template> getIfAvailable(UUID uuid); //Paste-Render
 
     /**
      * Retrieves the most recent version of the Server {@link Template} as soon as available.
      * <p>
-     * On the Server the callback will directly invoked with the return value of {@link #getTemplateIfAvailable(UUID)}
+     * On the Server the callback will directly invoked with the return value of {@link #getIfAvailable(UUID)}
      * whilst on the Client this results in querying the Server for the current {@link Template} and then invoking the
      * callback once this query arrives.
      *

@@ -3,8 +3,11 @@ package com.direwolf20.buildinggadgets.common.schema.template;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.schema.BoundingBox;
-import it.unimi.dsi.fastutil.longs.*;
+import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -20,7 +23,6 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public final class Template implements Iterable<TemplateData> {
     private static final String KEY_POS = "pos";
@@ -34,7 +36,6 @@ public final class Template implements Iterable<TemplateData> {
     private static final long BYTE_MASK_40BIT = ((long) 0xFF_FF_FF_FF) << 8 | 0xFF;
     private static final int MAX_NUMBER_OF_STATES = (1 << 24) - 1;
     private final Long2ObjectMap<BlockState> states;
-    private final Long2ObjectMap<CompoundNBT> tileNbtData;
     private final BoundingBox bounds;
     private final String author;
 
@@ -43,7 +44,6 @@ public final class Template implements Iterable<TemplateData> {
             return Optional.empty();
 
         Long2ObjectMap<BlockState> states = new Long2ObjectLinkedOpenHashMap<>();
-        Long2ObjectMap<CompoundNBT> tileNbtData = new Long2ObjectOpenHashMap<>();
         BoundingBox bounds = null;
         String author = nbt.getString(KEY_AUTHOR);
 
@@ -90,32 +90,7 @@ public final class Template implements Iterable<TemplateData> {
         //re-evaluate the bounding box based on potentially missing blocks
         bounds = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
 
-        if (nbt.contains(KEY_TILE_DATA, NBT.TAG_LIST) && nbt.contains(KEY_TILE_POS, NBT.TAG_LONG_ARRAY)) {
-            assert nbt.get(KEY_TILE_DATA) != null;
-            //read the tile data
-            List<CompoundNBT> uniqueTileCompounds = ((ListNBT) nbt.get(KEY_TILE_DATA)).stream()
-                    .filter(n -> n instanceof CompoundNBT)
-                    .map(n -> (CompoundNBT) n)
-                    .collect(Collectors.toCollection(LinkedList::new));
-            //process the tile compounds
-            for (long packed : nbt.getLongArray(KEY_TILE_POS)) {
-                int id = getId(packed);
-                if (id >= uniqueTileCompounds.size() || id < 0) {
-                    BuildingGadgets.LOGGER.error("Found illegal tile-data-id {} in Template at pos {}(={}), when {} states " +
-                                    "are known. This indicates a greater Problem and the Template is therefore deemed broken.",
-                            id, getPos(packed), posFromLong(new Mutable(), getPos(packed)), uniqueTileCompounds.size());
-                    return Optional.empty();
-                }
-                CompoundNBT data = uniqueTileCompounds.get(id);
-                if (data == null) {
-                    BuildingGadgets.LOGGER.error("Skipping null tile data!");
-                    continue;
-                }
-                tileNbtData.put(getPos(packed), data);
-            }
-        }
-
-        return Optional.of(new Template(states, tileNbtData, bounds, author));
+        return Optional.of(new Template(states, bounds, author));
     }
 
     private static int getId(long packed) {
@@ -126,10 +101,8 @@ public final class Template implements Iterable<TemplateData> {
         return packed & BYTE_MASK_40BIT;
     }
 
-    private Template(Long2ObjectMap<BlockState> states, Long2ObjectMap<CompoundNBT> tileNbtData,
-                     BoundingBox bounds, String author) {
+    private Template(Long2ObjectMap<BlockState> states, BoundingBox bounds, String author) {
         this.states = states;
-        this.tileNbtData = tileNbtData;
         this.bounds = bounds;
         this.author = author;
     }
@@ -184,14 +157,14 @@ public final class Template implements Iterable<TemplateData> {
      * This implementation uses only a single {@link TemplateData} and a single {@link Mutable} instance during the
      * iteration which are mutated to fit to the current iteration point. Therefore a new invocation of
      * {@link Iterator#next()} will reset the data viewed by a reference to this {@link Iterator}'s result.
-     * <p>
+     *
      * This implementation provides {@code O(1)} Object allocations during during iteration (assuming no tile data
      * to be present) in order to be usable with large Templates without over-utilising the garbage collector.
      * For an idea of the performance of this mutable variant compared to recreating the Object in each step,
      * refer to the classical {@link String} concat test (for example a variant of this can be seen in the second
      * answer of this:
      * https://stackoverflow.com/questions/1532461/stringbuilder-vs-string-concatenation-in-tostring-in-java).
-     * <p>
+     *
      * The Tile Data has to be copied, as it would otherwise would allow manipulation of this Templates internal
      * data structure!
      *
@@ -214,16 +187,12 @@ public final class Template implements Iterable<TemplateData> {
                 Entry<BlockState> entry = it.next();
                 thePos = posFromLong(thePos != null ? thePos : new Mutable(), entry.getLongKey());
 
-                CompoundNBT nbt = tileNbtData.get(entry.getLongKey());
-                if (nbt != null)
-                    nbt = nbt.copy();
-
                 if (theData == null) {
-                    theData = new TemplateData(thePos, entry.getValue(), nbt);
+                    theData = new TemplateData(thePos, entry.getValue());
                     return theData;
                 }
 
-                return theData.setInformation(thePos, entry.getValue(), nbt);
+                return theData.setInformation(thePos, entry.getValue());
             }
         };
     }
@@ -236,10 +205,6 @@ public final class Template implements Iterable<TemplateData> {
         int stateCounter = 0;
         int tileCounter = 0;
         LongList posStateList = new LongArrayList(states.size());
-        LongList posTileList = new LongArrayList(tileNbtData.size());
-
-        //The code below could be shortened by putting it into a function (or better class) with type parameters
-        //However this would likely confuse people which is why this has not been done
 
         //These sets are purely for logging and will rarely be filled...
         Set<BlockState> statesOutOfRange = Collections.newSetFromMap(new IdentityHashMap<>()); //states can do with reference equality
@@ -265,33 +230,10 @@ public final class Template implements Iterable<TemplateData> {
         ListNBT uniqueStates = allStates.keySet().stream()
                 .map(NBTUtil::writeBlockState)
                 .collect(NBTHelper.LIST_COLLECTOR);
-        //Let's create all the longs necessary for the pos->tile-nbt mapping
-        for (Entry<CompoundNBT> entry : tileNbtData.long2ObjectEntrySet()) {
-            if (! allTileData.containsKey(entry.getValue())) {
-                if (tileCounter > MAX_NUMBER_OF_STATES) {
-                    if (! tileDataOutOfRange.contains(entry.getValue())) {
-                        BuildingGadgets.LOGGER.error("Too many different tile data entries to be stored in a " +
-                                        "single Template!!! {} would get id {} which is out of range {0,...,{}}!",
-                                entry.getValue(), tileCounter++, MAX_NUMBER_OF_STATES);
-                        tileDataOutOfRange.add(entry.getValue());
-                    }
-                    continue;
-                }
-                allTileData.put(entry.getValue(), tileCounter++);
-            }
-            int tileId = allTileData.getInt(entry.getValue());
-            posTileList.add(includeId(entry.getLongKey(), tileId));
-        }
-        //Now transform the tile data
-        ListNBT uniqueTileData = allTileData.keySet().stream().collect(NBTHelper.LIST_COLLECTOR);
 
         //and finally we can put it all into the compound
         res.putLongArray(KEY_POS, posStateList.toLongArray());
         res.put(KEY_DATA, uniqueStates);
-        if (! posTileList.isEmpty() && ! uniqueTileData.isEmpty()) {
-            res.putLongArray(KEY_TILE_POS, posTileList.toLongArray());
-            res.put(KEY_TILE_DATA, uniqueTileData);
-        }
         res.putString(KEY_AUTHOR, author);
 
         return res;
