@@ -9,8 +9,10 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.common.util.Constants.NBT;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public final class TemplateWorldSave extends WorldSavedData {
@@ -73,6 +75,18 @@ public final class TemplateWorldSave extends WorldSavedData {
         }
         compound.put(KEY_TEMPLATE_LIST, templateList);
         return compound;
+    }
+
+    public Optional<Template> getTemplate(UUID id) {//Templates are immutable => no markDirty
+        return Optional.ofNullable(templates.get(id));
+    }
+
+    public void setTemplate(UUID id, @Nullable Template template) {
+        if (template != null)
+            templates.put(id, template);
+        else
+            templates.remove(id);
+        markDirty();
     }
 
     private String getSExtension(int number) {

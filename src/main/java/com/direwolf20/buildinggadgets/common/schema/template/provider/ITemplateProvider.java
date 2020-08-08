@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.schema.template.provider;
 
 import com.direwolf20.buildinggadgets.common.schema.template.Template;
-import jdk.internal.jline.internal.Nullable;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 public interface ITemplateProvider {
 
     /**
-     * Attempts to retrieve the current {@link Template} if already present. Queries the other side if the
+     * Attempts to retrieve the current {@link Template} if already present. May query the Server if the
      * {@link Template} is not present, but does not wait for the result.
      *
      * @param uuid The id for which to retrieve a
@@ -35,11 +35,12 @@ public interface ITemplateProvider {
 
     /**
      * Set's the {@link Template} corresponding to {@code id} to the given value and updates the other side if specified.
+     * Notice that this may trigger callbacks added to {@link #getWhenAvailable(UUID, Consumer)}.
      *
      * @param id         The id of the {@link Template} which is to be updated
      * @param template   The new {@link Template}
      * @param sendTarget The {@link PacketTarget} to which an update is to be send to. If null no update will be send.
      */
     //Server Copies building or Template Manager copied a template from client clipboard
-    void setAndUpdateRemote(UUID id, Template template, @Nullable PacketTarget sendTarget);
+    void setAndUpdateRemote(UUID id, @Nullable Template template, @Nullable PacketTarget sendTarget);
 }
