@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.client.renders;
 
 import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
+import com.direwolf20.buildinggadgets.common.inventory.InventoryLinker;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
@@ -26,10 +27,12 @@ import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.Dimension;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -56,16 +59,16 @@ public abstract class BaseRenderer {
     }
 
     private static void renderLinkedInventoryOutline(RenderWorldLastEvent evt, ItemStack item, PlayerEntity player) {
-        // This is problematic as you use REMOTE_INVENTORY_POS to get the dimension instead of REMOTE_INVENTORY_DIM
-        ResourceLocation dim = GadgetUtils.getDIMFromNBT(item, NBTKeys.REMOTE_INVENTORY_POS);
-        BlockPos pos = GadgetUtils.getPOSFromNBT(item, NBTKeys.REMOTE_INVENTORY_POS);
-
-        if (dim == null || pos == null)
+        Pair<BlockPos, RegistryKey<World>> dataFromStack = InventoryLinker.getDataFromStack(item);
+        if (dataFromStack == null) {
             return;
+        }
 
-        if (player.world.getDimensionRegistryKey().getRegistryName() != dim)
+        if (!player.world.getRegistryKey().equals(dataFromStack.getValue())) {
             return;
+        }
 
+        BlockPos pos = dataFromStack.getKey();
         Vector3d renderPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView()
                 .subtract(pos.getX(), pos.getY(), pos.getZ())
                 .add(.005f, .005f, .005f);

@@ -162,8 +162,10 @@ public class GadgetBuilding extends AbstractGadget {
             if (!player.isSneaking()) {
                 BaseRenderer.updateInventoryCache();
             } else {
-                if (Screen.hasControlDown())
+                if (Screen.hasControlDown()) {
                     PacketHandler.sendToServer(new PacketBindTool());
+                    System.out.println("attempting to bind");
+                }
             }
         }
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);

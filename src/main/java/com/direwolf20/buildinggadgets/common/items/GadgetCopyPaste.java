@@ -50,6 +50,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
@@ -65,6 +66,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -305,25 +307,29 @@ public class GadgetCopyPaste extends AbstractGadget {
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
         player.setActiveHand(hand);
-        BlockPos posLookingAt = VectorHelper.getPosLookingAt(player, stack);
+
+        BlockRayTraceResult posLookingAt = VectorHelper.getLookingAt(player, stack);
+        TileEntity tileEntity = world.getTileEntity(posLookingAt.getPos());
+        boolean lookingAtInventory = tileEntity != null && tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).isPresent();
+
         if (! world.isRemote()) {
-            if (player.isSneaking() && GadgetUtils.setRemoteInventory(stack, player, world, posLookingAt, false) == ActionResultType.SUCCESS)
-                return new ActionResult<>(ActionResultType.SUCCESS, stack);
+            if (player.isSneaking() && lookingAtInventory) {
+                return ActionResult.pass(stack);
+            }
 
             if (getToolMode(stack) == ToolMode.COPY) {
-                if (world.getBlockState(posLookingAt) != Blocks.AIR.getDefaultState())
-                    setRegionAndCopy(stack, world, player, posLookingAt);
+                if (world.getBlockState(posLookingAt.getPos()) != Blocks.AIR.getDefaultState())
+                    setRegionAndCopy(stack, world, player, posLookingAt.getPos());
             } else if (getToolMode(stack) == ToolMode.PASTE && ! player.isSneaking())
                 getActivePos(player, stack).ifPresent(pos -> build(stack, world, player, pos));
         } else {
-            if (player.isSneaking()) {
-                if (Screen.hasControlDown())
-                    PacketHandler.sendToServer(new PacketBindTool());
-                else if (GadgetUtils.getRemoteInventory(posLookingAt, world, NetworkIO.Operation.EXTRACT) != null)
-                    return new ActionResult<>(ActionResultType.SUCCESS, stack);
+            if (player.isSneaking() && Screen.hasControlDown() && lookingAtInventory) {
+                PacketHandler.sendToServer(new PacketBindTool());
+                return ActionResult.pass(stack);
             }
+
             if (getToolMode(stack) == ToolMode.COPY) {
-                if (player.isSneaking() && world.getBlockState(posLookingAt) == Blocks.AIR.getDefaultState())
+                if (player.isSneaking() && world.getBlockState(posLookingAt.getPos()) == Blocks.AIR.getDefaultState())
                     GuiMod.COPY.openScreen(player);
             } else if (player.isSneaking()) {
                 GuiMod.PASTE.openScreen(player);

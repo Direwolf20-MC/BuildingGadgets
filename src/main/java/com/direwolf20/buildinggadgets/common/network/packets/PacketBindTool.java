@@ -1,9 +1,6 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
-import com.direwolf20.buildinggadgets.common.items.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.items.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.items.*;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -26,12 +23,8 @@ public class PacketBindTool {
                     return;
 
                 ItemStack stack = AbstractGadget.getGadget(player);
-                if (stack.getItem() instanceof GadgetBuilding)
-                    GadgetUtils.bindToolToTE(stack, player);
-                else if (stack.getItem() instanceof GadgetExchanger)
-                    GadgetUtils.bindToolToTE(stack, player);
-                else if (stack.getItem() instanceof GadgetCopyPaste)
-                    GadgetUtils.bindToolToTE(stack, player);
+                if (!(stack.getItem() instanceof GadgetDestruction))
+                    GadgetUtils.linkToInventory(stack, player);
             });
             ctx.get().setPacketHandled(true);
         }

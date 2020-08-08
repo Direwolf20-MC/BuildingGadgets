@@ -66,7 +66,6 @@ public final class PlayerItemIndex implements IItemIndex {
 
 // this is extremely buggy and poorly planned out code.
 //        remainingCount -= insertIntoEmptyHandles(stack, remainingCount, simulate);
-//        System.out.println(remainingCount);
 //        if (remainingCount == 0)
 //            return 0;
 
@@ -79,7 +78,6 @@ public final class PlayerItemIndex implements IItemIndex {
     private int insertIntoProviders(ItemStack stack, int remainingCount, boolean simulate) {
         for (IInsertProvider insertProvider : insertProviders) {
             remainingCount -= insertProvider.insert(stack, remainingCount, simulate);
-            System.out.println(remainingCount);
             if (remainingCount <= 0)
                 return 0;
         }

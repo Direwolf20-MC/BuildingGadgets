@@ -85,35 +85,35 @@ public class PacketSetRemoteInventoryCache {
         return loc;
     }
 
-    public static class Handler {
-        public static void handle(final PacketSetRemoteInventoryCache msg, Supplier<Context> ctx) {
-            ctx.get().enqueueWork(() -> {
-                ServerPlayerEntity player = ctx.get().getSender();
-                if (player != null) {
-                    Set<UniqueItem> itemTypes = new HashSet<>();
-                    ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
-                    IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(msg.loc.getRight(), msg.loc.getLeft(), player.world);
-                    if (remoteInventory != null) {
-                        for (int i = 0; i < remoteInventory.getSlots(); i++) {
-                            ItemStack stack = remoteInventory.getStackInSlot(i);
-                            if (!stack.isEmpty()) {
-                                Item item = stack.getItem();
-                                UniqueItem uniqueItem = new UniqueItem(item);
-                                if (!itemTypes.contains(uniqueItem)) {
-                                    itemTypes.add(uniqueItem);
-                                    builder.addCopies(uniqueItem, InventoryHelper.countInContainer(remoteInventory, item));
-                                }
-                            }
-                        }
-                    }
-                    PacketHandler.sendTo(new PacketSetRemoteInventoryCache(builder.build(), msg.isCopyPaste()), player);
-                    return;
-                }
-                if (msg.isCopyPaste())
-                    EventTooltip.setCache(msg.getCache());
-                else
-                    BaseRenderer.setInventoryCache(msg.getCache());
-            });
-        }
-    }
+//    public static class Handler {
+//        public static void handle(final PacketSetRemoteInventoryCache msg, Supplier<Context> ctx) {
+//            ctx.get().enqueueWork(() -> {
+//                ServerPlayerEntity player = ctx.get().getSender();
+//                if (player != null) {
+//                    Set<UniqueItem> itemTypes = new HashSet<>();
+//                    ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
+//                    IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(msg.loc.getRight(), msg.loc.getLeft(), player.world);
+//                    if (remoteInventory != null) {
+//                        for (int i = 0; i < remoteInventory.getSlots(); i++) {
+//                            ItemStack stack = remoteInventory.getStackInSlot(i);
+//                            if (!stack.isEmpty()) {
+//                                Item item = stack.getItem();
+//                                UniqueItem uniqueItem = new UniqueItem(item);
+//                                if (!itemTypes.contains(uniqueItem)) {
+//                                    itemTypes.add(uniqueItem);
+//                                    builder.addCopies(uniqueItem, InventoryHelper.countInContainer(remoteInventory, item));
+//                                }
+//                            }
+//                        }
+//                    }
+//                    PacketHandler.sendTo(new PacketSetRemoteInventoryCache(builder.build(), msg.isCopyPaste()), player);
+//                    return;
+//                }
+//                if (msg.isCopyPaste())
+//                    EventTooltip.setCache(msg.getCache());
+//                else
+//                    BaseRenderer.setInventoryCache(msg.getCache());
+//            });
+//        }
+//    }
 }

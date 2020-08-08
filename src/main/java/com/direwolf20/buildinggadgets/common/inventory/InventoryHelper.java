@@ -36,6 +36,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.EmptyHandler;
+import net.minecraftforge.items.wrapper.InvWrapper;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -67,10 +69,10 @@ public class InventoryHelper {
 
     static List<IInsertProvider> indexInsertProviders(ItemStack tool, PlayerEntity player) {
         ImmutableList.Builder<IInsertProvider> builder = ImmutableList.builder();
-        IItemHandler remoteInv = GadgetUtils.getRemoteInventory(tool, player.world);
-        if (remoteInv != null)
-            builder.add(new HandlerInsertProvider(remoteInv));
+
+        InventoryLinker.getLinkedInventory(player.world, tool).ifPresent(e -> builder.add(new HandlerInsertProvider(e)));
         builder.add(new PlayerInventoryInsertProvider(player));
+
         return builder.build();
     }
 
@@ -85,8 +87,10 @@ public class InventoryHelper {
 
     static List<IItemHandler> getHandlers(ItemStack stack, PlayerEntity player) {
         List<IItemHandler> handlers = new ArrayList<>();
-        handlers.add(GadgetUtils.getRemoteInventory(stack, player.world));
+
+        InventoryLinker.getLinkedInventory(player.world, stack).ifPresent(handlers::add);
         player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handlers::add);
+
         return handlers;
     }
 
@@ -123,8 +127,8 @@ public class InventoryHelper {
 
         //Try to insert into the remote inventory.
         ItemStack tool = AbstractGadget.getGadget(player);
-        IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(tool,world.getWorld());
-        if (remoteInventory != null) {
+        IItemHandler remoteInventory = InventoryLinker.getLinkedInventory(world.getWorld(), tool).orElse(new EmptyHandler());
+        if (remoteInventory.getSlots() > 0) {
             for (int i = 0; i < remoteInventory.getSlots(); i++) {
                 ItemStack containerItem = remoteInventory.getStackInSlot(i);
                 ItemStack giveItemStack = itemStack.copy();

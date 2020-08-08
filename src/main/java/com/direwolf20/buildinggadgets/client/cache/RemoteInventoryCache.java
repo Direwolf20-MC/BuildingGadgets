@@ -72,10 +72,6 @@ public class RemoteInventoryCache {
 
     @Nullable
     private Pair<ResourceLocation, BlockPos> getInventoryLocation(ItemStack stack) {
-        CompoundNBT nbt = stack.getTag();
-        if (nbt == null)
-            return null;
-
         ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, NBTKeys.REMOTE_INVENTORY_POS);
         BlockPos pos = GadgetUtils.getPOSFromNBT(stack, NBTKeys.REMOTE_INVENTORY_POS);
         return dim == null || pos == null ? null : new ImmutablePair<>(dim, pos);
