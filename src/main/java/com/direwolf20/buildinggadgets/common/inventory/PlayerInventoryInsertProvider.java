@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.inventory;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.event.ForgeEventFactory;
 
 /**
  * An {@link net.minecraftforge.items.IItemHandler} which inserts items into the PlayerInventory by making it pick up a freshly created ItemStack.
@@ -20,17 +21,16 @@ public final class PlayerInventoryInsertProvider implements IInsertProvider {
         if (copy.getCount() != count)
             copy.setCount(count);
 
-        ItemEntity itemEntity = new ItemEntity(player.world, player.getX(), player.getY(), player.getZ(), copy) {
-            //If the stack is completely inserted, then the ItemEntity will reset the count just after it calls remove... We need to catch that 0  count though
-            //So we hack our way into remove
-            @Override
-            public void remove() {
-                super.remove();
-                stack.setCount(getItem().getCount());
+        int wasPickedUp = ForgeEventFactory.onItemPickup(new ItemEntity(player.world, player.getX(), player.getY(), player.getZ(), copy), player);
+        // 0  = no body captured the event and we should handle it by hand.
+        if( wasPickedUp == 0 ) {
+            player.inventory.addItemStackToInventory(copy);
+            if (copy.isEmpty()) {
+                return count;
             }
-        };
+        }
 
-        itemEntity.onCollideWithPlayer(player);
-        return Math.min(stack.getCount(), itemEntity.getItem().getCount());
+        // If not inserted, allow to fail over
+        return 0;
     }
 }
