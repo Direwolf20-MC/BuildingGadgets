@@ -335,8 +335,9 @@ public abstract class AbstractGadget extends Item {
     public void undo(World world, PlayerEntity player, ItemStack stack) {
         UndoWorldSave save = getUndoSave();
         Optional<Undo> undoOptional = save.getUndo(getUUID(stack));
+
         if (undoOptional.isPresent()) {
-            Undo undo = undoOptional.orElseThrow(RuntimeException::new);
+            Undo undo = undoOptional.get();
             IItemIndex index = InventoryHelper.index(stack, player);
             if (! ForceUnloadedCommand.mayForceUnloadedChunks(player)) {//TODO separate command
                 ImmutableSortedSet<ChunkPos> unloadedChunks = undo.getBoundingBox().getUnloadedChunks(world);
@@ -352,6 +353,7 @@ public abstract class AbstractGadget extends Item {
                     .player(player)
                     .stack(stack)
                     .build(world);
+
             UndoScheduler.scheduleUndo(undo, index, buildContext, Config.GADGETS.placeSteps.get());
         } else
             player.sendStatusMessage(MessageTranslation.NOTHING_TO_UNDO.componentTranslation().setStyle(Styles.RED), true);

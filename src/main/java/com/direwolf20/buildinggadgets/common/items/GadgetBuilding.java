@@ -198,6 +198,10 @@ public class GadgetBuilding extends AbstractGadget {
         List<BlockPos> coords = GadgetUtils.getAnchor(heldItem).orElse(new ArrayList<>());
 
         BlockData blockData = getToolBlock(heldItem);
+        if (blockData.getState() == Blocks.AIR.getDefaultState()) {
+            return;
+        }
+
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
             BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
             if (world.isAirBlock(lookingAt.getPos())) //If we aren't looking at anything, exit
@@ -214,16 +218,16 @@ public class GadgetBuilding extends AbstractGadget {
 
         Undo.Builder builder = Undo.builder();
         IItemIndex index = InventoryHelper.index(stack, player);
-        if (blockData.getState() != Blocks.AIR.getDefaultState()) { //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
-            //TODO replace with a better TileEntity supporting Fake IWorld
-            fakeWorld.setWorldAndState(player.world, blockData.getState(), coords); // Initialize the fake world's blocks
-            for (BlockPos coordinate : coords) {
-                //Get the extended block state in the fake world
-                //Disabled to fix Chisel
-                //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-                placeBlock(world, player, index, builder, coordinate, blockData);
-            }
+
+         //TODO replace with a better TileEntity supporting Fake IWorld
+        fakeWorld.setWorldAndState(player.world, blockData.getState(), coords); // Initialize the fake world's blocks
+        for (BlockPos coordinate : coords) {
+            //Get the extended block state in the fake world
+            //Disabled to fix Chisel
+            //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
+            placeBlock(world, player, index, builder, coordinate, blockData);
         }
+
         pushUndo(stack, builder.build(world));
     }
 
