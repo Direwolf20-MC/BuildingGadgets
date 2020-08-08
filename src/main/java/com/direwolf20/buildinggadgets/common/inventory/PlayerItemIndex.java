@@ -51,6 +51,7 @@ public final class PlayerItemIndex implements IItemIndex {
                     .map(itemStack -> performSimpleInsert(itemStack, count, simulate))
                     .orElseGet(() -> performComplexInsert(obj, count, simulate));
         else {
+            // This likely has the same disregard for valid slots as the simple insert does
             int remainingCount = performComplexInsert(obj, count, simulate);
             return remainingCount == 0 ? 0 : obj.tryCreateInsertStack(Collections.unmodifiableMap(handleMap), count)
                     .map(itemStack -> performSimpleInsert(itemStack, count, simulate))
@@ -63,9 +64,11 @@ public final class PlayerItemIndex implements IItemIndex {
         if (remainingCount == 0)
             return 0;
 
-        remainingCount -= insertIntoEmptyHandles(stack, remainingCount, simulate);
-        if (remainingCount == 0)
-            return 0;
+// this is extremely buggy and poorly planned out code.
+//        remainingCount -= insertIntoEmptyHandles(stack, remainingCount, simulate);
+//        System.out.println(remainingCount);
+//        if (remainingCount == 0)
+//            return 0;
 
         if (! simulate)
             spawnRemainder(stack, remainingCount);
@@ -76,6 +79,7 @@ public final class PlayerItemIndex implements IItemIndex {
     private int insertIntoProviders(ItemStack stack, int remainingCount, boolean simulate) {
         for (IInsertProvider insertProvider : insertProviders) {
             remainingCount -= insertProvider.insert(stack, remainingCount, simulate);
+            System.out.println(remainingCount);
             if (remainingCount <= 0)
                 return 0;
         }
@@ -87,16 +91,17 @@ public final class PlayerItemIndex implements IItemIndex {
                 .computeIfAbsent(Item.class, c -> new HashMap<>())
                 .getOrDefault(Items.AIR, ImmutableList.of());
 
-        for (IObjectHandle<?> handle : emptyHandles) {
+        for (Iterator<IObjectHandle<?>> it = emptyHandles.iterator(); it.hasNext() && remainingCount >= 0; ) {
+            IObjectHandle<?> handle = it.next();
             UniqueItem item = UniqueItem.ofStack(stack);
 
             int match = handle.insert(item, remainingCount, simulate);
             if (match > 0)
                 remainingCount -= match;
 
-//            handleMap.get(Item.class)
-//                    .computeIfAbsent(item.getIndexObject(), i -> new ArrayList<>())
-//                    .add(handle);
+            handleMap.get(Item.class)
+                    .computeIfAbsent(item.getIndexObject(), i -> new ArrayList<>())
+                    .add(handle);
 
             if (remainingCount <= 0)
                 return 0;
