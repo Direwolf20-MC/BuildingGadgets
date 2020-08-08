@@ -122,15 +122,18 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         super.render(matrices, mouseX, mouseY, partialTicks);
         this.drawMouseoverTooltip(matrices, mouseX, mouseY);
 
+        drawStringWithShadow(matrices, textRenderer, "Preview disabled for now...", guiLeft - 10, guiTop + 40, 0xFFFFFF);
         if (this.template != null) {
             renderRequirement(matrices, mouseX, mouseY);
         }
 
-        validateCache(partialTicks);
+//        validateCache(partialTicks);
     }
 
     @Override
     protected void drawBackground(MatrixStack matrices, float partialTicks, int mouseX, int mouseY) {
+        renderBackground(matrices);
+
         getMinecraft().getTextureManager().bindTexture(background);
         drawTexture(matrices, guiLeft - 20, guiTop - 12, 0, 0, xSize, ySize + 25);
         drawTexture(matrices, (guiLeft - 20) + xSize, guiTop + 8, xSize + 3, 30, 71, ySize);
@@ -143,7 +146,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }
 
         this.nameField.render(matrices, mouseX, mouseY, partialTicks);
-        fill(matrices, guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
+//        fill(matrices, guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
 
         if( this.template != null ) {
             renderPanel();
