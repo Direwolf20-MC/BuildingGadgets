@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.building;
 
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.MoreObjects;

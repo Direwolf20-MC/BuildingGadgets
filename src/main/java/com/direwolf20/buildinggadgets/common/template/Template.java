@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.template;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.PositionalBuildView;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
@@ -28,17 +29,17 @@ import java.util.function.Function;
 
 public final class Template {
     public static Template deserialize(CompoundNBT nbt, @Nullable TemplateHeader externalHeader, boolean persisted) {
-        ListNBT posList = nbt.getList(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_POS, NBT.TAG_LONG);
-        TemplateHeader.Builder header = TemplateHeader.builderFromNBT(nbt.getCompound(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_HEADER));
+        ListNBT posList = nbt.getList(NBTKeys.KEY_POS, NBT.TAG_LONG);
+        TemplateHeader.Builder header = TemplateHeader.builderFromNBT(nbt.getCompound(NBTKeys.KEY_HEADER));
         if (externalHeader != null)
             header = header.name(externalHeader.getName()).author(externalHeader.getAuthor());
         DataDecompressor<ITileDataSerializer> serializerDecompressor = persisted ? new DataDecompressor<>(
-                nbt.getList(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING),
+                nbt.getList(NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING),
                 inbt -> RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), inbt.getString()),
                 value -> SerialisationSupport.dummyDataSerializer())
                 : null;
         DataDecompressor<BlockData> dataDecompressor = new DataDecompressor<>(
-                nbt.getList(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_DATA, NBT.TAG_COMPOUND),
+                nbt.getList(NBTKeys.KEY_DATA, NBT.TAG_COMPOUND),
                 inbt -> persisted ?
                         BlockData.tryDeserialize((CompoundNBT) inbt, serializerDecompressor, true) :
                         BlockData.tryDeserialize((CompoundNBT) inbt, false),
@@ -107,11 +108,11 @@ public final class Template {
                 d.serialize(dataSerializerCompressor, true)
                 : d.serialize(false));
         ListNBT serializerList = persisted ? dataSerializerCompressor.write(s -> StringNBT.of(s.getRegistryName().toString())) : null;
-        res.put(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_DATA, dataList);
-        res.put(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_POS, posList);
+        res.put(NBTKeys.KEY_DATA, dataList);
+        res.put(NBTKeys.KEY_POS, posList);
         res.put(NBTKeys.KEY_HEADER, header.toNBT(persisted));
         if (persisted)
-            res.put(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_SERIALIZER, serializerList);
+            res.put(NBTKeys.KEY_SERIALIZER, serializerList);
         return res;
     }
 

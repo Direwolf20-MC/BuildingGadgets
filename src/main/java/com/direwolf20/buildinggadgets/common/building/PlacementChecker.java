@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.building;
 
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;

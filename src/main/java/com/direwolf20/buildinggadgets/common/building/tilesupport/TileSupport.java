@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.building.tilesupport;
 
 import com.direwolf20.buildinggadgets.common.building.BlockData;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.registry.Registries.TileEntityData;
 import com.direwolf20.buildinggadgets.common.template.SerialisationSupport;
 import com.google.common.base.MoreObjects;

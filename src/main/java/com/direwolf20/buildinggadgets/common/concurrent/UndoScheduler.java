@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;

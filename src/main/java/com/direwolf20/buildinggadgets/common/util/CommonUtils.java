@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util;
 
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;

@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.concurrent;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.OurItems;

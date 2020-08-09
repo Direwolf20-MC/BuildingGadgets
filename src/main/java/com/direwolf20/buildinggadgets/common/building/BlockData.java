@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.registry.Registries;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;

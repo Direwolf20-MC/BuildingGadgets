@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.template;
 
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadException;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadException.CorruptDataException;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadException.CorruptJsonException;
