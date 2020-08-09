@@ -65,7 +65,7 @@ public final class PlayerItemIndex implements IItemIndex {
             return 0;
 
 // this is extremely buggy and poorly planned out code.
-//        remainingCount -= insertIntoEmptyHandles(stack, remainingCount, simulate);
+//        insertIntoEmptyHandles(stack, remainingCount, simulate);
 //        if (remainingCount == 0)
 //            return 0;
 
@@ -84,28 +84,32 @@ public final class PlayerItemIndex implements IItemIndex {
         return remainingCount;
     }
 
+    // todo: fix or rewrite. has many root issues:
+    //       uses methods not intended for forge, has the ability to replace stacks, indexes players inventory even though we already handle the players inventory,
+    //       doesn't check for a valid slot, ignores the IItemHandler contract. Maybe more
     private int insertIntoEmptyHandles(ItemStack stack, int remainingCount, boolean simulate) {
-        List<IObjectHandle<?>> emptyHandles = handleMap
-                .computeIfAbsent(Item.class, c -> new HashMap<>())
-                .getOrDefault(Items.AIR, ImmutableList.of());
-
-        for (Iterator<IObjectHandle<?>> it = emptyHandles.iterator(); it.hasNext() && remainingCount >= 0; ) {
-            IObjectHandle<?> handle = it.next();
-            UniqueItem item = UniqueItem.ofStack(stack);
-
-            int match = handle.insert(item, remainingCount, simulate);
-            if (match > 0)
-                remainingCount -= match;
-
-            handleMap.get(Item.class)
-                    .computeIfAbsent(item.getIndexObject(), i -> new ArrayList<>())
-                    .add(handle);
-
-            if (remainingCount <= 0)
-                return 0;
-        }
-
-        return remainingCount;
+//        List<IObjectHandle<?>> emptyHandles = handleMap
+//                .computeIfAbsent(Item.class, c -> new HashMap<>())
+//                .getOrDefault(Items.AIR, ImmutableList.of());
+//
+//        for (Iterator<IObjectHandle<?>> it = emptyHandles.iterator(); it.hasNext() && remainingCount >= 0; ) {
+//            IObjectHandle<?> handle = it.next();
+//            UniqueItem item = UniqueItem.ofStack(stack);
+//
+//            int match = handle.insert(item, remainingCount, simulate);
+//            if (match > 0)
+//                remainingCount -= match;
+//
+//            handleMap.get(Item.class)
+//                    .computeIfAbsent(item.getIndexObject(), i -> new ArrayList<>())
+//                    .add(handle);
+//
+//            if (remainingCount <= 0)
+//                return 0;
+//        }
+//
+//        return remainingCount;
+        return 0;
     }
 
     private void spawnRemainder(ItemStack stack, int remainingCount) {

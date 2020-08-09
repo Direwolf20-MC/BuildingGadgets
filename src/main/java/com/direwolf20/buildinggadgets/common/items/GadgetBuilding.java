@@ -164,7 +164,6 @@ public class GadgetBuilding extends AbstractGadget {
             } else {
                 if (Screen.hasControlDown()) {
                     PacketHandler.sendToServer(new PacketBindTool());
-                    System.out.println("attempting to bind");
                 }
             }
         }

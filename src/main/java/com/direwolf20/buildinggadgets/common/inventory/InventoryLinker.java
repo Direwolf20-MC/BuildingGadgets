@@ -42,7 +42,6 @@ public class InventoryLinker {
 
         // Set the relevant data
         CompoundNBT compound = stack.getOrCreateTag();
-        System.out.println(world.getRegistryKey().getValue().toString());
         compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, world.getRegistryKey().getValue().toString());
         compound.put(NBTKeys.REMOTE_INVENTORY_POS, NBTUtil.writeBlockPos(trace.getPos()));
         return Result.success();
@@ -74,7 +73,6 @@ public class InventoryLinker {
      * @implNote Ideally this would not have to get the same data twice but for now, this works fine.
      */
     private static boolean removeIfSame(ItemStack stack, BlockPos pos) {
-        System.out.println("Attempted removal");
         // This isn't ideal that we have to do this twice
         Pair<BlockPos, RegistryKey<World>> dataFromStack = getDataFromStack(stack);
         if (dataFromStack == null) {
