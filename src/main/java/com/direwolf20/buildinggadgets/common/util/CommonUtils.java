@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util;
 
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -19,7 +18,7 @@ public final class CommonUtils {
         return new BlockRayTraceResult(simVec, dir, pos, false);
     }
 
-    public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, IBuildContext context, @Nullable Vector3d simulatePos) {
+    public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, BuildContext context, @Nullable Vector3d simulatePos) {
         MaterialList.SubEntryBuilder builder = MaterialList.andBuilder();
         for (PlacementTarget placementTarget : buildView) {
             BlockRayTraceResult target = simulatePos != null ? CommonUtils.fakeRayTrace(simulatePos, placementTarget.getPos()) : null;

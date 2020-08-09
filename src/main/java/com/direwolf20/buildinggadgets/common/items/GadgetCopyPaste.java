@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.Region;
 import com.direwolf20.buildinggadgets.common.building.PlacementChecker;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.WorldBuildView;
@@ -34,7 +33,6 @@ import com.direwolf20.buildinggadgets.common.util.lang.*;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
-import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableSortedSet;
@@ -389,7 +387,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void performCopy(ItemStack stack, WorldBuildView buildView) {
-        IBuildContext context = buildView.getContext();
+        BuildContext context = buildView.getContext();
         assert context.getPlayer() != null;
         PlayerEntity player = context.getPlayer();
         CopyScheduler.scheduleCopy((map, region) -> {
@@ -414,7 +412,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 Template template = provider.getTemplateForKey(key);
-                IBuildContext buildContext = BuildContext.builder()
+                BuildContext buildContext = BuildContext.builder()
                         .stack(stack)
                         .player(player)
                         .build(world);

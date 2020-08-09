@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.building.tilesupport;
 
 import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.registry.Registries.TileEntityData;
 import com.direwolf20.buildinggadgets.common.template.SerialisationSupport;
 import com.google.common.base.MoreObjects;
@@ -76,7 +75,7 @@ public final class TileSupport {
         }
 
         @Override
-        public boolean placeIn(IBuildContext context, BlockState state, BlockPos position) {
+        public boolean placeIn(BuildContext context, BlockState state, BlockPos position) {
             return context.getWorld().setBlockState(position, state, 0);
         }
 

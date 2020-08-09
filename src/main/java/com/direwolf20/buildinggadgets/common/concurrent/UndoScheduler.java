@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
@@ -23,7 +22,7 @@ import java.util.Objects;
 import java.util.Spliterator;
 
 public final class UndoScheduler extends SteppedScheduler {
-    public static UndoScheduler scheduleUndo(Undo undo, IItemIndex index, IBuildContext context, int steps) {
+    public static UndoScheduler scheduleUndo(Undo undo, IItemIndex index, BuildContext context, int steps) {
         Preconditions.checkArgument(steps > 0);
 
         UndoScheduler res = new UndoScheduler(
@@ -39,10 +38,10 @@ public final class UndoScheduler extends SteppedScheduler {
 
     private final Spliterator<Map.Entry<BlockPos, BlockInfo>> spliterator;
     private boolean lastWasSuccess;
-    private final IBuildContext context;
+    private final BuildContext context;
     private final IItemIndex index;
 
-    private UndoScheduler(Undo undo, IItemIndex index, IBuildContext context, int steps) {
+    private UndoScheduler(Undo undo, IItemIndex index, BuildContext context, int steps) {
         super(steps);
         assert context.getPlayer() != null;
         assert ! context.getStack().isEmpty();

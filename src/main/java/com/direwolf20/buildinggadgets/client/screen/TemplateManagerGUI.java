@@ -7,7 +7,6 @@ package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
@@ -582,7 +581,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                     PlayerEntity player = getMinecraft().player;
                     assert player != null;
 
-                    IBuildContext buildContext = BuildContext.builder()
+                    BuildContext buildContext = BuildContext.builder()
                             .player(player)
                             .stack(stack)
                             .build(getWorld());

@@ -22,9 +22,9 @@ import java.util.Spliterators;
  * produce at most via {@link #estimateSize()} in combination with hinting the amount of {@link IUniqueObject}'s required.
  * However this is not strictly necessary and when computation might be costly it is not advised to return an accurate value.
  * <p>
- * The {@code IBuildView} is constructed given an instance of {@link IBuildContext}. This
+ * The {@code IBuildView} is constructed given an instance of {@link BuildContext}. This
  * context allows the {@link IBuildView} to adapt itself to the environment in which it is viewed. Therefore no assumptions may be made, that
- * 2 distinct instances of {@code IBuildView} will produce the same results even if they were constructed by the same {@link IBuildContext}.
+ * 2 distinct instances of {@code IBuildView} will produce the same results even if they were constructed by the same {@link BuildContext}.
  * <p>
  * All Methods in this class may throw an {@link IllegalStateException} if called after the {@code IBuildView} has been closed.
  * @implSpec Notice that no guarantees are made for the order in which {@link PlacementTarget}'s are produced by this {@code IBuildView}.
@@ -109,5 +109,5 @@ public interface IBuildView extends Iterable<PlacementTarget> {
 
     Region getBoundingBox();
 
-    IBuildContext getContext();
+    BuildContext getContext();
 }

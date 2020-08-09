@@ -11,10 +11,10 @@ import javax.annotation.concurrent.Immutable;
 import java.util.Objects;
 
 /**
- * Simple implementation of {@link IBuildContext} providing a {@link Builder} for creation.
+ * Simple implementation of {@link BuildContext} providing a {@link Builder} for creation.
  */
 @Immutable
-public final class BuildContext implements IBuildContext {
+public final class BuildContext {
     /**
      * @return A new {@link Builder}.
      */
@@ -24,9 +24,9 @@ public final class BuildContext implements IBuildContext {
 
     /**
      * @param context The context to copy. If null, then this Method acts as if calling {@link #builder()}.
-     * @return A new {@link Builder} with all values copied from the specified {@link IBuildContext}.
+     * @return A new {@link Builder} with all values copied from the specified {@link BuildContext}.
      */
-    public static Builder builderOf(@Nullable IBuildContext context) {
+    public static Builder builderOf(@Nullable BuildContext context) {
         Builder builder = builder();
         if (context == null) {
             return builder;
@@ -51,7 +51,6 @@ public final class BuildContext implements IBuildContext {
     /**
      * @return The {@link IWorld} of this {@code SimpleBuildContext}. Will not be null.
      */
-    @Override
     public IWorld getWorld() {
         return world;
     }
@@ -60,12 +59,10 @@ public final class BuildContext implements IBuildContext {
      * @return The {@link PlayerEntity} performing the build. May be null if unknown.
      */
     @Nullable
-    @Override
     public PlayerEntity getPlayer() {
         return player;
     }
 
-    @Override
     public ItemStack getStack() {
         return stack;
     }

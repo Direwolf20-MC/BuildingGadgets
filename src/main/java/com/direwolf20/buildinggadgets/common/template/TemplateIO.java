@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.template;
 
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadException;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadException.CorruptDataException;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadException.CorruptJsonException;
@@ -75,15 +74,15 @@ public final class TemplateIO {
         writeTemplateJson(template, stream, null);
     }
 
-    public static void writeTemplateJson(Template template, OutputStream stream, @Nullable IBuildContext context) throws TemplateWriteException {
+    public static void writeTemplateJson(Template template, OutputStream stream, @Nullable BuildContext context) throws TemplateWriteException {
         GSON.toJson(TemplateJsonRepresentation.ofTemplate(template, context), new OutputStreamWriter(stream));
     }
 
     public static String writeTemplateJson(Template template) throws TemplateWriteException {
-        return writeTemplateJson(template, (IBuildContext) null);
+        return writeTemplateJson(template, (BuildContext) null);
     }
 
-    public static String writeTemplateJson(Template template, @Nullable IBuildContext context) throws TemplateWriteException {
+    public static String writeTemplateJson(Template template, @Nullable BuildContext context) throws TemplateWriteException {
         return GSON.toJson(TemplateJsonRepresentation.ofTemplate(template, context));
     }
 
@@ -104,7 +103,7 @@ public final class TemplateIO {
     }
 
     private static final class TemplateJsonRepresentation {
-        public static TemplateJsonRepresentation ofTemplate(Template template, @Nullable IBuildContext context) throws TemplateWriteException {
+        public static TemplateJsonRepresentation ofTemplate(Template template, @Nullable BuildContext context) throws TemplateWriteException {
             TemplateHeader header = context != null ?
                     template.getHeaderAndForceMaterials(context) :
                     template.getHeader();

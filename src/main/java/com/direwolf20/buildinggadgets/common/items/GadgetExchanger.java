@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
@@ -258,7 +257,7 @@ public class GadgetExchanger extends AbstractGadget {
         if (tool.isEmpty() || !this.canUse(tool, player))
             return;
 
-        IBuildContext buildContext = BuildContext.builder()
+        BuildContext buildContext = BuildContext.builder()
                 .stack(tool)
                 .player(player)
                 .build(world);

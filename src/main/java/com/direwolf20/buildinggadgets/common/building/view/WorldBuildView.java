@@ -27,23 +27,23 @@ import java.util.function.Consumer;
  * to evaluate all {@link BlockData} instances described by this {@link IBuildView view}.
  */
 public final class WorldBuildView implements IBuildView {
-    private final IBuildContext context;
+    private final BuildContext context;
     private final Region region;
-    private final BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory;
+    private final BiFunction<BuildContext, BlockPos, Optional<BlockData>> dataFactory;
     private BlockPos translation;
 
-    public static WorldBuildView create(IBuildContext context, Region region) {
+    public static WorldBuildView create(BuildContext context, Region region) {
         return create(context, region, null);
     }
 
-    public static WorldBuildView create(IBuildContext context, Region region, @Nullable BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory) {
+    public static WorldBuildView create(BuildContext context, Region region, @Nullable BiFunction<BuildContext, BlockPos, Optional<BlockData>> dataFactory) {
         return new WorldBuildView(
-                Objects.requireNonNull(context, "Cannot create WorldBuildView without an IBuildContext!"),
+                Objects.requireNonNull(context, "Cannot create WorldBuildView without an BuildContext!"),
                 Objects.requireNonNull(region, "Cannot create WorldBuildView without an Region!"),
                 dataFactory != null ? dataFactory : (c, p) -> Optional.of(TileSupport.createBlockData(c.getWorld(), p)));
     }
 
-    private WorldBuildView(IBuildContext context, Region region, BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory) {
+    private WorldBuildView(BuildContext context, Region region, BiFunction<BuildContext, BlockPos, Optional<BlockData>> dataFactory) {
         this.context = context;
         this.region = region;
         this.dataFactory = dataFactory;
@@ -72,7 +72,7 @@ public final class WorldBuildView implements IBuildView {
     }
 
     @Override
-    public IBuildContext getContext() {
+    public BuildContext getContext() {
         return context;
     }
 
@@ -82,10 +82,10 @@ public final class WorldBuildView implements IBuildView {
 
     private static final class WorldBackedSpliterator extends DelegatingSpliterator<BlockPos, PlacementTarget> {
         private final BlockPos translation;
-        private final BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory;
-        private final IBuildContext context;
+        private final BiFunction<BuildContext, BlockPos, Optional<BlockData>> dataFactory;
+        private final BuildContext context;
 
-        private WorldBackedSpliterator(Spliterator<BlockPos> other, BlockPos translation, BiFunction<IBuildContext, BlockPos, Optional<BlockData>> dataFactory, IBuildContext context) {
+        private WorldBackedSpliterator(Spliterator<BlockPos> other, BlockPos translation, BiFunction<BuildContext, BlockPos, Optional<BlockData>> dataFactory, BuildContext context) {
             super(other);
             this.translation = translation;
             this.dataFactory = dataFactory;

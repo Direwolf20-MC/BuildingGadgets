@@ -1,8 +1,6 @@
 package com.direwolf20.buildinggadgets.common.building;
 
-import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
@@ -35,9 +33,9 @@ public final class PlacementChecker {
     private final ToIntFunction<PlacementTarget> energyFun;
     private final IItemIndex index;
     private final boolean firePlaceEvents;
-    private final BiPredicate<IBuildContext, PlacementTarget> placeCheck;
+    private final BiPredicate<BuildContext, PlacementTarget> placeCheck;
 
-    public PlacementChecker(LazyOptional<IEnergyStorage> energyCap, ToIntFunction<PlacementTarget> energyFun, IItemIndex index, BiPredicate<IBuildContext, PlacementTarget> placeCheck, boolean firePlaceEvents) {
+    public PlacementChecker(LazyOptional<IEnergyStorage> energyCap, ToIntFunction<PlacementTarget> energyFun, IItemIndex index, BiPredicate<BuildContext, PlacementTarget> placeCheck, boolean firePlaceEvents) {
         this.energyCap = energyCap;
         this.energyFun = energyFun;
         this.index = index;
@@ -48,7 +46,7 @@ public final class PlacementChecker {
     /**
      * @implNote This code is so god damn messy. Good luck understanding it.
      */
-    public CheckResult checkPositionWithResult(IBuildContext context, PlacementTarget target, boolean giveBackItems) {
+    public CheckResult checkPositionWithResult(BuildContext context, PlacementTarget target, boolean giveBackItems) {
         if (target.getPos().getY() > context.getWorld().getHeight() || target.getPos().getY() < 0 || ! placeCheck.test(context, target))
             return new CheckResult(MatchResult.failure(), ImmutableMultiset.of(), false, false);
         int energy = energyFun.applyAsInt(target);

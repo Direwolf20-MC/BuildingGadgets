@@ -6,7 +6,6 @@ import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
@@ -123,7 +122,7 @@ public class CopyPasteRender extends BaseRenderer {
             GadgetCopyPaste.getActivePos(player, heldItem).ifPresent(startPos -> {
                 MockDelegationWorld fakeWorld = new MockDelegationWorld(world);
 
-                IBuildContext context = BuildContext.builder().player(player).stack(heldItem).build(fakeWorld);
+                BuildContext context = BuildContext.builder().player(player).stack(heldItem).build(fakeWorld);
 
                 // Get the template and move it to the start pos (player.pick())
                 IBuildView view = provider.getTemplateForKey(key).createViewInContext(context);
@@ -141,7 +140,7 @@ public class CopyPasteRender extends BaseRenderer {
         }));
     }
 
-    private void renderTargets(MatrixStack matrix, Vector3d projectedView, IBuildContext context, List<PlacementTarget> targets, BlockPos startPos) {
+    private void renderTargets(MatrixStack matrix, Vector3d projectedView, BuildContext context, List<PlacementTarget> targets, BlockPos startPos) {
         tickTrack++;
         if (renderBuffer != null && tickTrack < 300) {
             if (tickTrack % 30 == 0) {

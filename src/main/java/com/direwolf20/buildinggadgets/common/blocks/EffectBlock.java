@@ -3,7 +3,6 @@ package com.direwolf20.buildinggadgets.common.blocks;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
@@ -88,7 +87,7 @@ public class EffectBlock extends Block {
      */
     private static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MaterialColor.AIR).notSolid().build();
 
-    public static void spawnUndoBlock(IBuildContext context, PlacementTarget target) {
+    public static void spawnUndoBlock(BuildContext context, PlacementTarget target) {
         BlockState state = context.getWorld().getBlockState(target.getPos());
 
         TileEntity curTe = context.getWorld().getTileEntity(target.getPos());
@@ -101,7 +100,7 @@ public class EffectBlock extends Block {
         }
     }
 
-    public static void spawnEffectBlock(IBuildContext context, PlacementTarget target, Mode mode, boolean usePaste) {//TODO pass the buildcontext through, aka invert the overloading
+    public static void spawnEffectBlock(BuildContext context, PlacementTarget target, Mode mode, boolean usePaste) {//TODO pass the buildcontext through, aka invert the overloading
         spawnEffectBlock(context.getWorld(), target.getPos(), target.getData(), mode, usePaste);
     }
 
