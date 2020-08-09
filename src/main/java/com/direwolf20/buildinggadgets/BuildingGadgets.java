@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets;
 
 import com.direwolf20.buildinggadgets.client.Events;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
+import com.direwolf20.buildinggadgets.common.capbility.TemplateProviderCapability;
 import com.direwolf20.buildinggadgets.common.commands.ClearUndoStoreCommand;
 import com.direwolf20.buildinggadgets.common.commands.SpawnBlocksCommand;
 import com.direwolf20.buildinggadgets.common.items.ModItems;
@@ -20,7 +21,6 @@ import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -63,6 +63,7 @@ public class BuildingGadgets
     }
 
     private void setup(final FMLCommonSetupEvent event) {
+        TemplateProviderCapability.register();
         Packets.register();
     }
 

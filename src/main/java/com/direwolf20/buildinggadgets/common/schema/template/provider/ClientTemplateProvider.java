@@ -39,6 +39,7 @@ public final class ClientTemplateProvider implements ITemplateProvider {
             pendingRequests.add(uuid);
             //TODO request Template from remote
         }
+        cleanUp();
         return res;
     }
 
@@ -56,6 +57,7 @@ public final class ClientTemplateProvider implements ITemplateProvider {
                         "due to an unexpected exception! The callback will not be run!", e);
             }
         }
+        cleanUp();
     }
 
     @Override
@@ -70,5 +72,11 @@ public final class ClientTemplateProvider implements ITemplateProvider {
         updateListeners.invalidate(id);
         if (listener != null)
             listener.accept(Optional.ofNullable(template));
+        cleanUp();
+    }
+
+    private void cleanUp() {
+        cachedTemplates.cleanUp();
+        updateListeners.cleanUp();
     }
 }
