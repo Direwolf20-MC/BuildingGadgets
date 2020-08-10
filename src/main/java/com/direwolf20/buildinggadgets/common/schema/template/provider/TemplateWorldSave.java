@@ -45,12 +45,14 @@ public final class TemplateWorldSave extends WorldSavedData {
         for (INBT templateNBT : templates) {
             CompoundNBT templateCompound = (CompoundNBT) templateNBT;
             UUID id = templateCompound.getUniqueId(KEY_ID);
+            
             boolean deserializeError = Template.deserializeNBT(templateCompound.getCompound(KEY_DATA))
                     .map(t -> {
                         this.templates.put(id, t);
                         return Boolean.FALSE;
                     })
                     .orElse(Boolean.TRUE);
+
             if (deserializeError)
                 BuildingGadgets.LOGGER.error("Could not load Template with id {}. Discarding.", id);
             else
