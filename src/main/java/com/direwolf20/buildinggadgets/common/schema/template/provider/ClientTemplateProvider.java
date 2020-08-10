@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.schema.template.provider;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.packets.Packets;
 import com.direwolf20.buildinggadgets.common.packets.RequestTemplatePacket;
+import com.direwolf20.buildinggadgets.common.packets.UpdateTemplatePacket;
 import com.direwolf20.buildinggadgets.common.schema.template.Template;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -68,7 +69,8 @@ public final class ClientTemplateProvider implements ITemplateProvider {
             cachedTemplates.put(id, template);
         else
             cachedTemplates.invalidate(id);
-        if (sendTarget != null) ; //TODO send update
+        if (sendTarget != null)
+            UpdateTemplatePacket.send(id, template, sendTarget);
         pendingRequests.remove(id);
         Consumer<Optional<Template>> listener = updateListeners.getIfPresent(id);
         updateListeners.invalidate(id);
