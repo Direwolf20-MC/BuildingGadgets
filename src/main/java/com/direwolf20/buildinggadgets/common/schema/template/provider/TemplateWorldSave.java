@@ -88,6 +88,10 @@ public final class TemplateWorldSave extends WorldSavedData {
     }
 
     public void setTemplate(UUID id, @Nullable Template template) {
+        Template current = templates.get(id); //avoid mark dirties...
+        if (current == template)
+            return;
+
         if (template != null)
             templates.put(id, template);
         else
