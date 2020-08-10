@@ -38,11 +38,14 @@ public final class ClientTemplateProvider implements ITemplateProvider {
     @Override
     public Optional<Template> getIfAvailable(UUID uuid) {
         Optional<Template> res = Optional.ofNullable(cachedTemplates.getIfPresent(uuid));
+
         if (! res.isPresent() && ! pendingRequests.contains(uuid)) {
             pendingRequests.add(uuid);
             Packets.sendToServer(new RequestTemplatePacket(uuid));
         }
+
         cleanUp();
+
         return res;
     }
 
@@ -60,6 +63,7 @@ public final class ClientTemplateProvider implements ITemplateProvider {
                         "due to an unexpected exception! The callback will not be run!", e);
             }
         }
+
         cleanUp();
     }
 
@@ -69,13 +73,16 @@ public final class ClientTemplateProvider implements ITemplateProvider {
             cachedTemplates.put(id, template);
         else
             cachedTemplates.invalidate(id);
+
         if (sendTarget != null)
             UpdateTemplatePacket.send(id, template, sendTarget);
+
         pendingRequests.remove(id);
         Consumer<Optional<Template>> listener = updateListeners.getIfPresent(id);
         updateListeners.invalidate(id);
         if (listener != null)
             listener.accept(Optional.ofNullable(template));
+
         cleanUp();
     }
 

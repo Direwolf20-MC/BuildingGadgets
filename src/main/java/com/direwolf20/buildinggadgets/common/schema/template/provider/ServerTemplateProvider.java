@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.schema.template.provider;
 
+import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.packets.UpdateTemplatePacket;
 import com.direwolf20.buildinggadgets.common.schema.template.Template;
 import net.minecraft.world.server.ServerWorld;
@@ -37,6 +38,7 @@ public final class ServerTemplateProvider implements ITemplateProvider {
             TemplateWorldSave.getInstance(theWorld).setTemplate(id, template);
             if (sendTarget != null)
                 UpdateTemplatePacket.send(id, template, sendTarget);
-        }
+        } else
+            BuildingGadgets.LOGGER.warn("Attempted to set template with id {} on an unloaded world!!!", id);
     }
 }

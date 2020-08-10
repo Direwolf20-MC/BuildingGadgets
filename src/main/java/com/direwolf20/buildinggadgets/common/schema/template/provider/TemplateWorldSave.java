@@ -37,8 +37,10 @@ public final class TemplateWorldSave extends WorldSavedData {
             BuildingGadgets.LOGGER.warn("No templates found to load from nbt data.");
             return;
         }
+
         ListNBT templates = nbt.getList(KEY_TEMPLATE_LIST, NBT.TAG_COMPOUND);
         BuildingGadgets.LOGGER.debug("Loading {} template{}.", templates.size(), getSExtension(templates.size()));
+
         int loadCount = 0;
         for (INBT templateNBT : templates) {
             CompoundNBT templateCompound = (CompoundNBT) templateNBT;
@@ -54,6 +56,7 @@ public final class TemplateWorldSave extends WorldSavedData {
             else
                 loadCount++;
         }
+
         if (loadCount == templates.size())
             BuildingGadgets.LOGGER.debug("Successfully loaded {}/{} template{}.",
                     templates.size(), templates.size(), getSExtension(templates.size()));
@@ -66,6 +69,7 @@ public final class TemplateWorldSave extends WorldSavedData {
     @Override
     public CompoundNBT write(CompoundNBT compound) {
         BuildingGadgets.LOGGER.debug("Saving {} template{}.", templates.size(), getSExtension(templates.size()));
+
         ListNBT templateList = new ListNBT();
         for (Map.Entry<UUID, Template> entry : templates.entrySet()) {
             CompoundNBT templateCompound = new CompoundNBT();
@@ -73,7 +77,9 @@ public final class TemplateWorldSave extends WorldSavedData {
             templateCompound.put(KEY_DATA, entry.getValue().serializeNBT());
             templateList.add(templateCompound);
         }
+
         compound.put(KEY_TEMPLATE_LIST, templateList);
+
         return compound;
     }
 
@@ -86,6 +92,7 @@ public final class TemplateWorldSave extends WorldSavedData {
             templates.put(id, template);
         else
             templates.remove(id);
+
         markDirty();
     }
 

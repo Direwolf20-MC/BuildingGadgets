@@ -47,6 +47,7 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
                 .map(b -> {
                     int remainingBytes = b.length;
                     int seqNumber = 0;
+
                     while (remainingBytes > 0) {
                         int size = Math.min(remainingBytes, SPLIT_SIZE);
                         remainingBytes -= size;
@@ -55,6 +56,7 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
                         Packets.INSTANCE.send(target, new UpdateTemplatePacket(id, curSession.getAndIncrement(),
                                 payload, seqNumber++, remainingBytes > 0));
                     }
+
                     return null;
                 })
                 .orElseGet(() -> {
@@ -82,6 +84,7 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
         super(buffer);
         //ensure that it actually reads the size it wrote - the no-arg version reads the whole buffer!!!
         session = buffer.readInt();
+
         if (buffer.readBoolean()) {
             payload = buffer.readByteArray(SPLIT_SIZE);
             seqNumber = buffer.readVarInt();
@@ -89,13 +92,16 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
             payload = null;
             seqNumber = - 1;
         }
+
         hasMore = buffer.readBoolean();
     }
 
     public void encode(PacketBuffer buffer) {
         super.encode(buffer);
+
         buffer.writeInt(session);
         buffer.writeBoolean(payload != null);
+
         if (payload != null)
             buffer.writeByteArray(payload);
     }
@@ -104,9 +110,11 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
         ctx.get().enqueueWork(() -> {
             try {
                 PacketAssembly assembly = assemblyByPlayerId.get(Optional.ofNullable(ctx.get().getSender()).map(Entity::getUniqueID));
+
                 Supplier<Supplier<World>> loadSafeWorld = ctx.get().getDirection().getReceptionSide().isClient() ?
                         () -> () -> net.minecraft.client.Minecraft.getInstance().world :
                         () -> () -> ctx.get().getSender().getServerWorld();
+
                 assembly.assembleAndSetTemplate(this, loadSafeWorld);
             } catch (Exception e) {
                 BuildingGadgets.LOGGER.error("Unexpected exception assembling packet {}.", this, e);
@@ -139,6 +147,7 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
         public void assembleAndSetTemplate(UpdateTemplatePacket packet, Supplier<Supplier<World>> world) {
             List<UpdateTemplatePacket> inSession = toAssemble.computeIfAbsent(packet.session, i -> new LinkedList<>());
             addPacketAtIndex(packet, inSession);
+
             if (checkComplete(inSession))
                 world.get().get().getCapability(TemplateProviderCapability.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(p ->
                         p.setAndUpdateRemote(inSession.get(0).getId(), reassemble(inSession), null));
@@ -146,6 +155,7 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
 
         private void addPacketAtIndex(UpdateTemplatePacket packet, List<UpdateTemplatePacket> inSession) {
             ListIterator<UpdateTemplatePacket> it = inSession.listIterator();
+
             while (it.hasNext() && packet != null) {
                 UpdateTemplatePacket curPacket = it.next();
                 if (packet.seqNumber < curPacket.seqNumber) {
@@ -154,6 +164,7 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
                     packet = null;
                 }
             }
+
             if (packet != null)
                 inSession.add(packet);
         }
@@ -161,11 +172,14 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
         private boolean checkComplete(List<UpdateTemplatePacket> inSession) {
             if (inSession.get(inSession.size() - 1).hasMore)
                 return false;
+
             int index = 0;
+
             for (UpdateTemplatePacket packet : inSession) {
                 if (packet.seqNumber != index++)
                     return false;
             }
+
             return true;
         }
 
@@ -173,14 +187,18 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
             int length = inSession.stream().mapToInt(UpdateTemplatePacket::getPayloadSize).sum();
             if (length < 0) //single packet with no payload
                 return null;
+
             byte[] data = new byte[length];
             int read = 0;
+
             for (UpdateTemplatePacket packet : inSession) {
                 assert packet.payload != null;
                 System.arraycopy(packet.payload, 0, data, read, packet.payload.length);
                 read += packet.payload.length;
             }
+
             assert read == data.length;
+            
             try {
                 CompoundNBT nbt = CompressedStreamTools.readCompressed(new ByteArrayInputStream(data));
                 return Template.deserializeNBT(nbt).orElse(null);

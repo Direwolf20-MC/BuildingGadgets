@@ -29,10 +29,12 @@ public final class TranslationWrapper implements Iterable<TemplateData> {
             public TemplateData next() {
                 TemplateData other = it.next();
                 BlockPos pos = other.getPos();
+
                 if (pos instanceof Mutable)
                     ((Mutable) pos).setPos(pos.getX() + relTranslation.getX(), pos.getY() + relTranslation.getY(), pos.getZ() + relTranslation.getZ());
                 else
                     other.setInformation(pos.add(relTranslation), other.getState());
+
                 return other;
             }
         };
