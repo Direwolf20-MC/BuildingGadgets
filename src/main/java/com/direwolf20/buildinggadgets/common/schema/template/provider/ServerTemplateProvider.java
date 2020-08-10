@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.schema.template.provider;
 
+import com.direwolf20.buildinggadgets.common.packets.UpdateTemplatePacket;
 import com.direwolf20.buildinggadgets.common.schema.template.Template;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
@@ -34,7 +35,8 @@ public final class ServerTemplateProvider implements ITemplateProvider {
         ServerWorld theWorld = world.get();
         if (theWorld != null) {
             TemplateWorldSave.getInstance(theWorld).setTemplate(id, template);
-            if (sendTarget != null) ; //TODO implement packets
+            if (sendTarget != null)
+                UpdateTemplatePacket.send(id, template, sendTarget);
         }
     }
 }

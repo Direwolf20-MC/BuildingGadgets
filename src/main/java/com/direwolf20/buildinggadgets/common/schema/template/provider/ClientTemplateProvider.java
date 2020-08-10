@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.common.schema.template.provider;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.packets.Packets;
+import com.direwolf20.buildinggadgets.common.packets.RequestTemplatePacket;
 import com.direwolf20.buildinggadgets.common.schema.template.Template;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -37,7 +39,7 @@ public final class ClientTemplateProvider implements ITemplateProvider {
         Optional<Template> res = Optional.ofNullable(cachedTemplates.getIfPresent(uuid));
         if (! res.isPresent() && ! pendingRequests.contains(uuid)) {
             pendingRequests.add(uuid);
-            //TODO request Template from remote
+            Packets.sendToServer(new RequestTemplatePacket(uuid));
         }
         cleanUp();
         return res;
