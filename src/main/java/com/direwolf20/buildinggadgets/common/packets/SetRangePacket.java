@@ -9,45 +9,45 @@ import net.minecraftforge.fml.network.NetworkEvent;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class SetRangePacket {
-    private int range;
+public final class SetRangePacket {
+
+    private final int range;
 
     public SetRangePacket() {
-        this.range = -1;
+        this.range = - 1;
     }
 
     public SetRangePacket(int range) {
         this.range = range;
     }
 
-    public static void encode(SetRangePacket msg, PacketBuffer buffer) {
-        buffer.writeInt(msg.range);
-    }
     public static SetRangePacket decode(PacketBuffer buffer) {
         return new SetRangePacket(buffer.readInt());
     }
 
-    public static class Handler {
-        public static void handle(final SetRangePacket msg, Supplier<NetworkEvent.Context> ctx) {
-            ctx.get().enqueueWork(() -> {
-                ServerPlayerEntity player = ctx.get().getSender();
-                if (player == null)
-                    return;
+    public void encode(PacketBuffer buffer) {
+        buffer.writeInt(range);
+    }
 
-                Optional<ItemStack> stack = Gadget.findGadget(player);
-                stack.ifPresent(gadget -> {
-                    if (msg.range < 0)
-                        ((Gadget) gadget.getItem()).cycleRange(gadget, player);
-                    else
-                        ((Gadget) gadget.getItem()).setRange(gadget, msg.range);
-                });
+    public void handle(Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
+            ServerPlayerEntity player = ctx.get().getSender();
+            if (player == null)
+                return;
 
-                // TODO: 09/07/2020 Add this back
-//                else if (stack.getItem() instanceof GadgetDestruction)
-//                    GadgetDestruction.switchOverlay(player, stack);
+            Optional<ItemStack> stack = Gadget.findGadget(player);
+            stack.ifPresent(gadget -> {
+                if (range < 0)
+                    ((Gadget) gadget.getItem()).cycleRange(gadget, player);
+                else
+                    ((Gadget) gadget.getItem()).setRange(gadget, range);
             });
 
-            ctx.get().setPacketHandled(true);
-        }
+            // TODO: 09/07/2020 Add this back
+            //                else if (stack.getItem() instanceof GadgetDestruction)
+            //                    GadgetDestruction.switchOverlay(player, stack);
+        });
+
+        ctx.get().setPacketHandled(true);
     }
 }
