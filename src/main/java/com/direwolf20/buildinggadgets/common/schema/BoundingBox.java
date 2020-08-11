@@ -1,19 +1,18 @@
 package com.direwolf20.buildinggadgets.common.schema;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.Vec3i;
 
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class BoundingBox {
-    public int minX;
-    public int minY;
-    public int minZ;
-    public int maxX;
-    public int maxY;
-    public int maxZ;
+public final class BoundingBox {
+    private final int minX;
+    private final int minY;
+    private final int minZ;
+    private final int maxX;
+    private final int maxY;
+    private final int maxZ;
 
     public BoundingBox(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
         this.minX = Math.min(minX, maxX);
@@ -42,7 +41,35 @@ public class BoundingBox {
     public BoundingBox grow(int x, int y, int z) {
         return new BoundingBox(minX, minY, minZ, maxX + x, maxY + y, maxZ + z);
     }
-    
+
+    public Stream<BlockPos> stream() {
+        return BlockPos.getAllInBox(minX, minY, minZ, maxX, maxY, maxZ).map(BlockPos::toImmutable);
+    }
+
+    public int getMinX() {
+        return minX;
+    }
+
+    public int getMinY() {
+        return minY;
+    }
+
+    public int getMinZ() {
+        return minZ;
+    }
+
+    public int getMaxX() {
+        return maxX;
+    }
+
+    public int getMaxY() {
+        return maxY;
+    }
+
+    public int getMaxZ() {
+        return maxZ;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
