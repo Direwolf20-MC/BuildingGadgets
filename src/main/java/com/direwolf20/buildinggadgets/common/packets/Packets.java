@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.packets;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.items.BuildingGadget;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.FakePlayer;
@@ -30,9 +29,9 @@ public class Packets {
     public static void register() {
         int id = 0;
 
-        INSTANCE.registerMessage(id++, SetRangePacket.class, SetRangePacket::encode, SetRangePacket::decode, SetRangePacket.Handler::handle);
-        INSTANCE.registerMessage(id++, SetModePacket.class, SetModePacket::encode, SetModePacket::decode, SetModePacket.Handler::handle);
-        INSTANCE.registerMessage(id++, UndoPacket.class, UndoPacket::encode, UndoPacket::decode, UndoPacket.Handler::handle);
+        INSTANCE.registerMessage(id++, SetRangePacket.class, SetRangePacket::encode, SetRangePacket::decode, SetRangePacket::handle);
+        INSTANCE.registerMessage(id++, SetModePacket.class, SetModePacket::encode, SetModePacket::decode, SetModePacket::handle);
+        INSTANCE.registerMessage(id++, UndoPacket.class, UndoPacket::encode, UndoPacket::decode, UndoPacket::handle);
     }
 
     public static void sendTo(Object msg, ServerPlayerEntity player) {
