@@ -3,11 +3,8 @@ package com.direwolf20.buildinggadgets.common.schema.template;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.schema.BoundingBox;
-import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
-import it.unimi.dsi.fastutil.longs.LongArrayList;
-import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -26,9 +23,7 @@ import java.util.*;
 
 public final class Template implements Iterable<TemplateData> {
     private static final String KEY_POS = "pos";
-    private static final String KEY_TILE_POS = "tile_pos";
     private static final String KEY_DATA = "data";
-    private static final String KEY_TILE_DATA = "tile_data";
     private static final String KEY_AUTHOR = "author";
     private static final int BYTE_MASK_12BIT = 0xF_FF;
     private static final int BYTE_MASK_14BIT = 0x3F_FF;
@@ -54,8 +49,8 @@ public final class Template implements Iterable<TemplateData> {
         for (INBT stateNBT : nbtStates) {
             //read blockstate will replace everything unknown with the default value for Blocks: AIR
             BlockState state = NBTUtil.readBlockState((CompoundNBT) stateNBT);
+            //a trace log, as this may be normal... In the future we might want to replace this with some placeholder
             if (state == Blocks.AIR.getDefaultState())
-                //a trace log, as this may be normal... In the future we might want to replace this with some placeholder
                 BuildingGadgets.LOGGER.trace("Found unknown state with nbt {}. Will be ignored!", stateNBT);
             uniqueStates.add(state);
         }
@@ -89,8 +84,10 @@ public final class Template implements Iterable<TemplateData> {
         }
         //re-evaluate the bounding box based on potentially missing blocks
         bounds = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
-
-        return Optional.of(new Template(states, bounds, author));
+        //The Template may no longer have 0,0,0 min - if the corresponding blocks had to be removed
+        //Therefore normalize the result.
+        return Optional.of(new Template(states, bounds, author))
+                .map(Template::normalize);
     }
 
     private static int getId(long packed) {
@@ -138,7 +135,7 @@ public final class Template implements Iterable<TemplateData> {
      *
      * @param setTo      the {@link Mutable} to apply values to
      * @param serialized the long produced by {@link #vecToLong(Vec3i)}
-     * @return {@code setTo} to allow for Method chainging.
+     * @return {@code setTo} to allow for Method changing.
      */
     private static Mutable posFromLong(Mutable setTo, long serialized) {
         int x = (int) ((serialized >> 26) & BYTE_MASK_14BIT);
@@ -164,9 +161,6 @@ public final class Template implements Iterable<TemplateData> {
      * refer to the classical {@link String} concat test (for example a variant of this can be seen in the second
      * answer of this:
      * https://stackoverflow.com/questions/1532461/stringbuilder-vs-string-concatenation-in-tostring-in-java).
-     *
-     * The Tile Data has to be copied, as it would otherwise would allow manipulation of this Templates internal
-     * data structure!
      *
      * @return An {@link Iterator} of the {@link TemplateData} represented by this Template in X-Y-Z order.
      */
@@ -197,18 +191,37 @@ public final class Template implements Iterable<TemplateData> {
         };
     }
 
+    /**
+     * @return A Template that is normalized to the bounds [(0,0,0), (maxX, maxY, maxZ)]
+     */
+    public Template normalize() {
+        BlockPos min = bounds.getMinPos();
+        if (min.equals(BlockPos.ZERO))
+            return this;
+
+        int translationX = - min.getX();
+        int translationY = - min.getY();
+        int translationZ = - min.getZ();
+        Long2ObjectMap<BlockState> transformedStates = new Long2ObjectOpenHashMap<>();
+        Mutable pos = new Mutable();
+        for (Entry<BlockState> entry : states.long2ObjectEntrySet())
+            transformedStates.put(
+                    vecToLong(posFromLong(pos, entry.getLongKey()).move(translationX, translationY, translationZ)),
+                    entry.getValue()
+            );
+
+        return new Template(transformedStates, new BoundingBox(BlockPos.ZERO, bounds.getMaxPos().subtract(min)), author);
+    }
+
     public CompoundNBT serializeNBT() {
         BuildingGadgets.LOGGER.trace("Serializing {}'s Template of size {}.", author, states.size());
         CompoundNBT res = new CompoundNBT();
         Object2IntMap<BlockState> allStates = new Object2IntLinkedOpenHashMap<>(); //linked to keep the order
-        Object2IntMap<CompoundNBT> allTileData = new Object2IntLinkedOpenHashMap<>(); //linked to keep the order
         int stateCounter = 0;
-        int tileCounter = 0;
         LongList posStateList = new LongArrayList(states.size());
 
         //These sets are purely for logging and will rarely be filled...
         Set<BlockState> statesOutOfRange = Collections.newSetFromMap(new IdentityHashMap<>()); //states can do with reference equality
-        Set<CompoundNBT> tileDataOutOfRange = new HashSet<>();
         //Let's create all the longs necessary for the pos->state mapping
         for (Entry<BlockState> entry : states.long2ObjectEntrySet()) {
             if (! allStates.containsKey(entry.getValue())) {

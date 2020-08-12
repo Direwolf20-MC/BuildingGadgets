@@ -46,6 +46,14 @@ public final class BoundingBox {
         return BlockPos.getAllInBox(minX, minY, minZ, maxX, maxY, maxZ).map(BlockPos::toImmutable);
     }
 
+    public BlockPos getMinPos() {
+        return new BlockPos(getMinX(), getMaxX(), getMaxZ());
+    }
+
+    public BlockPos getMaxPos() {
+        return new BlockPos(getMaxX(), getMaxY(), getMaxZ());
+    }
+
     public int getMinX() {
         return minX;
     }
