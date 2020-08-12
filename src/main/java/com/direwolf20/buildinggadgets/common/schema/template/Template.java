@@ -3,8 +3,12 @@ package com.direwolf20.buildinggadgets.common.schema.template;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.schema.BoundingBox;
-import it.unimi.dsi.fastutil.longs.*;
+import com.google.common.base.Preconditions;
+import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -72,7 +76,7 @@ public final class Template implements Iterable<TemplateData> {
                 continue;
             long posLong = getPos(packed);
             posFromLong(thePos, posLong);
-            //I'd actually like to outsource this to a class, but Mike told me not to...
+            //I'd actually like to outsource this to a class, but Mike told me not to... (see Builder#recordBlock)
             minX = Math.min(thePos.getX(), minX);
             minY = Math.min(thePos.getY(), minY);
             minZ = Math.min(thePos.getZ(), minZ);
@@ -88,6 +92,19 @@ public final class Template implements Iterable<TemplateData> {
         //Therefore normalize the result.
         return Optional.of(new Template(states, bounds, author))
                 .map(Template::normalize);
+    }
+
+    /**
+     * Create a new Builder with the specified translation. All Blocks recorded by the {@link Builder} must have positions
+     * such that for any pos a, {@code a.subtract(translationPos)} returns a pos with onnly positive coordinates.
+     *
+     * @param translationPos The origin of the resulting {@code Template}'s coordinate system, expressed in the world
+     *                       coordinate system.
+     * @return A new {@link Builder}
+     * @see Builder#recordBlock(Mutable, BlockState)
+     */
+    public static Builder builder(BlockPos translationPos) {
+        return new Builder(translationPos);
     }
 
     private static int getId(long packed) {
@@ -123,7 +140,7 @@ public final class Template implements Iterable<TemplateData> {
      * @param vec The vector to "longify"
      * @return A long consisting of [24bit-unused]|[14bit-x_coord]|[12bit-y_coord]|[14bit-z_coord]
      */
-    private long vecToLong(Vec3i vec) {
+    private static long vecToLong(Vec3i vec) {
         long res = (long) (vec.getX() & BYTE_MASK_14BIT) << 26;
         res |= (vec.getY() & BYTE_MASK_12BIT) << 14;
         res |= (vec.getZ() & BYTE_MASK_14BIT);
@@ -202,7 +219,7 @@ public final class Template implements Iterable<TemplateData> {
         int translationX = - min.getX();
         int translationY = - min.getY();
         int translationZ = - min.getZ();
-        Long2ObjectMap<BlockState> transformedStates = new Long2ObjectOpenHashMap<>();
+        Long2ObjectMap<BlockState> transformedStates = new Long2ObjectLinkedOpenHashMap<>();
         Mutable pos = new Mutable();
         for (Entry<BlockState> entry : states.long2ObjectEntrySet())
             transformedStates.put(
@@ -250,5 +267,67 @@ public final class Template implements Iterable<TemplateData> {
         res.putString(KEY_AUTHOR, author);
 
         return res;
+    }
+
+    public static final class Builder {
+        private int minX;
+        private int minY;
+        private int minZ;
+        private int maxX;
+        private int maxY;
+        private int maxZ;
+        private final BlockPos translationPos;
+        private final Long2ObjectMap<BlockState> states;
+        private String author;
+
+        /**
+         * @see #builder(BlockPos)
+         */
+        public Builder(BlockPos translationPos) {
+            this.translationPos = translationPos;
+            this.states = new Long2ObjectLinkedOpenHashMap<>();
+            this.author = "";
+        }
+
+        /**
+         * Set the author of the resulting {@link Template}. Defaults to {@code ""}.
+         *
+         * @param author The author of the resulting {@link Template}
+         * @return The {@code Builder} instance for Method chaining.
+         */
+        public Builder author(String author) {
+            this.author = author;
+            return this;
+        }
+
+        /**
+         * Record the given block in the resulting Template. This assumes that after applying translation all coordinates
+         * of the given position will be positive (this is the case if only positions within a {@link BoundingBox}
+         * are used and the translation-pos was obtained via {@link BoundingBox#getMinPos()}).
+         *
+         * @param pos   The real-world pos at which {@code state} was found.
+         * @param state The {@link BlockState} to record.
+         * @return The {@code Builder} instance for Method chaining.
+         */
+        public Builder recordBlock(Mutable pos, BlockState state) {
+            pos = pos.move(- translationPos.getX(), - translationPos.getY(), - translationPos.getZ());
+            Preconditions.checkArgument(pos.getX() >= 0 && pos.getY() >= 0 && pos.getZ() >= 0,
+                    "Encountered {} which is out of bounds using translation {}.", pos, translationPos);
+            states.put(vecToLong(pos), state);
+            minX = Math.min(pos.getX(), minX);
+            minY = Math.min(pos.getY(), minY);
+            minZ = Math.min(pos.getZ(), minZ);
+            maxX = Math.max(pos.getX(), maxX);
+            maxY = Math.max(pos.getY(), maxY);
+            maxZ = Math.max(pos.getZ(), maxZ);
+            return this;
+        }
+
+        /**
+         * @return The {@link Template} which is represented by this Builder
+         */
+        public Template build() {
+            return new Template(states, new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ), author).normalize();
+        }
     }
 }

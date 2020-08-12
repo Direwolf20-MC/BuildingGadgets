@@ -11,8 +11,6 @@ import com.google.common.cache.LoadingCache;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
@@ -20,8 +18,6 @@ import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -183,6 +179,7 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
             return true;
         }
 
+        @Nullable
         private Template reassemble(List<UpdateTemplatePacket> inSession) {
             int length = inSession.stream().mapToInt(UpdateTemplatePacket::getPayloadSize).sum();
             if (length < 0) //single packet with no payload
@@ -198,14 +195,8 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
             }
 
             assert read == data.length;
-            
-            try {
-                CompoundNBT nbt = CompressedStreamTools.readCompressed(new ByteArrayInputStream(data));
-                return Template.deserializeNBT(nbt).orElse(null);
-            } catch (IOException e) {
-                BuildingGadgets.LOGGER.error("Could not reassemble Template due to unexpected Exception!", e);
-                return null;
-            }
+
+            return TemplateIO.readCompressedBytes(data).orElse(null);
         }
     }
 }
