@@ -96,7 +96,10 @@ public final class Template implements Iterable<TemplateData> {
 
     /**
      * Create a new Builder with the specified translation. All Blocks recorded by the {@link Builder} must have positions
-     * such that for any pos a, {@code a.subtract(translationPos)} returns a pos with onnly positive coordinates.
+     * such that for any pos a, {@code a.subtract(translationPos)} returns a pos with only positive coordinates.
+     * <p>
+     * This can for example be achieved by using {@link BoundingBox#getMinPos()} to get the translationPos and then
+     * record only positions within the {@link BoundingBox}.
      *
      * @param translationPos The origin of the resulting {@code Template}'s coordinate system, expressed in the world
      *                       coordinate system.
