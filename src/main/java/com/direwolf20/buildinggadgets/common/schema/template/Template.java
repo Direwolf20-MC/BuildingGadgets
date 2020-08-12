@@ -97,7 +97,7 @@ public final class Template implements Iterable<TemplateData> {
     /**
      * Create a new Builder with the specified translation. All Blocks recorded by the {@link Builder} must have positions
      * such that for any pos a, {@code a.subtract(translationPos)} returns a pos with only positive coordinates.
-     * 
+     *
      * This can for example be achieved by using {@link BoundingBox#getMinPos()} to get the translationPos and then
      * record only positions within the {@link BoundingBox}.
      *
@@ -290,6 +290,8 @@ public final class Template implements Iterable<TemplateData> {
             this.translationPos = translationPos;
             this.states = new Long2ObjectLinkedOpenHashMap<>();
             this.author = "";
+            this.minX = this.minY = this.minZ = Integer.MAX_VALUE;
+            this.maxX = this.maxY = this.maxZ = Integer.MIN_VALUE;
         }
 
         /**
@@ -330,6 +332,9 @@ public final class Template implements Iterable<TemplateData> {
          * @return The {@link Template} which is represented by this Builder
          */
         public Template build() {
+            if (states.isEmpty()) {
+                minX = maxX = minY = maxY = minZ = maxZ = 0;
+            }
             return new Template(states, new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ), author).normalize();
         }
     }
