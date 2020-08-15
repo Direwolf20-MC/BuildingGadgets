@@ -33,7 +33,7 @@ public final class TranslationWrapper implements Iterable<TemplateData> {
                 if (pos instanceof Mutable)
                     ((Mutable) pos).setPos(pos.getX() + relTranslation.getX(), pos.getY() + relTranslation.getY(), pos.getZ() + relTranslation.getZ());
                 else
-                    other.setInformation(pos.add(relTranslation), other.getState());
+                    other.setInformation(pos.add(relTranslation), other.getData());
 
                 return other;
             }

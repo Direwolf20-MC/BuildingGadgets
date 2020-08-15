@@ -3,27 +3,30 @@ package com.direwolf20.buildinggadgets.common.schema.template;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.schema.BoundingBox;
-import com.google.common.base.Preconditions;
-import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap.Entry;
+import com.direwolf20.buildinggadgets.common.schema.template.TemplateData.BlockData;
+import com.google.common.collect.ImmutableSortedMap;
+import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
-import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.Direction.Axis;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockPos.Mutable;
 import net.minecraft.util.math.Vec3i;
 import net.minecraftforge.common.util.Constants.NBT;
 
+import javax.annotation.Nullable;
 import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Function;
 
 public final class Template implements Iterable<TemplateData> {
     private static final String KEY_POS = "pos";
@@ -34,48 +37,54 @@ public final class Template implements Iterable<TemplateData> {
     private static final int BYTE_MASK_24BIT = 0xFF_FF_FF;
     private static final long BYTE_MASK_40BIT = ((long) 0xFF_FF_FF_FF) << 8 | 0xFF;
     private static final int MAX_NUMBER_OF_STATES = (1 << 24) - 1;
-    private final Long2ObjectMap<BlockState> states;
+    private static final Comparator<BlockPos> YXZ_COMPARATOR =
+            Comparator.comparing(BlockPos::getY).thenComparing(BlockPos::getX).thenComparing(BlockPos::getZ);
+    private static final int[][] IDENTITY_3X3 = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+    private final ImmutableSortedMap<BlockPos, BlockData> data;
     private final BoundingBox bounds;
     private final String author;
+
+    private Template(ImmutableSortedMap<BlockPos, BlockData> data, BoundingBox bounds, String author) {
+        this.data = data;
+        this.bounds = bounds;
+        this.author = author;
+    }
 
     public static Optional<Template> deserializeNBT(CompoundNBT nbt) {
         if (! nbt.contains(KEY_POS, NBT.TAG_LONG_ARRAY) || ! nbt.contains(KEY_DATA, NBT.TAG_LIST))
             return Optional.empty();
 
-        Long2ObjectMap<BlockState> states = new Long2ObjectLinkedOpenHashMap<>();
-        BoundingBox bounds = null;
-        String author = nbt.getString(KEY_AUTHOR);
-
         //read the states
-        ListNBT nbtStates = (ListNBT) nbt.get(KEY_DATA);
-        assert nbtStates != null;
-        List<BlockState> uniqueStates = new ArrayList<>(nbtStates.size());
-        for (INBT stateNBT : nbtStates) {
+        ListNBT nbtData = (ListNBT) nbt.get(KEY_DATA);
+        assert nbtData != null;
+        List<BlockData> uniqueData = new ArrayList<>(nbtData.size());
+        for (INBT dataNBT : nbtData) {
             //read blockstate will replace everything unknown with the default value for Blocks: AIR
-            BlockState state = NBTUtil.readBlockState((CompoundNBT) stateNBT);
+            BlockData data = BlockData.deserialize((CompoundNBT) dataNBT);
             //a trace log, as this may be normal... In the future we might want to replace this with some placeholder
-            if (state == Blocks.AIR.getDefaultState())
-                BuildingGadgets.LOGGER.trace("Found unknown state with nbt {}. Will be ignored!", stateNBT);
-            uniqueStates.add(state);
+            if (data.getState() == Blocks.AIR.getDefaultState())
+                BuildingGadgets.LOGGER.trace("Found unknown state with nbt {}. Will be ignored!", dataNBT);
+            uniqueData.add(data);
         }
-        //process the state map
+        //process the state map - need the explicit type in order to be able to trim
+        ImmutableSortedMap.Builder<BlockPos, BlockData> builder = ImmutableSortedMap.orderedBy(YXZ_COMPARATOR);
         int minX = 0, minY = 0, minZ = 0, maxX = 0, maxY = 0, maxZ = 0;
-        Mutable thePos = new Mutable();
         for (long packed : nbt.getLongArray(KEY_POS)) {
             int id = getId(packed);
-            if (id >= uniqueStates.size() || id < 0) {
+            long posLong = getPosLong(packed);
+            BlockPos thePos = posFromLong(posLong);
+            if (id >= uniqueData.size() || id < 0) {
                 BuildingGadgets.LOGGER.error("Found illegal state-id {} in Template at pos {}(={}), when {} states " +
                                 "are known. This indicates a greater Problem and the Template is therefore deemed broken.",
-                        id, getPos(packed), posFromLong(new Mutable(), getPos(packed)), uniqueStates.size());
+                        id, getPosLong(packed), thePos, uniqueData.size());
                 return Optional.empty();
             }
-            BlockState state = uniqueStates.get(id);
-            if (state == Blocks.AIR.getDefaultState())
-                //Skip unknown Blocks - this has no log, as it is already logged before and even might happen more
-                //than once. So having a log here might result in serious log spam
+
+            BlockData data = uniqueData.get(id);
+            //Skip unknown Blocks - this has no log, as it is already logged before and even might happen more
+            //than once. So having a log here might result in serious log spam
+            if (data.getState() == Blocks.AIR.getDefaultState())
                 continue;
-            long posLong = getPos(packed);
-            posFromLong(thePos, posLong);
             //I'd actually like to outsource this to a class, but Mike told me not to... (see Builder#recordBlock)
             minX = Math.min(thePos.getX(), minX);
             minY = Math.min(thePos.getY(), minY);
@@ -84,56 +93,31 @@ public final class Template implements Iterable<TemplateData> {
             maxY = Math.max(thePos.getY(), maxY);
             maxZ = Math.max(thePos.getZ(), maxZ);
 
-            states.put(posLong, state);
+            builder.put(thePos, data);
         }
         //re-evaluate the bounding box based on potentially missing blocks
-        bounds = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+        BoundingBox bounds = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+        String author = nbt.getString(KEY_AUTHOR);
         //The Template may no longer have 0,0,0 min - if the corresponding blocks had to be removed
         //Therefore normalize the result.
-        return Optional.of(new Template(states, bounds, author))
+        return Optional.of(new Template(builder.build(), bounds, author))
                 .map(Template::normalize);
     }
 
     /**
      * Create a new Builder with the specified translation. All Blocks recorded by the {@link Builder} must have positions
      * such that for any pos a, {@code a.subtract(translationPos)} returns a pos with only positive coordinates.
-     *
-     * This can for example be achieved by using {@link BoundingBox#getMinPos()} to get the translationPos and then
+     * <p>
+     * This can for example be achieved by using {@link BoundingBox#createMinPos()} to get the translationPos and then
      * record only positions within the {@link BoundingBox}.
      *
      * @param translationPos The origin of the resulting {@code Template}'s coordinate system, expressed in the world
      *                       coordinate system.
      * @return A new {@link Builder}
-     * @see Builder#recordBlock(Mutable, BlockState)
+     * @see Builder#recordBlock(BlockPos, BlockState, CompoundNBT)
      */
     public static Builder builder(BlockPos translationPos) {
         return new Builder(translationPos);
-    }
-
-    private static int getId(long packed) {
-        return (int) ((packed >> 40) & BYTE_MASK_24BIT);
-    }
-
-    private static long getPos(long packed) {
-        return packed & BYTE_MASK_40BIT;
-    }
-
-    private Template(Long2ObjectMap<BlockState> states, BoundingBox bounds, String author) {
-        this.states = states;
-        this.bounds = bounds;
-        this.author = author;
-    }
-
-    public BoundingBox getBounds() {
-        return bounds;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public int size() {
-        return states.size();
     }
 
     /**
@@ -150,23 +134,155 @@ public final class Template implements Iterable<TemplateData> {
         return res;
     }
 
+    private static long includeId(long posLong, int stateId) {
+        return posLong | ((long) (stateId & BYTE_MASK_24BIT) << 40);
+    }
+
+    private static int getId(long packed) {
+        return (int) ((packed >> 40) & BYTE_MASK_24BIT);
+    }
+
+    private static long getPosLong(long packed) {
+        return packed & BYTE_MASK_40BIT;
+    }
+
     /**
-     * Converts longs provided by {@link #vecToLong(Vec3i)} back into a {@link Mutable MutableBlockPos}.
+     * Converts longs provided by {@link #vecToLong(Vec3i)} back into a {@link BlockPos}.
      *
-     * @param setTo      the {@link Mutable} to apply values to
      * @param serialized the long produced by {@link #vecToLong(Vec3i)}
-     * @return {@code setTo} to allow for Method changing.
+     * @return A new position from the serialized long.
      */
-    private static Mutable posFromLong(Mutable setTo, long serialized) {
+    private static BlockPos posFromLong(long serialized) {
         int x = (int) ((serialized >> 26) & BYTE_MASK_14BIT);
         int y = (int) ((serialized >> 14) & BYTE_MASK_12BIT);
         int z = (int) (serialized & BYTE_MASK_14BIT);
-        setTo.setPos(x, y, z);
-        return setTo;
+        return new BlockPos(x, y, z);
     }
 
-    private long includeId(long posLong, int stateId) {
-        return posLong | ((long) (stateId & BYTE_MASK_24BIT) << 40);
+    private static int sineForRotation(Rotation rot) {
+        switch (rot) {
+            case NONE:
+            case CLOCKWISE_180:
+                return 0;
+            case CLOCKWISE_90:
+                return 1;
+            case COUNTERCLOCKWISE_90:
+                return - 1;
+            default:
+                throw new AssertionError("Unknown Rotation " + rot);
+        }
+    }
+
+    private static int cosineForRotation(Rotation rot) {
+        return sineForRotation(rot.add(Rotation.CLOCKWISE_90));
+    }
+
+    private static int[][] rotationMatrixFor(Axis axis, Rotation rotation) { //copied from #495
+        int[][] matrix = new int[3][3]; //remember it's Java => everything initiated to 0
+        switch (axis) {
+            case X: {
+                matrix[0][0] = 1;
+                matrix[1][1] = cosineForRotation(rotation);
+                matrix[1][2] = sineForRotation(rotation);
+                matrix[2][1] = - sineForRotation(rotation);
+                matrix[2][2] = cosineForRotation(rotation);
+                break;
+            }
+            case Y: {
+                matrix[1][1] = 1;
+                matrix[0][0] = cosineForRotation(rotation);
+                matrix[2][0] = sineForRotation(rotation);
+                matrix[0][2] = - sineForRotation(rotation);
+                matrix[2][2] = cosineForRotation(rotation);
+                break;
+            }
+            case Z: {
+                matrix[2][2] = 1;
+                matrix[0][0] = cosineForRotation(rotation);
+                matrix[0][1] = sineForRotation(rotation);
+                matrix[1][0] = - sineForRotation(rotation);
+                matrix[1][1] = cosineForRotation(rotation);
+                break;
+            }
+        }
+        return matrix;
+    }
+
+    private static int[][] mirrorMatrixFor(Axis axis) {
+        switch (axis) {
+            case X:
+                return new int[][]{{- 1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+            case Y:
+                return new int[][]{{1, 0, 0}, {0, - 1, 0}, {0, 0, 1}};
+            case Z:
+                return new int[][]{{1, 0, 0}, {0, 1, 0}, {0, 0, - 1}};
+            default:
+                throw new AssertionError("Unknown Axis " + axis);
+        }
+    }
+
+    private static BlockPos matrixMul(int[][] matrix, Vec3i invTranslation, BlockPos pos) {
+        assert matrix.length == 3 && matrix[0].length == 3 && matrix[1].length == 3 && matrix[2].length == 3;
+        int x = pos.getX() * matrix[0][0] + pos.getY() * matrix[0][1] + pos.getZ() * matrix[0][2] - invTranslation.getX();
+        int y = pos.getX() * matrix[1][0] + pos.getY() * matrix[1][1] + pos.getZ() * matrix[1][2] - invTranslation.getY();
+        int z = pos.getX() * matrix[2][0] + pos.getY() * matrix[2][1] + pos.getZ() * matrix[2][2] - invTranslation.getZ();
+        return new BlockPos(x, y, z);
+    }
+
+    public BoundingBox getBounds() {
+        return bounds;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public int size() {
+        return data.size();
+    }
+
+    public CompoundNBT serializeNBT() {
+        if (! isNormalized()) {
+            BuildingGadgets.LOGGER.warn("Attempted to serialize denormal Template. This should never happen!");
+            return normalize().serializeNBT();
+        }
+
+        BuildingGadgets.LOGGER.trace("Serializing {}'s Template of size {}.", author, data.size());
+        CompoundNBT res = new CompoundNBT();
+        Object2IntMap<BlockData> allStates = new Object2IntLinkedOpenHashMap<>(); //linked to keep the order
+        int stateCounter = 0;
+        LongList posStateList = new LongArrayList(data.size());
+
+        //These sets are purely for logging and will rarely be filled...
+        Set<BlockData> dataOutOfRange = new HashSet<>();
+        //Let's create all the longs necessary for the pos->state mapping
+        for (Entry<BlockPos, BlockData> entry : data.entrySet()) {
+            if (! allStates.containsKey(entry.getValue())) {
+                if (stateCounter > MAX_NUMBER_OF_STATES) {
+                    if (! dataOutOfRange.contains(entry.getValue())) {
+                        BuildingGadgets.LOGGER.error("Too many states to be stored in a single Template!!! " +
+                                        "{} would get id {} which is out of range {0,...,{}}!", entry.getValue(), stateCounter++,
+                                MAX_NUMBER_OF_STATES);
+                        dataOutOfRange.add(entry.getValue());
+                    }
+                    continue;
+                }
+                allStates.put(entry.getValue(), stateCounter++);
+            }
+            int stateId = allStates.getInt(entry.getValue());
+            posStateList.add(includeId(vecToLong(entry.getKey()), stateId));
+        }
+        //Now transform the states
+        ListNBT uniqueStates = allStates.keySet().stream()
+                .map(BlockData::serialize)
+                .collect(NBTHelper.LIST_COLLECTOR);
+
+        //and finally we can put it all into the compound
+        res.putLongArray(KEY_POS, posStateList.toLongArray());
+        res.put(KEY_DATA, uniqueStates);
+        res.putString(KEY_AUTHOR, author);
+
+        return res;
     }
 
     /**
@@ -187,9 +303,8 @@ public final class Template implements Iterable<TemplateData> {
     @Override
     public Iterator<TemplateData> iterator() {
         return new Iterator<TemplateData>() {
-            private final ObjectIterator<Entry<BlockState>> it = states.long2ObjectEntrySet().iterator();
+            private final Iterator<Entry<BlockPos, BlockData>> it = data.entrySet().iterator();
             private TemplateData theData = null;
-            private Mutable thePos = null;
 
             @Override
             public boolean hasNext() {
@@ -198,78 +313,56 @@ public final class Template implements Iterable<TemplateData> {
 
             @Override
             public TemplateData next() {
-                Entry<BlockState> entry = it.next();
-                thePos = posFromLong(thePos != null ? thePos : new Mutable(), entry.getLongKey());
+                Entry<BlockPos, BlockData> entry = it.next();
 
-                if (theData == null) {
-                    theData = new TemplateData(thePos, entry.getValue());
-                    return theData;
-                }
+                if (theData == null)
+                    theData = new TemplateData(entry.getKey(), entry.getValue());
 
-                return theData.setInformation(thePos, entry.getValue());
+                return theData.setInformation(entry.getKey(), entry.getValue());
             }
         };
     }
 
-    /**
-     * @return A Template that is normalized to the bounds [(0,0,0), (maxX, maxY, maxZ)]
-     */
-    public Template normalize() {
-        BlockPos min = bounds.getMinPos();
-        if (min.equals(BlockPos.ZERO))
-            return this;
-
-        int translationX = - min.getX();
-        int translationY = - min.getY();
-        int translationZ = - min.getZ();
-        Long2ObjectMap<BlockState> transformedStates = new Long2ObjectLinkedOpenHashMap<>();
-        Mutable pos = new Mutable();
-        for (Entry<BlockState> entry : states.long2ObjectEntrySet())
-            transformedStates.put(
-                    vecToLong(posFromLong(pos, entry.getLongKey()).move(translationX, translationY, translationZ)),
-                    entry.getValue()
-            );
-
-        return new Template(transformedStates, new BoundingBox(BlockPos.ZERO, bounds.getMaxPos().subtract(min)), author);
+    public Template rotate(Axis axis, Rotation rotation) {
+        int[][] mat = rotationMatrixFor(axis, rotation);
+        Function<BlockData, BlockData> transform = axis == Axis.Y ? s -> s.rotate(rotation) : Function.identity();
+        return matrixOp(mat, transform);
     }
 
-    public CompoundNBT serializeNBT() {
-        BuildingGadgets.LOGGER.trace("Serializing {}'s Template of size {}.", author, states.size());
-        CompoundNBT res = new CompoundNBT();
-        Object2IntMap<BlockState> allStates = new Object2IntLinkedOpenHashMap<>(); //linked to keep the order
-        int stateCounter = 0;
-        LongList posStateList = new LongArrayList(states.size());
+    public Template mirror(Axis axis) {
+        int[][] mat = mirrorMatrixFor(axis);
+        Mirror m = axis == Axis.X ? Mirror.LEFT_RIGHT : axis == Axis.Z ? Mirror.FRONT_BACK : Mirror.NONE;
+        Function<BlockData, BlockData> transform = m != Mirror.NONE ? b -> b.mirror(m) : Function.identity();
+        return matrixOp(mat, transform);
+    }
 
-        //These sets are purely for logging and will rarely be filled...
-        Set<BlockState> statesOutOfRange = Collections.newSetFromMap(new IdentityHashMap<>()); //states can do with reference equality
-        //Let's create all the longs necessary for the pos->state mapping
-        for (Entry<BlockState> entry : states.long2ObjectEntrySet()) {
-            if (! allStates.containsKey(entry.getValue())) {
-                if (stateCounter > MAX_NUMBER_OF_STATES) {
-                    if (! statesOutOfRange.contains(entry.getValue())) {
-                        BuildingGadgets.LOGGER.error("Too many states to be stored in a single Template!!! " +
-                                        "{} would get id {} which is out of range {0,...,{}}!", entry.getValue(), stateCounter++,
-                                MAX_NUMBER_OF_STATES);
-                        statesOutOfRange.add(entry.getValue());
-                    }
-                    continue;
-                }
-                allStates.put(entry.getValue(), stateCounter++);
-            }
-            int stateId = allStates.getInt(entry.getValue());
-            posStateList.add(includeId(entry.getLongKey(), stateId));
-        }
-        //Now transform the states
-        ListNBT uniqueStates = allStates.keySet().stream()
-                .map(NBTUtil::writeBlockState)
-                .collect(NBTHelper.LIST_COLLECTOR);
+    /**
+     * @return A Template that is normalized to the bounds [(0,0,0), (maxX, maxY, maxZ)]. The resulting Template will also
+     * be sorted in (x,y,z) order.
+     */
+    private Template normalize() {
+        if (isNormalized())
+            return this;
+        //notice that this still has O(n) time complexity: translation does not change the order thus Arrays#sort, which
+        //is used under the hood, will sort the already sorted array in O(n)
+        return matrixOp(IDENTITY_3X3, Function.identity());
+    }
 
-        //and finally we can put it all into the compound
-        res.putLongArray(KEY_POS, posStateList.toLongArray());
-        res.put(KEY_DATA, uniqueStates);
-        res.putString(KEY_AUTHOR, author);
+    private boolean isNormalized() {
+        return bounds.createMinPos().equals(BlockPos.ZERO);
+    }
 
-        return res;
+    private Template matrixOp(int[][] matrix3x3, Function<BlockData, BlockData> dataTransform) {
+        BlockPos min = matrixMul(matrix3x3, BlockPos.ZERO, bounds.createMinPos());
+        BlockPos max = matrixMul(matrix3x3, BlockPos.ZERO, bounds.createMaxPos());
+        BoundingBox transformed = new BoundingBox(min, max);
+        BlockPos translation = transformed.createMinPos();
+
+        ImmutableSortedMap<BlockPos, BlockData> map = data.entrySet().stream()
+                .map(e -> Pair.of(matrixMul(matrix3x3, translation, e.getKey()), dataTransform.apply(e.getValue())))
+                .collect(ImmutableSortedMap.toImmutableSortedMap(YXZ_COMPARATOR, Pair::getFirst, Pair::getSecond));
+
+        return new Template(map, new BoundingBox(BlockPos.ZERO, transformed.createMaxPos().subtract(translation)), author);
     }
 
     public static final class Builder {
@@ -280,15 +373,15 @@ public final class Template implements Iterable<TemplateData> {
         private int maxY;
         private int maxZ;
         private final BlockPos translationPos;
-        private final Long2ObjectMap<BlockState> states;
+        private final ImmutableSortedMap.Builder<BlockPos, BlockData> builder;
         private String author;
 
         /**
          * @see #builder(BlockPos)
          */
-        public Builder(BlockPos translationPos) {
+        private Builder(BlockPos translationPos) {
             this.translationPos = translationPos;
-            this.states = new Long2ObjectLinkedOpenHashMap<>();
+            this.builder = ImmutableSortedMap.orderedBy(YXZ_COMPARATOR);
             this.author = "";
             this.minX = this.minY = this.minZ = Integer.MAX_VALUE;
             this.maxX = this.maxY = this.maxZ = Integer.MIN_VALUE;
@@ -306,25 +399,23 @@ public final class Template implements Iterable<TemplateData> {
         }
 
         /**
-         * Record the given block in the resulting Template. This assumes that after applying translation all coordinates
-         * of the given position will be positive (this is the case if only positions within a {@link BoundingBox}
-         * are used and the translation-pos was obtained via {@link BoundingBox#getMinPos()}).
+         * Record the given block in the resulting Template.
          *
          * @param pos   The real-world pos at which {@code state} was found.
          * @param state The {@link BlockState} to record.
+         * @param tileNBT tile data if present or null else
          * @return The {@code Builder} instance for Method chaining.
          */
-        public Builder recordBlock(Mutable pos, BlockState state) {
-            pos = pos.move(- translationPos.getX(), - translationPos.getY(), - translationPos.getZ());
-            Preconditions.checkArgument(pos.getX() >= 0 && pos.getY() >= 0 && pos.getZ() >= 0,
-                    "Encountered {} which is out of bounds using translation {}.", pos, translationPos);
-            states.put(vecToLong(pos), state);
-            minX = Math.min(pos.getX(), minX);
-            minY = Math.min(pos.getY(), minY);
-            minZ = Math.min(pos.getZ(), minZ);
-            maxX = Math.max(pos.getX(), maxX);
-            maxY = Math.max(pos.getY(), maxY);
-            maxZ = Math.max(pos.getZ(), maxZ);
+        public Builder recordBlock(BlockPos pos, BlockState state, @Nullable CompoundNBT tileNBT) {
+            assert state.hasTileEntity() || tileNBT == null;
+            BlockPos key = pos.subtract(translationPos).toImmutable();
+            builder.put(key, new BlockData(state, tileNBT));
+            minX = Math.min(key.getX(), minX);
+            minY = Math.min(key.getY(), minY);
+            minZ = Math.min(key.getZ(), minZ);
+            maxX = Math.max(key.getX(), maxX);
+            maxY = Math.max(key.getY(), maxY);
+            maxZ = Math.max(key.getZ(), maxZ);
             return this;
         }
 
@@ -332,10 +423,10 @@ public final class Template implements Iterable<TemplateData> {
          * @return The {@link Template} which is represented by this Builder
          */
         public Template build() {
-            if (states.isEmpty()) {
-                minX = maxX = minY = maxY = minZ = maxZ = 0;
-            }
-            return new Template(states, new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ), author).normalize();
+            assert author != null;
+            ImmutableSortedMap<BlockPos, BlockData> map = builder.build();
+            BoundingBox bounds = map.isEmpty() ? BoundingBox.ZEROS : new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+            return new Template(map, bounds, author).normalize();
         }
     }
 }

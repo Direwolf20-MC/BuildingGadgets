@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public final class BoundingBox {
+    public static final BoundingBox ZEROS = new BoundingBox(BlockPos.ZERO, BlockPos.ZERO);
     private final int minX;
     private final int minY;
     private final int minZ;
@@ -46,11 +47,11 @@ public final class BoundingBox {
         return BlockPos.getAllInBox(minX, minY, minZ, maxX, maxY, maxZ).map(BlockPos::toImmutable);
     }
 
-    public BlockPos getMinPos() {
+    public BlockPos createMinPos() {
         return new BlockPos(getMinX(), getMaxX(), getMaxZ());
     }
 
-    public BlockPos getMaxPos() {
+    public BlockPos createMaxPos() {
         return new BlockPos(getMaxX(), getMaxY(), getMaxZ());
     }
 
