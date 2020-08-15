@@ -64,16 +64,10 @@ public final class TemplateData {
         private final BlockState state;
         @Nullable
         private final CompoundNBT nbt;
-        private final int hashCode;
-
-        private BlockData(BlockState state, @Nullable CompoundNBT nbt, int hashCode) {
-            this.state = state;
-            this.nbt = nbt;
-            this.hashCode = hashCode;
-        }
 
         public BlockData(BlockState state, @Nullable CompoundNBT nbt) {
-            this(state, nbt, nbt != null ? 31 * state.hashCode() + nbt.hashCode() : state.hashCode());
+            this.state = state;
+            this.nbt = nbt;
         }
 
         public static BlockData deserialize(CompoundNBT nbt) {
@@ -95,7 +89,7 @@ public final class TemplateData {
         }
 
         public BlockData copy() {
-            return new BlockData(state, nbt != null ? nbt.copy() : nbt, hashCode);
+            return new BlockData(state, nbt != null ? nbt.copy() : nbt);
         }
 
         public CompoundNBT serialize() {
@@ -121,7 +115,6 @@ public final class TemplateData {
             if (! (o instanceof BlockData)) return false;
 
             final BlockData blockData = (BlockData) o;
-            if (hashCode != blockData.hashCode) return false; //short-circuit for guava set's...
 
             if (! state.equals(blockData.state)) return false;
             return nbt != null ? nbt.equals(blockData.nbt) : blockData.nbt == null;
@@ -129,7 +122,7 @@ public final class TemplateData {
 
         @Override
         public int hashCode() {
-            return hashCode;
+            return nbt != null ? 31 * state.hashCode() + nbt.hashCode() : state.hashCode();
         }
     }
 }
