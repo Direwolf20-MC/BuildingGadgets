@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.schema.template;
 
+import com.google.common.base.MoreObjects;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
@@ -9,18 +10,20 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nullable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * This class is a mutable wrapper around {@link BlockPos position} and {@link BlockState state} it therefore represents
- * a single data point in a {@link Template}. Notice that because it is mutable this class should
- * not be stored directly when outside code has references to it.
+ * a single data point in a {@link Template}.
  */
+@Immutable
 public final class TemplateData {
-    private BlockPos pos;
-    private BlockData data;
+    private final BlockPos pos;
+    private final BlockData data;
 
     public TemplateData(BlockPos pos, BlockData data) {
-        setInformation(pos, data);
+        this.pos = pos.toImmutable();
+        this.data = data;
     }
 
     public BlockPos getPos() {
@@ -31,14 +34,8 @@ public final class TemplateData {
         return data;
     }
 
-    public TemplateData setInformation(BlockPos pos, BlockData data) {
-        this.pos = pos;
-        this.data = data;
-        return this;
-    }
-
     public TemplateData copy() {
-        return new TemplateData(pos.toImmutable(), data.copy());
+        return new TemplateData(pos, data.copy());
     }
 
     @Override
@@ -58,6 +55,15 @@ public final class TemplateData {
         return 31 * result + data.hashCode();
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("pos", pos)
+                .add("data", data)
+                .toString();
+    }
+
+    @Immutable
     public static final class BlockData {
         private static final String KEY_STATE = "state";
         private static final String KEY_NBT = "tile";
@@ -89,7 +95,7 @@ public final class TemplateData {
         }
 
         public BlockData copy() {
-            return new BlockData(state, nbt != null ? nbt.copy() : nbt);
+            return new BlockData(state, copyNbt());
         }
 
         public CompoundNBT serialize() {
@@ -123,6 +129,14 @@ public final class TemplateData {
         @Override
         public int hashCode() {
             return nbt != null ? 31 * state.hashCode() + nbt.hashCode() : state.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this)
+                    .add("state", state)
+                    .add("nbt", nbt)
+                    .toString();
         }
     }
 }

@@ -5,11 +5,12 @@ import com.direwolf20.buildinggadgets.common.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.schema.BoundingBox;
 import com.direwolf20.buildinggadgets.common.schema.template.TemplateData.BlockData;
 import com.google.common.collect.ImmutableSortedMap;
-import com.mojang.datafixers.util.Pair;
+import com.google.common.collect.ImmutableSortedSet;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
 import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import jdk.nashorn.internal.ir.annotations.Immutable;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundNBT;
@@ -19,15 +20,15 @@ import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockPos.Mutable;
 import net.minecraft.util.math.Vec3i;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nullable;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
+@Immutable
 public final class Template implements Iterable<TemplateData> {
     private static final String KEY_POS = "pos";
     private static final String KEY_DATA = "data";
@@ -39,12 +40,14 @@ public final class Template implements Iterable<TemplateData> {
     private static final int MAX_NUMBER_OF_STATES = (1 << 24) - 1;
     private static final Comparator<BlockPos> YXZ_COMPARATOR =
             Comparator.comparing(BlockPos::getY).thenComparing(BlockPos::getX).thenComparing(BlockPos::getZ);
+    private static final Comparator<TemplateData> BY_POS_YXZ = Comparator.comparing(TemplateData::getPos, YXZ_COMPARATOR);
     private static final int[][] IDENTITY_3X3 = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-    private final ImmutableSortedMap<BlockPos, BlockData> data;
+    //sorted to be able to guarantee iteration order
+    private final ImmutableSortedSet<TemplateData> data;
     private final BoundingBox bounds;
     private final String author;
 
-    private Template(ImmutableSortedMap<BlockPos, BlockData> data, BoundingBox bounds, String author) {
+    private Template(ImmutableSortedSet<TemplateData> data, BoundingBox bounds, String author) {
         this.data = data;
         this.bounds = bounds;
         this.author = author;
@@ -67,7 +70,7 @@ public final class Template implements Iterable<TemplateData> {
             uniqueData.add(data);
         }
         //process the state map - need the explicit type in order to be able to trim
-        ImmutableSortedMap.Builder<BlockPos, BlockData> builder = ImmutableSortedMap.orderedBy(YXZ_COMPARATOR);
+        ImmutableSortedSet.Builder<TemplateData> builder = ImmutableSortedSet.orderedBy(BY_POS_YXZ);
         int minX = 0, minY = 0, minZ = 0, maxX = 0, maxY = 0, maxZ = 0;
         for (long packed : nbt.getLongArray(KEY_POS)) {
             int id = getId(packed);
@@ -93,7 +96,7 @@ public final class Template implements Iterable<TemplateData> {
             maxY = Math.max(thePos.getY(), maxY);
             maxZ = Math.max(thePos.getZ(), maxZ);
 
-            builder.put(thePos, data);
+            builder.add(new TemplateData(thePos, data));
         }
         //re-evaluate the bounding box based on potentially missing blocks
         BoundingBox bounds = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
@@ -256,21 +259,21 @@ public final class Template implements Iterable<TemplateData> {
         //These sets are purely for logging and will rarely be filled...
         Set<BlockData> dataOutOfRange = new HashSet<>();
         //Let's create all the longs necessary for the pos->state mapping
-        for (Entry<BlockPos, BlockData> entry : data.entrySet()) {
-            if (! allStates.containsKey(entry.getValue())) {
+        for (TemplateData entry : data) {
+            if (! allStates.containsKey(entry.getData())) {
                 if (stateCounter > MAX_NUMBER_OF_STATES) {
-                    if (! dataOutOfRange.contains(entry.getValue())) {
+                    if (! dataOutOfRange.contains(entry.getData())) {
                         BuildingGadgets.LOGGER.error("Too many states to be stored in a single Template!!! " +
-                                        "{} would get id {} which is out of range {0,...,{}}!", entry.getValue(), stateCounter++,
+                                        "{} would get id {} which is out of range {0,...,{}}!", entry.getData(), stateCounter++,
                                 MAX_NUMBER_OF_STATES);
-                        dataOutOfRange.add(entry.getValue());
+                        dataOutOfRange.add(entry.getData());
                     }
                     continue;
                 }
-                allStates.put(entry.getValue(), stateCounter++);
+                allStates.put(entry.getData(), stateCounter++);
             }
-            int stateId = allStates.getInt(entry.getValue());
-            posStateList.add(includeId(vecToLong(entry.getKey()), stateId));
+            int stateId = allStates.getInt(entry.getData());
+            posStateList.add(includeId(vecToLong(entry.getPos()), stateId));
         }
         //Now transform the states
         ListNBT uniqueStates = allStates.keySet().stream()
@@ -286,41 +289,20 @@ public final class Template implements Iterable<TemplateData> {
     }
 
     /**
-     * Warning: do not store the {@link TemplateData} without invoking {@link TemplateData#copy()} first.
-     * This implementation uses only a single {@link TemplateData} and a single {@link Mutable} instance during the
-     * iteration which are mutated to fit to the current iteration point. Therefore a new invocation of
-     * {@link Iterator#next()} will reset the data viewed by a reference to this {@link Iterator}'s result.
-     *
-     * This implementation provides {@code O(1)} Object allocations during during iteration (assuming no tile data
-     * to be present) in order to be usable with large Templates without over-utilising the garbage collector.
-     * For an idea of the performance of this mutable variant compared to recreating the Object in each step,
-     * refer to the classical {@link String} concat test (for example a variant of this can be seen in the second
-     * answer of this:
-     * https://stackoverflow.com/questions/1532461/stringbuilder-vs-string-concatenation-in-tostring-in-java).
-     *
-     * @return An {@link Iterator} of the {@link TemplateData} represented by this Template in X-Y-Z order.
+     * @return An {@link Iterator} over this Template's elements, iterating the elements in YXZ order.
      */
     @Override
     public Iterator<TemplateData> iterator() {
-        return new Iterator<TemplateData>() {
-            private final Iterator<Entry<BlockPos, BlockData>> it = data.entrySet().iterator();
-            private TemplateData theData = null;
+        return data.iterator();
+    }
 
-            @Override
-            public boolean hasNext() {
-                return it.hasNext();
-            }
+    @Override
+    public Spliterator<TemplateData> spliterator() {
+        return data.spliterator();
+    }
 
-            @Override
-            public TemplateData next() {
-                Entry<BlockPos, BlockData> entry = it.next();
-
-                if (theData == null)
-                    theData = new TemplateData(entry.getKey(), entry.getValue());
-
-                return theData.setInformation(entry.getKey(), entry.getValue());
-            }
-        };
+    public Stream<TemplateData> stream() {
+        return data.stream();
     }
 
     public Template rotate(Axis axis, Rotation rotation) {
@@ -358,9 +340,9 @@ public final class Template implements Iterable<TemplateData> {
         BoundingBox transformed = new BoundingBox(min, max);
         BlockPos translation = transformed.createMinPos();
 
-        ImmutableSortedMap<BlockPos, BlockData> map = data.entrySet().stream()
-                .map(e -> Pair.of(matrixMul(matrix3x3, translation, e.getKey()), dataTransform.apply(e.getValue())))
-                .collect(ImmutableSortedMap.toImmutableSortedMap(YXZ_COMPARATOR, Pair::getFirst, Pair::getSecond));
+        ImmutableSortedSet<TemplateData> map = data.stream()
+                .map(td -> new TemplateData(matrixMul(matrix3x3, translation, td.getPos()), dataTransform.apply(td.getData())))
+                .collect(ImmutableSortedSet.toImmutableSortedSet(BY_POS_YXZ));
 
         return new Template(map, new BoundingBox(BlockPos.ZERO, transformed.createMaxPos().subtract(translation)), author);
     }
@@ -409,7 +391,7 @@ public final class Template implements Iterable<TemplateData> {
         public Builder recordBlock(BlockPos pos, BlockState state, @Nullable CompoundNBT tileNBT) {
             assert state.hasTileEntity() || tileNBT == null;
             BlockPos key = pos.subtract(translationPos).toImmutable();
-            builder.put(key, new BlockData(state, tileNBT));
+            builder.put(key, new BlockData(state, tileNBT != null ? tileNBT.copy() : tileNBT));
             minX = Math.min(key.getX(), minX);
             minY = Math.min(key.getY(), minY);
             minZ = Math.min(key.getZ(), minZ);
@@ -424,9 +406,12 @@ public final class Template implements Iterable<TemplateData> {
          */
         public Template build() {
             assert author != null;
-            ImmutableSortedMap<BlockPos, BlockData> map = builder.build();
-            BoundingBox bounds = map.isEmpty() ? BoundingBox.ZEROS : new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
-            return new Template(map, bounds, author).normalize();
+            ImmutableSortedSet<TemplateData> data = builder.build().entrySet()
+                    .stream()
+                    .map(e -> new TemplateData(e.getKey(), e.getValue()))
+                    .collect(ImmutableSortedSet.toImmutableSortedSet(BY_POS_YXZ));
+            BoundingBox bounds = data.isEmpty() ? BoundingBox.ZEROS : new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+            return new Template(data, bounds, author).normalize();
         }
     }
 }
