@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.schema.BoundingBox;
 import com.direwolf20.buildinggadgets.common.schema.template.TemplateData.BlockData;
-import com.google.common.collect.ImmutableSortedMap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
 import it.unimi.dsi.fastutil.longs.LongList;
@@ -289,6 +289,9 @@ public final class Template implements Iterable<TemplateData> {
     }
 
     /**
+     * Consume the {@code Template} by iterating over it. Notice that some data has been removed from the tile data passed
+     * to {@link Builder#recordBlock(BlockPos, BlockState, CompoundNBT)} and needs to be re-added.
+     *
      * @return An {@link Iterator} over this Template's elements, iterating the elements in YXZ order.
      */
     @Override
@@ -355,7 +358,7 @@ public final class Template implements Iterable<TemplateData> {
         private int maxY;
         private int maxZ;
         private final BlockPos translationPos;
-        private final ImmutableSortedMap.Builder<BlockPos, BlockData> builder;
+        private final ImmutableMap.Builder<BlockPos, BlockData> builder;
         private String author;
 
         /**
@@ -363,7 +366,7 @@ public final class Template implements Iterable<TemplateData> {
          */
         private Builder(BlockPos translationPos) {
             this.translationPos = translationPos;
-            this.builder = ImmutableSortedMap.orderedBy(YXZ_COMPARATOR);
+            this.builder = ImmutableMap.builder();
             this.author = "";
             this.minX = this.minY = this.minZ = Integer.MAX_VALUE;
             this.maxX = this.maxY = this.maxZ = Integer.MIN_VALUE;
@@ -381,17 +384,31 @@ public final class Template implements Iterable<TemplateData> {
         }
 
         /**
-         * Record the given block in the resulting Template.
+         * Record the given block in the resulting Template. This will also strip unnecessary data from a copy of the
+         * tile data. The tags {@code "x"}, {@code "y"}, , {@code "z"} and {@code "id"} will be removed as this
+         * information would be either wrong or redundant when placing a tile from a Template.
          *
          * @param pos   The real-world pos at which {@code state} was found.
          * @param state The {@link BlockState} to record.
-         * @param tileNBT tile data if present or null else
+         * @param tileNBT Tile data if present or null else. Will not be modified.
          * @return The {@code Builder} instance for Method chaining.
          */
         public Builder recordBlock(BlockPos pos, BlockState state, @Nullable CompoundNBT tileNBT) {
             assert state.hasTileEntity() || tileNBT == null;
             BlockPos key = pos.subtract(translationPos).toImmutable();
-            builder.put(key, new BlockData(state, tileNBT != null ? tileNBT.copy() : tileNBT));
+            if (tileNBT != null) {
+                tileNBT = tileNBT.copy();
+                //remove data that is not relevant to our purpose
+                tileNBT.remove("x");
+                tileNBT.remove("y");
+                tileNBT.remove("z");
+                //remove this is as well. We place the blockstate and then let the world create the tile for us
+                //thus the id can also be reapplied, as we'll have the tile at hand
+                tileNBT.remove("id");
+                if (tileNBT.isEmpty()) //this data is therefore not needed
+                    tileNBT = null;
+            }
+            builder.put(key, new BlockData(state, tileNBT));
             minX = Math.min(key.getX(), minX);
             minY = Math.min(key.getY(), minY);
             minZ = Math.min(key.getZ(), minZ);
