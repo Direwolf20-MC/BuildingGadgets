@@ -3,11 +3,9 @@ package com.direwolf20.buildinggadgets.common.schema.template;
 import com.google.common.base.MoreObjects;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
@@ -65,8 +63,6 @@ public final class TemplateData {
 
     @Immutable
     public static final class BlockData {
-        private static final String KEY_STATE = "state";
-        private static final String KEY_NBT = "tile";
         private final BlockState state;
         @Nullable
         private final CompoundNBT nbt;
@@ -76,17 +72,15 @@ public final class TemplateData {
             this.nbt = nbt;
         }
 
-        public static BlockData deserialize(CompoundNBT nbt) {
-            if (nbt.contains(KEY_STATE, NBT.TAG_COMPOUND) && nbt.contains(KEY_NBT, NBT.TAG_COMPOUND)) {
-                BlockState state = NBTUtil.readBlockState(nbt.getCompound(KEY_STATE));
-                CompoundNBT tile = nbt.getCompound(KEY_NBT);
-                return new BlockData(state, tile);
-            }
-            return new BlockData(NBTUtil.readBlockState(nbt), null);
-        }
-
         public BlockState getState() {
             return state;
+        }
+
+        //package-private getter for serialization in Templates. Having this public is dangerous as it makes
+        //Templates mutable!!!
+        @Nullable
+        CompoundNBT getNbt() {
+            return nbt;
         }
 
         @Nullable
@@ -96,15 +90,6 @@ public final class TemplateData {
 
         public BlockData copy() {
             return new BlockData(state, copyNbt());
-        }
-
-        public CompoundNBT serialize() {
-            if (nbt == null)
-                return NBTUtil.writeBlockState(state);
-            CompoundNBT res = new CompoundNBT();
-            res.put(KEY_STATE, NBTUtil.writeBlockState(state));
-            res.put(KEY_NBT, nbt);
-            return res;
         }
 
         public BlockData mirror(Mirror mirror) {

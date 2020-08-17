@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.schema.template;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.schema.BoundingBox;
 import com.direwolf20.buildinggadgets.common.schema.template.TemplateData.BlockData;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import it.unimi.dsi.fastutil.longs.LongArrayList;
@@ -16,6 +16,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
@@ -26,18 +27,25 @@ import net.minecraftforge.common.util.Constants.NBT;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 @Immutable
 public final class Template implements Iterable<TemplateData> {
-    private static final String KEY_POS = "pos";
-    private static final String KEY_DATA = "data";
+    private static final Collector<INBT, ListNBT, ListNBT> LIST_COLLECTOR =
+            Collector.of(ListNBT::new, ListNBT::add, (l1, l2) -> {l1.addAll(l2); return l1;});
+    private static final String KEY_STATE_POS = "state_pos";
+    private static final String KEY_STATE_DATA = "state_data";
     private static final String KEY_AUTHOR = "author";
+    private static final String KEY_TILE_POS = "tile_pos";
+    private static final String KEY_TILE_DATA = "tile_data";
+    private static final String LOG_STATES = "states";
+    private static final String LOG_TILES = "tiles";
     private static final int BYTE_MASK_12BIT = 0xF_FF;
     private static final int BYTE_MASK_14BIT = 0x3F_FF;
     private static final int BYTE_MASK_24BIT = 0xFF_FF_FF;
     private static final long BYTE_MASK_40BIT = ((long) 0xFF_FF_FF_FF) << 8 | 0xFF;
-    private static final int MAX_NUMBER_OF_STATES = (1 << 24) - 1;
+    private static final int MAX_NUMBER_OF_IDS = (1 << 24) - 1;
     private static final Comparator<BlockPos> YXZ_COMPARATOR =
             Comparator.comparing(BlockPos::getY).thenComparing(BlockPos::getX).thenComparing(BlockPos::getZ);
     private static final Comparator<TemplateData> BY_POS_YXZ = Comparator.comparing(TemplateData::getPos, YXZ_COMPARATOR);
@@ -54,39 +62,44 @@ public final class Template implements Iterable<TemplateData> {
     }
 
     public static Optional<Template> deserializeNBT(CompoundNBT nbt) {
-        if (! nbt.contains(KEY_POS, NBT.TAG_LONG_ARRAY) || ! nbt.contains(KEY_DATA, NBT.TAG_LIST))
+        if (! nbt.contains(KEY_STATE_POS, NBT.TAG_LONG_ARRAY) || ! nbt.contains(KEY_STATE_DATA, NBT.TAG_LIST))
             return Optional.empty();
 
         //read the states
-        ListNBT nbtData = (ListNBT) nbt.get(KEY_DATA);
+        ListNBT nbtData = (ListNBT) nbt.get(KEY_STATE_DATA);
         assert nbtData != null;
-        List<BlockData> uniqueData = new ArrayList<>(nbtData.size());
+        List<BlockState> uniqueStates = new ArrayList<>(nbtData.size());
         for (INBT dataNBT : nbtData) {
             //read blockstate will replace everything unknown with the default value for Blocks: AIR
-            BlockData data = BlockData.deserialize((CompoundNBT) dataNBT);
+            BlockState state = NBTUtil.readBlockState((CompoundNBT) dataNBT);
             //a trace log, as this may be normal... In the future we might want to replace this with some placeholder
-            if (data.getState() == Blocks.AIR.getDefaultState())
+            if (state == Blocks.AIR.getDefaultState())
                 BuildingGadgets.LOGGER.trace("Found unknown state with nbt {}. Will be ignored!", dataNBT);
-            uniqueData.add(data);
+            uniqueStates.add(state);
         }
-        //process the state map - need the explicit type in order to be able to trim
+        List<CompoundNBT> uniqueTiles = nbt.contains(KEY_TILE_DATA, NBT.TAG_LIST) ?
+                ((ListNBT) nbt.get(KEY_TILE_DATA)).stream().map(n -> (CompoundNBT) n).collect(ImmutableList.toImmutableList()) :
+                ImmutableList.of();
+
         ImmutableSortedSet.Builder<TemplateData> builder = ImmutableSortedSet.orderedBy(BY_POS_YXZ);
         int minX = 0, minY = 0, minZ = 0, maxX = 0, maxY = 0, maxZ = 0;
-        for (long packed : nbt.getLongArray(KEY_POS)) {
+        long[] tilePos = nbt.getLongArray(KEY_TILE_POS); //returns empty arry if not present
+        int tileIndex = 0;
+        for (long packed : nbt.getLongArray(KEY_STATE_POS)) {
             int id = getId(packed);
             long posLong = getPosLong(packed);
             BlockPos thePos = posFromLong(posLong);
-            if (id >= uniqueData.size() || id < 0) {
+            if (id >= uniqueStates.size() || id < 0) {
                 BuildingGadgets.LOGGER.error("Found illegal state-id {} in Template at pos {}(={}), when {} states " +
-                                "are known. This indicates a greater Problem and the Template is therefore deemed broken.",
-                        id, getPosLong(packed), thePos, uniqueData.size());
+                                "are known. The Template is therefore deemed broken.",
+                        id, posLong, thePos, uniqueStates.size());
                 return Optional.empty();
             }
 
-            BlockData data = uniqueData.get(id);
+            BlockState state = uniqueStates.get(id);
             //Skip unknown Blocks - this has no log, as it is already logged before and even might happen more
             //than once. So having a log here might result in serious log spam
-            if (data.getState() == Blocks.AIR.getDefaultState())
+            if (state == Blocks.AIR.getDefaultState())
                 continue;
             //I'd actually like to outsource this to a class, but Mike told me not to... (see Builder#recordBlock)
             minX = Math.min(thePos.getX(), minX);
@@ -96,7 +109,21 @@ public final class Template implements Iterable<TemplateData> {
             maxY = Math.max(thePos.getY(), maxY);
             maxZ = Math.max(thePos.getZ(), maxZ);
 
-            builder.add(new TemplateData(thePos, data));
+            CompoundNBT tileData = null;
+            if (tileIndex < tilePos.length && tileIndex >= 0) {
+                long tilePosLong = getPosLong(tilePos[tileIndex]);
+                if (tilePosLong == posLong) {
+                    int tileId = getId(tilePos[tileIndex++]);
+                    if (tileId < uniqueTiles.size() && tileId >= 0)
+                        tileData = uniqueTiles.get(tileId);
+                    else
+                        BuildingGadgets.LOGGER.error("Found illegal tile-id {} in Template at pos {}(={}), " +
+                                        "when {} tiles are known. Skipping tile data.",
+                                tileId, tilePos, thePos, uniqueTiles.size());
+                }
+            }
+
+            builder.add(new TemplateData(thePos, new BlockData(state, tileData)));
         }
         //re-evaluate the bounding box based on potentially missing blocks
         BoundingBox bounds = new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
@@ -252,40 +279,60 @@ public final class Template implements Iterable<TemplateData> {
 
         BuildingGadgets.LOGGER.trace("Serializing {}'s Template of size {}.", author, data.size());
         CompoundNBT res = new CompoundNBT();
-        Object2IntMap<BlockData> allStates = new Object2IntLinkedOpenHashMap<>(); //linked to keep the order
+        Object2IntMap<BlockState> allStates = new Object2IntLinkedOpenHashMap<>(); //linked to keep the order
+        Object2IntMap<CompoundNBT> allTiles = new Object2IntLinkedOpenHashMap<>();
         int stateCounter = 0;
+        int tileCounter = 0;
         LongList posStateList = new LongArrayList(data.size());
+        LongList posTileDataList = new LongArrayList();
 
         //These sets are purely for logging and will rarely be filled...
-        Set<BlockData> dataOutOfRange = new HashSet<>();
+        Set<BlockState> statesOutOfRange = new HashSet<>();
+        Set<CompoundNBT> tilesOutOfRange = new HashSet<>();
         //Let's create all the longs necessary for the pos->state mapping
         for (TemplateData entry : data) {
-            if (! allStates.containsKey(entry.getData())) {
-                if (stateCounter > MAX_NUMBER_OF_STATES) {
-                    if (! dataOutOfRange.contains(entry.getData())) {
-                        BuildingGadgets.LOGGER.error("Too many states to be stored in a single Template!!! " +
-                                        "{} would get id {} which is out of range {0,...,{}}!", entry.getData(), stateCounter++,
-                                MAX_NUMBER_OF_STATES);
-                        dataOutOfRange.add(entry.getData());
-                    }
-                    continue;
-                }
-                allStates.put(entry.getData(), stateCounter++);
-            }
+            long pos = vecToLong(entry.getPos());
+            stateCounter = addInfo(entry.getData().getState(), allStates, stateCounter, statesOutOfRange, LOG_STATES);
             int stateId = allStates.getInt(entry.getData());
-            posStateList.add(includeId(vecToLong(entry.getPos()), stateId));
+            posStateList.add(includeId(pos, stateId));
+            if (entry.getData().getNbt() != null) {
+                tileCounter = addInfo(entry.getData().getNbt(), allTiles, tileCounter, tilesOutOfRange, LOG_TILES);
+                int tileId = allTiles.getInt(entry.getData().getNbt());
+                posTileDataList.add(includeId(pos, tileId));
+            }
         }
-        //Now transform the states
+        //Now transform the data
         ListNBT uniqueStates = allStates.keySet().stream()
-                .map(BlockData::serialize)
-                .collect(NBTHelper.LIST_COLLECTOR);
+                .map(NBTUtil::writeBlockState)
+                .collect(LIST_COLLECTOR);
+        ListNBT uniqueTiles = allTiles.keySet().stream().collect(LIST_COLLECTOR);
 
         //and finally we can put it all into the compound
-        res.putLongArray(KEY_POS, posStateList.toLongArray());
-        res.put(KEY_DATA, uniqueStates);
+        res.putLongArray(KEY_STATE_POS, posStateList.toLongArray());
+        res.put(KEY_STATE_DATA, uniqueStates);
+        if (! posTileDataList.isEmpty()) {
+            res.putLongArray(KEY_TILE_POS, posTileDataList.toLongArray());
+            res.put(KEY_TILE_DATA, uniqueTiles);
+        }
         res.putString(KEY_AUTHOR, author);
 
         return res;
+    }
+
+    private static <T> int addInfo(T obj, Object2IntMap<T> idMap, int idCount, Set<T> outOfRange, String logName) {
+        if (! idMap.containsKey(obj)) {
+            if (idCount > MAX_NUMBER_OF_IDS) {
+                if (! outOfRange.contains(obj)) {
+                    BuildingGadgets.LOGGER.error("Too many {}} to be stored in a single Template!!! " +
+                                    "{} would get id {} which is out of range {0,...,{}}!", logName, obj, idCount++,
+                            MAX_NUMBER_OF_IDS);
+                    outOfRange.add(obj);
+                }
+                return idCount;
+            }
+            idMap.put(obj, idCount++);
+        }
+        return idCount;
     }
 
     /**
@@ -423,12 +470,17 @@ public final class Template implements Iterable<TemplateData> {
          */
         public Template build() {
             assert author != null;
-            ImmutableSortedSet<TemplateData> data = builder.build().entrySet()
+            ImmutableMap<BlockPos, BlockData> dataMap = builder.build();
+            BoundingBox bounds = dataMap.isEmpty() ? BoundingBox.ZEROS : new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
+            BlockPos minPos = bounds.createMinPos();
+            if (! minPos.equals(BlockPos.ZERO))
+                bounds = new BoundingBox(BlockPos.ZERO, bounds.createMaxPos().subtract(minPos));
+            ImmutableSortedSet<TemplateData> data = dataMap.entrySet()
                     .stream()
-                    .map(e -> new TemplateData(e.getKey(), e.getValue()))
+                    .map(e -> new TemplateData(e.getKey().subtract(minPos), e.getValue()))
                     .collect(ImmutableSortedSet.toImmutableSortedSet(BY_POS_YXZ));
-            BoundingBox bounds = data.isEmpty() ? BoundingBox.ZEROS : new BoundingBox(minX, minY, minZ, maxX, maxY, maxZ);
-            return new Template(data, bounds, author).normalize();
+            //No need to normalize as we do that already above in a single step
+            return new Template(data, bounds, author);
         }
     }
 }
