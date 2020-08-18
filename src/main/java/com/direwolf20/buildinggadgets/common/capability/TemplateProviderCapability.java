@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.capbility;
+package com.direwolf20.buildinggadgets.common.capability;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.schema.template.provider.ClientTemplateProvider;

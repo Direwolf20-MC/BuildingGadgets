@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * Base implementation of an {@link ITemplateProvider} which handles the update listeners registered to
  * {@link ITemplateProvider#registerUpdateCallback(UUID, ToBooleanBiFunction)}.
  */
-public abstract class AbsTemplateProvider implements ITemplateProvider {
+abstract class AbsTemplateProvider implements ITemplateProvider {
     private final LoadingCache<UUID, Set<ToBooleanBiFunction<Optional<Template>, Boolean>>> updateListeners;
 
     public AbsTemplateProvider() {

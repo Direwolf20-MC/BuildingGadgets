@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.packets;
 
 import com.direwolf20.buildinggadgets.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.capbility.TemplateProviderCapability;
+import com.direwolf20.buildinggadgets.common.capability.TemplateProviderCapability;
 import com.direwolf20.buildinggadgets.common.schema.template.Template;
 import com.direwolf20.buildinggadgets.common.schema.template.TemplateIO;
 import com.google.common.base.MoreObjects;
@@ -24,7 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 
 public final class UpdateTemplatePacket extends RequestTemplatePacket {
-    private static final int SPLIT_SIZE = 30000;//split every 30000 bytes - this is below the client limit
+    //split every 30000 bytes - this is below the client limit
+    private static final int SPLIT_SIZE = 30000;
     private static final AtomicInteger curSession = new AtomicInteger();
     //null UUID indicates server-origin assembly
     private static final LoadingCache<Optional<UUID>, PacketAssembly> assemblyByPlayerId = CacheBuilder.newBuilder()
@@ -38,28 +39,37 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
             });
 
     public static void send(UUID id, @Nullable Template template, PacketTarget target) {
-        Optional.ofNullable(template)
-                .flatMap(TemplateIO::getCompressedBytes)
-                .map(b -> {
-                    int remainingBytes = b.length;
-                    int seqNumber = 0;
+        if (template != null)
+            sendParts(id, template, target);
+        else
+            sendEmpty(id, target);
+    }
 
-                    while (remainingBytes > 0) {
-                        int size = Math.min(remainingBytes, SPLIT_SIZE);
-                        remainingBytes -= size;
-                        byte[] payload = new byte[size];
-                        System.arraycopy(b, seqNumber * SPLIT_SIZE, payload, 0, size);
-                        Packets.INSTANCE.send(target, new UpdateTemplatePacket(id, curSession.getAndIncrement(),
-                                payload, seqNumber++, remainingBytes > 0));
-                    }
+    private static void sendParts(UUID id, Template template, PacketTarget target) {
+        Optional<byte[]> bytes = TemplateIO.getCompressedBytes(template);
+        if (bytes.isPresent())
+            sendParts(id, bytes.get(), target);
+        else
+            sendEmpty(id, target);
+    }
 
-                    return null;
-                })
-                .orElseGet(() -> {
-                    Packets.INSTANCE.send(target,
-                            new UpdateTemplatePacket(id, curSession.getAndIncrement(), null, 0, false));
-                    return null;
-                });
+    private static void sendParts(UUID id, byte[] bytes, PacketTarget target) {
+        int remainingBytes = bytes.length;
+        int seqNumber = 0;
+
+        while (remainingBytes > 0) {
+            int size = Math.min(remainingBytes, SPLIT_SIZE);
+            remainingBytes -= size;
+            byte[] payload = new byte[size];
+            System.arraycopy(bytes, seqNumber * SPLIT_SIZE, payload, 0, size);
+            Packets.INSTANCE.send(target, new UpdateTemplatePacket(id, curSession.getAndIncrement(),
+                    payload, seqNumber++, remainingBytes > 0));
+        }
+    }
+
+    private static void sendEmpty(UUID id, PacketTarget target) {
+        Packets.INSTANCE.send(target,
+                new UpdateTemplatePacket(id, curSession.getAndIncrement(), null, 0, false));
     }
 
     @Nullable

@@ -1,6 +1,6 @@
-@MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package com.direwolf20.buildinggadgets.common.schema.template.provider;
+@MethodsReturnNonnullByDefault
+package com.direwolf20.buildinggadgets.common.packets;
 
 import mcp.MethodsReturnNonnullByDefault;
 
