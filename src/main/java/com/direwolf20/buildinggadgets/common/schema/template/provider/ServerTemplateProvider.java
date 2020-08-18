@@ -10,25 +10,25 @@ import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
-public final class ServerTemplateProvider implements ITemplateProvider {
+public final class ServerTemplateProvider extends AbsTemplateProvider {
     private final WeakReference<ServerWorld> world;
 
     public ServerTemplateProvider(ServerWorld world) {
+        super();
         this.world = new WeakReference<>(world);
     }
 
     @Override
     public Optional<Template> getIfAvailable(UUID uuid) {
-        return Optional.ofNullable(world.get())
-                .map(TemplateWorldSave::getInstance)
-                .flatMap(save -> save.getTemplate(uuid));
+        return getTemplate(uuid);
     }
 
     @Override
-    public void getWhenAvailable(UUID id, Consumer<Optional<Template>> callback) {
-        callback.accept(getIfAvailable(id));
+    protected Optional<Template> getTemplate(UUID uuid) {
+        return Optional.ofNullable(world.get())
+                .map(TemplateWorldSave::getInstance)
+                .flatMap(save -> save.getTemplate(uuid));
     }
 
     @Override
@@ -38,6 +38,7 @@ public final class ServerTemplateProvider implements ITemplateProvider {
             TemplateWorldSave.getInstance(theWorld).setTemplate(id, template);
             if (sendTarget != null)
                 UpdateTemplatePacket.send(id, template, sendTarget);
+            super.setAndUpdateRemote(id, template, sendTarget);
         } else
             BuildingGadgets.LOGGER.warn("Attempted to set template with id {} on an unloaded world!!!", id);
     }

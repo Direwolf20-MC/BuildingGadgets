@@ -2,11 +2,11 @@ package com.direwolf20.buildinggadgets.common.schema.template.provider;
 
 import com.direwolf20.buildinggadgets.common.schema.template.Template;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
+import net.minecraftforge.fml.network.simple.SimpleChannel.MessageBuilder.ToBooleanBiFunction;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 public interface ITemplateProvider {
 
@@ -16,26 +16,26 @@ public interface ITemplateProvider {
      *
      * @param uuid The id for which to retrieve a
      * @return An {@link Optional} containing the {@link Template} corresponding to {@code id} if present or
-     * {@link Optional#empty()} else.
+     *         {@link Optional#empty()} else.
      */
     Optional<Template> getIfAvailable(UUID uuid); //Paste-Render
 
     /**
-     * Retrieves the most recent version of the Server {@link Template} as soon as available.
-     * <p>
-     * On the Server the callback will directly invoked with the return value of {@link #getIfAvailable(UUID)}
-     * whilst on the Client this results in querying the Server for the current {@link Template} and then invoking the
-     * callback once this query arrives.
+     * Register a callback to be called when the {@link Template} known by {@code id} is updated. The callback should not
+     * be triggered when a corresponding cache entry is triggered. Listeners may time out and in this case will be invoked
+     * with the current {@link Template} value and a value of true for the second parameter. Returning true instead of false
+     * will be prevent the listener from being removed.
      *
      * @param id       The id of the {@link Template} to query
-     * @param callback callback to invoke as soon as the Template is ready. May be {@link Optional#empty()} if the
-     *                 Server has no {@link Template} for {@code id}
+     * @param callback Callback to invoke as soon as the Template changes. May be {@link Optional#empty()} if the template
+     *                 is removed by an explicit call to {@link #setAndUpdateRemote(UUID, Template, PacketTarget)}. Returns
+     *                 {@code true} if it wishes to remain registered.
      */
-    void getWhenAvailable(UUID id, Consumer<Optional<Template>> callback);//TemplateManager wants to copy a Template
+    void registerUpdateCallback(UUID id, ToBooleanBiFunction<Optional<Template>, Boolean> callback);//TemplateManager wants to copy a Template
 
     /**
      * Set's the {@link Template} corresponding to {@code id} to the given value and updates the other side if specified.
-     * Notice that this may trigger callbacks added to {@link #getWhenAvailable(UUID, Consumer)}.
+     * Notice that this will trigger callbacks added to {@link #registerUpdateCallback(UUID, ToBooleanBiFunction)}.
      *
      * @param id         The id of the {@link Template} which is to be updated
      * @param template   The new {@link Template}
