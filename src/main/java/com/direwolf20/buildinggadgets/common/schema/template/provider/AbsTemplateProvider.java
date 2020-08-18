@@ -27,14 +27,16 @@ public abstract class AbsTemplateProvider implements ITemplateProvider {
                 .removalListener(new RemovalListener<UUID, Set<ToBooleanBiFunction<Optional<Template>, Boolean>>>() {
                     @Override
                     public void onRemoval(RemovalNotification<UUID, Set<ToBooleanBiFunction<Optional<Template>, Boolean>>> notification) {
-                        Set<ToBooleanBiFunction<Optional<Template>, Boolean>> resSet = new HashSet<>();
-                        Optional<Template> template = getTemplate(notification.getKey());
-                        for (ToBooleanBiFunction<Optional<Template>, Boolean> fun : notification.getValue()) {
-                            if (fun.applyAsBool(template, true))
-                                resSet.add(fun);
+                        if (! notification.getValue().isEmpty()) {
+                            Set<ToBooleanBiFunction<Optional<Template>, Boolean>> resSet = new HashSet<>();
+                            Optional<Template> template = getTemplate(notification.getKey());
+                            for (ToBooleanBiFunction<Optional<Template>, Boolean> fun : notification.getValue()) {
+                                if (fun.applyAsBool(template, true))
+                                    resSet.add(fun);
+                            }
+                            if (! resSet.isEmpty()) //TODO test if this actually works, or whether it gives us an CME
+                                updateListeners.put(notification.getKey(), resSet);
                         }
-                        if (! resSet.isEmpty()) //TODO test if this actually works, or whether it gives us an CME
-                            updateListeners.put(notification.getKey(), resSet);
                     }
                 })
                 .build(new CacheLoader<UUID, Set<ToBooleanBiFunction<Optional<Template>, Boolean>>>() {
@@ -60,8 +62,10 @@ public abstract class AbsTemplateProvider implements ITemplateProvider {
     public void setAndUpdateRemote(UUID id, @Nullable Template template, @Nullable PacketDistributor.PacketTarget sendTarget) {
         Optional<Template> optTemp = Optional.ofNullable(template);
         try {
-            for (ToBooleanBiFunction<Optional<Template>, Boolean> fun : updateListeners.get(id))
-                fun.applyAsBool(optTemp, false);
+            Set<ToBooleanBiFunction<Optional<Template>, Boolean>> listeners = updateListeners.get(id);
+            listeners.removeIf(fun -> fun.applyAsBool(optTemp, false));
+            if (listeners.isEmpty())
+                updateListeners.invalidate(id);
         } catch (Exception e) {
             BuildingGadgets.LOGGER.error("Unexpected exception delivering update to listeners of {}", id);
         }
