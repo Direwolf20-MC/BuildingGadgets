@@ -1,12 +1,20 @@
 package com.direwolf20.buildinggadgets.common.schema;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.AbstractIterator;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockPos.Mutable;
 import net.minecraft.util.math.Vec3i;
 
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public final class BoundingBox {
+    public static BoundingBox of(int... array) {
+        Preconditions.checkArgument(array.length == 6);
+        return new BoundingBox(array[0], array[1], array[2], array[3], array[4], array[5]);
+    }
+
     public static final BoundingBox ZEROS = new BoundingBox(BlockPos.ZERO, BlockPos.ZERO);
     private final int minX;
     private final int minY;
@@ -47,6 +55,27 @@ public final class BoundingBox {
         return BlockPos.getAllInBox(minX, minY, minZ, maxX, maxY, maxZ).map(BlockPos::toImmutable);
     }
 
+    public Iterable<Mutable> translatedYXZIterable(Vec3i translation) {
+        return () -> new AbstractIterator<Mutable>() {
+            private final Mutable pos = new Mutable(minX, minY, minZ);
+
+            @Override
+            protected Mutable computeNext() {
+                int newY = pos.getY() + 1;
+                int newX = pos.getX();
+                int newZ = pos.getZ();
+                if (newY > maxY) {
+                    newY = minY;
+                    if (++ newX > maxX && ++ newZ <= maxZ)
+                        newX = minX;
+                    else if (newZ > maxZ)
+                        return endOfData();
+                }
+                return pos.move(newX, newY, newZ);
+            }
+        };
+    }
+
     public BlockPos createMinPos() {
         return new BlockPos(getMinX(), getMaxX(), getMaxZ());
     }
@@ -77,6 +106,10 @@ public final class BoundingBox {
 
     public int getMaxZ() {
         return maxZ;
+    }
+
+    public int[] toArray() {
+        return new int[]{minX, minY, minZ, maxX, maxY, maxZ};
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.packets;
 
 import com.direwolf20.buildinggadgets.common.construction.modes.Mode;
+import com.direwolf20.buildinggadgets.common.items.CutPasteShowcase;
 import com.direwolf20.buildinggadgets.common.items.Gadget;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -34,7 +35,10 @@ public final class SetModePacket {
             ServerPlayerEntity player = ctx.get().getSender();
             if (player == null)
                 return;
-
+            if (player.getHeldItemMainhand().getItem() instanceof CutPasteShowcase) {
+                ((CutPasteShowcase) player.getHeldItemMainhand().getItem()).onModeSwitch(player.getHeldItemMainhand());
+                return;
+            }
             Optional<ItemStack> stack = Gadget.findGadget(player);
             stack.ifPresent(itemStack -> {
                 Gadget gadget = ((Gadget) itemStack.getItem());

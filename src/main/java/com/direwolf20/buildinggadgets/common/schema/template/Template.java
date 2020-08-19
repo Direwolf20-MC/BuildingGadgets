@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.common.schema.template;
 import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.schema.BoundingBox;
 import com.direwolf20.buildinggadgets.common.schema.template.TemplateData.BlockData;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -395,6 +396,15 @@ public final class Template implements Iterable<TemplateData> {
                 .collect(ImmutableSortedSet.toImmutableSortedSet(BY_POS_YXZ));
 
         return new Template(map, new BoundingBox(BlockPos.ZERO, transformed.createMaxPos().subtract(translation)), author);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("bounds", bounds)
+                .add("author", author)
+                .add("size", data.size())
+                .toString();
     }
 
     public static final class Builder {

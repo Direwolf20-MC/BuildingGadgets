@@ -14,4 +14,5 @@ public final class ModItems {
     public static final RegistryObject<Item> COPIER_GADGET = ITEMS.register("copier_gadget", CopierGadget::new);
     public static final RegistryObject<Item> EXCHANGING_GADGET = ITEMS.register("exchanging_gadget", ExchangingGadget::new);
     public static final RegistryObject<Item> DESTRUCTION_GADGET = ITEMS.register("destruction_gadget", DestructionGadget::new);
+    public static final RegistryObject<Item> CUT_PASTE_SHOWCASE = ITEMS.register("cut_paste_showcase", CutPasteShowcase::new);
 }

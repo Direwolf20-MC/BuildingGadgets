@@ -1,11 +1,18 @@
 package com.direwolf20.buildinggadgets.common.schema.template;
 
+import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.google.common.base.MoreObjects;
 import net.minecraft.block.BlockState;
+import net.minecraft.inventory.IClearable;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Mirror;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorld;
+import net.minecraftforge.common.util.Constants.BlockFlags;
 
 import javax.annotation.Nullable;
 import javax.annotation.concurrent.Immutable;
@@ -83,13 +90,33 @@ public final class TemplateData {
             return nbt;
         }
 
-        @Nullable
-        public CompoundNBT copyNbt() {
-            return nbt != null ? nbt.copy() : null;
+        public void placeInWorld(IWorld world, BlockPos pos) {
+            //Mojang does this for what I presume are performance reasons - see feature.Template#addBlocksToWorld
+            if (state.hasTileEntity())
+                IClearable.clearObj(world.getTileEntity(pos));
+            if (world.setBlockState(pos, state, BlockFlags.BLOCK_UPDATE) && nbt != null) {
+                TileEntity te = world.getTileEntity(pos);
+                if (te != null) {
+                    CompoundNBT apply = nbt.copy();
+                    ResourceLocation type = TileEntityType.getId(te.getType());
+                    if (type == null) {
+                        //almost copy Mojang's error message - just don't throw an exception
+                        BuildingGadgets.LOGGER.error("Cannot place tile data at {}, because {} is missing a mapping. " +
+                                "This is a bug!!!", pos, te.getClass());
+                        return;
+                    }
+                    apply.putString("id", type.toString());
+                    apply.putInt("x", pos.getX());
+                    apply.putInt("y", pos.getX());
+                    apply.putInt("z", pos.getX());
+                    te.read(apply);
+                    te.markDirty();
+                }
+            }
         }
 
         public BlockData copy() {
-            return new BlockData(state, copyNbt());
+            return new BlockData(state, nbt);
         }
 
         public BlockData mirror(Mirror mirror) {

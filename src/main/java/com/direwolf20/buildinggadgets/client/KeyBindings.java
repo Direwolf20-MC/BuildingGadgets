@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.client;
 
 import com.direwolf20.buildinggadgets.common.helpers.MessageHelper;
+import com.direwolf20.buildinggadgets.common.items.CutPasteShowcase;
 import com.direwolf20.buildinggadgets.common.packets.Packets;
 import com.direwolf20.buildinggadgets.common.packets.SetModePacket;
 import com.direwolf20.buildinggadgets.common.packets.SetRangePacket;
@@ -9,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.client.settings.KeyConflictContext;
@@ -18,10 +20,12 @@ import org.lwjgl.glfw.GLFW;
 public final class KeyBindings {
 
     private static final KeyConflicts CONFLICT_CONTEXT = new KeyConflicts();
-    public static KeyBinding menuSettings;
-    public static KeyBinding range;
-    public static KeyBinding mode;
-    public static KeyBinding undo;
+    private static KeyBinding menuSettings;
+    private static KeyBinding range;
+    private static KeyBinding mode;
+    private static KeyBinding undo;
+    private static KeyBinding rotate;
+    private static KeyBinding mirror;
 
     /**
      * Register the keybindings we need for the mod.
@@ -31,12 +35,15 @@ public final class KeyBindings {
         range = createBinding("range", GLFW.GLFW_KEY_R);
         mode = createBinding("mode", GLFW.GLFW_KEY_V);
         undo = createBinding("undo", GLFW.GLFW_KEY_U);
+        //These are here just so I can interface with it properly - no idea if that makes sense to do keep them
+        rotate = createBinding("rotate", GLFW.GLFW_KEY_UNKNOWN);
+        mirror = createBinding("mirror", GLFW.GLFW_KEY_UNKNOWN);
 
-//        anchor = createBinding("anchor", GLFW.GLFW_KEY_H);
-//        fuzzy = createBinding("fuzzy", GLFW.GLFW_KEY_UNKNOWN);
-//        connectedArea = createBinding("connected_area", GLFW.GLFW_KEY_UNKNOWN);
-//        rotateMirror = createBinding("rotate_mirror", GLFW.GLFW_KEY_UNKNOWN);
-//        materialList = createBinding("material_list", GLFW.GLFW_KEY_M);
+        //        anchor = createBinding("anchor", GLFW.GLFW_KEY_H);
+        //        fuzzy = createBinding("fuzzy", GLFW.GLFW_KEY_UNKNOWN);
+        //        connectedArea = createBinding("connected_area", GLFW.GLFW_KEY_UNKNOWN);
+        //        rotateMirror = createBinding("rotate_mirror", GLFW.GLFW_KEY_UNKNOWN);
+        //        materialList = createBinding("material_list", GLFW.GLFW_KEY_M);
     }
 
     /**
@@ -58,6 +65,7 @@ public final class KeyBindings {
      * @param event key event
      */
     public static void onKeyPressed(InputEvent.KeyInputEvent event) {
+
         if (range.isPressed()) {
             Packets.sendToServer(new SetRangePacket());
         }
@@ -68,6 +76,14 @@ public final class KeyBindings {
 
         if (undo.isPressed()) {
             Packets.sendToServer(new UndoPacket());
+        }
+        assert Minecraft.getInstance().world != null && Minecraft.getInstance().player != null;//for IntelliJ
+        ItemStack held = Minecraft.getInstance().player.getHeldItemMainhand();
+        if (held.getItem() instanceof CutPasteShowcase) {
+            if (rotate.isPressed())
+                ((CutPasteShowcase) held.getItem()).onRotate(Minecraft.getInstance().world, held);
+            if (mirror.isPressed())
+                ((CutPasteShowcase) held.getItem()).onMirror(Minecraft.getInstance().world, held);
         }
     }
 
