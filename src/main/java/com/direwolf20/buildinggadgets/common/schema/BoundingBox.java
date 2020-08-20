@@ -55,7 +55,7 @@ public final class BoundingBox {
         return BlockPos.getAllInBox(minX, minY, minZ, maxX, maxY, maxZ).map(BlockPos::toImmutable);
     }
 
-    public Iterable<Mutable> translatedYXZIterable(Vec3i translation) {
+    public Iterable<Mutable> yxzIterable() {
         return () -> new AbstractIterator<Mutable>() {
             private final Mutable pos = new Mutable(minX, minY, minZ);
 
@@ -71,13 +71,13 @@ public final class BoundingBox {
                     else if (newZ > maxZ)
                         return endOfData();
                 }
-                return pos.move(newX, newY, newZ);
+                return pos.setPos(newX, newY, newZ);
             }
         };
     }
 
     public BlockPos createMinPos() {
-        return new BlockPos(getMinX(), getMaxX(), getMaxZ());
+        return new BlockPos(getMinX(), getMinY(), getMinZ());
     }
 
     public BlockPos createMaxPos() {

@@ -29,7 +29,9 @@ import net.minecraftforge.common.util.Constants.BlockFlags;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fml.network.PacketDistributor;
 
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.BiPredicate;
 
 public final class CutPasteShowcase extends Item {
     private enum Mode {
@@ -76,8 +78,10 @@ public final class CutPasteShowcase extends Item {
             BuildingGadgets.LOGGER.info("{} is cutting area {}.", author, bounds);
             long startTime = System.nanoTime();
             Builder builder = Template.builder(min).author(author);
-            for (Mutable m : fBounds.translatedYXZIterable(min)) {
+            for (Mutable m : fBounds.yxzIterable()) {
                 BlockState state = world.getBlockState(m);
+                if (state.isAir(world, m))
+                    continue;
                 TileEntity tileEntity = world.getTileEntity(m);
                 CompoundNBT nbt = null;
                 if (tileEntity != null)
@@ -89,7 +93,7 @@ public final class CutPasteShowcase extends Item {
             Template res = builder.build();
             long end = System.nanoTime();
             BuildingGadgets.LOGGER.info("Cutting area {} completed. Result is {}.", bounds, res);
-            BuildingGadgets.LOGGER.info("Cutting took {}ms, building took {}ms => {}ms in total.",
+            BuildingGadgets.LOGGER.info("Cutting took {}ms, assembling took {}ms => {}ms in total.",
                     timeString(buildTime - startTime), timeString(end - buildTime), timeString(end - startTime));
             p.setAndUpdateRemote(getID(stack), res, PacketDistributor.PLAYER.with(() -> player));
         });
@@ -148,10 +152,18 @@ public final class CutPasteShowcase extends Item {
             }).orElseGet(() -> {
                 //normally this would happen on the server and therefore the following code would only contain a log
                 //and not register a callback - that's just for testing purposes
-                p.registerUpdateCallback(id, (opt, isRetrieval) -> {
-                    if (opt.isPresent()) rotate(p, id, opt.get(), randAxis, rot);
-                    else BuildingGadgets.LOGGER.error("Could not rotate Template with id {} as it does not exist.", id);
-                    return READD_TEST;
+                p.registerUpdateCallback(id, new BiPredicate<Optional<Template>, Boolean>() {
+                    private boolean applied = false; //this is only necessary for when READD_TEST = true
+
+                    @Override
+                    public boolean test(Optional<Template> opt, Boolean retrieval) {
+                        if (! applied && opt.isPresent()) {
+                            applied = true;
+                            rotate(p, id, opt.get(), randAxis, rot);
+                        } else if (! applied)
+                            BuildingGadgets.LOGGER.error("Could not mirror Template with id {} as it does not exist.", id);
+                        return READD_TEST;
+                    }
                 });
                 return null;
             });
@@ -178,10 +190,18 @@ public final class CutPasteShowcase extends Item {
             }).orElseGet(() -> {
                 //normally this would happen on the server and therefore the following code would only contain a log
                 //and not register a callback - that's just for testing purposes
-                p.registerUpdateCallback(id, (opt, isRetrieval) -> {
-                    if (opt.isPresent()) mirror(p, id, opt.get(), randAxis);
-                    else BuildingGadgets.LOGGER.error("Could not mirror Template with id {} as it does not exist.", id);
-                    return READD_TEST;
+                p.registerUpdateCallback(id, new BiPredicate<Optional<Template>, Boolean>() {
+                    private boolean applied = false; //this is only necessary for when READD_TEST = true
+
+                    @Override
+                    public boolean test(Optional<Template> opt, Boolean retrieval) {
+                        if (! applied && opt.isPresent()) {
+                            applied = true;
+                            mirror(p, id, opt.get(), randAxis);
+                        } else
+                            BuildingGadgets.LOGGER.error("Could not mirror Template with id {} as it does not exist.", id);
+                        return READD_TEST;
+                    }
                 });
                 return null;
             });

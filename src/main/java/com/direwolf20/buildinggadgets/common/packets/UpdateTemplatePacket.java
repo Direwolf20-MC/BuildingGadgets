@@ -88,28 +88,29 @@ public final class UpdateTemplatePacket extends RequestTemplatePacket {
 
     public UpdateTemplatePacket(PacketBuffer buffer) {
         super(buffer);
-        //ensure that it actually reads the size it wrote - the no-arg version reads the whole buffer!!!
         session = buffer.readInt();
+        hasMore = buffer.readBoolean();
 
         if (buffer.readBoolean()) {
-            payload = buffer.readByteArray(SPLIT_SIZE);
             seqNumber = buffer.readVarInt();
+            payload = buffer.readByteArray(SPLIT_SIZE);
         } else {
             payload = null;
             seqNumber = - 1;
         }
-
-        hasMore = buffer.readBoolean();
     }
 
     public void encode(PacketBuffer buffer) {
         super.encode(buffer);
 
         buffer.writeInt(session);
+        buffer.writeBoolean(hasMore);
         buffer.writeBoolean(payload != null);
 
-        if (payload != null)
+        if (payload != null) {
+            buffer.writeVarInt(seqNumber);
             buffer.writeByteArray(payload);
+        }
     }
 
     public void handle(Supplier<Context> ctx) {

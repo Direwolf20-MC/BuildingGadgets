@@ -390,7 +390,7 @@ public final class Template implements Iterable<TemplateData> {
         BlockPos max = matrixMul(matrix3x3, BlockPos.ZERO, bounds.createMaxPos());
         BoundingBox transformed = new BoundingBox(min, max);
         BlockPos translation = transformed.createMinPos();
-
+        //BuildingGadgets.LOGGER.info("Transformed {} into {}. Applying translation {}.", bounds, transformed, translation);
         ImmutableSortedSet<TemplateData> map = data.stream()
                 .map(td -> new TemplateData(matrixMul(matrix3x3, translation, td.getPos()), dataTransform.apply(td.getData())))
                 .collect(ImmutableSortedSet.toImmutableSortedSet(BY_POS_YXZ));

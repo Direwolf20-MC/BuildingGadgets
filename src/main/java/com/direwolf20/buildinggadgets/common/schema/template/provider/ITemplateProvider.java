@@ -2,11 +2,11 @@ package com.direwolf20.buildinggadgets.common.schema.template.provider;
 
 import com.direwolf20.buildinggadgets.common.schema.template.Template;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
-import net.minecraftforge.fml.network.simple.SimpleChannel.MessageBuilder.ToBooleanBiFunction;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.BiPredicate;
 
 public interface ITemplateProvider {
 
@@ -31,11 +31,11 @@ public interface ITemplateProvider {
      *                 is removed by an explicit call to {@link #setAndUpdateRemote(UUID, Template, PacketTarget)}. Returns
      *                 {@code true} if it wishes to remain registered.
      */
-    void registerUpdateCallback(UUID id, ToBooleanBiFunction<Optional<Template>, Boolean> callback);//TemplateManager wants to copy a Template
+    void registerUpdateCallback(UUID id, BiPredicate<Optional<Template>, Boolean> callback);//TemplateManager wants to copy a Template
 
     /**
      * Set's the {@link Template} corresponding to {@code id} to the given value and updates the other side if specified.
-     * Notice that this will trigger callbacks added to {@link #registerUpdateCallback(UUID, ToBooleanBiFunction)}.
+     * Notice that this will trigger callbacks added to {@link #registerUpdateCallback(UUID, BiPredicate)}.
      *
      * @param id         The id of the {@link Template} which is to be updated
      * @param template   The new {@link Template}
