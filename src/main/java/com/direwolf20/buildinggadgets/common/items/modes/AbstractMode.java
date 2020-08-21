@@ -92,12 +92,12 @@ public abstract class AbstractMode {
 
         if (worldBlockState.getBlock().getDefaultState() != lookingAtState.getBlock().getDefaultState() && !context.isFuzzy())
             return false;
-        
+
         // Finally, ensure at least a single face is exposed.
         boolean hasSingeValid = false;
         for(Direction direction : Direction.values()) {
             BlockPos offset = pos.offset(direction);
-            if( context.getWorld().isAirBlock(offset) || context.getWorld().getBlockState(offset).getShape(context.getWorld(), offset) != VoxelShapes.fullCube()) {
+            if( context.getWorld().isAirBlock(offset) || worldBlockState.isSideInvisible(worldBlockState, direction) ) {
                 hasSingeValid = true;
                 break;
             }
