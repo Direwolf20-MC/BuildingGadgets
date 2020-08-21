@@ -4,6 +4,7 @@ package com.direwolf20.buildinggadgets.common.items;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
+import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.concurrent.UndoScheduler;
@@ -205,7 +206,7 @@ public abstract class AbstractGadget extends Item {
         if (player.isCreative() || getEnergyMax() == 0)
             return;
 
-        tool.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> e.extractEnergy(getEnergyCost(tool), false));
+        tool.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> ((IPrivateEnergy) e).extractPower(getEnergyCost(tool), false));
     }
 
     protected void addEnergyInformation(List<ITextComponent> tooltip, ItemStack stack) {
