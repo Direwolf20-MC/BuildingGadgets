@@ -75,7 +75,7 @@ public final class CutPasteShowcase extends Item {
 
         world.getCapability(TemplateProviderCapability.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(p -> {
             String author = player.getDisplayName().getUnformattedComponentText();
-            BuildingGadgets.LOGGER.info("{} is cutting area {}.", author, bounds);
+            BuildingGadgets.LOGGER.info("{} is cutting area {}.", author, fBounds);
             long startTime = System.nanoTime();
             Builder builder = Template.builder(min).author(author);
             for (Mutable m : fBounds.yxzIterable()) {
@@ -87,7 +87,7 @@ public final class CutPasteShowcase extends Item {
                 if (tileEntity != null)
                     nbt = tileEntity.write(new CompoundNBT());
                 builder.recordBlock(m, state, nbt);
-                world.setBlockState(m, Blocks.AIR.getDefaultState());
+                world.setBlockState(m, Blocks.AIR.getDefaultState(), BlockFlags.NO_NEIGHBOR_DROPS | BlockFlags.BLOCK_UPDATE);
             }
             long buildTime = System.nanoTime();
             Template res = builder.build();

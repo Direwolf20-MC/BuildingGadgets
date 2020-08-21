@@ -67,7 +67,7 @@ abstract class AbsTemplateProvider implements ITemplateProvider {
             if (listeners.isEmpty())
                 updateListeners.invalidate(id);
         } catch (Exception e) {
-            BuildingGadgets.LOGGER.error("Unexpected exception delivering update to listeners of {}", id);
+            BuildingGadgets.LOGGER.error("Unexpected exception delivering update to listeners of {}", id, e);
         }
         cleanUp();
     }

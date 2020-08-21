@@ -294,7 +294,7 @@ public final class Template implements Iterable<TemplateData> {
         for (TemplateData entry : data) {
             long pos = vecToLong(entry.getPos());
             stateCounter = addInfo(entry.getData().getState(), allStates, stateCounter, statesOutOfRange, LOG_STATES);
-            int stateId = allStates.getInt(entry.getData());
+            int stateId = allStates.getInt(entry.getData().getState());
             posStateList.add(includeId(pos, stateId));
             if (entry.getData().getNbt() != null) {
                 tileCounter = addInfo(entry.getData().getNbt(), allTiles, tileCounter, tilesOutOfRange, LOG_TILES);
