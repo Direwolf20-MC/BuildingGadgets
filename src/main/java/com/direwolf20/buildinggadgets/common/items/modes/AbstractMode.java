@@ -73,20 +73,26 @@ public abstract class AbstractMode {
         BlockState worldBlockState = context.getWorldState(pos);
         TileEntity te = context.getWorld().getTileEntity(pos);
 
-        if ((worldBlockState != lookingAtState && !context.isFuzzy())
-                || worldBlockState == OurBlocks.EFFECT_BLOCK.get().getDefaultState()
-                || worldBlockState == context.getSetState() )
-            return false;
-
-        if (te != null && (!(te instanceof ConstructionBlockTileEntity) || te.getBlockState() == context.getSetState()))
-            return false;
-
-        if (worldBlockState.getBlockHardness(context.getWorld(), pos) < 0)
-            return false;
-
+        // No air! or water
         if( worldBlockState.getMaterial() == Material.AIR || worldBlockState.getMaterial().isLiquid() )
             return false;
 
+        // No effect blocks and don't try with the same block as you're trying to exchange with
+        if (worldBlockState == OurBlocks.EFFECT_BLOCK.get().getDefaultState()
+                || worldBlockState == context.getSetState() )
+            return false;
+
+        // No tiles unless construction block
+        if (te != null && (!(te instanceof ConstructionBlockTileEntity) || te.getBlockState() == context.getSetState()))
+            return false;
+
+        // Don't exchange bedrock
+        if (worldBlockState.getBlockHardness(context.getWorld(), pos) < 0)
+            return false;
+
+        if (worldBlockState.getBlock().getDefaultState() != lookingAtState.getBlock().getDefaultState() && !context.isFuzzy())
+            return false;
+        
         // Finally, ensure at least a single face is exposed.
         boolean hasSingeValid = false;
         for(Direction direction : Direction.values()) {
