@@ -28,31 +28,39 @@ import java.util.Objects;
  */
 public final class TemplateHeader {
     public static final String VERSION = "2-beta";
-    private static final String MC_VERSION = "1.15.2";
+    private static final String MC_VERSION = "1.16.1";
     
     private static final ComparableVersion COMP_VERSION = new ComparableVersion(VERSION);
 
+    // todo: add support for previous templates from older versions
     private static final JsonBiDiSerializer<TemplateHeader> BI_DI_SERIALIZER = new JsonBiDiSerializer<TemplateHeader>() {
         @Override
         public TemplateHeader deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            JsonObject object = json.getAsJsonObject();
-            String mcVersion = object.getAsJsonPrimitive(JsonKeys.HEADER_MC_VERSION).getAsString();
+            JsonObject data = json.getAsJsonObject();
+
+            String mcVersion = data.getAsJsonPrimitive(JsonKeys.HEADER_MC_VERSION).getAsString();
             if (! mcVersion.equals(MC_VERSION))
                 throw new IllegalMinecraftVersionException(mcVersion, MC_VERSION);
-            String version = object.getAsJsonPrimitive(JsonKeys.HEADER_VERSION).getAsString();
+
+            String version = data.getAsJsonPrimitive(JsonKeys.HEADER_VERSION).getAsString();
             if (new ComparableVersion(version).compareTo(COMP_VERSION) > 0)
                 throw new UnknownTemplateVersionException(version);
+
             TemplateHeader.Builder builder;
-            if (object.has(JsonKeys.HEADER_BOUNDING_BOX))
-                builder = TemplateHeader.builder(context.deserialize(object.get(JsonKeys.HEADER_BOUNDING_BOX), Region.class));
+            if (data.has(JsonKeys.HEADER_BOUNDING_BOX))
+                builder = TemplateHeader.builder(context.deserialize(data.get(JsonKeys.HEADER_BOUNDING_BOX), Region.class));
             else
                 builder = TemplateHeader.builder(Region.singleZero());
-            if (object.has(JsonKeys.HEADER_NAME))
-                builder.name(context.deserialize(object.get(JsonKeys.HEADER_NAME), String.class));
-            if (object.has(JsonKeys.HEADER_AUTHOR))
-                builder.author(context.deserialize(object.get(JsonKeys.HEADER_AUTHOR), String.class));
-            if (object.has(JsonKeys.HEADER_REQUIRED_ITEMS))
-                builder.requiredItems(context.deserialize(object.get(JsonKeys.HEADER_REQUIRED_ITEMS), MaterialList.class));
+
+            if (data.has(JsonKeys.HEADER_NAME))
+                builder.name(context.deserialize(data.get(JsonKeys.HEADER_NAME), String.class));
+
+            if (data.has(JsonKeys.HEADER_AUTHOR))
+                builder.author(context.deserialize(data.get(JsonKeys.HEADER_AUTHOR), String.class));
+
+            if (data.has(JsonKeys.HEADER_REQUIRED_ITEMS))
+                builder.requiredItems(context.deserialize(data.get(JsonKeys.HEADER_REQUIRED_ITEMS), MaterialList.class));
+
             return builder.build();
         }
 

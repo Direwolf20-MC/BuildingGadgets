@@ -1,8 +1,7 @@
 package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
@@ -10,7 +9,7 @@ import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
-import com.direwolf20.buildinggadgets.common.registry.OurItems;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
@@ -18,6 +17,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -25,6 +25,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.ITextProperties;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderTooltipEvent;
@@ -39,8 +40,7 @@ import java.util.List;
  * This class was adapted from code written by Vazkii
  * Thanks Vazkii!!
  */
-
-@Mod.EventBusSubscriber(modid = Reference.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = Reference.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class EventTooltip {
     private static final String PLACE_HOLDER = "\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r";
     private static final Comparator<Multiset.Entry<IUniqueObject<?>>> ENTRY_COMPARATOR = Comparator
@@ -66,9 +66,9 @@ public class EventTooltip {
                 Template template = provider.getTemplateForKey(templateKey);
                 IItemIndex index = InventoryHelper.index(stack, mc.player);
 
-                IBuildContext buildContext = SimpleBuildContext.builder()
-                        .usedStack(stack)
-                        .buildingPlayer(mc.player)
+                BuildContext buildContext = BuildContext.builder()
+                        .stack(stack)
+                        .player(mc.player)
                         .build(mc.world);
 
                 TemplateHeader header = template.getHeaderAndForceMaterials(buildContext);
@@ -100,6 +100,7 @@ public class EventTooltip {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
         Minecraft mc = Minecraft.getInstance();
+        MatrixStack matrices = event.getMatrixStack();
 
         if( mc.world == null || mc.player == null )
             return;
@@ -108,9 +109,9 @@ public class EventTooltip {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(templateKey -> {
                 Template template = provider.getTemplateForKey(templateKey);
                 IItemIndex index = InventoryHelper.index(stack, mc.player);
-                IBuildContext buildContext = SimpleBuildContext.builder()
-                        .usedStack(stack)
-                        .buildingPlayer(mc.player)
+                BuildContext buildContext = BuildContext.builder()
+                        .stack(stack)
+                        .player(mc.player)
                         .build(mc.world);
                 TemplateHeader header = template.getHeaderAndForceMaterials(buildContext);
                 MaterialList list = header.getRequiredItems();
@@ -125,10 +126,10 @@ public class EventTooltip {
                 int by = event.getY();
                 int j = 0;
                 int totalMissing = 0;
-                List<String> tooltip = event.getLines();
+                List<? extends ITextProperties> tooltip = event.getLines();
                 FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-                for (String s : tooltip) {
-                    if (s.trim().equals(PLACE_HOLDER))
+                for (ITextProperties s : tooltip) {
+                    if (s.getString().trim().equals(PLACE_HOLDER))
                         break;
                     by += fontRenderer.FONT_HEIGHT;
                 }
@@ -140,24 +141,30 @@ public class EventTooltip {
                 for (Multiset.Entry<IUniqueObject<?>> entry : sortedEntries) {
                     int x = bx + (j % STACKS_PER_LINE) * 18;
                     int y = by + (j / STACKS_PER_LINE) * 20;
-                    totalMissing += renderRequiredBlocks(entry.getElement().createStack(), x, y, existing.count(entry.getElement()), entry.getCount());
+                    totalMissing += renderRequiredBlocks(matrices, entry.getElement().createStack(), x, y, existing.count(entry.getElement()), entry.getCount());
                     j++;
                 }
                 if (!match.isSuccess()) {
-                    IUniqueObject<?> pasteItem = new UniqueItem(OurItems.constructionPaste);
+                    IUniqueObject<?> pasteItem = new UniqueItem(OurItems.CONSTRUCTION_PASTE_ITEM.get());
                     Multiset<IUniqueObject<?>> pasteSet = ImmutableMultiset.<IUniqueObject<?>>builder()
                             .addCopies(pasteItem, totalMissing)
                             .build();
                     int hasAmt = index.tryMatch(pasteSet).getFoundItems().count(pasteItem);
                     int x = bx + (j % STACKS_PER_LINE) * 18;
                     int y = by + (j / STACKS_PER_LINE) * 20;
-                    renderRequiredBlocks(pasteItem.createStack(), x, y, hasAmt, InventoryHelper.longToInt(totalMissing));
+
+                    int required = Integer.MAX_VALUE;
+                    try {
+                        required = Math.toIntExact(totalMissing);
+                    } catch (ArithmeticException ignored) {}
+
+                    renderRequiredBlocks(matrices, pasteItem.createStack(), x, y, hasAmt, required);
                 }
             });
         });
     }
 
-    private static int renderRequiredBlocks(ItemStack itemStack, int x, int y, int count, int req) {
+    private static int renderRequiredBlocks(MatrixStack matrices, ItemStack itemStack, int x, int y, int count, int req) {
         Minecraft mc = Minecraft.getInstance();
         RenderSystem.disableDepthTest();
         RenderSystem.depthMask(false);
@@ -165,7 +172,7 @@ public class EventTooltip {
         ItemRenderer render = mc.getItemRenderer();
         //The zLevel is the position that the item is drawn on. If too low, it'll draw behind other items in the GUI. Bump it up and then back down to draw this on top of everything else
         render.zLevel += 500f;
-        net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
+        net.minecraft.client.renderer.RenderHelper.enableGuiDepthLighting();
         render.renderItemIntoGUI(itemStack, x, y);
         render.zLevel -= 500f;
         //String s1 = req == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
@@ -178,7 +185,7 @@ public class EventTooltip {
         //translating on the z axis here works like above. If too low, it'll draw the text behind items in the GUI. Items are drawn around zlevel 200 btw
         RenderSystem.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 500);
         RenderSystem.scalef(0.5F, 0.5F, 0.5F);
-        mc.fontRenderer.drawStringWithShadow(s1, 0, 0, color);
+        mc.fontRenderer.drawWithShadow(matrices, s1, 0, 0, color);
         RenderSystem.popMatrix();
 
         int missingCount = 0;
@@ -192,7 +199,7 @@ public class EventTooltip {
                 RenderSystem.pushMatrix();
                 RenderSystem.translatef(x + 8 - w2 / 4, y + 17, 500);
                 RenderSystem.scalef(0.5F, 0.5F, 0.5F);
-                mc.fontRenderer.drawStringWithShadow(s2, 0, 0, 0xFF0000);
+                mc.fontRenderer.drawWithShadow(matrices, s2, 0, 0, 0xFF0000);
                 RenderSystem.popMatrix();
                 missingCount = (req - count);
             }

@@ -3,8 +3,8 @@ package com.direwolf20.buildinggadgets.common.entities;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlockPowder;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
-import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
+import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.Block;
@@ -79,7 +79,7 @@ public class ConstructionBlockEntity extends EntityBase {
                     if (opaque || neighborBrightness || ! ambient) {
                         BlockData tempSetBlock = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
                         BlockData tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockData();
-                        world.setBlockState(targetPos, OurBlocks.constructionBlock.getDefaultState()
+                        world.setBlockState(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().getDefaultState()
                                 .with(ConstructionBlock.BRIGHT, ! opaque)
                                 .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness)
                                 .with(ConstructionBlock.AMBIENT_OCCLUSION, ambient));
@@ -89,8 +89,8 @@ public class ConstructionBlockEntity extends EntityBase {
                         }
                     }
                 }
-            } else if (world.getBlockState(targetPos) == OurBlocks.constructionBlockPowder.getDefaultState()) {
-                world.setBlockState(targetPos, OurBlocks.constructionBlockDense.getDefaultState());
+            } else if (world.getBlockState(targetPos) == OurBlocks.CONSTRUCTION_POWDER_BLOCK.get().getDefaultState()) {
+                world.setBlockState(targetPos, OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState());
             }
         }
     }

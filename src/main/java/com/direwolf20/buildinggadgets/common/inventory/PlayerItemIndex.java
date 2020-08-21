@@ -51,6 +51,7 @@ public final class PlayerItemIndex implements IItemIndex {
                     .map(itemStack -> performSimpleInsert(itemStack, count, simulate))
                     .orElseGet(() -> performComplexInsert(obj, count, simulate));
         else {
+            // This likely has the same disregard for valid slots as the simple insert does
             int remainingCount = performComplexInsert(obj, count, simulate);
             return remainingCount == 0 ? 0 : obj.tryCreateInsertStack(Collections.unmodifiableMap(handleMap), count)
                     .map(itemStack -> performSimpleInsert(itemStack, count, simulate))
@@ -62,41 +63,53 @@ public final class PlayerItemIndex implements IItemIndex {
         int remainingCount = insertIntoProviders(stack, count, simulate);
         if (remainingCount == 0)
             return 0;
-        remainingCount = insertIntoEmptyHandles(stack, remainingCount, simulate);
-        if (remainingCount == 0)
-            return 0;
+
+// this is extremely buggy and poorly planned out code.
+//        insertIntoEmptyHandles(stack, remainingCount, simulate);
+//        if (remainingCount == 0)
+//            return 0;
+
         if (! simulate)
             spawnRemainder(stack, remainingCount);
+
         return 0;
     }
 
     private int insertIntoProviders(ItemStack stack, int remainingCount, boolean simulate) {
         for (IInsertProvider insertProvider : insertProviders) {
-            remainingCount = insertProvider.insert(stack, remainingCount, simulate);
+            remainingCount -= insertProvider.insert(stack, remainingCount, simulate);
             if (remainingCount <= 0)
                 return 0;
         }
         return remainingCount;
     }
 
+    // todo: fix or rewrite. has many root issues:
+    //       uses methods not intended for forge, has the ability to replace stacks, indexes players inventory even though we already handle the players inventory,
+    //       doesn't check for a valid slot, ignores the IItemHandler contract. Maybe more
     private int insertIntoEmptyHandles(ItemStack stack, int remainingCount, boolean simulate) {
-        List<IObjectHandle<?>> emptyHandles = handleMap
-                .computeIfAbsent(Item.class, c -> new HashMap<>())
-                .getOrDefault(Items.AIR, ImmutableList.of());
-        for (Iterator<IObjectHandle<?>> it = emptyHandles.iterator(); it.hasNext() && remainingCount >= 0; ) {
-            IObjectHandle<?> handle = it.next();
-            UniqueItem item = UniqueItem.ofStack(stack);
-            int match = handle.insert(item, remainingCount, simulate);
-            if (match > 0)
-                remainingCount -= match;
-            it.remove();
-            handleMap.get(Item.class)
-                    .computeIfAbsent(item.getIndexObject(), i -> new ArrayList<>())
-                    .add(handle);
-            if (remainingCount <= 0)
-                return 0;
-        }
-        return remainingCount;
+//        List<IObjectHandle<?>> emptyHandles = handleMap
+//                .computeIfAbsent(Item.class, c -> new HashMap<>())
+//                .getOrDefault(Items.AIR, ImmutableList.of());
+//
+//        for (Iterator<IObjectHandle<?>> it = emptyHandles.iterator(); it.hasNext() && remainingCount >= 0; ) {
+//            IObjectHandle<?> handle = it.next();
+//            UniqueItem item = UniqueItem.ofStack(stack);
+//
+//            int match = handle.insert(item, remainingCount, simulate);
+//            if (match > 0)
+//                remainingCount -= match;
+//
+//            handleMap.get(Item.class)
+//                    .computeIfAbsent(item.getIndexObject(), i -> new ArrayList<>())
+//                    .add(handle);
+//
+//            if (remainingCount <= 0)
+//                return 0;
+//        }
+//
+//        return remainingCount;
+        return 0;
     }
 
     private void spawnRemainder(ItemStack stack, int remainingCount) {
@@ -104,7 +117,7 @@ public final class PlayerItemIndex implements IItemIndex {
             ItemStack copy = stack.copy();
             copy.setCount(Math.min(remainingCount, copy.getMaxStackSize()));
             remainingCount -= copy.getCount();
-            ItemEntity itemEntity = new ItemEntity(player.world, player.getPosX(), player.getPosY(), player.getPosZ(), copy);
+            ItemEntity itemEntity = new ItemEntity(player.world, player.getX(), player.getY(), player.getZ(), copy);
             player.world.addEntity(itemEntity);
         }
     }
@@ -114,6 +127,7 @@ public final class PlayerItemIndex implements IItemIndex {
         List<IObjectHandle<?>> handles = handleMap
                 .getOrDefault(obj.getIndexClass(), ImmutableMap.of())
                 .getOrDefault(obj.getIndexObject(), ImmutableList.of());
+
         for (Iterator<IObjectHandle<?>> it = handles.iterator(); it.hasNext() && remainingCount >= 0; ) {
             IObjectHandle<?> handle = it.next();
             int match = handle.insert(obj, remainingCount, simulate);

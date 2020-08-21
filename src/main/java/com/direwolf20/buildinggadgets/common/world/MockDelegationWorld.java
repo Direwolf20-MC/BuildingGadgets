@@ -2,8 +2,7 @@ package com.direwolf20.buildinggadgets.common.world;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.google.common.base.Preconditions;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
@@ -12,7 +11,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -28,11 +27,10 @@ import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.lighting.WorldLightManager;
-import net.minecraft.world.storage.WorldInfo;
+import net.minecraft.world.storage.IWorldInfo;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -60,9 +58,9 @@ public class MockDelegationWorld implements IWorld {
         addBlock(null, pos, data);
     }
 
-    public void addBlock(@Nullable IBuildContext context, @Nonnull BlockPos pos, BlockData data) {
+    public void addBlock(@Nullable BuildContext context, @Nonnull BlockPos pos, BlockData data) {
         if (data != null)
-            data.placeIn(SimpleBuildContext.builderOf(context).build(this), pos);
+            data.placeIn(BuildContext.builderOf(context).build(this.getWorld()), pos);
     }
 
     public IWorld getDelegate() {
@@ -121,14 +119,6 @@ public class MockDelegationWorld implements IWorld {
     }
 
     /**
-     * gets the random world seed
-     */
-    @Override
-    public long getSeed() {
-        return delegate.getSeed();
-    }
-
-    /**
      * gets the current fullness of the moon expressed as a float between 1.0 and 0.0, in steps of .25
      */
     @Override
@@ -173,11 +163,8 @@ public class MockDelegationWorld implements IWorld {
         return delegate.getWorld();
     }
 
-    /**
-     * Returns the world's WorldInfo object
-     */
     @Override
-    public WorldInfo getWorldInfo() {
+    public IWorldInfo getWorldInfo() {
         return delegate.getWorldInfo();
     }
 
@@ -205,22 +192,14 @@ public class MockDelegationWorld implements IWorld {
         return delegate.getRandom();
     }
 
+
     @Override
-    public void notifyNeighbors(BlockPos pos, Block blockIn) {
-        /*
+    public void updateNeighbors(BlockPos p_230547_1_, Block p_230547_2_) {
+                /*
         left blank as we can't notify Blocks as this isn't a subclass of world and it makes no sense notifying the Blocks in the delegate
         as they won't know about this Block...
         */
     }
-
-    /**
-     * Gets the spawn point in the world
-     */
-    @Override
-    public BlockPos getSpawnPoint() {
-        return delegate.getSpawnPoint();
-    }
-
 
     /**
      * Checks to see if an air block exists at the provided location. Note that this only checks to see if the blocks
@@ -237,25 +216,14 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public Biome getNoiseBiomeRaw(int x, int y, int z) {
+    public Biome getGeneratorStoredBiome(int p_225604_1_, int p_225604_2_, int p_225604_3_) {
         return null;
     }
 
     @Override
-    public WorldLightManager getLightManager() {
+    public Biome getBiomeForNoiseGen(int p_225526_1_, int p_225526_2_, int p_225526_3_) {
         return null;
     }
-
-    @Override
-    public int getLightFor(LightType type, BlockPos pos) {
-        return delegate.getLightFor(type, pos);
-    }
-
-    @Override
-    public int getLightSubtracted(BlockPos pos, int amount) {
-        return delegate.getLightSubtracted(pos, amount);
-    }
-
 
     @Override
     public int getHeight(Heightmap.Type heightmapType, int x, int z) {
@@ -268,9 +236,16 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public BiomeManager getBiomeManager() {
+    public BiomeManager getBiomeAccess() {
         return null;
     }
+
+// removed 1.16
+//    @Override
+//    public BiomeManager getBiomeManager() {
+//        return null;
+//    }
+//
 
     @Override
     public WorldBorder getWorldBorder() {
@@ -298,7 +273,7 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public Dimension getDimension() {
+    public DimensionType getDimension() {
         return delegate.getDimension();
     }
 
@@ -322,13 +297,18 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public IFluidState getFluidState(BlockPos pos) {
+    public FluidState getFluidState(BlockPos pos) {
         return getBlockState(pos).getFluidState(); // In the end that's what mc does
     }
 
     @Override
     public int getMaxLightLevel() {
         return delegate.getMaxLightLevel();
+    }
+
+    @Override
+    public boolean setBlockState(BlockPos p_241211_1_, BlockState p_241211_2_, int p_241211_3_, int p_241211_4_) {
+        return false;
     }
 
     /**
@@ -364,9 +344,15 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public boolean destroyBlock(BlockPos p_225521_1_, boolean p_225521_2_, @Nullable Entity p_225521_3_) {
+    public boolean breakBlock(BlockPos p_241212_1_, boolean p_241212_2_, @Nullable Entity p_241212_3_, int p_241212_4_) {
         return false;
     }
+
+// todo: 1.16 removed.
+//    @Override
+//    public boolean destroyBlock(BlockPos p_225521_1_, boolean p_225521_2_, @Nullable Entity p_225521_3_) {
+//        return false;
+//    }
 
     //-------------------Extra Methods--------------------
 
@@ -402,6 +388,16 @@ public class MockDelegationWorld implements IWorld {
 
     protected BlockInfo createInfo(BlockPos pos, BlockState state) {
         return new BlockInfo(pos, state);
+    }
+
+    @Override
+    public float getBrightness(Direction p_230487_1_, boolean p_230487_2_) {
+        return delegate.getBrightness(p_230487_1_, p_230487_2_);
+    }
+
+    @Override
+    public WorldLightManager getLightingProvider() {
+        return delegate.getLightingProvider();
     }
 
     public static class BlockInfo {
@@ -446,7 +442,7 @@ public class MockDelegationWorld implements IWorld {
                         entity.setPos(pos);
                         //if we pass our wrapped world down to this, it will cause it to determine an errornous blockstate...
                         //we'd need to reflect into the te...
-                        entity.setWorldAndPos(null, pos);
+                        entity.setLocation(null, pos);
                         entity.onLoad();
                     }
                 } catch (Exception e) {

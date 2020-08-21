@@ -1,8 +1,7 @@
 package com.direwolf20.buildinggadgets.common.capability;
 
-import com.direwolf20.buildinggadgets.common.items.pastes.ConstructionPasteContainerCreative;
-import com.direwolf20.buildinggadgets.common.items.pastes.GenericPasteContainer;
-import com.direwolf20.buildinggadgets.common.registry.OurItems;
+import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -11,11 +10,11 @@ import javax.annotation.Nonnull;
 
 public final class PasteContainerItemHandler implements IItemHandlerModifiable {
     private final ItemStack container;
-    private boolean isCreative;
+    private final boolean isCreative;
 
     public PasteContainerItemHandler(ItemStack container) {
         this.container = container;
-        this.isCreative = getContainerItem() instanceof ConstructionPasteContainerCreative;
+        this.isCreative = getContainerItem().isCreative();
     }
 
     @Override
@@ -32,7 +31,7 @@ public final class PasteContainerItemHandler implements IItemHandlerModifiable {
     @Override
     public ItemStack getStackInSlot(int slot) {
         int count = getCount();
-        return count <= 0 ? ItemStack.EMPTY : new ItemStack(OurItems.constructionPaste, count);
+        return count <= 0 ? ItemStack.EMPTY : new ItemStack(OurItems.CONSTRUCTION_PASTE_ITEM.get(), count);
     }
 
     @Nonnull
@@ -59,7 +58,7 @@ public final class PasteContainerItemHandler implements IItemHandlerModifiable {
             return ItemStack.EMPTY;
 
         if (isCreative)
-            return new ItemStack(OurItems.constructionPaste, amount);
+            return new ItemStack(OurItems.CONSTRUCTION_PASTE_ITEM.get(), amount);
 
         int currentCount = getCount();
         int newCount = setCount(currentCount - amount, simulate);
@@ -68,7 +67,7 @@ public final class PasteContainerItemHandler implements IItemHandlerModifiable {
         if (dif == 0)
             return ItemStack.EMPTY;
 
-        return new ItemStack(OurItems.constructionPaste, dif);
+        return new ItemStack(OurItems.CONSTRUCTION_PASTE_ITEM.get(), dif);
     }
 
     @Override
@@ -78,15 +77,15 @@ public final class PasteContainerItemHandler implements IItemHandlerModifiable {
 
     @Override
     public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-        return stack.getItem() == OurItems.constructionPaste;
+        return stack.getItem() == OurItems.CONSTRUCTION_PASTE_ITEM.get();
     }
 
     private int getCount() {
         return getContainerItem().getPasteCount(container);
     }
 
-    private GenericPasteContainer getContainerItem() {
-        return ((GenericPasteContainer) container.getItem());
+    private ConstructionPasteContainer getContainerItem() {
+        return ((ConstructionPasteContainer) container.getItem());
     }
 
     private int setCount(int count, boolean simulate) {

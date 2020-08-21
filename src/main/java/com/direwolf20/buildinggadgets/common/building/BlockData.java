@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.registry.Registries;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
@@ -130,11 +130,11 @@ public final class BlockData {
     }
 
     /**
-     * @param context The {@link IBuildContext} in which to perform the placement.
+     * @param context The {@link BuildContext} in which to perform the placement.
      * @param pos The {@link BlockPos} at which to perform the placement.
      * @return whether or not the {@link ITileEntityData} reported that placement was performed.
      */
-    public boolean placeIn(IBuildContext context, BlockPos pos) {
+    public boolean placeIn(BuildContext context, BlockPos pos) {
         return tileData.placeIn(context, state, pos);
     }
 
@@ -166,7 +166,7 @@ public final class BlockData {
         return new BlockData(getState().rotate(rotation), getTileData());
     }
 
-    public MaterialList getRequiredItems(IBuildContext context, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
+    public MaterialList getRequiredItems(BuildContext context, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
         return getTileData().getRequiredItems(context, getState(), target, pos);
     }
 

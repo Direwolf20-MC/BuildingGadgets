@@ -1,22 +1,26 @@
 package com.direwolf20.buildinggadgets.client.renderer;
 
+import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
-import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
+import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
+import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
+import com.direwolf20.buildinggadgets.common.tileentities.EffectBlockTileEntity;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.vector.Matrix4f;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.util.Random;
@@ -36,7 +40,7 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
             return;
         IVertexBuilder builder;
 
-        IRenderTypeBuffer.Impl buffer2 = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        IRenderTypeBuffer.Impl buffer2 = Minecraft.getInstance().getBufferBuilders().getEntityVertexConsumers();
         EffectBlock.Mode toolMode = tile.getReplacementMode();
         BlockRendererDispatcher dispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
 
@@ -65,19 +69,35 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
         float f2 = (float) (color & 255) / 255.0F;
 
         if (tile.isUsingPaste() && toolMode == EffectBlock.Mode.PLACE)
-            renderBlockState = OurBlocks.constructionBlockDense.getDefaultState();
+            renderBlockState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
 
-        builder = buffer2.getBuffer(MyRenderType.RenderBlock);
-        IBakedModel ibakedmodel = dispatcher.getModelForState(renderBlockState);
-        for (Direction direction : Direction.values()) {
-            renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 1f, ibakedmodel.getQuads(renderBlockState, direction, new Random(MathHelper.getPositionRandom(tile.getPos())), EmptyModelData.INSTANCE), 15728640, 655360);
+        builder = buffer2.getBuffer(OurRenderTypes.RenderBlock);
+        if (!renderData.getState().hasTileEntity()) {
+            IBakedModel ibakedmodel = dispatcher.getModelForState(renderBlockState);
+            for (Direction direction : Direction.values()) {
+                renderModelBrightnessColorQuads(stack.peek(), builder, f, f1, f2, 1f, ibakedmodel.getQuads(renderBlockState, direction, new Random(MathHelper.getPositionRandom(tile.getPos())), EmptyModelData.INSTANCE), 15728640, 655360);
+            }
+            renderModelBrightnessColorQuads(stack.peek(), builder, f, f1, f2, 1f, ibakedmodel.getQuads(renderBlockState, null, new Random(MathHelper.getPositionRandom(tile.getPos())), EmptyModelData.INSTANCE), 15728640, 655360);
+        } else {
+            TileEntity te = BaseRenderer.getTileEntityWorld().getTileEntity(renderBlockState);
+            TileEntityRenderer<TileEntity> teRender = BaseRenderer.getTileEntityWorld().getTileEntityRender(renderBlockState);
+
+            if (teRender != null) {
+                te.setPos(tile.getPos());
+                stack.push();
+                try {
+                    teRender.render(te, partialTicks, stack, buffer, 15728880, OverlayTexture.DEFAULT_UV);
+                } catch (Exception e) {
+                    BuildingGadgets.LOG.warn("TER Exception with block type: " + renderBlockState);
+                }
+                stack.pop();
+            }
         }
-        renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 1f, ibakedmodel.getQuads(renderBlockState, null, new Random(MathHelper.getPositionRandom(tile.getPos())), EmptyModelData.INSTANCE), 15728640, 655360);
 
         stack.pop();
         stack.push();
 
-        builder = buffer.getBuffer(MyRenderType.MissingBlockOverlay);
+        builder = buffer.getBuffer(OurRenderTypes.MissingBlockOverlay);
 
         float x = 0,
                 y = 0,
@@ -101,53 +121,52 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
 
         if (alpha > 0.33f)
             alpha = 0.33f;
-
-        alpha = 0.125f;
-        Matrix4f matrix = stack.getLast().getMatrix();
+        
+        Matrix4f matrix = stack.peek().getModel();
 
         // Down
-        if (tile.getWorld().getBlockState(tile.getPos().down()).getBlock() != OurBlocks.effectBlock) {
-            builder.pos(matrix, x, y, z).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, maxX, y, z).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, maxX, y, maxZ).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, x, y, maxZ).color(red, green, blue, alpha).endVertex();
+        if (tile.getWorld().getBlockState(tile.getPos().down()).getBlock() != OurBlocks.EFFECT_BLOCK.get()) {
+            builder.vertex(matrix, x, y, z).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, maxX, y, z).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, maxX, y, maxZ).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, x, y, maxZ).color(red, green, blue, alpha).endVertex();
         }
         // Up
-        if (tile.getWorld().getBlockState(tile.getPos().up()).getBlock() != OurBlocks.effectBlock) {
-            builder.pos(matrix, x, maxY, z).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, x, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, maxX, maxY, z).color(red, green, blue, alpha).endVertex();
+        if (tile.getWorld().getBlockState(tile.getPos().up()).getBlock() != OurBlocks.EFFECT_BLOCK.get()) {
+            builder.vertex(matrix, x, maxY, z).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, x, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, maxX, maxY, z).color(red, green, blue, alpha).endVertex();
         }
         // North
-        if (tile.getWorld().getBlockState(tile.getPos().north()).getBlock() != OurBlocks.effectBlock) {
-            builder.pos(matrix, x, y, z).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, x, maxY, z).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, maxX, maxY, z).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, maxX, y, z).color(red, green, blue, alpha).endVertex();
+        if (tile.getWorld().getBlockState(tile.getPos().north()).getBlock() != OurBlocks.EFFECT_BLOCK.get()) {
+            builder.vertex(matrix, x, y, z).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, x, maxY, z).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, maxX, maxY, z).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, maxX, y, z).color(red, green, blue, alpha).endVertex();
         }
         // South
-        if (tile.getWorld().getBlockState(tile.getPos().south()).getBlock() != OurBlocks.effectBlock) {
-            builder.pos(matrix, x, y, maxZ).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, maxX, y, maxZ).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, x, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+        if (tile.getWorld().getBlockState(tile.getPos().south()).getBlock() != OurBlocks.EFFECT_BLOCK.get()) {
+            builder.vertex(matrix, x, y, maxZ).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, maxX, y, maxZ).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, x, maxY, maxZ).color(red, green, blue, alpha).endVertex();
         }
         // East
-        if (tile.getWorld().getBlockState(tile.getPos().east()).getBlock() != OurBlocks.effectBlock) {
-            builder.pos(matrix, maxX, y, z).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, maxX, maxY, z).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, maxX, y, maxZ).color(red, green, blue, alpha).endVertex();
+        if (tile.getWorld().getBlockState(tile.getPos().east()).getBlock() != OurBlocks.EFFECT_BLOCK.get()) {
+            builder.vertex(matrix, maxX, y, z).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, maxX, maxY, z).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, maxX, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, maxX, y, maxZ).color(red, green, blue, alpha).endVertex();
         }
         // West
-        if (tile.getWorld().getBlockState(tile.getPos().west()).getBlock() != OurBlocks.effectBlock) {
-            builder.pos(matrix, x, y, z).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, x, y, maxZ).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, x, maxY, maxZ).color(red, green, blue, alpha).endVertex();
-            builder.pos(matrix, x, maxY, z).color(red, green, blue, alpha).endVertex();
+        if (tile.getWorld().getBlockState(tile.getPos().west()).getBlock() != OurBlocks.EFFECT_BLOCK.get()) {
+            builder.vertex(matrix, x, y, z).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, x, y, maxZ).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, x, maxY, maxZ).color(red, green, blue, alpha).endVertex();
+            builder.vertex(matrix, x, maxY, z).color(red, green, blue, alpha).endVertex();
         }
         stack.pop();
-        buffer2.finish();
+        buffer2.draw(); // @mcp: draw (yarn) = finish (mcp)
     }
 }

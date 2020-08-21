@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.client.events;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.client.screen.ModeRadialMenu;
-import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;

@@ -20,8 +20,8 @@ import java.util.List;
 
 public class TemplateItem extends Item {
 
-    public TemplateItem(Properties builder) {
-        super(builder.maxStackSize(1));
+    public TemplateItem() {
+        super(OurItems.itemProperties().maxStackSize(1));
     }
 
     @Nullable
@@ -38,18 +38,15 @@ public class TemplateItem extends Item {
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        if( !playerIn.isShiftKeyDown() )
+        if( !playerIn.isSneaking() )
             return super.onItemRightClick(worldIn, playerIn, handIn);
 
         return GuiMod.MATERIAL_LIST.openScreen(playerIn)
-                ? ActionResult.resultSuccess(playerIn.getHeldItem(handIn))
+                ? ActionResult.success(playerIn.getHeldItem(handIn))
                 : super.onItemRightClick(worldIn, playerIn, handIn);
     }
 
-    /**
-     * Awful name :+1:
-     */
-    public static ItemStack getHeldCapItem(PlayerEntity player) {
+    public static ItemStack getTemplateItem(PlayerEntity player) {
         ItemStack mainhand = player.getHeldItemMainhand();
         if (mainhand.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
             return mainhand;

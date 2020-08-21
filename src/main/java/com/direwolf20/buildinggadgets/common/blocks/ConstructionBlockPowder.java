@@ -5,7 +5,9 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FallingBlock;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.item.FallingBlockEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Direction;
@@ -20,8 +22,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class ConstructionBlockPowder extends FallingBlock {
-    public ConstructionBlockPowder(Properties builder) {
-        super(builder);
+    public ConstructionBlockPowder() {
+        super(Block.Properties.create(Material.SAND).hardnessAndResistance(10f));
     }
 
     @Override
@@ -31,7 +33,7 @@ public class ConstructionBlockPowder extends FallingBlock {
     }
 
     @Override
-    public void onEndFalling(World worldIn, BlockPos pos, BlockState p_176502_3_, BlockState p_176502_4_) {
+    public void onEndFalling(World worldIn, BlockPos pos, BlockState p_176502_3_, BlockState p_176502_4_, FallingBlockEntity p_176502_5_) {
         if (worldIn.getFluidState(pos).isTagged(FluidTags.WATER))
             worldIn.addEntity(new ConstructionBlockEntity(worldIn, pos, true));
     }

@@ -1,21 +1,21 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.OurTileEntities;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.IProperty;
+import net.minecraft.state.Property;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -24,18 +24,19 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
 
 //@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
 public class ConstructionBlock extends Block /*implements IFacade*/ {
     //TODO Review which methods we are overriding -- a LOT more were added at some point, many of which I probably don't want in here :).
-    public static final IProperty<Boolean> BRIGHT = BooleanProperty.create("bright");
-    public static final IProperty<Boolean> NEIGHBOR_BRIGHTNESS = BooleanProperty.create("neighbor_brightness");
-    public static final IProperty<Boolean> AMBIENT_OCCLUSION = BooleanProperty.create("ambient_occlusion");
+    public static final Property<Boolean> BRIGHT = BooleanProperty.create("bright");
+    public static final Property<Boolean> NEIGHBOR_BRIGHTNESS = BooleanProperty.create("neighbor_brightness");
+    public static final Property<Boolean> AMBIENT_OCCLUSION = BooleanProperty.create("ambient_occlusion");
 
-    public ConstructionBlock(Properties builder) {
-        super(builder);
+    public ConstructionBlock() {
+        super(Block.Properties.create(Material.SAND).hardnessAndResistance(2f, 0f).harvestTool(ToolType.SHOVEL));
         setDefaultState(this.getStateContainer().getBaseState().with(BRIGHT, true).with(NEIGHBOR_BRIGHTNESS, false).with(AMBIENT_OCCLUSION, false));
     }
 
@@ -58,7 +59,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return ConstructionBlockTileEntity.TYPE.create();
+        return OurTileEntities.CONSTRUCTION_BLOCK_TILE_ENTITY.get().create();
     }
 
     public boolean isMimicNull(BlockState mimicBlock) {
@@ -131,29 +132,34 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
      * example, fences make their connections to this block if possible and observers pulse if this block was placed in
      * front of their detector
      */
-    @Override
-    public void updateNeighbors(BlockState stateIn, IWorld worldIn, BlockPos pos, int flags) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.updateNeighbors(worldIn, pos, flags);
-        } else {
-            super.updateNeighbors(stateIn, worldIn, pos, flags);
-        }
-    }
+// removed as of 1.16
+// todo: eval replacement
+//    @Override
+//    public void updateNeighbors(BlockState stateIn, IWorld worldIn, BlockPos pos, int flags) {
+//        BlockState mimic = getActualMimicBlock(worldIn, pos);
+//        if (!isMimicNull(mimic)) {
+//            mimic.updateNeighbors(worldIn, pos, flags);
+//        } else {
+//            super.updateNeighbors(stateIn, worldIn, pos, flags);
+//        }
+//    }
 
     /**
      * performs updates on diagonal neighbors of the target position and passes in the flags. The flags can be referenced
      * from the docs for {@link BlockState#updateDiagonalNeighbors(IWorld, BlockPos, int)}.
+     *
+     * removed as of 1.16
+     * todo: eval replacement
      */
-    @Override
-    public void updateDiagonalNeighbors(BlockState state, IWorld worldIn, BlockPos pos, int flags) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.updateDiagonalNeighbors(worldIn, pos, flags);
-        } else {
-            super.updateDiagonalNeighbors(state, worldIn, pos, flags);
-        }
-    }
+//    @Override
+//    public void updateDiagonalNeighbors(BlockState state, IWorld worldIn, BlockPos pos, int flags, int something) {
+//        BlockState mimic = getActualMimicBlock(worldIn, pos);
+//        if (!isMimicNull(mimic)) {
+//            mimic.updateDiagonalNeighbors(worldIn, pos, flags);
+//        } else {
+//            super.updateDiagonalNeighbors(state, worldIn, pos, flags, something);
+//        }
+//    }
 
     @Override
     public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
@@ -162,10 +168,11 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return !isMimicNull(mimic) ? mimic.allowsMovement(worldIn, pos, type) : super.allowsMovement(state, worldIn, pos, type);
     }
 
-    @Override
-    public boolean hasTileEntity() {
-        return true;
-    }
+// @todo: removed 1.16, find replacement
+//    @Override
+//    public boolean hasTileEntity() {
+//        return true;
+//    }
 
     @Override
     public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side) {
@@ -199,7 +206,8 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public VoxelShape getRaytraceShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
-        return !isMimicNull(mimic) ? mimic.getRaytraceShape(worldIn, pos) : super.getRaytraceShape(state, worldIn, pos);
+        // dummy is likely wrong.
+        return !isMimicNull(mimic) ? mimic.getRaytraceShape(worldIn, pos, ISelectionContext.dummy()) : super.getRaytraceShape(state, worldIn, pos);
     }
 
     @Override
@@ -208,176 +216,17 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
         return !isMimicNull(mimic) ? mimic.propagatesSkylightDown(reader, pos) : super.propagatesSkylightDown(state, reader, pos);
     }
 
-    /*@Override
-    public void randomTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        BlockState mimic = getActualMimicBlock(world, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.randomTick(world, pos, random);
-        } else {
-            super.randomTick(state, world, pos, random);
-        }
-    }
-
-    @Override
-    public void tick(BlockState state, ServerWorld worldIn, BlockPos pos, Random random) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.getBlock().tick(state, worldIn, pos, random);
-        } else {
-            super.tick(state, worldIn, pos, random);
-        }
-    }*/
-
-    /**
-     * Called periodically clientside on blocks near the player to show effects (like furnace fire particles). Note that
-     * this method is unrelated to ? and ?, and will always be called regardless
-     * of whether the block can receive random update ticks
-     */
-    /*@Override
-    public void animateTick(BlockState stateIn, World worldIn, BlockPos pos, Random rand) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            try {
-                mimic.getBlock().animateTick(stateIn, worldIn, pos, rand);
-            } catch (Exception var8) {
-                super.animateTick(stateIn, worldIn, pos, rand);
-            }
-        } else {
-            super.animateTick(stateIn, worldIn, pos, rand);
-        }
-    }*/
-
-    /**
-     * Called when a neighboring block was changed and marks that this state should perform any checks during a neighbor
-     * change. Cases may include when redstone power is updated, cactus blocks popping off due to a neighboring solid
-     * block, etc.
-     */
-    /*@Override
-    public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean p_220069_6_) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.neighborChanged(worldIn, pos, blockIn, fromPos, p_220069_6_);
-        } else {
-            super.neighborChanged(state, worldIn, pos, blockIn, fromPos, p_220069_6_);
-        }
-    }*/
-
-    /**
-     * Get the hardness of this Block relative to the ability of the given player
-     * @deprecated call via {@link BlockState#getPlayerRelativeBlockHardness(PlayerEntity, IBlockReader, BlockPos)} whenever
-     * possible. Implementing/overriding is fine.
-     */
-    /*@Override
-    public float getPlayerRelativeBlockHardness(BlockState state, PlayerEntity player, IBlockReader worldIn, BlockPos pos) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        return !isMimicNull(mimic) ? mimic.getPlayerRelativeBlockHardness(player, worldIn, pos) : super.getPlayerRelativeBlockHardness(state, player, worldIn, pos);
-    }
-
-    @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        return ! isMimicNull(mimic) ? super.onBlockActivated(state, worldIn, pos, player, handIn, hit) : super.onBlockActivated(state, worldIn, pos, player, handIn, hit);
-    }*/
-
-    /**
-     * Called when the given entity walks on this Block
-     */
-    /*@Override
-    public void onEntityWalk(World worldIn, BlockPos pos, Entity entityIn) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.getBlock().onEntityWalk(worldIn, pos, entityIn);
-        } else {
-            super.onEntityWalk(worldIn, pos, entityIn);
-        }
-    }
-
-    @Nullable
-    @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        return super.getStateForPlacement(context);
-    }
-
-    @Override
-    public void onBlockClicked(BlockState state, World worldIn, BlockPos pos, PlayerEntity player) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            super.onBlockClicked(state, worldIn, pos, player);
-            //mimic.onBlockClicked(worldIn, pos, player);
-        } else {
-            super.onBlockClicked(state, worldIn, pos, player);
-        }
-    }*/
-
-    /**
-     * @deprecated call via {@link BlockState#getWeakPower(IBlockReader, BlockPos, Direction)} whenever possible.
-     * Implementing/overriding is fine.
-     */
-    /*@Override
-    public int getWeakPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-        BlockState mimic = getActualMimicBlock(blockAccess, pos);
-        return !isMimicNull(mimic) ? mimic.getWeakPower(blockAccess, pos, side) : super.getWeakPower(blockState, blockAccess, pos, side);
-    }*/
-
-    /**
-     * @deprecated call via {@link BlockState#getStrongPower(IBlockReader, BlockPos, Direction)} whenever possible.
-     * Implementing/overriding is fine.
-     */
-    /*@Override
-    public int getStrongPower(BlockState blockState, IBlockReader blockAccess, BlockPos pos, Direction side) {
-        BlockState mimic = getActualMimicBlock(blockAccess, pos);
-        return !isMimicNull(mimic) ? mimic.getStrongPower(blockAccess, pos, side) : super.getStrongPower(blockState, blockAccess, pos, side);
-    }*/
-
-    /**
-     * @deprecated call via {@link BlockState#getPushReaction()} whenever possible. Implementing/overriding is fine.
-     */
-    /*@Override
-    public PushReaction getPushReaction(BlockState state) {
-        return PushReaction.BLOCK;
-    }*/
-
-    /**
-     * Block's chance to react to a living entity falling on it.
-     */
-    /*@Override
-    public void onFallenUpon(World worldIn, BlockPos pos, Entity entityIn, float fallDistance) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.getBlock().onFallenUpon(worldIn, pos, entityIn, fallDistance);
-        } else {
-            super.onFallenUpon(worldIn, pos, entityIn, fallDistance);
-        }
-    }*/
-
-    /**
-     * Called similar to random ticks, but only when it is raining.
-     */
-    /*@Override
-    public void fillWithRain(World worldIn, BlockPos pos) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!isMimicNull(mimic)) {
-            mimic.getBlock().fillWithRain(worldIn, pos);
-        } else {
-            super.fillWithRain(worldIn, pos);
-        }
-    }*/
-
     /**
      * @deprecated call via whenever possible.
      * Implementing/overriding is fine.
+     *
+     * todo: removed 1.16 find replacement
      */
-    @Override
-    public Vec3d getOffset(BlockState state, IBlockReader worldIn, BlockPos pos) {
-        BlockState mimic = getActualMimicBlock(worldIn, pos);
-        return !isMimicNull(mimic) ? mimic.getOffset(worldIn, pos) : super.getOffset(state, worldIn, pos);
-    }
-
-    /*@Override
-    public boolean canSustainPlant(BlockState state, IBlockReader world, BlockPos pos, Direction facing, IPlantable plantable) {
-        BlockState mimic = getActualMimicBlock(world, pos);
-        return !isMimicNull(mimic) ? mimic.canSustainPlant(world, pos, facing, plantable) : super.canSustainPlant(state, world, pos, facing, plantable);
-    }*/
+//    @Override
+//    public Vector3d getOffset(BlockState state, IBlockReader worldIn, BlockPos pos) {
+//        BlockState mimic = getActualMimicBlock(worldIn, pos);
+//        return !isMimicNull(mimic) ? mimic.getOffset(worldIn, pos) : super.getOffset(state, worldIn, pos);
+//    }
 
     // Todo re-eval
    /* @Override
@@ -404,18 +253,19 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     }*/
 
 
-    @Override
-    public boolean isNormalCube(BlockState state, IBlockReader world, BlockPos pos) {
-        BlockState mimicBlock = getActualMimicBlock(world, pos);
-        if (mimicBlock == null) {
-            return super.isNormalCube(state, world, pos);
-        }
-        try {
-            return mimicBlock.getBlock().isNormalCube(mimicBlock, world, pos);
-        } catch (Exception var8) {
-            return super.isNormalCube(state, world, pos);
-        }
-    }
+// todo: removed 1.16 - find replacement
+//    @Override
+//    public boolean isNormalCube(BlockState state, IBlockReader world, BlockPos pos) {
+//        BlockState mimicBlock = getActualMimicBlock(world, pos);
+//        if (mimicBlock == null) {
+//            return super.isNormalCube(state, world, pos);
+//        }
+//        try {
+//            return mimicBlock.getBlock().isNormalCube(mimicBlock, world, pos);
+//        } catch (Exception var8) {
+//            return super.isNormalCube(state, world, pos);
+//        }
+//    }
 
     @Deprecated
     @OnlyIn(Dist.CLIENT)

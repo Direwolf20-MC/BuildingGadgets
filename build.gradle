@@ -10,10 +10,10 @@ buildscript {
 }
 
 apply plugin: 'java'
-apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'net.minecraftforge.gradle'
+
 version = "$version"
 def env = System.getenv()
 if (env.BUILD_NUMBER) {
@@ -22,14 +22,13 @@ if (env.BUILD_NUMBER) {
 group = 'com.direwolf20.buildinggadgets'
 archivesBaseName = 'buildinggadgets'
 
-String forgeVersion = "${minecraft_version}-${forge_major}.${forge_minor}"
-String forgeName = "$forge_base:$forgeVersion"
-
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
     mappings channel: 'snapshot', version: "${mcp_mappings}"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
+
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
         client {
@@ -67,8 +66,12 @@ minecraft {
         }
     }
 }
+
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 repositories {
+    maven {
+        url "https://maven.tterrag.com/"
+    }
     maven {
         // JEI
         name = "Progwml6 maven"
@@ -80,8 +83,9 @@ repositories {
         url = "https://modmaven.k-4u.nl"
     }
 }
+
 dependencies {
-    minecraft forgeName
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_major}.${forge_minor}"
     //JEI
     compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
@@ -94,11 +98,10 @@ dependencies {
 processResources {
     inputs.property('version', project.version)
     inputs.property('forge_major', project.forge_major)
-    inputs.property('update_json', project.update_json)
 
     from(sourceSets.main.resources.srcDirs) {
         include 'META-INF/mods.toml'
-        expand 'version':project.version, 'forge_major':project.forge_major, 'update_json':project.update_json
+        expand 'version':project.version, 'forge_major':project.forge_major
     }
     
     from(sourceSets.main.resources.srcDirs) {

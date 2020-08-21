@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
-import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -41,7 +41,7 @@ public class PacketRotateMirror {
                     return;
 
                 ItemStack stack = AbstractGadget.getGadget(player);
-                Operation operation = msg.operation != null ? msg.operation : (player.isShiftKeyDown() ? Operation.MIRROR : Operation.ROTATE);
+                Operation operation = msg.operation != null ? msg.operation : (player.isSneaking() ? Operation.MIRROR : Operation.ROTATE);
 
                 if (operation == Operation.MIRROR) {
                     ((AbstractGadget) stack.getItem()).onMirror(stack, player);

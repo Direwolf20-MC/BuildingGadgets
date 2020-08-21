@@ -2,12 +2,11 @@ package com.direwolf20.buildinggadgets.common.world;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.fluid.IFluidState;
+import net.minecraft.fluid.FluidState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldType;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -41,11 +40,8 @@ public class MockBuilderWorld implements IBlockReader {
     }
 
     @Override
-    public IFluidState getFluidState(BlockPos pos) {
+    public FluidState getFluidState(BlockPos pos) {
         return null;
     }
 
-    public WorldType getWorldType() {
-        return realWorld.getWorldType();
-    }
 }

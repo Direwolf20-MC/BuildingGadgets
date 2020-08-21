@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.building;
 
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.MoreObjects;
@@ -17,7 +17,7 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
- * {@link BlockPos} and {@link BlockData} combined, to allow for placement of an {@link BlockData} in an {@link IBuildContext}. Ths class also offers serialisation
+ * {@link BlockPos} and {@link BlockData} combined, to allow for placement of an {@link BlockData} in an {@link BuildContext}. Ths class also offers serialisation
  * capabilities, though in general mapping positions to data across a structure wide-map should be preferred, as BlockData:position is a 1:n relationship.
  * <p>
  * Notice that this class is immutable as long as the {@link ITileEntityData} instance of the contained {@link BlockData} is immutable.
@@ -70,11 +70,11 @@ public final class PlacementTarget {
 
     /**
      * Attempts to place the {@link BlockData} at the specified position.
-     * @param context The {@link IBuildContext} to place in.
+     * @param context The {@link BuildContext} to place in.
      * @return Whether or not placement was performed by the underlying {@link BlockData}
-     * @see BlockData#placeIn(IBuildContext, BlockPos)
+     * @see BlockData#placeIn(BuildContext, BlockPos)
      */
-    public boolean placeIn(IBuildContext context) {
+    public boolean placeIn(BuildContext context) {
         return data.placeIn(context, pos);
     }
 
@@ -86,7 +86,7 @@ public final class PlacementTarget {
         return new PlacementTarget(getPos(), getData().rotate(rotation));
     }
 
-    public MaterialList getRequiredMaterials(IBuildContext context, @Nullable RayTraceResult target) {
+    public MaterialList getRequiredMaterials(BuildContext context, @Nullable RayTraceResult target) {
         return getData().getRequiredItems(context, target, getPos());
     }
 

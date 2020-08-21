@@ -3,23 +3,23 @@ package com.direwolf20.buildinggadgets.common.blocks;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildContext;
-import com.direwolf20.buildinggadgets.common.building.view.SimpleBuildContext;
+import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
-import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.tiles.EffectBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.tileentities.EffectBlockTileEntity;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.material.MaterialColor;
 import net.minecraft.block.material.PushReaction;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.loot.LootContext;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
@@ -45,7 +45,7 @@ public class EffectBlock extends Block {
                 BlockPos targetPos = builder.getPos();
                 BlockData targetBlock = builder.getRenderedBlock();
                 if (builder.isUsingPaste()) {
-                    world.setBlockState(targetPos, OurBlocks.constructionBlock.getDefaultState());
+                    world.setBlockState(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().getDefaultState());
                     TileEntity te = world.getTileEntity(targetPos);
                     if (te instanceof ConstructionBlockTileEntity) {
                         ((ConstructionBlockTileEntity) te).setBlockState(targetBlock, targetBlock);
@@ -57,7 +57,7 @@ public class EffectBlock extends Block {
                     if( targetBlock.getState().getBlock() instanceof LeavesBlock)
                         targetBlock = new BlockData(targetBlock.getState().with(LeavesBlock.PERSISTENT, true), targetBlock.getTileData());
 
-                    targetBlock.placeIn(SimpleBuildContext.builder().build(world), targetPos);
+                    targetBlock.placeIn(BuildContext.builder().build(world), targetPos);
                     BlockPos upPos = targetPos.up();
                     world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos, false);
                 }
@@ -81,7 +81,13 @@ public class EffectBlock extends Block {
         public abstract void onBuilderRemoved(EffectBlockTileEntity builder);
     }
 
-    public static void spawnUndoBlock(IBuildContext context, PlacementTarget target) {
+    /**
+     * As the effect block is effectively air it needs to have a material just like Air.
+     * We don't use Material.AIR as this is replaceable.
+     */
+    private static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MaterialColor.AIR).notSolid().build();
+
+    public static void spawnUndoBlock(BuildContext context, PlacementTarget target) {
         BlockState state = context.getWorld().getBlockState(target.getPos());
 
         TileEntity curTe = context.getWorld().getTileEntity(target.getPos());
@@ -94,7 +100,7 @@ public class EffectBlock extends Block {
         }
     }
 
-    public static void spawnEffectBlock(IBuildContext context, PlacementTarget target, Mode mode, boolean usePaste) {//TODO pass the buildcontext through, aka invert the overloading
+    public static void spawnEffectBlock(BuildContext context, PlacementTarget target, Mode mode, boolean usePaste) {//TODO pass the buildcontext through, aka invert the overloading
         spawnEffectBlock(context.getWorld(), target.getPos(), target.getData(), mode, usePaste);
     }
 
@@ -105,7 +111,7 @@ public class EffectBlock extends Block {
     }
 
     private static void spawnEffectBlock(@Nullable TileEntity curTe, BlockState curState, IWorld world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
-        BlockState state = OurBlocks.effectBlock.getDefaultState();
+        BlockState state = OurBlocks.EFFECT_BLOCK.get().getDefaultState();
         world.setBlockState(spawnPos, state, 3);
         assert world.getTileEntity(spawnPos) != null;
         ((EffectBlockTileEntity) world.getTileEntity(spawnPos)).initializeData(curState, curTe, spawnBlock, mode, usePaste);
@@ -114,8 +120,8 @@ public class EffectBlock extends Block {
             ((World) world).notifyBlockUpdate(spawnPos, state, state, Constants.BlockFlags.DEFAULT);
     }
 
-    public EffectBlock(Properties builder) {
-        super(builder);
+    public EffectBlock() {
+        super(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f).nonOpaque().noDrops());
     }
 
     @Override
@@ -142,11 +148,6 @@ public class EffectBlock extends Block {
     }
 
     @Override
-    public boolean isNormalCube(BlockState state, IBlockReader worldIn, BlockPos pos) {
-        return false;
-    }
-
-    @Override
     public boolean isSideInvisible(BlockState p_200122_1_, BlockState p_200122_2_, Direction p_200122_3_) {
         return true;
     }
@@ -154,10 +155,10 @@ public class EffectBlock extends Block {
     /**
      * This gets a complete list of items dropped from this block.
      *
-     * @param state Current state
+     * @param BlockState Current state
      */
     @Override
-    public List<ItemStack> getDrops(BlockState state, LootContext.Builder loot) {
+    public List<ItemStack> getDrops(BlockState p_220076_1_, LootContext.Builder p_220076_2_) {
         return new ArrayList<>();
     }
 

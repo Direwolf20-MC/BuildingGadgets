@@ -1,28 +1,23 @@
 package com.direwolf20.buildinggadgets.common.building;
 
-import com.direwolf20.buildinggadgets.common.building.placement.IPositionPlacementSequence;
-import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.spliterator.SpliteratorBackedPeekingIterator;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.PeekingIterator;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IWorldReader;
 
 import java.io.Serializable;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.Spliterator;
-import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * Represents a region in the world with a finite and nonzero size.
  */
-public final class Region implements IPositionPlacementSequence, Serializable {
+public final class Region implements Serializable {
     private static final Region ZERO = new Region(BlockPos.NULL_VECTOR);
 
     public static Region singleZero() {
@@ -82,11 +77,11 @@ public final class Region implements IPositionPlacementSequence, Serializable {
         this.maxZ = Math.max(minZ, maxZ);
     }
 
-    public Region(Vec3i vertex) {
+    public Region(Vector3i vertex) {
         this(vertex, vertex);
     }
 
-    public Region(Vec3i min, Vec3i max) {
+    public Region(Vector3i min, Vector3i max) {
         this(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
     }
 
@@ -108,11 +103,11 @@ public final class Region implements IPositionPlacementSequence, Serializable {
      * @param direction Direction to translate to
      * @return {@link Region}
      */
-    public Region translate(Vec3i direction) {
+    public Region translate(Vector3i direction) {
         return this.translate(direction.getX(), direction.getY(), direction.getZ());
     }
 
-    public Region inverseTranslate(Vec3i direction) {
+    public Region inverseTranslate(Vector3i direction) {
         return this.translate(- direction.getX(), - direction.getY(), - direction.getZ());
     }
 
@@ -192,7 +187,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
         return new Region(minX - x, minY - y, minZ - z, maxX + x, maxY + y, maxZ + z);
     }
 
-    public Region expand(Vec3i vec) {
+    public Region expand(Vector3i vec) {
         return expand(vec.getX(), vec.getY(), vec.getZ());
     }
 
@@ -224,11 +219,11 @@ public final class Region implements IPositionPlacementSequence, Serializable {
     }
 
     /**
-     * @see #collapse(int, int, int) - read x, y, and z from the {@link Vec3i}.
-     * @param vec Vec3i to collapse to
+     * @see #collapse(int, int, int) - read x, y, and z from the {@link Vector3i}.
+     * @param vec Vector3i to collapse to
      * @return {@link Region}
      */
-    public Region collapse(Vec3i vec) {
+    public Region collapse(Vector3i vec) {
         return collapse(vec.getX(), vec.getY(), vec.getZ());
     }
 
@@ -334,15 +329,15 @@ public final class Region implements IPositionPlacementSequence, Serializable {
         return z >= minZ && z <= maxZ;
     }
 
-    /**
-     * Accurate representation of whether the position is a part the structure or not.
-     *
-     * @see #contains(int, int, int)
-     */
-    @Override
-    public boolean mayContain(int x, int y, int z) {
-        return contains(x, y, z);
-    }
+//    /**
+//     * Accurate representation of whether the position is a part the structure or not.
+//     *
+//     * @see #contains(int, int, int)
+//     */
+//    @Override
+//    public boolean mayContain(int x, int y, int z) {
+//        return contains(x, y, z);
+//    }
 
     /**
      * @param x X
@@ -355,10 +350,6 @@ public final class Region implements IPositionPlacementSequence, Serializable {
         return containsX(x) && containsY(y) && containsZ(z);
     }
 
-    public boolean contains(Vec3i vec) {
-        return mayContain(vec.getX(), vec.getY(), vec.getZ());
-    }
-
     public boolean intersectsWith(Region other) {
         return this.maxX >= other.minX &&
                 this.minX <= other.maxX &&
@@ -368,48 +359,34 @@ public final class Region implements IPositionPlacementSequence, Serializable {
                 this.minY <= other.maxY;
     }
 
-    /**
-     * @return a new Region with the exact same properties
-     * @deprecated Since Region is immutable, this is not needed
-     */
-    @Deprecated
-    @Override
-    public Region copy() {
-        return new Region(minX, minY, minZ, maxX, maxY, maxZ);
+    public Stream<BlockPos> stream() {
+        return BlockPos.getAllInBox(minX, minY, minZ, maxX, maxY, maxZ).map(BlockPos::toImmutable);
     }
 
-    /**
-     * @return this
-     */
-    @Override
-    public Region getBoundingBox() {
-        return this;
-    }
+//    /**
+//     * The first result will have the minimum x, y, and z value. In the process it will advance in positive z-y-x order as used in BG-Code on various other places.
+//     * Positions provided by this Iterator may be considered ordered.
+//     *
+//     * @return A {@link PeekingIterator} over all positions in this Region
+//     * @implSpec starts at (minX, minY, minZ), ends at (maxX, maxY, maxZ)
+//     * @implNote the Iterator does not support removal Operations
+//     * @see com.direwolf20.buildinggadgets.common.util.CommonUtils#POSITION_COMPARATOR
+//     */
+//    @Override
+//    public PeekingIterator<BlockPos> iterator() {
+//        return new SpliteratorBackedPeekingIterator<>(spliterator());
+//    }
 
-    /**
-     * The first result will have the minimum x, y, and z value. In the process it will advance in positive z-y-x order as used in BG-Code on various other places.
-     * Positions provided by this Iterator may be considered ordered.
-     *
-     * @return A {@link PeekingIterator} over all positions in this Region
-     * @implSpec starts at (minX, minY, minZ), ends at (maxX, maxY, maxZ)
-     * @implNote the Iterator does not support removal Operations
-     * @see com.direwolf20.buildinggadgets.common.util.CommonUtils#POSITION_COMPARATOR
-     */
-    @Override
-    public PeekingIterator<BlockPos> iterator() {
-        return new SpliteratorBackedPeekingIterator<>(spliterator());
-    }
-
-    /**
-     * Creates a {@link Spliterator} over the positions described by this {@code Region}.
-     *
-     * @return a {@link Spliterator} over the positions described by this {@code Region}.
-     * @implSpec The returned {@link Spliterator} will be Immutable, Sorted and Sized
-     */
-    @Override
-    public Spliterator<BlockPos> spliterator() {
-        return new RegionSpliterator(this);
-    }
+//    /**
+//     * Creates a {@link Spliterator} over the positions described by this {@code Region}.
+//     *
+//     * @return a {@link Spliterator} over the positions described by this {@code Region}.
+//     * @implSpec The returned {@link Spliterator} will be Immutable, Sorted and Sized
+//     */
+//    @Override
+//    public Spliterator<BlockPos> spliterator() {
+//        return new RegionSpliterator(this);
+//    }
 
     @Override
     public String toString() {
@@ -499,10 +476,10 @@ public final class Region implements IPositionPlacementSequence, Serializable {
          *
          * @param iterable The iterable who's contents shall be in the resulting Region
          * @return The {@code Builder} to allow for Method chaining
-         * @see #enclose(Vec3i)
+         * @see #enclose(Vector3i)
          */
-        public Builder encloseAll(Iterable<? extends Vec3i> iterable) {
-            for (Vec3i vec : iterable) {
+        public Builder encloseAll(Iterable<? extends Vector3i> iterable) {
+            for (Vector3i vec : iterable) {
                 enclose(vec);
             }
             return this;
@@ -520,7 +497,7 @@ public final class Region implements IPositionPlacementSequence, Serializable {
          *
          * @return {@link Builder}
          */
-        public Builder enclose(Vec3i vec) {
+        public Builder enclose(Vector3i vec) {
             return enclose(vec.getX(), vec.getY(), vec.getZ());
         }
 
@@ -581,146 +558,5 @@ public final class Region implements IPositionPlacementSequence, Serializable {
         public Region build() {
             return new Region(minX, minY, minZ, maxX, maxY, maxZ);
         }
-    }
-
-    private static class RegionSpliterator implements Spliterator<BlockPos> {
-
-        private int minX;
-        private int minY;
-        private int minZ;
-
-        private int maxX;
-        private int maxY;
-        private int maxZ;
-
-        private int nextPosX;
-        private int nextPosY;
-        private int nextPosZ;
-
-        /**
-         * Note that as soon as this spliterator advanced once, it can no longer be guaranteed that the given blocks have not yet been visited
-         */
-        private boolean allowYZSplit;
-
-        private RegionSpliterator(Region region) {
-            this(region.getMinX(), region.getMinY(), region.getMinZ(), region.getMaxX(), region.getMaxY(), region.getMaxZ());
-        }
-
-        private RegionSpliterator(int minX, int minY, int minZ, int maxX, int maxY, int maxZ) {
-            this(minX, minY, minZ, maxX, maxY, maxZ, minX, minY, minZ, true);
-        }
-
-        private RegionSpliterator(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int posX, int posY, int posZ, boolean allowYZSplit) {
-            this.minX = minX;
-            this.minY = minY;
-            this.minZ = minZ;
-            this.maxX = maxX;
-            this.maxY = maxY;
-            this.maxZ = maxZ;
-
-            this.nextPosX = posX;
-            this.nextPosY = posY;
-            this.nextPosZ = posZ;
-            this.allowYZSplit = allowYZSplit;
-        }
-
-        @Override
-        public boolean tryAdvance(Consumer<? super BlockPos> action) {
-            if (isXOverflowed())
-                return false;
-
-            this.allowYZSplit = false;
-            BlockPos pos = new BlockPos(nextPosX, nextPosY, nextPosZ);
-
-            nextPosZ++;
-            if (isZOverflowed()) {
-                nextPosZ = minZ;
-                nextPosY++;
-            } else {
-                action.accept(pos);
-                return true;
-            }
-
-            if (isYOverflowed()) {
-                nextPosY = minY;
-                nextPosX++;
-            } else {
-                action.accept(pos);
-                return true;
-            }
-
-            // Returns (maxX, maxY, maxZ)
-            action.accept(pos);
-            return true;
-        }
-
-        /**
-         * @return A part of this {@link Spliterator}, if splitting is possible
-         */
-        @Override
-        public Spliterator<BlockPos> trySplit() {
-            int oldMinX = minX;
-            int oldMinY = minY;
-            int oldMinZ = minZ;
-            int oldPosX = nextPosX;
-            int oldPosY = nextPosY;
-            int oldPosZ = nextPosZ;
-
-            // Construct new min coordinates, so that at least one can be split of: max - min >= 1
-            if (maxX > minX) {
-                /* As Region's coordinates are inclusive, the amount of blocks along one axis is max - min + 1
-                 * half the length + base x
-                 */
-                minX = (maxX - minX + 1) / 2 + minX + 1;
-                resetPos();
-                return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, minX - 1, maxY, maxZ, oldPosX, oldPosY, oldPosZ, allowYZSplit);
-            } else if (maxY > minY && allowYZSplit) {
-                minY = (maxY - minY + 1) / 2 + minY + 1;
-                resetPos();
-                return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, maxX, minY - 1, maxZ, oldPosX, oldPosY, oldPosZ, allowYZSplit);
-            } else if (maxZ > minZ && allowYZSplit) {
-                minZ = (maxZ - minZ + 1) / 2 + minZ + 1;
-                resetPos();
-                return new RegionSpliterator(oldMinX, oldMinY, oldMinZ, maxX, maxY, minZ - 1, oldPosX, oldPosY, oldPosZ, allowYZSplit);
-            }
-            return null;
-        }
-
-        @Override
-        public long estimateSize() {
-            return (Math.abs((long) maxX - nextPosX) + 1) * (Math.abs((long) maxY - nextPosY) + 1) * (Math.abs((long) maxZ - nextPosZ + 1));
-        }
-
-        @Override
-        public int characteristics() {
-            return Spliterator.DISTINCT | Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED | Spliterator.SORTED | Spliterator.SIZED | Spliterator.SUBSIZED;
-        }
-
-        /**
-         * @return {@link com.direwolf20.buildinggadgets.common.util.CommonUtils#POSITION_COMPARATOR}
-         */
-        @Override
-        public Comparator<? super BlockPos> getComparator() {
-            return CommonUtils.POSITION_COMPARATOR;
-        }
-
-        private boolean isXOverflowed() {
-            return nextPosX > maxX;
-        }
-
-        private boolean isYOverflowed() {
-            return nextPosY > maxY;
-        }
-
-        private boolean isZOverflowed() {
-            return nextPosZ > maxZ;
-        }
-
-        private void resetPos() {
-            this.nextPosX = minX;
-            this.nextPosY = minY;
-            this.nextPosZ = minZ;
-        }
-
     }
 }

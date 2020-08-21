@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.client.screen.components;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.widget.list.ExtendedList;
@@ -24,81 +25,79 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks) {
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
         glEnable(GL_SCISSOR_TEST);
-        double guiScaleFactor = Minecraft.getInstance().getMainWindow().getGuiScaleFactor();
+        double guiScaleFactor = Minecraft.getInstance().getWindow().getGuiScaleFactor();
 
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         GL11.glScissor((int)(getLeft()  * guiScaleFactor),
-                (int)(Minecraft.getInstance().getMainWindow().getFramebufferHeight() - (getBottom() * guiScaleFactor)),
+                (int)(Minecraft.getInstance().getWindow().getFramebufferHeight() - (getBottom() * guiScaleFactor)),
                 (int)(width * guiScaleFactor),
                 (int)(height * guiScaleFactor));
 
-        renderParts(mouseX, mouseY, partialTicks);
+        renderParts(matrices, mouseX, mouseY, partialTicks);
         glDisable(GL_SCISSOR_TEST);
     }
 
     // Copied and modified from AbstractLists#render(int, int, float)
-    private void renderParts(int mouseX, int mouseY, float partialTicks) {
-        renderBackground();
+    private void renderParts(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
+        renderBackground(matrices);
         RenderSystem.disableLighting();
         RenderSystem.disableFog();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuffer();
 
-        renderContentBackground(tessellator, bufferbuilder);
+        renderContentBackground(matrices, tessellator, bufferbuilder);
 
         int k = getRowLeft();
-        int l = y0 + 4 - (int) getScrollAmount();
-        if (renderHeader) {
-            renderHeader(k, l, tessellator);
-        }
+        int l = getTop() + 4 - (int) getScrollAmount();
+        renderHeader(matrices, k, l, tessellator);
 
-        renderList(k, l, mouseX, mouseY, partialTicks);
+        renderList(matrices, k, l, mouseX, mouseY, partialTicks);
         RenderSystem.disableDepthTest();
 
         int j1 = getMaxScroll();
         if (j1 > 0) {
-            int k1 = (int) ((float) ((y1 - y0) * (y1 - y0)) / (float) getMaxPosition());
-            k1 = MathHelper.clamp(k1, 32, y1 - y0 - 8);
-            int l1 = (int) getScrollAmount() * (y1 - y0 - k1) / j1 + y0;
-            if (l1 < y0) {
-                l1 = y0;
+            int k1 = (int) ((float) ((getBottom() - getTop()) * (getBottom() - getTop())) / (float) getMaxPosition());
+            k1 = MathHelper.clamp(k1, 32, getBottom() - getTop() - 8);
+            int l1 = (int) getScrollAmount() * (getBottom() - getTop() - k1) / j1 + getTop();
+            if (l1 < getTop()) {
+                l1 = getTop();
             }
-            int x1 = getScrollbarPosition();
+            int x1 = getScrollbarPositionX();
             int x2 = x1 + 6;
 
             RenderSystem.disableTexture();
             bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-            bufferbuilder.pos(x1, y1, 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.pos(x2, y1, 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.pos(x2, y0, 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.pos(x1, y0, 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(x1, getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(x2, getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(x2, getTop(), 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(x1, getTop(), 0.0D).color(0, 0, 0, 255).endVertex();
 
-            bufferbuilder.pos(x1, (l1 + k1), 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.pos(x2, (l1 + k1), 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.pos(x2, l1, 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.pos(x1, l1, 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(x1, (l1 + k1), 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(x2, (l1 + k1), 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(x2, l1, 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(x1, l1, 0.0D).color(128, 128, 128, 255).endVertex();
 
-            bufferbuilder.pos(x1, (l1 + k1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.pos((x2 - 1), (l1 + k1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.pos((x2 - 1), l1, 0.0D).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.pos(x1, l1, 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex(x1, (l1 + k1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex((x2 - 1), (l1 + k1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex((x2 - 1), l1, 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex(x1, l1, 0.0D).color(192, 192, 192, 255).endVertex();
             tessellator.draw();
         }
 
-        renderDecorations(mouseX, mouseX);
+        renderDecorations(matrices, mouseX, mouseX);
         RenderSystem.enableTexture();
         RenderSystem.disableBlend();
     }
 
-    protected void renderContentBackground(Tessellator tessellator, BufferBuilder bufferbuilder) {
-        fillGradient(getLeft(), getTop(), getRight(), getBottom(), 0xC0101010, 0xD0101010);
+    protected void renderContentBackground(MatrixStack matrices, Tessellator tessellator, BufferBuilder bufferbuilder) {
+        fillGradient(matrices, getLeft(), getTop(), getRight(), getBottom(), 0xC0101010, 0xD0101010);
     }
 
-    // No dirt top/bottom background
     @Override
-    protected void renderHoleBackground(int p_renderHoleBackground_1_, int p_renderHoleBackground_2_, int p_renderHoleBackground_3_, int p_renderHoleBackground_4_) {
+    protected void renderBackground(MatrixStack p_230433_1_) {
+        super.renderBackground(p_230433_1_);
     }
 
     @Override
@@ -128,15 +127,6 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
 
     // Copied from AbstractList#getMaxScroll because it is private
     public final int getMaxScroll() {
-        return Math.max(0, this.getMaxPosition() - (this.y1 - this.y0 - 4));
-    }
-
-    // TODO wait until mcp fixes naming error, remove
-    public int getLeft() {
-        return this.x0;
-    }
-
-    public int getRight() {
-        return this.x1;
+        return Math.max(0, this.getMaxPosition() - (this.getBottom() - this.getTop() - 4));
     }
 }

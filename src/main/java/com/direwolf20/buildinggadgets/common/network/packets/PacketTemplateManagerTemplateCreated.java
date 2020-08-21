@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.common.registry.OurItems;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import net.minecraft.item.ItemStack;
@@ -47,7 +47,7 @@ public final class PacketTemplateManagerTemplateCreated extends UUIDPacket {
                     TileEntity tileEntity = world.getTileEntity(pos);
                     if (tileEntity != null) {
                         tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
-                            ItemStack stack = new ItemStack(OurItems.template);
+                            ItemStack stack = new ItemStack(OurItems.TEMPLATE_ITEM.get());
                             ITemplateKey key = stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
                             UUID id = key.getTemplateId(this::getId);
                             if (! id.equals(getId()))

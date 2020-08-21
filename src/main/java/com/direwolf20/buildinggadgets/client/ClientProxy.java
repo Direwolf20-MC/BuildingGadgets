@@ -3,15 +3,18 @@ package com.direwolf20.buildinggadgets.client;
 import com.direwolf20.buildinggadgets.client.cache.CacheTemplateProvider;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.models.ConstructionBakedModel;
+import com.direwolf20.buildinggadgets.client.screen.TemplateManagerGUI;
+import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
+import com.direwolf20.buildinggadgets.common.containers.OurContainers;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
-import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
-import com.direwolf20.buildinggadgets.common.registry.Registries;
-import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
+import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
+import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.SimpleSound;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraft.client.renderer.model.BakedQuad;
@@ -23,7 +26,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.ILightReader;
+import net.minecraft.world.IBlockDisplayReader;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -49,9 +52,10 @@ public class ClientProxy {
         MinecraftForge.EVENT_BUS.addListener(EventTooltip::onDrawTooltip);
         MinecraftForge.EVENT_BUS.addListener(ClientProxy::onPlayerLoggedOut);
 
-        // @michaelhillcox: I have questions on why this is here
-        Registries.clientSetup();
-        RenderTypeLookup.setRenderLayer(OurBlocks.constructionBlock, (RenderType) -> true);
+        ScreenManager.registerFactory(OurContainers.TEMPLATE_MANAGER_CONTAINER.get(), TemplateManagerGUI::new);
+        ((ConstructionBlock) OurBlocks.CONSTRUCTION_BLOCK.get()).initColorHandler(Minecraft.getInstance().getBlockColors());
+
+        RenderTypeLookup.setRenderLayer(OurBlocks.CONSTRUCTION_BLOCK.get(), (RenderType) -> true);
     }
 
     private static void registerSprites(TextureStitchEvent.Pre event) {
@@ -88,7 +92,7 @@ public class ClientProxy {
             }
 
             @Override
-            public boolean func_230044_c_() {
+            public boolean isSideLit() {
                 return false;
             }
 
@@ -108,7 +112,7 @@ public class ClientProxy {
                 facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 RenderType layer = MinecraftForgeClient.getRenderLayer();
                 if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
-                    facadeState = OurBlocks.constructionBlockDense.getDefaultState();
+                    facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
                 if (layer != null && ! RenderTypeLookup.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
@@ -130,7 +134,7 @@ public class ClientProxy {
 
             @Nonnull
             @Override
-            public IModelData getModelData(@Nonnull ILightReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+            public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
                 return tileData;
             }
         };
@@ -144,7 +148,7 @@ public class ClientProxy {
             }
 
             @Override
-            public boolean func_230044_c_() {
+            public boolean isSideLit() {
                 return false;
             }
 
@@ -164,7 +168,7 @@ public class ClientProxy {
                 facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 RenderType layer = MinecraftForgeClient.getRenderLayer();
                 if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
-                    facadeState = OurBlocks.constructionBlockDense.getDefaultState();
+                    facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
                 if (layer != null && ! RenderTypeLookup.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
@@ -186,7 +190,7 @@ public class ClientProxy {
 
             @Nonnull
             @Override
-            public IModelData getModelData(@Nonnull ILightReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+            public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
                 return tileData;
             }
         };

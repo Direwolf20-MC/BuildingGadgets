@@ -5,22 +5,20 @@ import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.items.InventoryWrapper;
-import com.direwolf20.buildinggadgets.common.items.gadgets.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.items.gadgets.modes.AbstractMode;
+import com.direwolf20.buildinggadgets.common.inventory.InventoryLinker;
+import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.items.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.items.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.template.Template;
 import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
-import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
+import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -31,20 +29,13 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceContext;
+import net.minecraft.util.math.*;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -187,13 +178,14 @@ public class GadgetUtils {
         return res;
     }
 
-    public static void bindToolToTE(ItemStack stack, PlayerEntity player) {
+    public static void linkToInventory(ItemStack stack, PlayerEntity player) {
         World world = player.world;
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, AbstractGadget.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
         if (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())
             return;
 
-        ActionResultType result = setRemoteInventory(stack, player, world, lookingAt.getPos(), true);
+        InventoryLinker.Result result = InventoryLinker.linkInventory(player.world, stack, lookingAt);
+        player.sendStatusMessage(new TranslationTextComponent(result.getI18n().getTranslationKey()), true);
     }
 
     public static ActionResult<Block> selectBlock(ItemStack stack, PlayerEntity player) {
@@ -201,11 +193,11 @@ public class GadgetUtils {
         World world = player.world;
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, AbstractGadget.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
         if (world.isAirBlock(lookingAt.getPos()))
-            return ActionResult.resultFail(Blocks.AIR);
+            return ActionResult.fail(Blocks.AIR);
 
         BlockState state = world.getBlockState(lookingAt.getPos());
         if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock()) || state.getBlock() instanceof EffectBlock)
-            return ActionResult.resultFail(state.getBlock());
+            return ActionResult.fail(state.getBlock());
 
         Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getPos(), player.getActiveHand());
         data.ifPresent(placeState -> {
@@ -215,7 +207,7 @@ public class GadgetUtils {
             setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));
         });
 
-        return ActionResult.resultSuccess(state.getBlock());
+        return ActionResult.success(state.getBlock());
     }
 
     public static ActionResultType setRemoteInventory(ItemStack stack, PlayerEntity player, World world, BlockPos pos, boolean setTool) {
@@ -229,8 +221,7 @@ public class GadgetUtils {
             setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockData());
             return ActionResultType.SUCCESS;
         }
-        if (setRemoteInventory(player, stack, pos, world))
-            return ActionResultType.SUCCESS;
+
 
         return ActionResultType.FAIL;
     }
@@ -267,60 +258,6 @@ public class GadgetUtils {
         return true;
     }
 
-    public static boolean setRemoteInventory(PlayerEntity player, ItemStack tool, BlockPos pos, World world) {
-        if (getRemoteInventory(pos, DimensionType.getKey(player.dimension), world) != null) {
-            boolean same = pos.equals(getPOSFromNBT(tool, NBTKeys.REMOTE_INVENTORY_POS));
-            writePOSToNBT(tool, same ? null : pos, NBTKeys.REMOTE_INVENTORY_POS, player.dimension);
-            player.sendStatusMessage(new StringTextComponent(TextFormatting.AQUA + new TranslationTextComponent("message.gadget." + (same ? "unboundTE" : "boundTE")).getUnformattedComponentText()), true);
-            return true;
-        }
-        return false;
-    }
-
-    @Nullable
-    public static IItemHandler getRemoteInventory(ItemStack tool, World world) {
-         return getRemoteInventory(tool, world, NetworkIO.Operation.EXTRACT);
-
-    }
-    @Nullable
-    public static IItemHandler getRemoteInventory(ItemStack tool, World world, NetworkIO.Operation operation) {
-        ResourceLocation dim = getDIMFromNBT(tool, NBTKeys.REMOTE_INVENTORY_POS);
-        if (dim == null) return null;
-        BlockPos pos = getPOSFromNBT(tool, NBTKeys.REMOTE_INVENTORY_POS);
-        return pos == null ? null : getRemoteInventory(pos, dim, world /*, operation*/);
-    }
-
-    @Nullable
-    public static IItemHandler getRemoteInventory(BlockPos pos, ResourceLocation dim, World world) {
-        return getRemoteInventory(pos, dim, world, NetworkIO.Operation.EXTRACT);
-    }
-
-    @Nullable
-    public static IItemHandler getRemoteInventory(BlockPos pos, ResourceLocation dimName, World world, NetworkIO.Operation operation) {
-        DimensionType dim = DimensionType.byName(dimName);
-        if (dim == null) return null;
-        MinecraftServer server = world.getServer();
-        if (server == null) return null;
-        World worldServer = server.getWorld(dim);
-
-        return getRemoteInventory(pos, worldServer, operation);
-    }
-
-    @Nullable
-    public static IItemHandler getRemoteInventory(BlockPos pos, World world, NetworkIO.Operation operation) {
-
-        TileEntity te = world.getTileEntity(pos);
-        if (te == null) return null;
-        //IItemHandler network = RefinedStorage.getWrappedNetwork(te, operation);
-        //if (network != null) return network;
-
-        LazyOptional<IItemHandler> cap = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-        if( !cap.isPresent() )
-            return null;
-
-        return cap.orElseThrow(CapabilityNotPresentException::new);
-    }
-
     public static String withSuffix(int count) {
         if (count < 1000) return "" + count;
         int exp = (int) (Math.log(count) / Math.log(1000));
@@ -340,23 +277,6 @@ public class GadgetUtils {
             return;
         }
         tagCompound.put(tagName, NBTUtil.writeBlockPos(pos));
-        stack.setTag(tagCompound);
-    }
-
-    public static void writePOSToNBT(ItemStack stack, @Nullable BlockPos pos, String tagName, DimensionType dimension) {
-        CompoundNBT tagCompound = stack.getTag();
-        if (tagCompound == null) {
-            tagCompound = new CompoundNBT();
-        }
-        if (pos == null) {
-            tagCompound.get(tagName);
-            tagCompound.remove(tagName);
-            stack.setTag(tagCompound);
-            return;
-        }
-        CompoundNBT posTag = NBTUtil.writeBlockPos(pos);
-        posTag.putString(NBTKeys.GADGET_DIM, DimensionType.getKey(dimension).toString());
-        tagCompound.put(tagName, posTag);
         stack.setTag(tagCompound);
     }
 
@@ -394,8 +314,9 @@ public class GadgetUtils {
         if (tileEntity != null) {
             LazyOptional<IItemHandler> cap = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
             cap.ifPresent(handler -> {
-                if (handler instanceof IItemHandlerModifiable)
-                    net.minecraft.inventory.InventoryHelper.dropInventoryItems(world, pos, new InventoryWrapper((IItemHandlerModifiable) handler));
+                for (int i = 0; i < handler.getSlots(); i++) {
+                    net.minecraft.inventory.InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), handler.getStackInSlot(i));
+                }
             });
         }
     }

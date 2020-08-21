@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.client.screen.components;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.util.text.StringTextComponent;
 
 import java.util.function.BiConsumer;
 
@@ -11,7 +12,7 @@ public class GuiTextFieldBase extends TextFieldWidget {
     private BiConsumer<GuiTextFieldBase, String> postModification;
 
     public GuiTextFieldBase(FontRenderer fontRenderer, int x, int y, int width) {
-        super(fontRenderer, x, y, width, 15,"");
+        super(fontRenderer, x, y, width, 15, StringTextComponent.EMPTY);
 
         setMaxStringLength(50);
         setValidator(s -> {

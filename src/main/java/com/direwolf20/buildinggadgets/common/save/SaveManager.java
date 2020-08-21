@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.save;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.SaveReference;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.WorldSavedData;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
@@ -35,7 +35,7 @@ public enum SaveManager {
 
     public void onServerStarted(FMLServerStartedEvent event) {
         BuildingGadgets.LOG.debug("Loading World Saves.");
-        ServerWorld world = event.getServer().getWorld(DimensionType.OVERWORLD);
+        ServerWorld world = event.getServer().getWorld(World.OVERWORLD);
         for (UndoSaveContainer c : undoSaves) {
             c.acquire(world);
         }

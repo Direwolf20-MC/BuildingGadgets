@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.client.renderer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.util.math.vector.Matrix4f;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;
@@ -22,9 +22,7 @@ public class DireVertexBuffer implements AutoCloseable {
     }
 
     public void bindBuffer() {
-        RenderSystem.glBindBuffer(34962, () -> {
-            return this.glBufferId;
-        });
+        RenderSystem.glBindBuffer(34962, () -> this.glBufferId);
     }
 
     public void upload(DireBufferBuilder bufferIn) {
@@ -71,9 +69,7 @@ public class DireVertexBuffer implements AutoCloseable {
     }
 
     public static void unbindBuffer() {
-        RenderSystem.glBindBuffer(34962, () -> {
-            return 0;
-        });
+        RenderSystem.glBindBuffer(34962, () -> 0);
     }
 
     public void close() {
