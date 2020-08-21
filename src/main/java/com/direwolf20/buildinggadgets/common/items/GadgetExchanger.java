@@ -295,19 +295,14 @@ public class GadgetExchanger extends AbstractGadget {
             Iterator<ImmutableMultiset<IUniqueObject<?>>> it = materials.iterator();
             Multiset<IUniqueObject<?>> producedItems = LinkedHashMultiset.create();
 
-            if (!buildContext.getStack().isEnchanted()) {
-                // #sorrynotsorry
-                if (!buildContext.getStack().isEnchanted()) {
-                    // enchants context.getStack().getEnchantmentTagList()
-                    List<ItemStack> drops = Block.getDrops(currentBlock, (ServerWorld) buildContext.getWorld(), pos, buildContext.getWorld().getTileEntity(pos));
-
-                    producedItems.addAll(drops.stream().map(UniqueItem::ofStack).collect(Collectors.toList()));
-                    index.insert(producedItems);
-                }
-            } else {
+            if (buildContext.getStack().isEnchanted() && EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, buildContext.getStack()) > 0) {
                 producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
-                index.insert(producedItems);
+            } else {
+                List<ItemStack> drops = Block.getDrops(currentBlock, (ServerWorld) buildContext.getWorld(), pos, buildContext.getWorld().getTileEntity(pos));
+                producedItems.addAll(drops.stream().map(UniqueItem::ofStack).collect(Collectors.toList()));
             }
+
+            index.insert(producedItems);
 
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.REPLACE, useConstructionPaste);
         }
