@@ -96,7 +96,7 @@ public class Config {
                         .defineInRange("Energy Cost", energyCost, 0, Integer.MAX_VALUE);
 
                 this.undoSize = SERVER_BUILDER
-                        .comment("The Gadget's Max Undo size")
+                        .comment("The Gadget's Max Undo size (Note, the exchanger does not support undo)")
                         .defineInRange("Max Undo History Size", getMaxUndo, 0, 128);
 
                 SERVER_BUILDER.pop();
