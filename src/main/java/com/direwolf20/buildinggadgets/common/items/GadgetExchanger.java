@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
+import com.direwolf20.buildinggadgets.client.renders.BuildRender;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
@@ -12,14 +14,12 @@ import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.items.modes.ExchangingModes;
-import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
-import com.direwolf20.buildinggadgets.client.renders.BuildRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
-import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -31,6 +31,8 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.LinkedHashMultiset;
+import com.google.common.collect.Multiset;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -58,16 +60,17 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
@@ -76,8 +79,8 @@ public class GadgetExchanger extends AbstractGadget {
 
     public GadgetExchanger() {
         super(OurItems.nonStackableItemProperties().maxDamage(1),
-                Config.GADGETS.GADGET_EXCHANGER.undoSize::get,
-                Reference.SaveReference.UNDO_EXCHANGING,
+                () -> 0,
+                "",
                 TagReference.WHITELIST_EXCHANGING,
                 TagReference.BLACKLIST_EXCHANGING);
     }
@@ -228,7 +231,6 @@ public class GadgetExchanger extends AbstractGadget {
             setAnchor(stack); // Remove the anchor
         }
 
-        Undo.Builder builder = Undo.builder();
         IItemIndex index = InventoryHelper.index(stack, player);
 
         //TODO replace fakeWorld
@@ -236,13 +238,11 @@ public class GadgetExchanger extends AbstractGadget {
         for (BlockPos coordinate : coords) {
             //Get the extended block state in the fake world Disabled to fix Chisel
             //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-            exchangeBlock(world, player, index, builder, coordinate, blockData);
+            exchangeBlock(world, player, index, coordinate, blockData);
         }
-
-        pushUndo(stack, builder.build(world));
     }
 
-    private void exchangeBlock(ServerWorld world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
+    private void exchangeBlock(ServerWorld world, ServerPlayerEntity player, IItemIndex index, BlockPos pos, BlockData setBlock) {
         BlockState currentBlock = world.getBlockState(pos);
         ITileEntityData data;
 
@@ -286,8 +286,6 @@ public class GadgetExchanger extends AbstractGadget {
         this.applyDamage(tool, player);
 
         if (index.applyMatch(match)) {
-            ImmutableMultiset<IUniqueObject<?>> usedItems = match.getChosenOption();
-
             MaterialList materials = te instanceof ConstructionBlockTileEntity ? InventoryHelper.PASTE_LIST : data.getRequiredItems(
                     buildContext,
                     currentBlock,
@@ -295,9 +293,22 @@ public class GadgetExchanger extends AbstractGadget {
                     pos);
 
             Iterator<ImmutableMultiset<IUniqueObject<?>>> it = materials.iterator();
-            ImmutableMultiset<IUniqueObject<?>> producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
-            index.insert(producedItems);
-            builder.record(world, pos, setBlock, usedItems, producedItems);
+            Multiset<IUniqueObject<?>> producedItems = LinkedHashMultiset.create();
+
+            if (!buildContext.getStack().isEnchanted()) {
+                // #sorrynotsorry
+                if (!buildContext.getStack().isEnchanted()) {
+                    // enchants context.getStack().getEnchantmentTagList()
+                    List<ItemStack> drops = Block.getDrops(currentBlock, (ServerWorld) buildContext.getWorld(), pos, buildContext.getWorld().getTileEntity(pos));
+
+                    producedItems.addAll(drops.stream().map(UniqueItem::ofStack).collect(Collectors.toList()));
+                    index.insert(producedItems);
+                }
+            } else {
+                producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
+                index.insert(producedItems);
+            }
+
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.REPLACE, useConstructionPaste);
         }
     }
@@ -313,12 +324,6 @@ public class GadgetExchanger extends AbstractGadget {
     @Override
     public int getUseDuration(ItemStack stack) {
         return 20;
-    }
-
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public boolean hasEffect(ItemStack stack) {
-        return false;
     }
 
     @Override

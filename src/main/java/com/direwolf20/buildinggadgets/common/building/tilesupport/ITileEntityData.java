@@ -53,10 +53,13 @@ public interface ITileEntityData {
         } catch (Exception e) {
             BuildingGadgets.LOG.trace("Failed to retrieve pickBlock for {}.", state, e);
         }
+
         if (stack == null)
             stack = new ItemStack(state.getBlock());
+
         if (stack.isEmpty())
             return MaterialList.empty();
+
         return MaterialList.of(UniqueItem.ofStack(stack));
     }
 }
