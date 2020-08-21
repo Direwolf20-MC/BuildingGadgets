@@ -97,7 +97,7 @@ public abstract class AbstractMode {
         boolean hasSingeValid = false;
         for(Direction direction : Direction.values()) {
             BlockPos offset = pos.offset(direction);
-            if( context.getWorld().isAirBlock(offset) || worldBlockState.isSideInvisible(worldBlockState, direction) ) {
+            if( context.getWorld().isAirBlock(offset) ) {
                 hasSingeValid = true;
                 break;
             }
