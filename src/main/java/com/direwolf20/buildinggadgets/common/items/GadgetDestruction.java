@@ -226,7 +226,7 @@ public class GadgetDestruction extends AbstractGadget {
             return false;
 
         if (! world.isRemote) {
-            BlockSnapshot blockSnapshot = BlockSnapshot.create(world, voidPos);
+            BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getRegistryKey(), world, voidPos);
             if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP))
                 return false;
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);

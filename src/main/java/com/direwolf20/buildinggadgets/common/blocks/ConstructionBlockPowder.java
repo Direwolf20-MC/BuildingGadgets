@@ -15,6 +15,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 
@@ -38,7 +39,7 @@ public class ConstructionBlockPowder extends FallingBlock {
             worldIn.addEntity(new ConstructionBlockEntity(worldIn, pos, true));
     }
 
-    private boolean tryTouchWater(IWorld worldIn, BlockPos pos) {
+    private boolean tryTouchWater(World worldIn, BlockPos pos) {
         boolean foundWater = false;
 
         for (Direction enumFacing : Direction.values()) {
@@ -49,8 +50,8 @@ public class ConstructionBlockPowder extends FallingBlock {
         }
 
         if (foundWater) {
-            if (worldIn.getWorld().getEntitiesWithinAABB(ConstructionBlockEntity.class, new AxisAlignedBB(pos.getX() - 0.5, pos.getY() - 0.5, pos.getZ() - 0.5, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)).isEmpty()) {
-                worldIn.addEntity(new ConstructionBlockEntity(worldIn.getWorld(), pos, true));
+            if (worldIn.getEntitiesWithinAABB(ConstructionBlockEntity.class, new AxisAlignedBB(pos.getX() - 0.5, pos.getY() - 0.5, pos.getZ() - 0.5, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)).isEmpty()) {
+                worldIn.addEntity(new ConstructionBlockEntity(worldIn, pos, true));
             }
         }
 

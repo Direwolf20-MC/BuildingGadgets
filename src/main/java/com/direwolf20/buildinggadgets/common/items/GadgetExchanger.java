@@ -278,7 +278,7 @@ public class GadgetExchanger extends AbstractGadget {
         if (! player.isAllowEdit() || ! world.isBlockModifiable(player, pos))
             return;
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.create(world, pos);
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getRegistryKey(), world, pos);
         BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP) || MinecraftForge.EVENT_BUS.post(e))
             return;

@@ -20,6 +20,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
@@ -52,15 +53,6 @@ public class MockDelegationWorld implements IWorld {
 
     public Set<Entry<BlockPos, BlockInfo>> entrySet() {
         return Collections.unmodifiableSet(posToBlock.entrySet());
-    }
-
-    public void addBlock(@Nonnull BlockPos pos, BlockData data) {
-        addBlock(null, pos, data);
-    }
-
-    public void addBlock(@Nullable BuildContext context, @Nonnull BlockPos pos, BlockData data) {
-        if (data != null)
-            data.placeIn(BuildContext.builderOf(context).build(this.getWorld()), pos);
     }
 
     public IWorld getDelegate() {
@@ -109,6 +101,11 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
+    public DynamicRegistries getRegistryManager() {
+        return null;
+    }
+
+    @Override
     public boolean removeBlock(BlockPos blockPos, boolean b) {
         return removeOverride(blockPos);
     }
@@ -116,22 +113,6 @@ public class MockDelegationWorld implements IWorld {
     @Override
     public boolean hasBlockState(BlockPos p_217375_1_, Predicate<BlockState> p_217375_2_) {
         return p_217375_2_.test(getBlockState(p_217375_1_));
-    }
-
-    /**
-     * gets the current fullness of the moon expressed as a float between 1.0 and 0.0, in steps of .25
-     */
-    @Override
-    public float getCurrentMoonPhaseFactor() {
-        return delegate.getCurrentMoonPhaseFactor();
-    }
-
-    /**
-     * calls calculateCelestialAngle
-     */
-    @Override
-    public float getCelestialAngle(float partialTicks) {
-        return delegate.getCelestialAngle(partialTicks);
     }
 
     @Override
@@ -156,11 +137,6 @@ public class MockDelegationWorld implements IWorld {
     @Override
     public IChunk getChunk(int chunkX, int chunkZ) {
         return delegate.getChunk(chunkX, chunkZ);
-    }
-
-    @Override
-    public World getWorld() {
-        return delegate.getWorld();
     }
 
     @Override

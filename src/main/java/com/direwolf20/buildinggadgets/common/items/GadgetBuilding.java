@@ -256,7 +256,7 @@ public class GadgetBuilding extends AbstractGadget {
                 useConstructionPaste = true;
         }
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.create(world, pos);
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getRegistryKey(), world, pos);
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP) || ! world.isBlockModifiable(player, pos) || !this.canUse(heldItem, player))
             return;
 

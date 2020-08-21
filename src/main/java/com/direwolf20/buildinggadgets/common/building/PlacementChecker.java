@@ -13,8 +13,10 @@ import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresen
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.WaterFluid;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.IServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.LazyOptional;
@@ -73,13 +75,14 @@ public final class PlacementChecker {
                 return new CheckResult(match, insertedItems, false, false);
             usePaste = true;
         }
-        BlockSnapshot blockSnapshot = BlockSnapshot.create(context.getWorld(), target.getPos());
+
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(context.getServerWorld().getRegistryKey(), context.getWorld(), target.getPos());
         boolean isAir = blockSnapshot.getCurrentBlock().isAir(context.getWorld(), target.getPos());
         if (firePlaceEvents && ForgeEventFactory.onBlockPlace(context.getPlayer(), blockSnapshot, Direction.UP))
             return new CheckResult(match, insertedItems, false, usePaste);
         if (! isAir) {
             if (firePlaceEvents) {
-                BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(context.getWorld().getWorld(),
+                BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(context.getServerWorld(),
                         target.getPos(), blockSnapshot.getCurrentBlock(),
                         context.getPlayer());
                 if (MinecraftForge.EVENT_BUS.post(e))

@@ -102,7 +102,7 @@ public class InventoryHelper {
                         .addDependency(Reference.HandleProviderReference.STACK_HANDLER_ITEM_HANDLE_RL, Reference.MARKER_AFTER_RL)));
     }
 
-    public static boolean giveItem(ItemStack itemStack, PlayerEntity player, IWorld world) {
+    public static boolean giveItem(ItemStack itemStack, PlayerEntity player, World world) {
         if (player.isCreative()) {
             return true;
         }
@@ -127,7 +127,7 @@ public class InventoryHelper {
 
         //Try to insert into the remote inventory.
         ItemStack tool = AbstractGadget.getGadget(player);
-        IItemHandler remoteInventory = InventoryLinker.getLinkedInventory(world.getWorld(), tool).orElse(new EmptyHandler());
+        IItemHandler remoteInventory = InventoryLinker.getLinkedInventory(world, tool).orElse(new EmptyHandler());
         if (remoteInventory.getSlots() > 0) {
             for (int i = 0; i < remoteInventory.getSlots(); i++) {
                 ItemStack containerItem = remoteInventory.getStackInSlot(i);

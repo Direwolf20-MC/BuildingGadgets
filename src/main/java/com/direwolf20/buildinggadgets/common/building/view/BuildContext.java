@@ -2,8 +2,10 @@ package com.direwolf20.buildinggadgets.common.building.view;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -20,19 +22,6 @@ public final class BuildContext {
      */
     public static Builder builder() {
         return new Builder();
-    }
-
-    /**
-     * @param context The context to copy. If null, then this Method acts as if calling {@link #builder()}.
-     * @return A new {@link Builder} with all values copied from the specified {@link BuildContext}.
-     */
-    public static Builder builderOf(@Nullable BuildContext context) {
-        Builder builder = builder();
-        if (context == null) {
-            return builder;
-        }
-
-        return builder.world(context.getWorld()).player(context.getPlayer()).stack(context.getStack());
     }
 
     @Nonnull
@@ -65,6 +54,10 @@ public final class BuildContext {
 
     public ItemStack getStack() {
         return stack;
+    }
+
+    public ServerWorld getServerWorld() {
+        return ((IServerWorld) world).getWorld();
     }
 
     /**

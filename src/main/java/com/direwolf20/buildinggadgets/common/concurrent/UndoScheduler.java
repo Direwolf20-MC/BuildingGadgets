@@ -73,7 +73,7 @@ public final class UndoScheduler extends SteppedScheduler {
             return;
         }
         if (! state.isAir(context.getWorld(), entry.getKey())) {
-            BreakEvent event = new BreakEvent(context.getWorld().getWorld(), entry.getKey(), state, context.getPlayer());
+            BreakEvent event = new BreakEvent(context.getServerWorld(), entry.getKey(), state, context.getPlayer());
             if (MinecraftForge.EVENT_BUS.post(event)) {
                 lastWasSuccess = false;
                 return;

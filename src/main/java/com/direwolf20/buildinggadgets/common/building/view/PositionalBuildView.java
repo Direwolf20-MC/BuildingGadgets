@@ -24,32 +24,6 @@ public final class PositionalBuildView implements IBuildView {
     private BlockPos translation;
     private BuildContext context;
 
-    public static <T> PositionalBuildView ofIterable(BuildContext context, Iterable<T> iterable, Function<? super T, ? extends BlockPos> keyExtractor, Function<? super T, BlockData> dataExtractor) {
-        ImmutableMap.Builder<BlockPos, BlockData> builder = ImmutableMap.builder();
-        Region.Builder regBuilder = iterable.iterator().hasNext() ? Region.enclosingBuilder() : Region.builder();
-        for (T target : iterable) {
-            BlockPos pos = keyExtractor.apply(target);
-            BlockData data = dataExtractor.apply(target);
-            builder.put(pos, data);
-            regBuilder.enclose(pos);
-        }
-        return createUnsafe(context, builder.build(), regBuilder.build());
-    }
-
-    public static PositionalBuildView ofIterable(BuildContext context, Iterable<PlacementTarget> iterable) {
-        return ofIterable(context, iterable, PlacementTarget::getPos, PlacementTarget::getData);
-    }
-
-    public static PositionalBuildView create(BuildContext context, Map<BlockPos, BlockData> map) {
-        if (map instanceof ImmutableMap) {
-            Region.Builder regBuilder = map.isEmpty() ? Region.builder() : Region.enclosingBuilder();
-            for (BlockPos pos : map.keySet()) {
-                regBuilder.enclose(pos);
-            }
-            return createUnsafe(context, map, regBuilder.build());
-        } else
-            return ofIterable(context, map.entrySet(), Map.Entry::getKey, Map.Entry::getValue);
-    }
 
     public static PositionalBuildView createUnsafe(BuildContext context, Map<BlockPos, BlockData> map, Region boundingBox) {
         return new PositionalBuildView(
