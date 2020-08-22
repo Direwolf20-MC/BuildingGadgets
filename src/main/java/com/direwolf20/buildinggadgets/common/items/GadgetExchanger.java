@@ -13,6 +13,7 @@ import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.items.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
@@ -32,6 +33,8 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.google.common.collect.ImmutableMultiset;
+import com.google.common.collect.LinkedHashMultiset;
+import com.google.common.collect.Multiset;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -69,6 +72,7 @@ import net.minecraftforge.event.world.BlockEvent;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
@@ -229,7 +233,6 @@ public class GadgetExchanger extends AbstractGadget {
             setAnchor(stack); // Remove the anchor
         }
 
-        Undo.Builder builder = Undo.builder();
         IItemIndex index = InventoryHelper.index(stack, player);
         if (blockData.getState() != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             //TODO replace fakeWorld
@@ -238,13 +241,12 @@ public class GadgetExchanger extends AbstractGadget {
                 //Get the extended block state in the fake world
                 //Disabled to fix Chisel
                 //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
-                exchangeBlock(world, player, index, builder, coordinate, blockData);
+                exchangeBlock(world, player, index, coordinate, blockData);
             }
         }
-        pushUndo(stack, builder.build(world.getDimension().getType()));
     }
 
-    private boolean exchangeBlock(ServerWorld world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
+    private boolean exchangeBlock(ServerWorld world, ServerPlayerEntity player, IItemIndex index, BlockPos pos, BlockData setBlock) {
         BlockState currentBlock = world.getBlockState(pos);
         ITileEntityData data;
         TileEntity te = world.getTileEntity(pos);
@@ -297,8 +299,6 @@ public class GadgetExchanger extends AbstractGadget {
         this.applyDamage(tool, player);
 
         if (index.applyMatch(match)) {
-            ImmutableMultiset<IUniqueObject<?>> usedItems = match.getChosenOption();
-
             MaterialList materials = te instanceof ConstructionBlockTileEntity ? InventoryHelper.PASTE_LIST : data.getRequiredItems(
                     buildContext,
                     currentBlock,
@@ -306,9 +306,17 @@ public class GadgetExchanger extends AbstractGadget {
                     pos);
 
             Iterator<ImmutableMultiset<IUniqueObject<?>>> it = materials.iterator();
-            ImmutableMultiset<IUniqueObject<?>> producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
+            Multiset<IUniqueObject<?>> producedItems = LinkedHashMultiset.create();
+
+            if (buildContext.getUsedStack().isEnchanted() && EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, buildContext.getUsedStack()) > 0) {
+                producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
+            } else {
+                List<ItemStack> drops = Block.getDrops(currentBlock, (ServerWorld) buildContext.getWorld(), pos, buildContext.getWorld().getTileEntity(pos));
+                producedItems.addAll(drops.stream().map(UniqueItem::ofStack).collect(Collectors.toList()));
+            }
+
             index.insert(producedItems);
-            builder.record(world, pos, setBlock, usedItems, producedItems);
+
             EffectBlock.spawnEffectBlock(world, pos, setBlock, EffectBlock.Mode.REPLACE, useConstructionPaste);
             return true;
         }
@@ -326,12 +334,6 @@ public class GadgetExchanger extends AbstractGadget {
     @Override
     public int getUseDuration(ItemStack stack) {
         return 20;
-    }
-
-    @Override
-    @OnlyIn(Dist.CLIENT)
-    public boolean hasEffect(ItemStack stack) {
-        return false;
     }
 
     @Override

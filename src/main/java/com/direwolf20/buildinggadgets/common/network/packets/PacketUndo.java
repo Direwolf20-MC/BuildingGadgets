@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.items.GadgetExchanger;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -23,7 +24,7 @@ public class PacketUndo {
                 return;
 
             ItemStack stack = AbstractGadget.getGadget(player);
-            if (! stack.isEmpty())
+            if (! stack.isEmpty() && !(stack.getItem() instanceof GadgetExchanger))
                 ((AbstractGadget) stack.getItem()).undo(player.world, player, stack);
         }
     }
