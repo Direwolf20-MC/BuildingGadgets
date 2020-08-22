@@ -62,9 +62,12 @@ public final class PlayerItemIndex implements IItemIndex {
         int remainingCount = insertIntoProviders(stack, count, simulate);
         if (remainingCount == 0)
             return 0;
-        remainingCount = insertIntoEmptyHandles(stack, remainingCount, simulate);
-        if (remainingCount == 0)
-            return 0;
+
+// buggy code
+//        remainingCount = insertIntoEmptyHandles(stack, remainingCount, simulate);
+//        if (remainingCount == 0)
+//            return 0;
+
         if (! simulate)
             spawnRemainder(stack, remainingCount);
         return 0;
@@ -72,7 +75,7 @@ public final class PlayerItemIndex implements IItemIndex {
 
     private int insertIntoProviders(ItemStack stack, int remainingCount, boolean simulate) {
         for (IInsertProvider insertProvider : insertProviders) {
-            remainingCount = insertProvider.insert(stack, remainingCount, simulate);
+            remainingCount -= insertProvider.insert(stack, remainingCount, simulate);
             if (remainingCount <= 0)
                 return 0;
         }
