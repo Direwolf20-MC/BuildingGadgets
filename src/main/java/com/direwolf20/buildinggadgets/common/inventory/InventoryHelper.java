@@ -34,6 +34,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.EmptyHandler;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -85,7 +86,7 @@ public class InventoryHelper {
     static List<IItemHandler> getHandlers(ItemStack stack, PlayerEntity player) {
         return Arrays.asList(
                 GadgetUtils.getRemoteInventory(stack, player.world),
-                player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(new EmptyItemHandler()));
+                player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(new EmptyHandler()));
     }
 
     public static void registerHandleProviders() {
@@ -348,40 +349,5 @@ public class InventoryHelper {
     //proper generics...
     private static <T extends Comparable<T>> BlockState applyProperty(BlockState state, BlockState from, IProperty<T> prop) {
         return state.with(prop, from.get(prop));
-    }
-
-    private static final class EmptyItemHandler implements IItemHandler {
-        @Override
-        public int getSlots() {
-            return 0;
-        }
-
-        @Nonnull
-        @Override
-        public ItemStack getStackInSlot(int slot) {
-            return ItemStack.EMPTY;
-        }
-
-        @Nonnull
-        @Override
-        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
-            return ItemStack.EMPTY;
-        }
-
-        @Nonnull
-        @Override
-        public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            return ItemStack.EMPTY;
-        }
-
-        @Override
-        public int getSlotLimit(int slot) {
-            return 0;
-        }
-
-        @Override
-        public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
-            return false;
-        }
     }
 }
