@@ -34,7 +34,6 @@ public class MockTileEntityRenderWorld implements IBlockReader {
                 return tileEntities.get(state);
             }
 
-            te.onLoad();
             tileEntities.put(state, te);
         }
 
