@@ -31,7 +31,7 @@ final class ConnectedSurfaceSequence implements IPositionPlacementSequence {
                     BlockState reference = world.getBlockState(searching2referenceMapper.apply(pos));
                     boolean isAir = reference.isAir(world, pos);
                     // If fuzzy=true, we ignore the block for reference
-                    return ! isAir && (fuzzy || filter == reference);
+                    return ! isAir && (fuzzy || filter.getBlock() == reference.getBlock());
                 });
     }
 

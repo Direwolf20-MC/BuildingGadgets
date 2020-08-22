@@ -91,6 +91,7 @@ public enum ExchangingMode {
             fakeWorld.setBlockState(pos, Blocks.AIR.getDefaultState(), 0);
             if (! target.getState().isValidPosition(fakeWorld, pos))
                 return false;
+
             fakeWorld.setBlockState(pos, data.getState(), 0); //set the new state for the side Rendering check
 
             BlockState worldBlockState = world.getBlockState(pos);
@@ -100,7 +101,7 @@ public enum ExchangingMode {
                 return false;
 
             // No need to replace if source and target are the same if fuzzy mode is off
-            if (!AbstractGadget.getFuzzy(tool) && worldBlockState != initialBlockState)
+            if (!AbstractGadget.getFuzzy(tool) && worldBlockState.getBlock() != initialBlockState.getBlock())
                 return false;
 
             // If the target is already enqueued, don't replace it

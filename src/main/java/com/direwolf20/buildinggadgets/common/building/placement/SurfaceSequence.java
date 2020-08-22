@@ -66,7 +66,7 @@ final class SurfaceSequence implements IPositionPlacementSequence {
                     BlockPos pos = it.next();
                     BlockPos referencePos = searching2referenceMapper.apply(pos);
                     BlockState baseBlock = world.getBlockState(referencePos);
-                    if ((fuzzy || baseBlock == selectedBase) && ! baseBlock.getBlock().isAir(baseBlock, world, referencePos))
+                    if ((fuzzy || baseBlock.getBlock() == selectedBase.getBlock()) && ! baseBlock.getBlock().isAir(baseBlock, world, referencePos))
                         return pos;
                 }
                 return endOfData();
