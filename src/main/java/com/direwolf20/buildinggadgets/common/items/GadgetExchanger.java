@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
+import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
@@ -199,37 +200,40 @@ public class GadgetExchanger extends AbstractGadget {
         player.sendStatusMessage(MessageTranslation.RANGE_SET.componentTranslation(range).setStyle(Styles.AQUA), true);
     }
 
-    private boolean exchange(ServerPlayerEntity player, ItemStack stack) {
+    private void exchange(ServerPlayerEntity player, ItemStack stack) {
         ServerWorld world = player.getServerWorld();
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
-            return false;
+            return;
 
         BlockData blockData = getToolBlock(heldItem);
-        List<BlockPos> coords = GadgetUtils.getAnchor(stack).orElse(new ArrayList<>());
 
-        if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
-            BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            Direction sideHit = lookingAt.getFace();
-
-            coords = getToolMode(stack).getMode().getCollection(
-                    new AbstractMode.UseContext(
-                            world,
-                            blockData.getState(),
-                            lookingAt.getPos(),
-                            heldItem,
-                            sideHit), player
-            );
-        } else { //If we do have an anchor, erase it (Even if the build fails)
-            setAnchor(stack);
+        // Don't attempt to do anything if we can't actually do it.
+        BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
+        TileEntity tileEntity = world.getTileEntity(lookingAt.getPos());
+        Block lookAtBlock = player.world.getBlockState(lookingAt.getPos()).getBlock();
+        if (blockData.getState() == Blocks.AIR.getDefaultState()
+                || lookAtBlock == OurBlocks.EFFECT_BLOCK.get()
+                || blockData.getState().getBlock() == lookAtBlock
+                || tileEntity != null) {
+            return;
         }
-        Set<BlockPos> coordinates = new HashSet<>(coords);
+
+        // Get the anchor or build the collection
+        Optional<List<BlockPos>> anchor = GadgetUtils.getAnchor(stack);
+        List<BlockPos> coords = anchor.orElseGet(
+                () -> getToolMode(stack).getMode().getCollection(new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, lookingAt.getFace()), player)
+        );
+
+        if (anchor.isPresent()) {
+            setAnchor(stack); // Remove the anchor
+        }
 
         Undo.Builder builder = Undo.builder();
         IItemIndex index = InventoryHelper.index(stack, player);
         if (blockData.getState() != Blocks.AIR.getDefaultState()) {  //Don't attempt a build if a block is not chosen -- Typically only happens on a new tool.
             //TODO replace fakeWorld
-            fakeWorld.setWorldAndState(player.world, blockData.getState(), coordinates); // Initialize the fake world's blocks
+            fakeWorld.setWorldAndState(player.world, blockData.getState(), coords); // Initialize the fake world's blocks
             for (BlockPos coordinate : coords) {
                 //Get the extended block state in the fake world
                 //Disabled to fix Chisel
@@ -238,7 +242,6 @@ public class GadgetExchanger extends AbstractGadget {
             }
         }
         pushUndo(stack, builder.build(world.getDimension().getType()));
-        return true;
     }
 
     private boolean exchangeBlock(ServerWorld world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
