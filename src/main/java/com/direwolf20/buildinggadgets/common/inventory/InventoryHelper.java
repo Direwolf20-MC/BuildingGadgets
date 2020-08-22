@@ -42,6 +42,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.wrapper.EmptyHandler;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -92,7 +93,7 @@ public class InventoryHelper {
     static List<IItemHandler> getHandlers(ItemStack stack, PlayerEntity player) {
         return Arrays.asList(
                 GadgetUtils.getRemoteInventory(stack, player.world),
-                player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(CapabilityNotPresentException::new));
+                player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(new EmptyHandler()));
     }
 
     private static void indexHandler(Multimap<Item, IObjectHandle> map, IItemHandler handler) {

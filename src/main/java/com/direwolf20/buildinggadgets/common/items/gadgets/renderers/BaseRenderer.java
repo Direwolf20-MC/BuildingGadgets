@@ -93,7 +93,7 @@ public abstract class BaseRenderer {
         if (player.isCreative() || !energy.isPresent())
             return Integer.MAX_VALUE;
 
-        return energy.orElseThrow(CapabilityNotPresentException::new).getEnergyStored();
+        return energy.map(IEnergyStorage::getEnergyStored).orElse(0);
     }
 
     protected BufferBuilder setupMissingRender() {
