@@ -17,6 +17,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BaseRendere
 import com.direwolf20.buildinggadgets.common.items.gadgets.renderers.BuildingRender;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
+import com.direwolf20.buildinggadgets.common.registry.OurBlocks;
 import com.direwolf20.buildinggadgets.common.save.Undo;
 import com.direwolf20.buildinggadgets.common.tiles.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -29,6 +30,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.direwolf20.buildinggadgets.common.world.FakeBuilderWorld;
 import com.google.common.collect.ImmutableMultiset;
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.gui.screen.Screen;
@@ -190,12 +192,26 @@ public class GadgetExchanger extends ModeGadget {
         player.sendStatusMessage(MessageTranslation.RANGE_SET.componentTranslation(range).setStyle(Styles.AQUA), true);
     }
 
-    private boolean exchange(ServerPlayerEntity player, ItemStack stack) {
+    private void exchange(ServerPlayerEntity player, ItemStack stack) {
         ServerWorld world = player.getServerWorld();
+        ItemStack heldItem = getGadget(player);
+        if (heldItem.isEmpty())
+            return;
+
         List<BlockPos> coords = GadgetUtils.getAnchor(stack);
+        BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
+
+        BlockData blockState = getToolBlock(heldItem);
+        TileEntity tileEntity = world.getTileEntity(lookingAt.getPos());
+        Block lookAtBlock = player.world.getBlockState(lookingAt.getPos()).getBlock();
+        if (blockState.getState() == Blocks.AIR.getDefaultState()
+                || lookAtBlock == OurBlocks.effectBlock
+                || blockState.getState().getBlock() == lookAtBlock
+                || tileEntity != null) {
+            return;
+        }
 
         if (coords.size() == 0) { //If we don't have an anchor, build in the current spot
-            BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
             BlockPos startBlock = lookingAt.getPos();
             Direction sideHit = lookingAt.getFace();
 //            BlockState setBlock = getToolBlock(stack);
@@ -205,11 +221,6 @@ public class GadgetExchanger extends ModeGadget {
         }
         Set<BlockPos> coordinates = new HashSet<>(coords);
 
-        ItemStack heldItem = getGadget(player);
-        if (heldItem.isEmpty())
-            return false;
-
-        BlockData blockState = getToolBlock(heldItem);
         Undo.Builder builder = Undo.builder();
         IItemIndex index = InventoryHelper.index(stack, player);
 
@@ -225,7 +236,6 @@ public class GadgetExchanger extends ModeGadget {
         }
 
         pushUndo(stack, builder.build(world.getDimension().getType()));
-        return true;
     }
 
     private void exchangeBlock(ServerWorld world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
