@@ -342,7 +342,7 @@ public class InventoryHelper {
             if (! UNSAFE_PROPERTIES.contains(prop))
                 placeState = applyProperty(placeState, state, prop);
         }
-        return Optional.of(new BlockData(state, TileSupport.createTileData(world, pos)));
+        return Optional.of(new BlockData(placeState, TileSupport.createTileData(world, pos)));
     }
 
     //proper generics...
