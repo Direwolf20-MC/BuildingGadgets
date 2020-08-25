@@ -141,7 +141,7 @@ public class GadgetExchanger extends AbstractGadget {
         ExchangingModes mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
                 .componentTranslation((mode == ExchangingModes.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
-                        .format(new TranslationTextComponent(mode.getTranslationKey()).getUnformattedComponentText()) : new TranslationTextComponent(mode.getTranslationKey())))
+                        .componentTranslation(new TranslationTextComponent(mode.getTranslationKey()).getUnformattedComponentText()) : new TranslationTextComponent(mode.getTranslationKey())))
                 .setStyle(Styles.AQUA));
 
         tooltip.add(TooltipTranslation.GADGET_BLOCK
