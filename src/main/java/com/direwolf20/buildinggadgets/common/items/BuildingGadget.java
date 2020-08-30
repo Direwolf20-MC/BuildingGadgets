@@ -27,7 +27,9 @@ public class BuildingGadget extends Gadget {
         new HorizontalWallMode(),
         new StairMode(),
         new GridMode(false),
-        new SurfaceMode(false)
+        new SurfaceMode(false),
+        new CircleMode(false, false),
+        new CircleMode(false, true)
     );
 
     public BuildingGadget() {

@@ -23,7 +23,9 @@ public class ExchangingGadget extends BuildingGadget {
         new SurfaceMode(true),
         new GridMode(true),
         new VerticalColumnMode(true),
-        new HorizontalColumnMode(true)
+        new HorizontalColumnMode(true),
+        new CircleMode(true, false),
+        new CircleMode(true, true)
     );
 
     public ExchangingGadget() {
