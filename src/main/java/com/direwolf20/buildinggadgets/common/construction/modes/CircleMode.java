@@ -11,7 +11,7 @@ import net.minecraft.util.math.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CircleMode<coordinates> extends Mode {
+public class CircleMode extends Mode {
     private final boolean filled;
 
     public CircleMode(boolean isExchanging, boolean filled) {

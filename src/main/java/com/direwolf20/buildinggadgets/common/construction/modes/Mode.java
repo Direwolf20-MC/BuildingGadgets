@@ -3,11 +3,13 @@ package com.direwolf20.buildinggadgets.common.construction.modes;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.StairsBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.World;
 
@@ -88,7 +90,9 @@ public abstract class Mode {
         boolean hasSingeValid = false;
         for(Direction direction : Direction.values()) {
             BlockPos offset = pos.offset(direction);
-            if( context.getWorld().isAirBlock(offset) || context.getWorld().getBlockState(offset).getShape(context.getWorld(), offset) != VoxelShapes.fullCube()) {
+            BlockState state = context.getWorld().getBlockState(offset);
+            if( state.isAir(context.getWorld(), offset)
+                    || (state.getShape(context.getWorld(), offset) != VoxelShapes.fullCube() && !(state.getBlock() instanceof StairsBlock))) {
                 hasSingeValid = true;
                 break;
             }
