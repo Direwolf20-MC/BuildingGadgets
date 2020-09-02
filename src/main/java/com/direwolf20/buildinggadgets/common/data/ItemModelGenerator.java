@@ -21,6 +21,7 @@ public class ItemModelGenerator extends ItemModelProvider {
         generateGadget(ModItems.EXCHANGING_GADGET);
         generateGadget(ModItems.DESTRUCTION_GADGET);
         generateGadget(ModItems.COPIER_GADGET);
+        generateGadget(ModItems.CUTTING_GADGET);
     }
 
     /**

@@ -70,7 +70,7 @@ public class BuildingGadget extends Gadget {
             return;
         }
 
-        playerIn.sendStatusMessage(MessageHelper.builder("message", "build-successful").success().build(), true);
+        playerIn.sendStatusMessage(MessageHelper.builder("message", "build-successful", bits.size()).success().build(), true);
 
         UUID uuid = UUID.randomUUID();
         if (new UndoStack(gadget).pushUndo(gadget, uuid, worldIn.getDimension().getType())) {

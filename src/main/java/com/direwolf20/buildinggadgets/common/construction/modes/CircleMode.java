@@ -15,7 +15,7 @@ public class CircleMode extends Mode {
     private final boolean filled;
 
     public CircleMode(boolean isExchanging, boolean filled) {
-        super(filled ? "circle" : "hollow_circle", isExchanging);
+        super(filled ? "filled_circle" : "circle_outline", isExchanging);
         this.filled = filled;
     }
 

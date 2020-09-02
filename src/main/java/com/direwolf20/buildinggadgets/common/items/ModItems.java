@@ -12,6 +12,7 @@ public final class ModItems {
 
     public static final RegistryObject<Item> BUILDING_GADGET = ITEMS.register("building_gadget", BuildingGadget::new);
     public static final RegistryObject<Item> COPIER_GADGET = ITEMS.register("copier_gadget", CopierGadget::new);
+    public static final RegistryObject<Item> CUTTING_GADGET = ITEMS.register("cutting_gadget", CuttingGadget::new);
     public static final RegistryObject<Item> EXCHANGING_GADGET = ITEMS.register("exchanging_gadget", ExchangingGadget::new);
     public static final RegistryObject<Item> DESTRUCTION_GADGET = ITEMS.register("destruction_gadget", DestructionGadget::new);
 }

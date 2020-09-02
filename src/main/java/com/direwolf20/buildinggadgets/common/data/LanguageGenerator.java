@@ -27,10 +27,10 @@ public class LanguageGenerator extends LanguageProvider {
         addKeyed("message", "undo-save-failure", "Undo data lost! Failure to store undo...");
         addKeyed("message", "undo-fetch-failure", "Undo data not found! The world save may have been cleared...");
         addKeyed("message", "undo-store-empty", "No undo's left!");
-        addKeyed("message", "build-successful", "Blocks Built!");
-        addKeyed("message", "block-selection-banned", "%s is a banned block, you can't select this one.");
+        addKeyed("message", "build-successful", "%s Blocks Built!");
+        addKeyed("message", "block-selection-banned", "%s is a banned block.");
         addKeyed("message", "blocks-undo", "%s blocks undone");
-        addKeyed("message", "no-blocks-placed", "No blocks were able to be placed :(");
+        addKeyed("message", "no-blocks-placed", "No blocks were able to be placed...");
 
         addKeyed("tooltip", "energy", "Energy: %s FE");
         addKeyed("tooltip", "selected-block", "Block: %s");
@@ -47,6 +47,7 @@ public class LanguageGenerator extends LanguageProvider {
         addItem(ModItems.EXCHANGING_GADGET, "Exchanging Gadget");
         addItem(ModItems.DESTRUCTION_GADGET, "Destruction Gadget");
         addItem(ModItems.COPIER_GADGET, "Copier Gadget");
+        addItem(ModItems.CUTTING_GADGET, "Cutting Gadget");
 
         addMode("build_to_me", "Build to me");
         addMode("grid", "Grid");
@@ -54,13 +55,14 @@ public class LanguageGenerator extends LanguageProvider {
         addMode("horizontal_wall", "Horizontal Wall");
         addMode("vertical_column", "Vertical Column");
         addMode("vertical_wall", "Vertical Wall");
+        addMode("filled_circle", "Circle Filled");
+        addMode("circle_outline", "Circle Outline");
         addMode("stairs", "Stairs");
         addMode("surface", "Surface");
         addMode("custom_area", "Custom Area");
         addMode("cut", "Cut");
         addMode("copy", "Copy");
         addMode("paste", "Paste");
-
     }
 
     private void addMode(String mode, String text) {
