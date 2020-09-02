@@ -2,11 +2,9 @@ package com.direwolf20.buildinggadgets.common.packets;
 
 import com.direwolf20.buildinggadgets.common.items.Gadget;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public final class SetRangePacket {
@@ -35,12 +33,11 @@ public final class SetRangePacket {
             if (player == null)
                 return;
 
-            Optional<ItemStack> stack = Gadget.findGadget(player);
-            stack.ifPresent(gadget -> {
+            Gadget.findGadget(player).ifPresent(e -> {
                 if (range < 0)
-                    ((Gadget) gadget.getItem()).cycleRange(gadget, player);
+                    e.getGadget().cycleRange(e.getStack(), player);
                 else
-                    ((Gadget) gadget.getItem()).setRange(gadget, range);
+                    e.getGadget().setRange(e.getStack(), range);
             });
 
             // TODO: 09/07/2020 Add this back

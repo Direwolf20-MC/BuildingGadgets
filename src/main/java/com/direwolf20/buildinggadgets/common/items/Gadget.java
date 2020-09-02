@@ -26,6 +26,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.ForgeI18n;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -101,14 +102,17 @@ public abstract class Gadget extends Item {
      * offhand is checked for last to ensure that if there is one in both hands the one
      * in the main hand will be retrieve first.
      */
-    public static Optional<ItemStack> findGadget(PlayerEntity entity) {
-        if (entity.getHeldItemMainhand().getItem() instanceof Gadget)
-            return Optional.of(entity.getHeldItemMainhand());
+    public static Optional<GadgetWithStack> findGadget(PlayerEntity entity) {
+        ItemStack stack = ItemStack.EMPTY;
+        if (entity.getHeldItemMainhand().getItem() instanceof Gadget) {
+            stack = entity.getHeldItemMainhand();
+        }
 
-        if (entity.getHeldItemOffhand().getItem() instanceof Gadget)
-            return Optional.of(entity.getHeldItemOffhand());
+        if (entity.getHeldItemOffhand().getItem() instanceof Gadget) {
+            stack = entity.getHeldItemOffhand();
+        }
 
-        return Optional.empty();
+        return !stack.isEmpty() ? Optional.of(GadgetWithStack.of(stack)) : Optional.empty();
     }
 
     /*
@@ -205,5 +209,31 @@ public abstract class Gadget extends Item {
 
         // notify the player
         entity.sendStatusMessage(MessageHelper.builder("message", "range-updated", range).info().build(), true);
+    }
+
+    /**
+     * I might remove this, it's just a simple way of passing around not only the gadget but also it's stack
+     * representation as well. It's also a bit nicer than a raw pair implementation.
+     */
+    public static class GadgetWithStack {
+        private final Gadget gadget;
+        private final ItemStack gadgetStack;
+
+        private GadgetWithStack(Gadget gadget, ItemStack gadgetStack) {
+            this.gadget = gadget;
+            this.gadgetStack = gadgetStack;
+        }
+
+        public static GadgetWithStack of(ItemStack gadgetStack) {
+            return new GadgetWithStack((Gadget) gadgetStack.getItem(), gadgetStack);
+        }
+
+        public Gadget getGadget() {
+            return gadget;
+        }
+
+        public ItemStack getStack() {
+            return gadgetStack;
+        }
     }
 }

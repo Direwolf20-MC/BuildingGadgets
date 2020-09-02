@@ -6,6 +6,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -14,7 +15,7 @@ public final class SetModePacket {
     private final int modeIndex;
 
     public SetModePacket() {
-        this.modeIndex = - 1;
+        this.modeIndex = -1;
     }
 
     public SetModePacket(int modeIndex) {
@@ -35,24 +36,15 @@ public final class SetModePacket {
             if (player == null)
                 return;
 
-            Optional<ItemStack> stack = Gadget.findGadget(player);
-            stack.ifPresent(itemStack -> {
-                Gadget gadget = ((Gadget) itemStack.getItem());
-
+            Gadget.findGadget(player).ifPresent(e -> {
                 if (modeIndex < 0) {
-                    gadget.cycleMode(itemStack, player);
+                    e.getGadget().cycleMode(e.getStack(), player);
                     return;
                 }
 
                 // Try and ensure we never attempt to get a mode out of it's enum bounds
-                Mode mode;
-                try {
-                    mode = gadget.getModes().get(modeIndex);
-                } catch (IndexOutOfBoundsException ignored) {
-                    mode = gadget.getModes().get(0);
-                }
-
-                gadget.setMode(itemStack, mode.getName());
+                Mode mode = e.getGadget().getModes().get(modeIndex > e.getGadget().getModes().size() ? 0 : modeIndex);
+                e.getGadget().setMode(e.getStack(), mode.getName());
             });
         });
 

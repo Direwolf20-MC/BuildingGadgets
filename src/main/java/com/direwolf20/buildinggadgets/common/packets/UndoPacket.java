@@ -14,9 +14,7 @@ public final class UndoPacket {
         return new UndoPacket();
     }
 
-    public void encode(PacketBuffer buffer) {
-
-    }
+    public void encode(PacketBuffer buffer) {}
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
@@ -24,8 +22,7 @@ public final class UndoPacket {
             if (player == null)
                 return;
 
-            Optional<ItemStack> stack = Gadget.findGadget(player);
-            stack.ifPresent(gadget -> ((Gadget) gadget.getItem()).undo(gadget, player.world, player));
+            Gadget.findGadget(player).ifPresent(e -> e.getGadget().undo(e.getStack(), player.world, player));
         });
 
         ctx.get().setPacketHandled(true);

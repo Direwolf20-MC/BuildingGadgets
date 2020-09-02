@@ -1,7 +1,5 @@
 package com.direwolf20.buildinggadgets.common.items;
 
-import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
-import com.direwolf20.buildinggadgets.common.construction.modes.Mode;
 import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
 import com.direwolf20.buildinggadgets.common.construction.modes.*;
 import net.minecraft.entity.player.PlayerEntity;
@@ -32,9 +30,9 @@ public class DestructionGadget extends Gadget {
 
     @Override
     public boolean action(World worldIn, PlayerEntity playerIn, ItemStack gadget, @Nullable BlockRayTraceResult rayTrace) {
-        Mode mode = this.getMode(gadget);
-
-        mode.getCollection(playerIn, new ModeUseContext(worldIn, setState, startPos, gadget, hitSide, false));
+//        Mode mode = this.getMode(gadget);
+//
+//        mode.getCollection(playerIn, new ModeUseContext(worldIn, setState, startPos, gadget, hitSide, false));
         return true;
     }
 
