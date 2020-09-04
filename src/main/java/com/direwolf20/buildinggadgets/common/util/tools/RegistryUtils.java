@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
+import com.direwolf20.buildinggadgets.common.tainted.Tainted;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -7,6 +8,7 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 
+@Tainted(reason = "Oh god no. This shouldn't exist")
 public final class RegistryUtils {
     private RegistryUtils() {}
 

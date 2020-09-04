@@ -4,9 +4,10 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRequestTemplate;
 import com.direwolf20.buildinggadgets.common.network.packets.SplitPacketUpdateTemplate;
-import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
-import com.direwolf20.buildinggadgets.common.template.ITemplateProvider;
-import com.direwolf20.buildinggadgets.common.template.Template;
+import com.direwolf20.buildinggadgets.common.tainted.Tainted;
+import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
+import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider;
+import com.direwolf20.buildinggadgets.common.tainted.template.Template;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -22,6 +23,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+@Tainted(reason = "Uses template system")
 public final class CacheTemplateProvider implements ITemplateProvider {
     private final Cache<UUID, Template> cache;
     private final Set<IUpdateListener> updateListeners;

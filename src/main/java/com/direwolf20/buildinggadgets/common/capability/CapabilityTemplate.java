@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.common.capability;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
-import com.direwolf20.buildinggadgets.common.template.ITemplateProvider;
-import com.direwolf20.buildinggadgets.common.template.InMemoryTemplateProvider;
-import com.direwolf20.buildinggadgets.common.template.TemplateKey;
+import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
+import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider;
+import com.direwolf20.buildinggadgets.common.tainted.template.InMemoryTemplateProvider;
+import com.direwolf20.buildinggadgets.common.tainted.template.TemplateKey;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;

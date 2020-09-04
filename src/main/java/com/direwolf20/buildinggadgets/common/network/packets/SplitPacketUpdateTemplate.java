@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
-import com.direwolf20.buildinggadgets.common.save.SaveManager;
-import com.direwolf20.buildinggadgets.common.template.TemplateKey;
-import com.direwolf20.buildinggadgets.common.template.Template;
-import com.direwolf20.buildinggadgets.common.template.TemplateIO;
+import com.direwolf20.buildinggadgets.common.tainted.save.SaveManager;
+import com.direwolf20.buildinggadgets.common.tainted.template.TemplateKey;
+import com.direwolf20.buildinggadgets.common.tainted.template.Template;
+import com.direwolf20.buildinggadgets.common.tainted.template.TemplateIO;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadException;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateWriteException;
 import net.minecraft.network.PacketBuffer;

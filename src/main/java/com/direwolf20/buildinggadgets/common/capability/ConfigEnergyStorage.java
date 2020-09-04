@@ -1,9 +1,11 @@
 package com.direwolf20.buildinggadgets.common.capability;
 
+import com.direwolf20.buildinggadgets.common.tainted.Tainted;
 import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.function.IntSupplier;
 
+@Tainted(reason = "This shouldn't have have 3 layers")
 public abstract class ConfigEnergyStorage implements IEnergyStorage {
     private final IntSupplier capacitySupplier;
     private final IntSupplier extractSupplier;

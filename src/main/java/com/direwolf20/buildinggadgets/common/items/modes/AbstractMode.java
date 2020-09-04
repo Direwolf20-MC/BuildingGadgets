@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileE
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.StairsBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
@@ -97,7 +98,9 @@ public abstract class AbstractMode {
         boolean hasSingeValid = false;
         for(Direction direction : Direction.values()) {
             BlockPos offset = pos.offset(direction);
-            if( context.getWorld().isAirBlock(offset) ) {
+            BlockState state = context.getWorld().getBlockState(offset);
+            if( state.isAir(context.getWorld(), offset)
+                    || (state.getShape(context.getWorld(), offset) != VoxelShapes.fullCube() && !(state.getBlock() instanceof StairsBlock))) {
                 hasSingeValid = true;
                 break;
             }

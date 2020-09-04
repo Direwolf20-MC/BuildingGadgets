@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
-import com.direwolf20.buildinggadgets.common.save.SaveManager;
-import com.direwolf20.buildinggadgets.common.template.TemplateKey;
+import com.direwolf20.buildinggadgets.common.tainted.save.SaveManager;
+import com.direwolf20.buildinggadgets.common.tainted.template.TemplateKey;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
