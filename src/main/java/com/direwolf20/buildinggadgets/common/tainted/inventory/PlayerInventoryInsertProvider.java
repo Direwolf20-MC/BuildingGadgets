@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.inventory;
+package com.direwolf20.buildinggadgets.common.tainted.inventory;
 
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;

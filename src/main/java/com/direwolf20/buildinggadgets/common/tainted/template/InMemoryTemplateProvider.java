@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.template;
+package com.direwolf20.buildinggadgets.common.tainted.template;
 
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 

@@ -1,13 +1,13 @@
-package com.direwolf20.buildinggadgets.common.registry;
+package com.direwolf20.buildinggadgets.common.tainted.registry;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataFactory;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileDataSerializer;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.inventory.handle.IHandleProvider;
-import com.direwolf20.buildinggadgets.common.inventory.handle.IObjectHandle;
-import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObjectSerializer;
-import com.direwolf20.buildinggadgets.common.template.SerialisationSupport;
+import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.ITileDataFactory;
+import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.ITileDataSerializer;
+import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.handle.IHandleProvider;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.handle.IObjectHandle;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObjectSerializer;
+import com.direwolf20.buildinggadgets.common.tainted.template.SerialisationSupport;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;

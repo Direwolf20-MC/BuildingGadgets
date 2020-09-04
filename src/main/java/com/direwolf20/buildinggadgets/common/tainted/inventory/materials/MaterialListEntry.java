@@ -1,6 +1,6 @@
-package com.direwolf20.buildinggadgets.common.inventory.materials;
+package com.direwolf20.buildinggadgets.common.tainted.inventory.materials;
 
-import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObject;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.PeekingIterator;
 import com.google.gson.JsonDeserializer;

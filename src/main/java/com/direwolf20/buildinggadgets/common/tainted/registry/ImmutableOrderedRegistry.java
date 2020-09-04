@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.registry;
+package com.direwolf20.buildinggadgets.common.tainted.registry;
 
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;

@@ -1,6 +1,6 @@
-package com.direwolf20.buildinggadgets.common.inventory.materials;
+package com.direwolf20.buildinggadgets.common.tainted.inventory.materials;
 
-import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.util.ref.JsonKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.JsonBiDiSerializer;

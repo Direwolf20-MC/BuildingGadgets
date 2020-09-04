@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.inventory.materials.objects;
+package com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects;
 
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSerializer;

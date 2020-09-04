@@ -1,12 +1,12 @@
-package com.direwolf20.buildinggadgets.common.save;
+package com.direwolf20.buildinggadgets.common.tainted.save;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRequestTemplate;
 import com.direwolf20.buildinggadgets.common.network.packets.SplitPacketUpdateTemplate;
-import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
-import com.direwolf20.buildinggadgets.common.template.ITemplateProvider;
-import com.direwolf20.buildinggadgets.common.template.Template;
+import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
+import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider;
+import com.direwolf20.buildinggadgets.common.tainted.template.Template;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;

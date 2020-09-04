@@ -1,9 +1,8 @@
-package com.direwolf20.buildinggadgets.common.inventory;
+package com.direwolf20.buildinggadgets.common.tainted.inventory;
 
-import com.direwolf20.buildinggadgets.common.inventory.handle.IObjectHandle;
-import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
-import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
-import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.handle.IObjectHandle;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObject;
 import com.google.common.collect.*;
 import com.google.common.collect.Multiset.Entry;
 import net.minecraft.entity.item.ItemEntity;

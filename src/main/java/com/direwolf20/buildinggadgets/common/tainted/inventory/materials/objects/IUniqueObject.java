@@ -1,6 +1,6 @@
-package com.direwolf20.buildinggadgets.common.inventory.materials.objects;
+package com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects;
 
-import com.direwolf20.buildinggadgets.common.inventory.handle.IObjectHandle;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.handle.IObjectHandle;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

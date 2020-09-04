@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.tainted.building.tilesupport;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
-import com.direwolf20.buildinggadgets.common.template.SerialisationSupport;
+import com.direwolf20.buildinggadgets.common.tainted.template.SerialisationSupport;
 import com.google.common.base.MoreObjects;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;

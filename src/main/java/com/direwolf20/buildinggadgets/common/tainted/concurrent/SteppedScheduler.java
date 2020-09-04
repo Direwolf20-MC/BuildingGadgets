@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.concurrent;
+package com.direwolf20.buildinggadgets.common.tainted.concurrent;
 
 import java.util.function.BooleanSupplier;
 

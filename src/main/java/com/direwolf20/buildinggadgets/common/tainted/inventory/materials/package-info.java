@@ -1,6 +1,6 @@
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-package com.direwolf20.buildinggadgets.common.inventory.materials;
+package com.direwolf20.buildinggadgets.common.tainted.inventory.materials;
 
 import mcp.MethodsReturnNonnullByDefault;
 

@@ -1,7 +1,7 @@
-package com.direwolf20.buildinggadgets.common.save;
+package com.direwolf20.buildinggadgets.common.tainted.save;
 
-import com.direwolf20.buildinggadgets.common.save.TemplateSave.TemplateInfo;
-import com.direwolf20.buildinggadgets.common.template.Template;
+import com.direwolf20.buildinggadgets.common.tainted.save.TemplateSave.TemplateInfo;
+import com.direwolf20.buildinggadgets.common.tainted.template.Template;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.nbt.CompoundNBT;
 

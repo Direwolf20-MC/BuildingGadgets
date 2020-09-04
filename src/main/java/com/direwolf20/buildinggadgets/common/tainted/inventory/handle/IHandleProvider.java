@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.inventory.handle;
+package com.direwolf20.buildinggadgets.common.tainted.inventory.handle;
 
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 

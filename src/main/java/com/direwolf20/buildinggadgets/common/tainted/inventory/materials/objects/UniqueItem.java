@@ -1,6 +1,6 @@
-package com.direwolf20.buildinggadgets.common.inventory.materials.objects;
+package com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects;
 
-import com.direwolf20.buildinggadgets.common.template.SerialisationSupport;
+import com.direwolf20.buildinggadgets.common.tainted.template.SerialisationSupport;
 import com.direwolf20.buildinggadgets.common.util.ref.JsonKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.RegistryUtils;

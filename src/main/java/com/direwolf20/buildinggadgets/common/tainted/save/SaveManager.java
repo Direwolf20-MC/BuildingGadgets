@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.save;
+package com.direwolf20.buildinggadgets.common.tainted.save;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.SaveReference;

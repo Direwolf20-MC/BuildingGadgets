@@ -1,6 +1,6 @@
-package com.direwolf20.buildinggadgets.common.save;
+package com.direwolf20.buildinggadgets.common.tainted.save;
 
-import com.direwolf20.buildinggadgets.common.save.UndoWorldSave.UndoValue;
+import com.direwolf20.buildinggadgets.common.tainted.save.UndoWorldSave.UndoValue;
 import net.minecraft.nbt.CompoundNBT;
 
 import java.util.Objects;

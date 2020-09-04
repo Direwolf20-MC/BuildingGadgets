@@ -8,7 +8,7 @@
  */
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-package com.direwolf20.buildinggadgets.common.template;
+package com.direwolf20.buildinggadgets.common.tainted.template;
 
 import mcp.MethodsReturnNonnullByDefault;
 

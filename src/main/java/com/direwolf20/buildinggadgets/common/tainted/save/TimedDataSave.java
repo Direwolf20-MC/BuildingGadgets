@@ -1,6 +1,6 @@
-package com.direwolf20.buildinggadgets.common.save;
+package com.direwolf20.buildinggadgets.common.tainted.save;
 
-import com.direwolf20.buildinggadgets.common.save.TimedDataSave.TimedValue;
+import com.direwolf20.buildinggadgets.common.tainted.save.TimedDataSave.TimedValue;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import it.unimi.dsi.fastutil.longs.Long2ObjectRBTreeMap;

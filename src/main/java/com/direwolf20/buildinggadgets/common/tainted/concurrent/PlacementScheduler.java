@@ -1,13 +1,13 @@
-package com.direwolf20.buildinggadgets.common.concurrent;
+package com.direwolf20.buildinggadgets.common.tainted.concurrent;
 
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
-import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.common.building.PlacementChecker;
-import com.direwolf20.buildinggadgets.common.building.PlacementChecker.CheckResult;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.save.Undo;
-import com.direwolf20.buildinggadgets.common.save.Undo.Builder;
+import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.tainted.building.PlacementChecker;
+import com.direwolf20.buildinggadgets.common.tainted.building.PlacementChecker.CheckResult;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.common.tainted.save.Undo;
+import com.direwolf20.buildinggadgets.common.tainted.save.Undo.Builder;
 import com.google.common.base.Preconditions;
 
 import java.util.Objects;

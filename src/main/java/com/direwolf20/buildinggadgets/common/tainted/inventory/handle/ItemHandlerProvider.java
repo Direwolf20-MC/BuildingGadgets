@@ -1,6 +1,6 @@
-package com.direwolf20.buildinggadgets.common.inventory.handle;
+package com.direwolf20.buildinggadgets.common.tainted.inventory.handle;
 
-import com.direwolf20.buildinggadgets.common.registry.Registries;
+import com.direwolf20.buildinggadgets.common.tainted.registry.Registries;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -12,7 +12,7 @@ import net.minecraftforge.items.IItemHandler;
 import java.util.*;
 
 /**
- * Indexes an IITemHandler for {@link IObjectHandle}'s, to allow {@link com.direwolf20.buildinggadgets.common.inventory.PlayerItemIndex} access
+ * Indexes an IITemHandler for {@link IObjectHandle}'s, to allow {@link com.direwolf20.buildinggadgets.common.tainted.inventory.PlayerItemIndex} access
  * to an indexed map of available Items.
  */
 public final class ItemHandlerProvider implements IHandleProvider {
