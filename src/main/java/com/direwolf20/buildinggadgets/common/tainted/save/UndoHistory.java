@@ -41,6 +41,7 @@ final class UndoHistory {
     void read(CompoundNBT nbt) {
         this.history.clear();
         INBT list = nbt.get(NBTKeys.WORLD_SAVE_UNDO_HISTORY);
+        System.out.println(list);
         if (list instanceof ListNBT) {
             NBTHelper.deserializeCollection((ListNBT) list, history, inbt -> Undo.deserialize((CompoundNBT) inbt));
             ensureSize();

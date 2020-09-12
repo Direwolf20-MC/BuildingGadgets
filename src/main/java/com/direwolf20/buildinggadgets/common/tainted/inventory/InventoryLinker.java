@@ -33,7 +33,7 @@ public class InventoryLinker {
         // remove if the existing linked inventory is the same block we're setting now.
         boolean removed = getLinkedInventory(world, stack)
                 .map(e -> removeIfSame(stack, trace.getPos()))
-                .orElse(Boolean.FALSE);
+                .orElse(false);
 
         if (removed) {
             return Result.removed();

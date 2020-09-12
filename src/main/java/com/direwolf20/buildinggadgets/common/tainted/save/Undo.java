@@ -138,7 +138,7 @@ public final class Undo {
         ListNBT dataSerializerList = serializerObjectIncrementer.write(ts -> StringNBT.valueOf(ts.getRegistryName().toString()));
         ListNBT itemSerializerList = itemSerializerIncrementer.write(s -> StringNBT.valueOf(s.getRegistryName().toString()));
 
-        res.putString(NBTKeys.WORLD_SAVE_DIM, dim.getRegistryName().toString());
+        res.putString(NBTKeys.WORLD_SAVE_DIM, dim.func_240901_a_().toString());
         res.put(NBTKeys.WORLD_SAVE_UNDO_BLOCK_LIST, infoList);
         res.put(NBTKeys.WORLD_SAVE_UNDO_DATA_LIST, dataList);
         res.put(NBTKeys.WORLD_SAVE_UNDO_DATA_SERIALIZER_LIST, dataSerializerList);
