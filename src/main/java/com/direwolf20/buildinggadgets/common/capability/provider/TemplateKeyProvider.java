@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.capability.provider;
 
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.capability.ItemTemplateKey;
-import com.direwolf20.buildinggadgets.common.template.ITemplateKey;
+import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;

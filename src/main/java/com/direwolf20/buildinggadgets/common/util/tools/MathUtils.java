@@ -1,9 +1,11 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
+import com.direwolf20.buildinggadgets.common.tainted.Tainted;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
+@Tainted(reason = "Shouldn't exist.")
 public final class MathUtils {
     public static final int B1_BYTE_MASK = 0xFF;
     public static final int B2_BYTE_MASK = 0xFF_FF;

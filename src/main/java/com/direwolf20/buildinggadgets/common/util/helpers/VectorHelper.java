@@ -26,8 +26,4 @@ public class VectorHelper {
         return (BlockRayTraceResult) result;
     }
 
-    public static BlockPos getPosLookingAt(PlayerEntity player, ItemStack tool) {
-        return VectorHelper.getLookingAt(player, tool).getPos();
-    }
-
 }

@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
 import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
+import com.direwolf20.buildinggadgets.common.tainted.Tainted;
 import net.minecraftforge.energy.IEnergyStorage;
 
 /**
@@ -12,6 +13,8 @@ import net.minecraftforge.energy.IEnergyStorage;
  * are insert/extract limits on the backing storage. In that case this implementation will only work as long as the accumulated buffer is smaller then
  * the defined limits.
  */
+
+@Tainted(reason = "So stupid. The cap supports simulating by default. This is pointless overhead")
 public final class SimulateEnergyStorage implements IPrivateEnergy {
     private final IEnergyStorage other;
     private int energyChanged;

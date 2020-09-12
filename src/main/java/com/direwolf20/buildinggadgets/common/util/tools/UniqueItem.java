@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
-import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.tainted.Tainted;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.Preconditions;
 import net.minecraft.block.BlockState;
@@ -15,6 +16,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Objects;
 
+@Tainted(reason = "Very old code that needs to be removed")
 public final class UniqueItem { //TODO @since 1.13.x can this be replaced with Item?
     public static final UniqueItem AIR = new UniqueItem(Items.AIR);
     private final Item item;

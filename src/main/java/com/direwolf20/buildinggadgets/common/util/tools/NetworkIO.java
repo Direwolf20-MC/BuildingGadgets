@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
+import com.direwolf20.buildinggadgets.common.tainted.Tainted;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
@@ -12,6 +13,7 @@ import java.util.List;
 //import com.raoulvdberge.refinedstorage.api.network.INetwork;
 //import com.raoulvdberge.refinedstorage.api.util.Action;
 
+@Tainted(reason = "Not being used")
 public abstract class NetworkIO implements IItemHandler {// TODO 1.13
     private final List<ItemStack> stacks;
 

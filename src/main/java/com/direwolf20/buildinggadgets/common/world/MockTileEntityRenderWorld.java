@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.world;
 
+import com.direwolf20.buildinggadgets.common.tainted.Tainted;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
@@ -12,6 +13,7 @@ import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
+@Tainted(reason = "Shouldn't exist")
 public class MockTileEntityRenderWorld implements IBlockReader {
 
     private final Map<BlockState, TileEntityRenderer<TileEntity>> tileEntityRenders = new HashMap<>();

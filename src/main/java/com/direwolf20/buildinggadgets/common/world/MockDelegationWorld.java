@@ -1,8 +1,9 @@
 package com.direwolf20.buildinggadgets.common.world;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
+import com.direwolf20.buildinggadgets.common.tainted.Tainted;
+import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.google.common.base.Preconditions;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
@@ -376,6 +377,7 @@ public class MockDelegationWorld implements IWorld {
         return delegate.getLightingProvider();
     }
 
+    @Tainted(reason = "Pointless system, also, uncommented...")
     public static class BlockInfo {
         private BlockPos pos;
         private BlockState state;

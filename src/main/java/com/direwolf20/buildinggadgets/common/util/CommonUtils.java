@@ -1,8 +1,9 @@
 package com.direwolf20.buildinggadgets.common.util;
 
-import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
+import com.direwolf20.buildinggadgets.common.tainted.Tainted;
+import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -19,6 +20,7 @@ public final class CommonUtils {
         return new BlockRayTraceResult(simVec, dir, pos, false);
     }
 
+    @Tainted(reason = "Part of the material list system")
     public static MaterialList estimateRequiredItems(Iterable<PlacementTarget> buildView, BuildContext context, @Nullable Vector3d simulatePos) {
         MaterialList.SubEntryBuilder builder = MaterialList.andBuilder();
         for (PlacementTarget placementTarget : buildView) {

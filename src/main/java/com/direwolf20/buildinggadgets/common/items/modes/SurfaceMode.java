@@ -1,11 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items.modes;
 
-import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
