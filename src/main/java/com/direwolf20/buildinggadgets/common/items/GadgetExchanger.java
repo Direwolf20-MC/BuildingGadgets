@@ -164,7 +164,7 @@ public class GadgetExchanger extends AbstractGadget {
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
-                if( !result.getType().isAccepted() ) {
+                if( !result.getType().isSuccessOrConsume() ) {
                     player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
                     return super.onItemRightClick(world, player, hand);
                 }
@@ -277,7 +277,7 @@ public class GadgetExchanger extends AbstractGadget {
         if (! player.isAllowEdit() || ! world.isBlockModifiable(player, pos))
             return;
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getRegistryKey(), world, pos);
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getDimensionKey(), world, pos);
         BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP) || MinecraftForge.EVENT_BUS.post(e))
             return;
@@ -288,7 +288,7 @@ public class GadgetExchanger extends AbstractGadget {
             MaterialList materials = te instanceof ConstructionBlockTileEntity ? InventoryHelper.PASTE_LIST : data.getRequiredItems(
                     buildContext,
                     currentBlock,
-                    world.rayTraceBlocks(new RayTraceContext(player.getPositionVec(), Vector3d.of(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
+                    world.rayTraceBlocks(new RayTraceContext(player.getPositionVec(), Vector3d.copy(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
                     pos);
 
             Iterator<ImmutableMultiset<IUniqueObject<?>>> it = materials.iterator();

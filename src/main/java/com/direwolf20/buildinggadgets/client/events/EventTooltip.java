@@ -23,6 +23,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.ITextProperties;
@@ -172,7 +173,7 @@ public class EventTooltip {
         ItemRenderer render = mc.getItemRenderer();
         //The zLevel is the position that the item is drawn on. If too low, it'll draw behind other items in the GUI. Bump it up and then back down to draw this on top of everything else
         render.zLevel += 500f;
-        net.minecraft.client.renderer.RenderHelper.enableGuiDepthLighting();
+        RenderHelper.enableStandardItemLighting();
         render.renderItemIntoGUI(itemStack, x, y);
         render.zLevel -= 500f;
         //String s1 = req == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
@@ -185,7 +186,7 @@ public class EventTooltip {
         //translating on the z axis here works like above. If too low, it'll draw the text behind items in the GUI. Items are drawn around zlevel 200 btw
         RenderSystem.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 500);
         RenderSystem.scalef(0.5F, 0.5F, 0.5F);
-        mc.fontRenderer.drawWithShadow(matrices, s1, 0, 0, color);
+        mc.fontRenderer.drawStringWithShadow(matrices, s1, 0, 0, color);
         RenderSystem.popMatrix();
 
         int missingCount = 0;
@@ -199,7 +200,7 @@ public class EventTooltip {
                 RenderSystem.pushMatrix();
                 RenderSystem.translatef(x + 8 - w2 / 4, y + 17, 500);
                 RenderSystem.scalef(0.5F, 0.5F, 0.5F);
-                mc.fontRenderer.drawWithShadow(matrices, s2, 0, 0, 0xFF0000);
+                mc.fontRenderer.drawStringWithShadow(matrices, s2, 0, 0, 0xFF0000);
                 RenderSystem.popMatrix();
                 missingCount = (req - count);
             }

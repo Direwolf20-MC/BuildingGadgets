@@ -211,7 +211,7 @@ public class GadgetDestruction extends AbstractGadget {
 
         return new Region(first, second).stream()
                 .filter(e -> isValidBlock(world, e, player, world.getBlockState(e)))
-                .sorted(Comparator.comparing(player.getBlockPos()::distanceSq))
+                .sorted(Comparator.comparing(player.getPosition()::distanceSq))
                 .collect(Collectors.toList());
     }
 
@@ -226,7 +226,7 @@ public class GadgetDestruction extends AbstractGadget {
             return false;
 
         if (! world.isRemote) {
-            BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getRegistryKey(), world, voidPos);
+            BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getDimensionKey(), world, voidPos);
             if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP))
                 return false;
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);

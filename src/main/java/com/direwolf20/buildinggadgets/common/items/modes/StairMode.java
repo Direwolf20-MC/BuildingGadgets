@@ -21,7 +21,7 @@ public class StairMode extends AbstractMode {
         XYZ facingXYZ = XYZ.fromFacing(side);
         for( int i = 0; i < context.getRange(); i ++ ) {
             // Check to see if we should build up or down from the player
-            int tmp = start.getY() > player.getY() + 1 ? (i + 1) * -1 : i;
+            int tmp = start.getY() > player.getPosY() + 1 ? (i + 1) * -1 : i;
 
             if( facingXYZ == XYZ.X )
                 coordinates.add(new BlockPos(start.getX() + (tmp * (side == Direction.EAST ? -1 : 1)), start.getY() + tmp, start.getZ()));

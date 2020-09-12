@@ -82,7 +82,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
     }
 
     @Override
-    protected int getScrollbarPositionX() {
+    protected int getScrollbarPosition() {
         return getRight() - MARGIN - SCROLL_BAR_WIDTH;
     }
 
@@ -189,7 +189,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
 
         private void drawIcon(ItemStack item, int slotX, int slotY) {
             RenderSystem.pushMatrix();
-            RenderHelper.enableGuiDepthLighting();
+            RenderHelper.enableStandardItemLighting();
             Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(item, slotX, slotY);
             RenderSystem.disableLighting();
             RenderSystem.color3f(1, 1, 1);
@@ -258,7 +258,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
     }
 
     private void sort() {
-        children().sort(sortingMode.getComparator());
+        getEventListeners().sort(sortingMode.getComparator());
     }
 
     enum SortingModes {

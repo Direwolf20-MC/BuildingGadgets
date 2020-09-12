@@ -95,7 +95,7 @@ public class CopyGUI extends Screen {
     }
 
     private void drawFieldLabel(MatrixStack matrices, String name, int x, int y) {
-        textRenderer.drawWithShadow(matrices, name, this.x + x, this.y + y, 0xFFFFFF);
+        font.drawStringWithShadow(matrices, name, this.x + x, this.y + y, 0xFFFFFF);
     }
 
     private void coordsModeSwitch() {

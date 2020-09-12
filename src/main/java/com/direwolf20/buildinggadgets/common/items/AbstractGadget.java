@@ -179,7 +179,7 @@ public abstract class AbstractGadget extends Item {
     }
 
     public boolean isAllowedBlock(Block block) {
-        if (getWhiteList().values().isEmpty())
+        if (getWhiteList().getAllElements().isEmpty())
             return ! getBlackList().contains(block);
         return getWhiteList().contains(block);
     }

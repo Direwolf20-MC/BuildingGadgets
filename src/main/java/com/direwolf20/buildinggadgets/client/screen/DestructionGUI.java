@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.ItemStack;
@@ -115,9 +116,9 @@ public class DestructionGUI extends Screen {
     public void render(@Nonnull MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
         super.render(matrices, mouseX, mouseY, partialTicks);
 
-        this.drawCenteredString(matrices, textRenderer, this.sizeString, width / 2, (height / 2) + 40, this.isValidSize ? 0x00FF00 : 0xFF2000);
+        drawCenteredString(matrices, font, this.sizeString, width / 2, (height / 2) + 40, this.isValidSize ? 0x00FF00 : 0xFF2000);
         if (!this.isValidSize) {
-            this.drawCenteredString(matrices, textRenderer, MessageTranslation.DESTRCUT_TOO_LARGE.format(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), width / 2, (height / 2) + 50, 0xFF2000);
+            drawCenteredString(matrices, font, MessageTranslation.DESTRCUT_TOO_LARGE.format(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), width / 2, (height / 2) + 50, 0xFF2000);
         }
     }
 

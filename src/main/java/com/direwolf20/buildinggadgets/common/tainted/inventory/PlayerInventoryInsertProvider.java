@@ -21,7 +21,7 @@ public final class PlayerInventoryInsertProvider implements IInsertProvider {
         if (copy.getCount() != count)
             copy.setCount(count);
 
-        int wasPickedUp = ForgeEventFactory.onItemPickup(new ItemEntity(player.world, player.getX(), player.getY(), player.getZ(), copy), player);
+        int wasPickedUp = ForgeEventFactory.onItemPickup(new ItemEntity(player.world, player.getPosX(), player.getPosY(), player.getPosZ(), copy), player);
         // 0  = no body captured the event and we should handle it by hand.
         if( wasPickedUp == 0 ) {
             player.inventory.addItemStackToInventory(copy);

@@ -76,7 +76,7 @@ public final class PlacementChecker {
             usePaste = true;
         }
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.create(context.getServerWorld().getRegistryKey(), context.getWorld(), target.getPos());
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(context.getServerWorld().getDimensionKey(), context.getWorld(), target.getPos());
         boolean isAir = blockSnapshot.getCurrentBlock().isAir(context.getWorld(), target.getPos());
         if (firePlaceEvents && ForgeEventFactory.onBlockPlace(context.getPlayer(), blockSnapshot, Direction.UP))
             return new CheckResult(match, insertedItems, false, usePaste);

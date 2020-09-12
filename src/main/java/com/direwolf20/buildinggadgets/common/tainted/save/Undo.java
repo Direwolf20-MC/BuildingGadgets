@@ -90,7 +90,7 @@ public final class Undo {
                 inbt -> NBTUtil.readBlockPos((CompoundNBT) inbt),
                 inbt -> BlockInfo.deserialize((CompoundNBT) inbt, dataReverseObjectIncrementer, itemSetReverseObjectIncrementer));
 
-        RegistryKey<World> dim = RegistryKey.of(Registry.field_239699_ae_, new ResourceLocation(nbt.getString(NBTKeys.WORLD_SAVE_DIM)));
+        RegistryKey<World> dim = RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(nbt.getString(NBTKeys.WORLD_SAVE_DIM)));
         Region bounds = Region.deserializeFrom(nbt.getCompound(NBTKeys.WORLD_SAVE_UNDO_BOUNDS));
         return new Undo(dim, map, bounds);
     }
@@ -135,8 +135,8 @@ public final class Undo {
         ListNBT infoList = NBTHelper.serializeMap(dataMap, NBTUtil::writeBlockPos, i -> i.serialize(dataObjectIncrementer, itemObjectIncrementer));
         ListNBT dataList = dataObjectIncrementer.write(d -> d.serialize(serializerObjectIncrementer, true));
         ListNBT itemSetList = itemObjectIncrementer.write(ms -> NBTHelper.writeIterable(ms.entrySet(), entry -> writeEntry(entry, itemSerializerIncrementer)));
-        ListNBT dataSerializerList = serializerObjectIncrementer.write(ts -> StringNBT.of(ts.getRegistryName().toString()));
-        ListNBT itemSerializerList = itemSerializerIncrementer.write(s -> StringNBT.of(s.getRegistryName().toString()));
+        ListNBT dataSerializerList = serializerObjectIncrementer.write(ts -> StringNBT.valueOf(ts.getRegistryName().toString()));
+        ListNBT itemSerializerList = itemSerializerIncrementer.write(s -> StringNBT.valueOf(s.getRegistryName().toString()));
 
         res.putString(NBTKeys.WORLD_SAVE_DIM, dim.getRegistryName().toString());
         res.put(NBTKeys.WORLD_SAVE_UNDO_BLOCK_LIST, infoList);
@@ -229,7 +229,7 @@ public final class Undo {
         }
 
         public Undo build(World dim) {
-            return new Undo(dim.getRegistryKey(), mapBuilder.build(), regionBuilder != null ? regionBuilder.build() : Region.singleZero());
+            return new Undo(dim.getDimensionKey(), mapBuilder.build(), regionBuilder != null ? regionBuilder.build() : Region.singleZero());
         }
     }
 }

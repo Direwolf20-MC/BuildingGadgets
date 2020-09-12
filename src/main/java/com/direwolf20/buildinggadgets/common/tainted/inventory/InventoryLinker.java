@@ -43,7 +43,7 @@ public class InventoryLinker {
 
         // Set the relevant data
         CompoundNBT compound = stack.getOrCreateTag();
-        compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, world.getRegistryKey().getValue().toString());
+        compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, world.getDimensionKey().getRegistryName().toString());
         compound.put(NBTKeys.REMOTE_INVENTORY_POS, NBTUtil.writeBlockPos(trace.getPos()));
         return Result.success();
     }
@@ -54,7 +54,7 @@ public class InventoryLinker {
      */
     public static LazyOptional<IItemHandler> getLinkedInventory(World world, ItemStack stack) {
         Pair<BlockPos, RegistryKey<World>> dataFromStack = getDataFromStack(stack);
-        if (dataFromStack == null || !world.getRegistryKey().equals(dataFromStack.getValue())) {
+        if (dataFromStack == null || !world.getDimensionKey().equals(dataFromStack.getValue())) {
             return LazyOptional.empty();
         }
 
@@ -107,7 +107,7 @@ public class InventoryLinker {
             return null;
         }
 
-        RegistryKey<World> dimKey = RegistryKey.of(Registry.field_239699_ae_, new ResourceLocation(compound.getString(NBTKeys.REMOTE_INVENTORY_DIM)));
+        RegistryKey<World> dimKey = RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(compound.getString(NBTKeys.REMOTE_INVENTORY_DIM)));
         return Pair.of(
             NBTUtil.readBlockPos(compound.getCompound(NBTKeys.REMOTE_INVENTORY_POS)),
             dimKey

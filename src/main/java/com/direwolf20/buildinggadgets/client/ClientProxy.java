@@ -91,8 +91,9 @@ public class ClientProxy {
                 return false;
             }
 
+            // no clue
             @Override
-            public boolean isSideLit() {
+            public boolean func_230044_c_() { //isSideLit maybe?
                 return false;
             }
 
@@ -148,9 +149,9 @@ public class ClientProxy {
             }
 
             @Override
-            public boolean isSideLit() {
+            public boolean func_230044_c_() {
                 return false;
-            }
+            } // is side lit maybe?
 
             @Override
             public boolean isBuiltInRenderer() {

@@ -193,11 +193,11 @@ public class GadgetUtils {
         World world = player.world;
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, AbstractGadget.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
         if (world.isAirBlock(lookingAt.getPos()))
-            return ActionResult.fail(Blocks.AIR);
+            return ActionResult.resultFail(Blocks.AIR);
 
         BlockState state = world.getBlockState(lookingAt.getPos());
         if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock()) || state.getBlock() instanceof EffectBlock)
-            return ActionResult.fail(state.getBlock());
+            return ActionResult.resultFail(state.getBlock());
 
         Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getPos(), player.getActiveHand());
         data.ifPresent(placeState -> {
@@ -207,7 +207,7 @@ public class GadgetUtils {
             setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));
         });
 
-        return ActionResult.success(state.getBlock());
+        return ActionResult.resultSuccess(state.getBlock());
     }
 
     public static ActionResultType setRemoteInventory(ItemStack stack, PlayerEntity player, World world, BlockPos pos, boolean setTool) {

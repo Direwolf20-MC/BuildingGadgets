@@ -42,7 +42,7 @@ public class TemplateItem extends Item {
             return super.onItemRightClick(worldIn, playerIn, handIn);
 
         return GuiMod.MATERIAL_LIST.openScreen(playerIn)
-                ? ActionResult.success(playerIn.getHeldItem(handIn))
+                ? ActionResult.resultSuccess(playerIn.getHeldItem(handIn))
                 : super.onItemRightClick(worldIn, playerIn, handIn);
     }
 

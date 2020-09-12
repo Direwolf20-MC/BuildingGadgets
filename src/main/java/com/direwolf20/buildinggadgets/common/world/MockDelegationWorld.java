@@ -102,7 +102,7 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public DynamicRegistries getRegistryManager() {
+    public DynamicRegistries func_241828_r() {
         return null;
     }
 
@@ -118,9 +118,10 @@ public class MockDelegationWorld implements IWorld {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public int getMoonPhase() {
-        return delegate.getMoonPhase();
+    public int func_242414_af() {
+        return delegate.func_242414_af();
     }
+
 
     @Override
     public ITickList<Block> getPendingBlockTicks() {
@@ -169,14 +170,13 @@ public class MockDelegationWorld implements IWorld {
         return delegate.getRandom();
     }
 
-
-    @Override
-    public void updateNeighbors(BlockPos p_230547_1_, Block p_230547_2_) {
-                /*
-        left blank as we can't notify Blocks as this isn't a subclass of world and it makes no sense notifying the Blocks in the delegate
-        as they won't know about this Block...
-        */
-    }
+//    @Override
+//    public void updateNeighbors(BlockPos p_230547_1_, Block p_230547_2_) {
+//                /*
+//        left blank as we can't notify Blocks as this isn't a subclass of world and it makes no sense notifying the Blocks in the delegate
+//        as they won't know about this Block...
+//        */
+//    }
 
     /**
      * Checks to see if an air block exists at the provided location. Note that this only checks to see if the blocks
@@ -193,12 +193,7 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public Biome getGeneratorStoredBiome(int p_225604_1_, int p_225604_2_, int p_225604_3_) {
-        return null;
-    }
-
-    @Override
-    public Biome getBiomeForNoiseGen(int p_225526_1_, int p_225526_2_, int p_225526_3_) {
+    public Biome getNoiseBiomeRaw(int x, int y, int z) {
         return null;
     }
 
@@ -213,7 +208,7 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public BiomeManager getBiomeAccess() {
+    public BiomeManager getBiomeManager() {
         return null;
     }
 
@@ -250,8 +245,8 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public DimensionType getDimension() {
-        return delegate.getDimension();
+    public DimensionType func_230315_m_() {
+        return delegate.func_230315_m_();
     }
 
     @Override
@@ -321,11 +316,11 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public boolean breakBlock(BlockPos p_241212_1_, boolean p_241212_2_, @Nullable Entity p_241212_3_, int p_241212_4_) {
+    public boolean destroyBlock(BlockPos pos, boolean dropBlock, @Nullable Entity entity, int recursionLeft) {
         return false;
     }
 
-// todo: 1.16 removed.
+    // todo: 1.16 removed.
 //    @Override
 //    public boolean destroyBlock(BlockPos p_225521_1_, boolean p_225521_2_, @Nullable Entity p_225521_3_) {
 //        return false;
@@ -368,13 +363,18 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public float getBrightness(Direction p_230487_1_, boolean p_230487_2_) {
-        return delegate.getBrightness(p_230487_1_, p_230487_2_);
+    public float getBrightness(BlockPos pos) {
+        return delegate.getBrightness(pos);
     }
 
     @Override
-    public WorldLightManager getLightingProvider() {
-        return delegate.getLightingProvider();
+    public float func_230487_a_(Direction p_230487_1_, boolean p_230487_2_) {
+        return 0;
+    }
+
+    @Override
+    public WorldLightManager getLightManager() {
+        return delegate.getLightManager();
     }
 
     @Tainted(reason = "Pointless system, also, uncommented...")
@@ -420,7 +420,7 @@ public class MockDelegationWorld implements IWorld {
                         entity.setPos(pos);
                         //if we pass our wrapped world down to this, it will cause it to determine an errornous blockstate...
                         //we'd need to reflect into the te...
-                        entity.setLocation(null, pos);
+                        entity.setWorldAndPos(null, pos);
                         entity.onLoad();
                     }
                 } catch (Exception e) {

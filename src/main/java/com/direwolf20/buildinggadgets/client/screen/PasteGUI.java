@@ -95,6 +95,6 @@ public class PasteGUI extends Screen {
     }
 
     private void drawLabel(MatrixStack matrices, String name, int x) {
-        textRenderer.drawWithShadow(matrices, name, (width / 2f) + x, (height / 2f) - 30, 0xFFFFFF);
+        font.drawStringWithShadow(matrices, name, (width / 2f) + x, (height / 2f) - 30, 0xFFFFFF);
     }
 }

@@ -188,7 +188,7 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
     private void setVertexFormat(VertexFormat vertexFormatIn) {
         if (this.vertexFormat != vertexFormatIn) {
             this.vertexFormat = vertexFormatIn;
-            boolean flag = vertexFormatIn == DefaultVertexFormats.POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL;
+            boolean flag = vertexFormatIn == DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP; //POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL;
             boolean flag1 = vertexFormatIn == DefaultVertexFormats.BLOCK;
             this.fastFormat = flag || flag1;
             this.fullFormat = flag;
@@ -239,22 +239,22 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
             this.nextVertexFormatIndex();
         }
 
-        if (this.colorFixed && this.vertexFormatElement.getUsage() == VertexFormatElement.Usage.COLOR) {
-            IVertexConsumer.super.color(this.fixedRed, this.fixedGreen, this.fixedBlue, this.fixedAlpha);
+        if (this.defaultColor && this.vertexFormatElement.getUsage() == VertexFormatElement.Usage.COLOR) {
+            IVertexConsumer.super.color(this.defaultRed, this.defaultGreen, this.defaultBlue, this.defaultAlpha);
         }
 
     }
 
     public IVertexBuilder color(int red, int green, int blue, int alpha) {
-        if (this.colorFixed) {
+        if (this.defaultColor) {
             throw new IllegalStateException();
         } else {
             return IVertexConsumer.super.color(red, green, blue, alpha);
         }
     }
 
-    public void vertex(float x, float y, float z, float red, float green, float blue, float alpha, float texU, float texV, int overlayUV, int lightmapUV, float normalX, float normalY, float normalZ) {
-        if (this.colorFixed) {
+    public void addVertex(float x, float y, float z, float red, float green, float blue, float alpha, float texU, float texV, int overlayUV, int lightmapUV, float normalX, float normalY, float normalZ) {
+        if (this.defaultColor) {
             throw new IllegalStateException();
         } else if (this.fastFormat) {
             this.putFloat(0, x);
@@ -277,13 +277,13 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
 
             this.putShort(i + 0, (short) (lightmapUV & '\uffff'));
             this.putShort(i + 2, (short) (lightmapUV >> 16 & '\uffff'));
-            this.putByte(i + 4, IVertexConsumer.func_227846_a_(normalX)); // @mcp: func_227846_a_ = normalInt
-            this.putByte(i + 5, IVertexConsumer.func_227846_a_(normalY));
-            this.putByte(i + 6, IVertexConsumer.func_227846_a_(normalZ));
+            this.putByte(i + 4, IVertexConsumer.normalInt(normalX)); // @mcp: func_227846_a_ = normalInt
+            this.putByte(i + 5, IVertexConsumer.normalInt(normalY));
+            this.putByte(i + 6, IVertexConsumer.normalInt(normalZ));
             this.nextElementBytes += i + 8;
             this.endVertex();
         } else {
-            super.vertex(x, y, z, red, green, blue, alpha, texU, texV, overlayUV, lightmapUV, normalX, normalY, normalZ);
+            super.addVertex(x, y, z, red, green, blue, alpha, texU, texV, overlayUV, lightmapUV, normalX, normalY, normalZ);
         }
     }
 

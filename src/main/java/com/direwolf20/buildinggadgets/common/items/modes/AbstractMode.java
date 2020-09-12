@@ -48,7 +48,7 @@ public abstract class AbstractMode {
         return collect(context, player, startPos)
                 .stream()
                 .filter(e -> isExchanging ? this.exchangingValidator(e, lookingAtState, context) : this.validator(player, e, context))
-                .sorted(Comparator.comparing((BlockPos pos) -> player.getBlockPos().distanceSq(pos)))
+                .sorted(Comparator.comparing((BlockPos pos) -> player.getPosition().distanceSq(pos)))
                 .collect(Collectors.toList());
     }
 

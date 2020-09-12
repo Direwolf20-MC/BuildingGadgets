@@ -94,14 +94,14 @@ public class GuiIconActionable extends Button {
 
         RenderSystem.disableTexture();
         RenderSystem.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, .15f);
-        drawTexture(matrices, this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
+        blit(matrices, this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
         RenderSystem.enableTexture();
 
         RenderSystem.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, alpha);
         Minecraft.getInstance().getTextureManager().bindTexture(selected ? selectedTexture : deselectedTexture);
-        drawTexture(matrices, this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
+        blit(matrices, this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
 
         if( mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height )
-            drawStringWithShadow(matrices, Minecraft.getInstance().fontRenderer, this.getMessage().getString(), mouseX > (Minecraft.getInstance().getWindow().getScaledWidth() / 2) ?  mouseX + 2 : mouseX - Minecraft.getInstance().fontRenderer.getStringWidth(getMessage().getString()), mouseY - 10, activeColor.getRGB());
+            drawString(matrices, Minecraft.getInstance().fontRenderer, this.getMessage().getString(), mouseX > (Minecraft.getInstance().getMainWindow().getScaledWidth() / 2) ?  mouseX + 2 : mouseX - Minecraft.getInstance().fontRenderer.getStringWidth(getMessage().getString()), mouseY - 10, activeColor.getRGB());
     }
 }

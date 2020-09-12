@@ -81,7 +81,7 @@ public class BuildRender extends BaseRenderer {
         getBuilderWorld().setWorldAndState(player.world, renderBlockState, coordinates);
 
         Vector3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getBufferBuilders().getEntityVertexConsumers();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
 
         //Save the current position that is being rendered (I think)
         MatrixStack matrix = evt.getMatrixStack();
@@ -105,15 +105,15 @@ public class BuildRender extends BaseRenderer {
 //                } catch (Exception ignored) {}
 //            }
 
-            OurRenderTypes.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new OurRenderTypes.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().getBufferBuilders().getEntityVertexConsumers(), .55f);
+            OurRenderTypes.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new OurRenderTypes.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().getRenderTypeBuffers().getBufferSource(), .55f);
             dispatcher.renderBlock(
-                    state, matrix, mutatedBuffer, 15728640, OverlayTexture.DEFAULT_UV, EmptyModelData.INSTANCE
+                    state, matrix, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE
             );
 
             //Move the render position back to where it was
             matrix.pop();
             RenderSystem.disableDepthTest();
-            buffer.draw(); // @mcp: finish (mcp) = draw (yarn)
+            buffer.finish(); // @mcp: finish (mcp) = draw (yarn)
         }
 
         // Don't even waste the time checking to see if we have the right energy, items, etc for creative mode
@@ -136,17 +136,17 @@ public class BuildRender extends BaseRenderer {
                 if (!match.isSuccess())
                     match = index.tryMatch(InventoryHelper.PASTE_LIST);
                 if (!match.isSuccess() || hasEnergy < 0) {
-                    renderMissingBlock(matrix.peek().getModel(), builder, coordinate);
+                    renderMissingBlock(matrix.getLast().getMatrix(), builder, coordinate);
                 } else {
                     index.applyMatch(match); //notify the recording index that this counts
-                    renderBoxSolid(matrix.peek().getModel(), builder, coordinate, .97f, 1f, .99f, .1f);
+                    renderBoxSolid(matrix.getLast().getMatrix(), builder, coordinate, .97f, 1f, .99f, .1f);
                 }
             }
         }
 
         matrix.pop();
         RenderSystem.disableDepthTest();
-        buffer.draw(); // @mcp: finish (mcp) = draw (yarn)
+        buffer.finish(); // @mcp: finish (mcp) = draw (yarn)
     }
 
     @Override

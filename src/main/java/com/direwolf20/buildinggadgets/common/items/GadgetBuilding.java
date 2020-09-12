@@ -150,7 +150,7 @@ public class GadgetBuilding extends AbstractGadget {
             //itemstack.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> e.receiveEnergy(15000000, false));
             if (player.isSneaking()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
-                if( !result.getType().isAccepted() ) {
+                if( !result.getType().isSuccessOrConsume() ) {
                     player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
                     return super.onItemRightClick(world, player, hand);
                 }
@@ -256,7 +256,7 @@ public class GadgetBuilding extends AbstractGadget {
                 useConstructionPaste = true;
         }
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getRegistryKey(), world, pos);
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getDimensionKey(), world, pos);
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP) || ! world.isBlockModifiable(player, pos) || !this.canUse(heldItem, player))
             return;
 

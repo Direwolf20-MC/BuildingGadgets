@@ -31,7 +31,7 @@ public class ConstructionBlockEntityRender extends EntityRenderer<ConstructionBl
     @Override
     public void render(ConstructionBlockEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
         BlockRendererDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getBufferBuilders().getEntityVertexConsumers();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         IVertexBuilder builder;
         Minecraft mc = Minecraft.getInstance();
         builder = buffer.getBuffer(OurRenderTypes.RenderBlock);
@@ -46,13 +46,13 @@ public class ConstructionBlockEntityRender extends EntityRenderer<ConstructionBl
         matrixStackIn.translate(-0.0005f, -0.0005f, -0.0005f);
         matrixStackIn.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
         BlockColors blockColors = Minecraft.getInstance().getBlockColors();
-        int color = blockColors.getColor(renderBlockState, mc.player.world, entityIn.getBlockPos(), 0);
+        int color = blockColors.getColor(renderBlockState, mc.player.world, entityIn.getPosition(), 0);
         float f = (float) (color >> 16 & 255) / 255.0F;
         float f1 = (float) (color >> 8 & 255) / 255.0F;
         float f2 = (float) (color & 255) / 255.0F;
         IBakedModel ibakedmodel = blockrendererdispatcher.getModelForState(renderBlockState);
         for (Direction direction : Direction.values()) {
-            renderModelBrightnessColorQuads(matrixStackIn.peek(), builder, f, f1, f2, scale, ibakedmodel.getQuads(renderBlockState, direction, new Random(MathHelper.getPositionRandom(entityIn.getBlockPos())), EmptyModelData.INSTANCE), 15728640, 655360);
+            renderModelBrightnessColorQuads(matrixStackIn.getLast(), builder, f, f1, f2, scale, ibakedmodel.getQuads(renderBlockState, direction, new Random(MathHelper.getPositionRandom(entityIn.getPosition())), EmptyModelData.INSTANCE), 15728640, 655360);
         }
         matrixStackIn.pop();
     }

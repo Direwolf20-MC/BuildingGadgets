@@ -102,12 +102,12 @@ public final class Template {
         DataCompressor<ITileDataSerializer> dataSerializerCompressor = new DataCompressor<>();
         for (Map.Entry<BlockPos, BlockData> entry : map.entrySet()) {
             long posEntry = MathUtils.includeStateId(MathUtils.posToLong(entry.getKey()), blockDataCompressor.applyAsInt(entry.getValue()));
-            posList.add(LongNBT.of(posEntry));
+            posList.add(LongNBT.valueOf(posEntry));
         }
         ListNBT dataList = blockDataCompressor.write(d -> persisted ?
                 d.serialize(dataSerializerCompressor, true)
                 : d.serialize(false));
-        ListNBT serializerList = persisted ? dataSerializerCompressor.write(s -> StringNBT.of(s.getRegistryName().toString())) : null;
+        ListNBT serializerList = persisted ? dataSerializerCompressor.write(s -> StringNBT.valueOf(s.getRegistryName().toString())) : null;
         res.put(NBTKeys.KEY_DATA, dataList);
         res.put(NBTKeys.KEY_POS, posList);
         res.put(NBTKeys.KEY_HEADER, header.toNBT(persisted));

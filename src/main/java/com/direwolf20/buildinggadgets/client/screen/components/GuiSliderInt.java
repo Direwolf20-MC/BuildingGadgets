@@ -63,21 +63,21 @@ public class GuiSliderInt extends Slider {
             return;
 
         Minecraft mc = Minecraft.getInstance();
-        hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+        isHovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
         fill(matrices, x, y, x + width, y + height, colorBackground);
         renderBg(matrices, mc, mouseX, mouseY);
         renderText(matrices, mc, this);
     }
 
     private void renderText(MatrixStack matrices, Minecraft mc, Button component) {
-        int color = ! active ? 10526880 : (hovered ? 16777120 : - 1);
+        int color = ! active ? 10526880 : (isHovered ? 16777120 : - 1);
         String buttonText = component.getMessage().getString();
         int strWidth = mc.fontRenderer.getStringWidth(buttonText);
         int ellipsisWidth = mc.fontRenderer.getStringWidth("...");
         if (strWidth > component.getWidth() - 6 && strWidth > ellipsisWidth)
-            buttonText = mc.fontRenderer.trimToWidth(buttonText, component.getWidth() - 6 - ellipsisWidth).trim() + "...";
+            buttonText = mc.fontRenderer.func_238412_a_(buttonText, component.getWidth() - 6 - ellipsisWidth).trim() + "...";
 
-        drawCenteredString(matrices, mc.fontRenderer, buttonText, component.x + component.getWidth() / 2, component.y + (component.getHeight() - 8) / 2, color);
+        drawCenteredString(matrices, mc.fontRenderer, buttonText, component.x + component.getWidth() / 2, component.y + (component.getHeightRealms() - 8) / 2, color);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class GuiSliderInt extends Slider {
                 return;
 
             Minecraft mc = Minecraft.getInstance();
-            hovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
+            isHovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
             fill(matrices, x, y, x + width, y + height, parent.colorBackground);
             parent.drawBorderedRect(matrices, x, y, width, height);
             parent.renderText(matrices, mc, this);

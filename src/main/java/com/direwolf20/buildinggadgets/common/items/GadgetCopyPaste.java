@@ -312,7 +312,7 @@ public class GadgetCopyPaste extends AbstractGadget {
 
         if (! world.isRemote()) {
             if (player.isSneaking() && lookingAtInventory) {
-                return ActionResult.pass(stack);
+                return ActionResult.resultPass(stack);
             }
 
             if (getToolMode(stack) == ToolMode.COPY) {
@@ -323,7 +323,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         } else {
             if (player.isSneaking() && Screen.hasControlDown() && lookingAtInventory) {
                 PacketHandler.sendToServer(new PacketBindTool());
-                return ActionResult.pass(stack);
+                return ActionResult.resultPass(stack);
             }
 
             if (getToolMode(stack) == ToolMode.COPY) {

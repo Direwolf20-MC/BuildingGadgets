@@ -99,7 +99,7 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
 
     public boolean canInteractWith(PlayerEntity playerIn) {
         // If we are too far away (>4 blocks) from this tile entity you cannot use it
-        return ! isRemoved() && playerIn.getDistanceSq(Vector3d.of(pos).add(0.5D, 0.5D, 0.5D)) <= 64D;
+        return ! isRemoved() && playerIn.getDistanceSq(Vector3d.copy(pos).add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
     @Nonnull

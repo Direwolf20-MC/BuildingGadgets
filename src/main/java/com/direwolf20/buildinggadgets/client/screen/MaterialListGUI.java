@@ -11,6 +11,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
@@ -77,7 +78,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
 
         this.scrollingList = new ScrollingMaterialList(this);
         // Make it receive mouse scroll events, so that the player can use his mouse wheel at the start
-        this.setFocused(scrollingList);
+        this.setListener(scrollingList);
         this.children.add(scrollingList);
 
         int buttonY = getWindowBottomY() - (ScrollingMaterialList.BOTTOM / 2 + BUTTON_HEIGHT / 2);
@@ -124,14 +125,14 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         GuiUtils.drawTexturedModalRect(backgroundX, backgroundY, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, 0F);
 
         scrollingList.render(matrices, mouseX, mouseY, particleTicks);
-        drawStringWithShadow(matrices, textRenderer, title, titleLeft, titleTop, Color.WHITE.getRGB());
+        drawString(matrices, font, title, titleLeft, titleTop, Color.WHITE.getRGB());
         super.render(matrices, mouseX, mouseY, particleTicks);
 
         if (buttonCopyList.isMouseOver(mouseX, mouseY)) {
-            renderTooltip(matrices, ImmutableList.of(MaterialListTranslation.HELP_COPY_LIST.componentTranslation()), mouseX, mouseY);
+            renderTooltip(matrices, Lists.transform(ImmutableList.of(MaterialListTranslation.HELP_COPY_LIST.componentTranslation()), ITextComponent::func_241878_f), mouseX, mouseY);
 //            GuiUtils.drawHoveringText(matrices, ImmutableList.of(MaterialListTranslation.HELP_COPY_LIST.componentTranslation()), mouseX, mouseY, width, height, Integer.MAX_VALUE, textRenderer);
         } else if (hoveringText != null) {
-            renderTooltip(matrices, hoveringText, mouseX, mouseY);
+            renderTooltip(matrices, Lists.transform(hoveringText, ITextComponent::func_241878_f), mouseX, mouseY);
 
 //            GuiUtils.drawHoveringText(matrices, hoveringText, hoveringTextX, hoveringTextY, width, height, Integer.MAX_VALUE, textRenderer);
             hoveringText = null;
@@ -207,8 +208,8 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
                 : author == null ? MaterialListTranslation.TITLE_NAME_ONLY.format(name)
                 : MaterialListTranslation.TITLE.format(name, author);
 
-        this.titleTop = getYForAlignedCenter(backgroundY, getWindowTopY() + ScrollingMaterialList.TOP, textRenderer.FONT_HEIGHT);
-        this.titleLeft = getXForAlignedCenter(backgroundX, getWindowRightX(), textRenderer.getStringWidth(title));
+        this.titleTop = getYForAlignedCenter(backgroundY, getWindowTopY() + ScrollingMaterialList.TOP, font.FONT_HEIGHT);
+        this.titleLeft = getXForAlignedCenter(backgroundX, getWindowRightX(), font.getStringWidth(title));
     }
 
     @Override
@@ -260,14 +261,14 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
         int y = getYForAlignedCenter(top, bottom, fontRenderer.FONT_HEIGHT);
         RenderSystem.enableTexture();
-        fontRenderer.draw(matrices, text, leftX, y, color);
+        fontRenderer.drawString(matrices, text, leftX, y, color);
     }
 
     public static void renderTextHorizontalRight(MatrixStack matrices, String text, int right, int y, int color) {
         FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
         int x = getXForAlignedRight(right, fontRenderer.getStringWidth(text));
         RenderSystem.enableTexture();
-        fontRenderer.draw(matrices, text, x, y, color);
+        fontRenderer.drawString(matrices, text, x, y, color);
     }
 
     public static boolean isPointInBox(double x, double y, int bx, int by, int width, int height) {

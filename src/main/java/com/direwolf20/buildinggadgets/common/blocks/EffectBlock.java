@@ -121,7 +121,7 @@ public class EffectBlock extends Block {
     }
 
     public EffectBlock() {
-        super(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f).nonOpaque().noDrops());
+        super(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f).notSolid().noDrops());
     }
 
     @Override
@@ -155,7 +155,7 @@ public class EffectBlock extends Block {
     /**
      * This gets a complete list of items dropped from this block.
      *
-     * @param BlockState Current state
+     * @param p_220076_1_ Current state
      */
     @Override
     public List<ItemStack> getDrops(BlockState p_220076_1_, LootContext.Builder p_220076_2_) {
