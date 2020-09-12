@@ -450,7 +450,7 @@ public class ModeRadialMenu extends Screen {
     @Override
     public void tick() {
         if (!InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), KeyBindings.menuSettings.getKey().getKeyCode())) {
-            onClose();
+            closeScreen();
             changeMode();
         }
 

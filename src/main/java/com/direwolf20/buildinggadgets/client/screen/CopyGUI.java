@@ -76,10 +76,10 @@ public class CopyGUI extends Screen {
                 }
                 PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
             }));
-            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLOSE.componentTranslation(), (button) -> onClose()));
+            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLOSE.componentTranslation(), (button) -> closeScreen()));
             add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLEAR.componentTranslation(), (button) -> {
                 PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ZERO, BlockPos.ZERO));
-                onClose();
+                closeScreen();
             }));
 
             if( Config.GENERAL.allowAbsoluteCoords.get() ) {
