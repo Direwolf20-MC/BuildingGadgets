@@ -35,15 +35,13 @@ public class InventoryLinker {
                 .map(e -> removeIfSame(stack, trace.getPos()))
                 .orElse(Boolean.FALSE);
 
-        getLinkedInventory(world, stack).ifPresent(System.out::println);
-
         if (removed) {
             return Result.removed();
         }
 
         // Set the relevant data
         CompoundNBT compound = stack.getOrCreateTag();
-        compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, world.getDimensionKey().getRegistryName().toString());
+        compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, world.getDimensionKey().func_240901_a_().toString());
         compound.put(NBTKeys.REMOTE_INVENTORY_POS, NBTUtil.writeBlockPos(trace.getPos()));
         return Result.success();
     }

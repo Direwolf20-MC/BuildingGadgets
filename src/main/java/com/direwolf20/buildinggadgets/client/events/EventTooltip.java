@@ -25,9 +25,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.ITextProperties;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -57,6 +55,11 @@ public class EventTooltip {
     }
 
     public static void addTemplatePadding(ItemStack stack, List<ITextComponent> tooltip) {
+        if (true) {
+            // todo: remove this hack once the pr noted below has been pulled
+            return;
+        }
+
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
         Minecraft mc = Minecraft.getInstance();
         if (mc.world == null || mc.player == null) //populateSearchTreeManager...
@@ -93,6 +96,7 @@ public class EventTooltip {
         });
     }
 
+    // todo: Check once https://github.com/MinecraftForge/MinecraftForge/pull/7268/ has been pulled
     @SubscribeEvent
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
         if (!Screen.hasShiftDown())
