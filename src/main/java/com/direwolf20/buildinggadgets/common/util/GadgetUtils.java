@@ -185,7 +185,7 @@ public class GadgetUtils {
             return;
 
         InventoryLinker.Result result = InventoryLinker.linkInventory(player.world, stack, lookingAt);
-        player.sendStatusMessage(new TranslationTextComponent(result.getI18n().getTranslationKey()), true);
+        player.sendStatusMessage(result.getI18n().componentTranslation(world.getBlockState(lookingAt.getPos()).getBlock().getTranslatedName()), true);
     }
 
     public static ActionResult<Block> selectBlock(ItemStack stack, PlayerEntity player) {
