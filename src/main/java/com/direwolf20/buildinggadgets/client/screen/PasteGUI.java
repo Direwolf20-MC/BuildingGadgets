@@ -41,7 +41,7 @@ public class PasteGUI extends Screen {
         List<AbstractButton> buttons = new ArrayList<AbstractButton>() {{
             add(new CopyGUI.CenteredButton(y + 20, 70, GuiTranslation.SINGLE_CONFIRM.componentTranslation(), (button) -> {
                 PacketHandler.sendToServer(new PacketPasteGUI(X.getValue(), Y.getValue(), Z.getValue()));
-                onClose();
+                closeScreen();
             }));
 
             add(new CopyGUI.CenteredButton(y + 20, 40, GuiTranslation.SINGLE_RESET.componentTranslation(), (button) -> {
@@ -95,6 +95,6 @@ public class PasteGUI extends Screen {
     }
 
     private void drawLabel(MatrixStack matrices, String name, int x) {
-        textRenderer.drawWithShadow(matrices, name, (width / 2f) + x, (height / 2f) - 30, 0xFFFFFF);
+        font.drawStringWithShadow(matrices, name, (width / 2f) + x, (height / 2f) - 30, 0xFFFFFF);
     }
 }

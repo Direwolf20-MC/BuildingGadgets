@@ -1,17 +1,17 @@
 package com.direwolf20.buildinggadgets.client.events;
 
 import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
-import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
-import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
-import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
-import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
-import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
-import com.direwolf20.buildinggadgets.common.template.Template;
-import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
+import com.direwolf20.buildinggadgets.common.tainted.template.Template;
+import com.direwolf20.buildinggadgets.common.tainted.template.TemplateHeader;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
@@ -23,10 +23,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.ITextProperties;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -56,6 +55,11 @@ public class EventTooltip {
     }
 
     public static void addTemplatePadding(ItemStack stack, List<ITextComponent> tooltip) {
+        if (true) {
+            // todo: remove this hack once the pr noted below has been pulled
+            return;
+        }
+
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
         Minecraft mc = Minecraft.getInstance();
         if (mc.world == null || mc.player == null) //populateSearchTreeManager...
@@ -92,6 +96,7 @@ public class EventTooltip {
         });
     }
 
+    // todo: Check once https://github.com/MinecraftForge/MinecraftForge/pull/7268/ has been pulled
     @SubscribeEvent
     public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
         if (!Screen.hasShiftDown())
@@ -172,7 +177,7 @@ public class EventTooltip {
         ItemRenderer render = mc.getItemRenderer();
         //The zLevel is the position that the item is drawn on. If too low, it'll draw behind other items in the GUI. Bump it up and then back down to draw this on top of everything else
         render.zLevel += 500f;
-        net.minecraft.client.renderer.RenderHelper.enableGuiDepthLighting();
+        RenderHelper.enableStandardItemLighting();
         render.renderItemIntoGUI(itemStack, x, y);
         render.zLevel -= 500f;
         //String s1 = req == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
@@ -185,7 +190,7 @@ public class EventTooltip {
         //translating on the z axis here works like above. If too low, it'll draw the text behind items in the GUI. Items are drawn around zlevel 200 btw
         RenderSystem.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 500);
         RenderSystem.scalef(0.5F, 0.5F, 0.5F);
-        mc.fontRenderer.drawWithShadow(matrices, s1, 0, 0, color);
+        mc.fontRenderer.drawStringWithShadow(matrices, s1, 0, 0, color);
         RenderSystem.popMatrix();
 
         int missingCount = 0;
@@ -199,7 +204,7 @@ public class EventTooltip {
                 RenderSystem.pushMatrix();
                 RenderSystem.translatef(x + 8 - w2 / 4, y + 17, 500);
                 RenderSystem.scalef(0.5F, 0.5F, 0.5F);
-                mc.fontRenderer.drawWithShadow(matrices, s2, 0, 0, 0xFF0000);
+                mc.fontRenderer.drawStringWithShadow(matrices, s2, 0, 0, 0xFF0000);
                 RenderSystem.popMatrix();
                 missingCount = (req - count);
             }

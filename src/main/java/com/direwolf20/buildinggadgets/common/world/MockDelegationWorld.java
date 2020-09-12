@@ -1,8 +1,9 @@
 package com.direwolf20.buildinggadgets.common.world;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
+import com.direwolf20.buildinggadgets.common.tainted.Tainted;
+import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.google.common.base.Preconditions;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
@@ -20,6 +21,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.world.*;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeManager;
@@ -52,15 +54,6 @@ public class MockDelegationWorld implements IWorld {
 
     public Set<Entry<BlockPos, BlockInfo>> entrySet() {
         return Collections.unmodifiableSet(posToBlock.entrySet());
-    }
-
-    public void addBlock(@Nonnull BlockPos pos, BlockData data) {
-        addBlock(null, pos, data);
-    }
-
-    public void addBlock(@Nullable BuildContext context, @Nonnull BlockPos pos, BlockData data) {
-        if (data != null)
-            data.placeIn(BuildContext.builderOf(context).build(this.getWorld()), pos);
     }
 
     public IWorld getDelegate() {
@@ -109,6 +102,11 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
+    public DynamicRegistries func_241828_r() {
+        return null;
+    }
+
+    @Override
     public boolean removeBlock(BlockPos blockPos, boolean b) {
         return removeOverride(blockPos);
     }
@@ -118,27 +116,12 @@ public class MockDelegationWorld implements IWorld {
         return p_217375_2_.test(getBlockState(p_217375_1_));
     }
 
-    /**
-     * gets the current fullness of the moon expressed as a float between 1.0 and 0.0, in steps of .25
-     */
-    @Override
-    public float getCurrentMoonPhaseFactor() {
-        return delegate.getCurrentMoonPhaseFactor();
-    }
-
-    /**
-     * calls calculateCelestialAngle
-     */
-    @Override
-    public float getCelestialAngle(float partialTicks) {
-        return delegate.getCelestialAngle(partialTicks);
-    }
-
     @Override
     @OnlyIn(Dist.CLIENT)
-    public int getMoonPhase() {
-        return delegate.getMoonPhase();
+    public int func_242414_af() {
+        return delegate.func_242414_af();
     }
+
 
     @Override
     public ITickList<Block> getPendingBlockTicks() {
@@ -156,11 +139,6 @@ public class MockDelegationWorld implements IWorld {
     @Override
     public IChunk getChunk(int chunkX, int chunkZ) {
         return delegate.getChunk(chunkX, chunkZ);
-    }
-
-    @Override
-    public World getWorld() {
-        return delegate.getWorld();
     }
 
     @Override
@@ -192,14 +170,13 @@ public class MockDelegationWorld implements IWorld {
         return delegate.getRandom();
     }
 
-
-    @Override
-    public void updateNeighbors(BlockPos p_230547_1_, Block p_230547_2_) {
-                /*
-        left blank as we can't notify Blocks as this isn't a subclass of world and it makes no sense notifying the Blocks in the delegate
-        as they won't know about this Block...
-        */
-    }
+//    @Override
+//    public void updateNeighbors(BlockPos p_230547_1_, Block p_230547_2_) {
+//                /*
+//        left blank as we can't notify Blocks as this isn't a subclass of world and it makes no sense notifying the Blocks in the delegate
+//        as they won't know about this Block...
+//        */
+//    }
 
     /**
      * Checks to see if an air block exists at the provided location. Note that this only checks to see if the blocks
@@ -216,12 +193,7 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public Biome getGeneratorStoredBiome(int p_225604_1_, int p_225604_2_, int p_225604_3_) {
-        return null;
-    }
-
-    @Override
-    public Biome getBiomeForNoiseGen(int p_225526_1_, int p_225526_2_, int p_225526_3_) {
+    public Biome getNoiseBiomeRaw(int x, int y, int z) {
         return null;
     }
 
@@ -236,7 +208,7 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public BiomeManager getBiomeAccess() {
+    public BiomeManager getBiomeManager() {
         return null;
     }
 
@@ -273,8 +245,8 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public DimensionType getDimension() {
-        return delegate.getDimension();
+    public DimensionType func_230315_m_() {
+        return delegate.func_230315_m_();
     }
 
     @Override
@@ -344,11 +316,11 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public boolean breakBlock(BlockPos p_241212_1_, boolean p_241212_2_, @Nullable Entity p_241212_3_, int p_241212_4_) {
+    public boolean destroyBlock(BlockPos pos, boolean dropBlock, @Nullable Entity entity, int recursionLeft) {
         return false;
     }
 
-// todo: 1.16 removed.
+    // todo: 1.16 removed.
 //    @Override
 //    public boolean destroyBlock(BlockPos p_225521_1_, boolean p_225521_2_, @Nullable Entity p_225521_3_) {
 //        return false;
@@ -391,15 +363,21 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public float getBrightness(Direction p_230487_1_, boolean p_230487_2_) {
-        return delegate.getBrightness(p_230487_1_, p_230487_2_);
+    public float getBrightness(BlockPos pos) {
+        return delegate.getBrightness(pos);
     }
 
     @Override
-    public WorldLightManager getLightingProvider() {
-        return delegate.getLightingProvider();
+    public float func_230487_a_(Direction p_230487_1_, boolean p_230487_2_) {
+        return 0;
     }
 
+    @Override
+    public WorldLightManager getLightManager() {
+        return delegate.getLightManager();
+    }
+
+    @Tainted(reason = "Pointless system, also, uncommented...")
     public static class BlockInfo {
         private BlockPos pos;
         private BlockState state;
@@ -442,7 +420,7 @@ public class MockDelegationWorld implements IWorld {
                         entity.setPos(pos);
                         //if we pass our wrapped world down to this, it will cause it to determine an errornous blockstate...
                         //we'd need to reflect into the te...
-                        entity.setLocation(null, pos);
+                        entity.setWorldAndPos(null, pos);
                         entity.onLoad();
                     }
                 } catch (Exception e) {

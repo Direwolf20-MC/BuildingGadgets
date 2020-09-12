@@ -4,17 +4,17 @@ import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.BuildRender;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
-import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.ITileEntityData;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
+import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
+import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.ITileEntityData;
+import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
-import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
-import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
-import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
-import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.items.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -27,7 +27,6 @@ import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.google.common.collect.ImmutableMultiset;
@@ -165,7 +164,7 @@ public class GadgetExchanger extends AbstractGadget {
         if (!world.isRemote) {
             if (player.isSneaking()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
-                if( !result.getType().isAccepted() ) {
+                if( !result.getType().isSuccessOrConsume() ) {
                     player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
                     return super.onItemRightClick(world, player, hand);
                 }
@@ -278,7 +277,7 @@ public class GadgetExchanger extends AbstractGadget {
         if (! player.isAllowEdit() || ! world.isBlockModifiable(player, pos))
             return;
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.create(world, pos);
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getDimensionKey(), world, pos);
         BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP) || MinecraftForge.EVENT_BUS.post(e))
             return;
@@ -289,7 +288,7 @@ public class GadgetExchanger extends AbstractGadget {
             MaterialList materials = te instanceof ConstructionBlockTileEntity ? InventoryHelper.PASTE_LIST : data.getRequiredItems(
                     buildContext,
                     currentBlock,
-                    world.rayTraceBlocks(new RayTraceContext(player.getPositionVec(), Vector3d.of(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
+                    world.rayTraceBlocks(new RayTraceContext(player.getPositionVec(), Vector3d.copy(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
                     pos);
 
             Iterator<ImmutableMultiset<IUniqueObject<?>>> it = materials.iterator();

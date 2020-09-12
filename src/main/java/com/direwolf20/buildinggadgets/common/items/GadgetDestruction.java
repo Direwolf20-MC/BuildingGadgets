@@ -2,14 +2,14 @@ package com.direwolf20.buildinggadgets.common.items;
 
 import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
-import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
+import com.direwolf20.buildinggadgets.common.tainted.building.Region;
+import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.DestructionRender;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
-import com.direwolf20.buildinggadgets.common.save.Undo;
+import com.direwolf20.buildinggadgets.common.tainted.save.Undo;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -211,7 +211,7 @@ public class GadgetDestruction extends AbstractGadget {
 
         return new Region(first, second).stream()
                 .filter(e -> isValidBlock(world, e, player, world.getBlockState(e)))
-                .sorted(Comparator.comparing(player.getBlockPos()::distanceSq))
+                .sorted(Comparator.comparing(player.getPosition()::distanceSq))
                 .collect(Collectors.toList());
     }
 
@@ -226,7 +226,7 @@ public class GadgetDestruction extends AbstractGadget {
             return false;
 
         if (! world.isRemote) {
-            BlockSnapshot blockSnapshot = BlockSnapshot.create(world, voidPos);
+            BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getDimensionKey(), world, voidPos);
             if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP))
                 return false;
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);

@@ -2,13 +2,13 @@ package com.direwolf20.buildinggadgets.client.renders;
 
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
-import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
-import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
-import com.direwolf20.buildinggadgets.common.inventory.RecordingItemIndex;
-import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
+import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.RecordingItemIndex;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.GadgetExchanger;
@@ -81,7 +81,7 @@ public class BuildRender extends BaseRenderer {
         getBuilderWorld().setWorldAndState(player.world, renderBlockState, coordinates);
 
         Vector3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getBufferBuilders().getEntityVertexConsumers();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
 
         //Save the current position that is being rendered (I think)
         MatrixStack matrix = evt.getMatrixStack();
@@ -105,15 +105,15 @@ public class BuildRender extends BaseRenderer {
 //                } catch (Exception ignored) {}
 //            }
 
-            OurRenderTypes.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new OurRenderTypes.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().getBufferBuilders().getEntityVertexConsumers(), .55f);
+            OurRenderTypes.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new OurRenderTypes.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().getRenderTypeBuffers().getBufferSource(), .55f);
             dispatcher.renderBlock(
-                    state, matrix, mutatedBuffer, 15728640, OverlayTexture.DEFAULT_UV, EmptyModelData.INSTANCE
+                    state, matrix, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE
             );
 
             //Move the render position back to where it was
             matrix.pop();
             RenderSystem.disableDepthTest();
-            buffer.draw(); // @mcp: finish (mcp) = draw (yarn)
+            buffer.finish(); // @mcp: finish (mcp) = draw (yarn)
         }
 
         // Don't even waste the time checking to see if we have the right energy, items, etc for creative mode
@@ -136,17 +136,17 @@ public class BuildRender extends BaseRenderer {
                 if (!match.isSuccess())
                     match = index.tryMatch(InventoryHelper.PASTE_LIST);
                 if (!match.isSuccess() || hasEnergy < 0) {
-                    renderMissingBlock(matrix.peek().getModel(), builder, coordinate);
+                    renderMissingBlock(matrix.getLast().getMatrix(), builder, coordinate);
                 } else {
                     index.applyMatch(match); //notify the recording index that this counts
-                    renderBoxSolid(matrix.peek().getModel(), builder, coordinate, .97f, 1f, .99f, .1f);
+                    renderBoxSolid(matrix.getLast().getMatrix(), builder, coordinate, .97f, 1f, .99f, .1f);
                 }
             }
         }
 
         matrix.pop();
         RenderSystem.disableDepthTest();
-        buffer.draw(); // @mcp: finish (mcp) = draw (yarn)
+        buffer.finish(); // @mcp: finish (mcp) = draw (yarn)
     }
 
     @Override

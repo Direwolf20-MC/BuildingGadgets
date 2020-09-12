@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
-import com.direwolf20.buildinggadgets.common.building.BlockData;
-import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
+import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
+import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.tileentities.EffectBlockTileEntity;
@@ -121,7 +121,7 @@ public class EffectBlock extends Block {
     }
 
     public EffectBlock() {
-        super(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f).nonOpaque().noDrops());
+        super(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f).notSolid().noDrops());
     }
 
     @Override
@@ -155,7 +155,7 @@ public class EffectBlock extends Block {
     /**
      * This gets a complete list of items dropped from this block.
      *
-     * @param BlockState Current state
+     * @param p_220076_1_ Current state
      */
     @Override
     public List<ItemStack> getDrops(BlockState p_220076_1_, LootContext.Builder p_220076_2_) {

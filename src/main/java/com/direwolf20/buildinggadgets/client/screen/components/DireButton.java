@@ -20,17 +20,17 @@ public class DireButton extends Button {
             FontRenderer fontrenderer = Minecraft.getInstance().fontRenderer;
             Minecraft.getInstance().getTextureManager().bindTexture(WIDGETS_LOCATION);
             RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-            this.hovered = isMouseOver(mouseX, mouseY);
+            this.isHovered = isMouseOver(mouseX, mouseY);
             RenderSystem.enableBlend();
             RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
             RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            this.drawTexture(matrices, this.x, this.y, 0, 46, this.width / 2, this.height);
-            this.drawTexture(matrices, this.x + this.width / 2, this.y, 200 - this.width / 2, 46, this.width / 2, this.height);
+            this.blit(matrices, this.x, this.y, 0, 46, this.width / 2, this.height);
+            this.blit(matrices, this.x + this.width / 2, this.y, 200 - this.width / 2, 46, this.width / 2, this.height);
 
 
             int bottomToDraw = 2;
-            this.drawTexture(matrices, this.x, this.y + this.height - bottomToDraw, 0, 66 - bottomToDraw, this.width / 2, bottomToDraw);
-            this.drawTexture(matrices, this.x + this.width / 2, this.y + this.height - bottomToDraw, 200 - this.width / 2, 66 - bottomToDraw, this.width / 2, bottomToDraw);
+            this.blit(matrices, this.x, this.y + this.height - bottomToDraw, 0, 66 - bottomToDraw, this.width / 2, bottomToDraw);
+            this.blit(matrices, this.x + this.width / 2, this.y + this.height - bottomToDraw, 200 - this.width / 2, 66 - bottomToDraw, this.width / 2, bottomToDraw);
 
             int j = 14737632;
 
@@ -38,7 +38,7 @@ public class DireButton extends Button {
                 j = this.packedFGColor;
             } else if (! this.active) {
                 j = 10526880;
-            } else if (this.hovered) {
+            } else if (this.isHovered) {
                 j = 16777120;
             }
 

@@ -41,9 +41,13 @@ public class TemplateItem extends Item {
         if( !playerIn.isSneaking() )
             return super.onItemRightClick(worldIn, playerIn, handIn);
 
-        return GuiMod.MATERIAL_LIST.openScreen(playerIn)
-                ? ActionResult.success(playerIn.getHeldItem(handIn))
-                : super.onItemRightClick(worldIn, playerIn, handIn);
+        if (worldIn.isRemote) {
+            return GuiMod.MATERIAL_LIST.openScreen(playerIn)
+                    ? ActionResult.resultSuccess(playerIn.getHeldItem(handIn))
+                    : super.onItemRightClick(worldIn, playerIn, handIn);
+        }
+
+        return super.onItemRightClick(worldIn, playerIn, handIn);
     }
 
     public static ItemStack getTemplateItem(PlayerEntity player) {

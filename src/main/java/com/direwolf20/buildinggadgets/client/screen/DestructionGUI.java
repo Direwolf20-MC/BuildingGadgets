@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.ItemStack;
@@ -55,13 +56,13 @@ public class DestructionGUI extends Screen {
 
             if (isWithinBounds()) {
                 PacketHandler.sendToServer(new PacketDestructionGUI(left.getValueInt(), right.getValueInt(), up.getValueInt(), down.getValueInt(), depth.getValueInt()));
-                this.onClose();
+                this.closeScreen();
             }
             else
                 Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.DESTRCUT_TOO_LARGE.componentTranslation(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), true);
         }));
 
-        this.addButton(new Button((x - 30) - 32, y + 65, 60, 20, new TranslationTextComponent(GuiMod.getLangKeySingle("cancel")), b -> onClose()));
+        this.addButton(new Button((x - 30) - 32, y + 65, 60, 20, new TranslationTextComponent(GuiMod.getLangKeySingle("cancel")), b -> closeScreen()));
 
         sliders.clear();
         sliders.add(depth   = new GuiDestructionSlider(x - (GuiDestructionSlider.width / 2), y - (GuiDestructionSlider.height / 2), GuiTranslation.SINGLE_DEPTH.format() + ":", GadgetDestruction.getToolValue(destructionTool, "depth")));
@@ -115,9 +116,9 @@ public class DestructionGUI extends Screen {
     public void render(@Nonnull MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
         super.render(matrices, mouseX, mouseY, partialTicks);
 
-        this.drawCenteredString(matrices, textRenderer, this.sizeString, width / 2, (height / 2) + 40, this.isValidSize ? 0x00FF00 : 0xFF2000);
+        drawCenteredString(matrices, font, this.sizeString, width / 2, (height / 2) + 40, this.isValidSize ? 0x00FF00 : 0xFF2000);
         if (!this.isValidSize) {
-            this.drawCenteredString(matrices, textRenderer, MessageTranslation.DESTRCUT_TOO_LARGE.format(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), width / 2, (height / 2) + 50, 0xFF2000);
+            drawCenteredString(matrices, font, MessageTranslation.DESTRCUT_TOO_LARGE.format(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), width / 2, (height / 2) + 50, 0xFF2000);
         }
     }
 

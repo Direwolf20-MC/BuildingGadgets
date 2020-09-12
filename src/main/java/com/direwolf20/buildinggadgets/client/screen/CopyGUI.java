@@ -1,13 +1,12 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.client.screen.components.GuiIncrementer;
-import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
-import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -77,10 +76,10 @@ public class CopyGUI extends Screen {
                 }
                 PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
             }));
-            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLOSE.componentTranslation(), (button) -> onClose()));
+            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLOSE.componentTranslation(), (button) -> closeScreen()));
             add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLEAR.componentTranslation(), (button) -> {
                 PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ZERO, BlockPos.ZERO));
-                onClose();
+                closeScreen();
             }));
 
             if( Config.GENERAL.allowAbsoluteCoords.get() ) {
@@ -96,7 +95,7 @@ public class CopyGUI extends Screen {
     }
 
     private void drawFieldLabel(MatrixStack matrices, String name, int x, int y) {
-        textRenderer.drawWithShadow(matrices, name, this.x + x, this.y + y, 0xFFFFFF);
+        font.drawStringWithShadow(matrices, name, this.x + x, this.y + y, 0xFFFFFF);
     }
 
     private void coordsModeSwitch() {

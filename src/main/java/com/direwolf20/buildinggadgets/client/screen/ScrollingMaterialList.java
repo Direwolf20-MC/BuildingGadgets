@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.client.screen.components.EntryList;
-import com.direwolf20.buildinggadgets.common.inventory.IItemIndex;
-import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
-import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
-import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.google.common.collect.ImmutableMultiset;
@@ -82,7 +82,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
     }
 
     @Override
-    protected int getScrollbarPositionX() {
+    protected int getScrollbarPosition() {
         return getRight() - MARGIN - SCROLL_BAR_WIDTH;
     }
 
@@ -189,7 +189,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
 
         private void drawIcon(ItemStack item, int slotX, int slotY) {
             RenderSystem.pushMatrix();
-            RenderHelper.enableGuiDepthLighting();
+            RenderHelper.enableStandardItemLighting();
             Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(item, slotX, slotY);
             RenderSystem.disableLighting();
             RenderSystem.color3f(1, 1, 1);
@@ -258,7 +258,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
     }
 
     private void sort() {
-        children().sort(sortingMode.getComparator());
+        getEventListeners().sort(sortingMode.getComparator());
     }
 
     enum SortingModes {

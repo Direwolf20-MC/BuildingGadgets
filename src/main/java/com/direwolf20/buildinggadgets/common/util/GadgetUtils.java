@@ -2,17 +2,17 @@ package com.direwolf20.buildinggadgets.common.util;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
-import com.direwolf20.buildinggadgets.common.building.BlockData;
+import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.inventory.InventoryLinker;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryLinker;
 import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
-import com.direwolf20.buildinggadgets.common.template.Template;
-import com.direwolf20.buildinggadgets.common.template.TemplateHeader;
+import com.direwolf20.buildinggadgets.common.tainted.template.Template;
+import com.direwolf20.buildinggadgets.common.tainted.template.TemplateHeader;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
@@ -35,11 +35,11 @@ import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.*;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -185,7 +185,7 @@ public class GadgetUtils {
             return;
 
         InventoryLinker.Result result = InventoryLinker.linkInventory(player.world, stack, lookingAt);
-        player.sendStatusMessage(new TranslationTextComponent(result.getI18n().getTranslationKey()), true);
+        player.sendStatusMessage(result.getI18n().componentTranslation(world.getBlockState(lookingAt.getPos()).getBlock().getTranslatedName()), true);
     }
 
     public static ActionResult<Block> selectBlock(ItemStack stack, PlayerEntity player) {
@@ -193,11 +193,11 @@ public class GadgetUtils {
         World world = player.world;
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, AbstractGadget.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
         if (world.isAirBlock(lookingAt.getPos()))
-            return ActionResult.fail(Blocks.AIR);
+            return ActionResult.resultFail(Blocks.AIR);
 
         BlockState state = world.getBlockState(lookingAt.getPos());
         if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock()) || state.getBlock() instanceof EffectBlock)
-            return ActionResult.fail(state.getBlock());
+            return ActionResult.resultFail(state.getBlock());
 
         Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getPos(), player.getActiveHand());
         data.ifPresent(placeState -> {
@@ -207,7 +207,7 @@ public class GadgetUtils {
             setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));
         });
 
-        return ActionResult.success(state.getBlock());
+        return ActionResult.resultSuccess(state.getBlock());
     }
 
     public static ActionResultType setRemoteInventory(ItemStack stack, PlayerEntity player, World world, BlockPos pos, boolean setTool) {

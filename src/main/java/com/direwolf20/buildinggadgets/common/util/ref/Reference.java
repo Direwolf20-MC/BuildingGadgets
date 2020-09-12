@@ -1,10 +1,13 @@
 package com.direwolf20.buildinggadgets.common.util.ref;
 
+import com.direwolf20.buildinggadgets.common.tainted.Tainted;
 import net.minecraft.util.ResourceLocation;
 
 // todo: remove. I Don't like how Botania does it and I don't like it here either.
 //       if you want to have a string used in mutiple places, find a home for it. Magic classes
 //       are not a good solution for OO
+
+@Tainted(reason = "Awful. Contains a large amount of unused data or single-query data")
 public final class Reference {
     public static final String MODID = "buildinggadgets";
     public static final String MARKER_BEFORE = MODID + ":before";

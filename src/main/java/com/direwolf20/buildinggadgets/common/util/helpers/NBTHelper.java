@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.helpers;
 
+import com.direwolf20.buildinggadgets.common.tainted.Tainted;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.Multiset;
 import net.minecraft.nbt.CompoundNBT;
@@ -19,6 +20,8 @@ import java.util.stream.StreamSupport;
  * Utility class providing additional Methods for reading and writing array's which are not normally provided as
  * NBT-Objects from Minecraft.
  */
+
+@Tainted(reason = "Everything here is single use. It should not be a helper")
 public class NBTHelper {
     public static <T> ListNBT writeIterable(Iterable<T> iterable, Function<? super T, ? extends INBT> serializer) {
         return StreamSupport.stream(iterable.spliterator(), false).map(serializer).collect(toListNBT());

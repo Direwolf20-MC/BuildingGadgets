@@ -82,6 +82,9 @@ repositories {
         name = "ModMaven"
         url = "https://modmaven.k-4u.nl"
     }
+    maven { // gigaherz mappings maven
+        url 'https://www.dogforce-games.com/maven/'
+    }
 }
 
 dependencies {
@@ -110,7 +113,7 @@ processResources {
 }
 
 jar {
-    group = project.artifactGroup
+    group = 'artifact'
     manifest {
         attributes(["Specification-Title": "Buildinggadgets",
                     "Specification-Version": forge_major, // We are version 1 of the modlauncher specification
@@ -123,7 +126,7 @@ jar {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    group = project.artifactGroup
+    group = 'artifact'
     manifest = jar.manifest
     classifier = 'sources'
     from sourceSets.main.allSource

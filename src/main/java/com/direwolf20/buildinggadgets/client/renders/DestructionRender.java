@@ -44,14 +44,14 @@ public class DestructionRender extends BaseRenderer {
         stack.push();
         stack.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
 
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getBufferBuilders().getEntityVertexConsumers();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         IVertexBuilder builder = buffer.getBuffer(OurRenderTypes.MissingBlockOverlay);
 
         GadgetDestruction.getArea(world, startBlock, facing, player, heldItem)
-                .forEach(pos -> renderMissingBlock(stack.peek().getModel(), builder, pos));
+                .forEach(pos -> renderMissingBlock(stack.getLast().getMatrix(), builder, pos));
 
         stack.pop();
         RenderSystem.disableDepthTest();
-        buffer.draw(); // @mcp: draw = finish
+        buffer.finish(); // @mcp: draw = finish
     }
 }

@@ -224,7 +224,7 @@ public class ModeRadialMenu extends Screen {
             button.setWidth(dim);
             button.setHeight(dim);
             if (isDestruction)
-                button.y = height / 2 + (isRight ? 10 : -button.getHeight() - 10);
+                button.y = height / 2 + (isRight ? 10 : -button.getHeightRealms() - 10);
             else
                 button.x = width / 2 + offset;
         }
@@ -377,7 +377,7 @@ public class ModeRadialMenu extends Screen {
 
             int xsp = xp - 4;
             int ysp = yp;
-            int width = textRenderer.getStringWidth(name);
+            int width = font.getStringWidth(name);
 
             if (xsp < x)
                 xsp -= width - 8;
@@ -386,7 +386,7 @@ public class ModeRadialMenu extends Screen {
 
             Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
             if (data.isSelected())
-                textRenderer.drawWithShadow(matrices, name, xsp + (data.isCentralized() ? width / 2f - 4 : 0), ysp, color.getRGB());
+                font.drawStringWithShadow(matrices, name, xsp + (data.isCentralized() ? width / 2f - 4 : 0), ysp, color.getRGB());
 
             double mod = 0.7;
             int xdp = (int) ((xp - x) * mod + x);
@@ -395,13 +395,13 @@ public class ModeRadialMenu extends Screen {
             getMinecraft().getTextureManager().bindTexture(signs.get(i));
             RenderSystem.color4f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
             getMinecraft().getTextureManager().bindTexture(signs.get(i));
-            drawTexture(matrices, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
+            blit(matrices, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
         }
 
         RenderSystem.enableRescaleNormal();
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-        RenderHelper.enableGuiDepthLighting();
+        RenderHelper.enableStandardItemLighting();
 
         float s = 2.25F * fract;
         RenderSystem.scalef(s, s, s);
@@ -449,12 +449,12 @@ public class ModeRadialMenu extends Screen {
 
     @Override
     public void tick() {
-        if (!InputMappings.isKeyDown(Minecraft.getInstance().getWindow().getHandle(), KeyBindings.menuSettings.getKey().getKeyCode())) {
-            onClose();
+        if (!InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), KeyBindings.menuSettings.getKey().getKeyCode())) {
+            closeScreen();
             changeMode();
         }
 
-        ImmutableSet<KeyBinding> set = ImmutableSet.of(getMinecraft().gameSettings.keyBindForward, getMinecraft().gameSettings.keyBindLeft, getMinecraft().gameSettings.keyBindBack, getMinecraft().gameSettings.keyBindRight, getMinecraft().gameSettings.keySneak, getMinecraft().gameSettings.keyBindSprint, getMinecraft().gameSettings.keyBindJump);
+        ImmutableSet<KeyBinding> set = ImmutableSet.of(getMinecraft().gameSettings.keyBindForward, getMinecraft().gameSettings.keyBindLeft, getMinecraft().gameSettings.keyBindBack, getMinecraft().gameSettings.keyBindRight, getMinecraft().gameSettings.keyBindSneak, getMinecraft().gameSettings.keyBindSprint, getMinecraft().gameSettings.keyBindJump);
         for (KeyBinding k : set)
             KeyBinding.setKeyBindState(k.getKey(), k.isKeyDown());
 

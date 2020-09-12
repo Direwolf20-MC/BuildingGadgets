@@ -4,10 +4,10 @@ import com.direwolf20.buildinggadgets.client.renderer.DireBufferBuilder;
 import com.direwolf20.buildinggadgets.client.renderer.DireVertexBuffer;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.common.building.Region;
-import com.direwolf20.buildinggadgets.common.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.building.view.BuildContext;
+import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.tainted.building.Region;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.world.MockDelegationWorld;
@@ -86,30 +86,30 @@ public class CopyPasteRender extends BaseRenderer {
 
         int R = 255, G = 223, B = 127;
 
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getBufferBuilders().getEntityVertexConsumers();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
         IVertexBuilder builder = buffer.getBuffer(OurRenderTypes.CopyGadgetLines);
 
-        Matrix4f matrix4f = matrix.peek().getModel();
-        builder.vertex(matrix4f, x, y, z).color(G, G, G, 0.0F).endVertex();
-        builder.vertex(matrix4f, x, y, z).color(G, G, G, R).endVertex();
-        builder.vertex(matrix4f, dx, y, z).color(G, B, B, R).endVertex();
-        builder.vertex(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
-        builder.vertex(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
-        builder.vertex(matrix4f, x, y, z).color(B, B, G, R).endVertex();
-        builder.vertex(matrix4f, x, dy, z).color(B, G, B, R).endVertex();
-        builder.vertex(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
-        builder.vertex(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
-        builder.vertex(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
-        builder.vertex(matrix4f, x, dy, z).color(G, G, G, R).endVertex();
-        builder.vertex(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
-        builder.vertex(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
-        builder.vertex(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
-        builder.vertex(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
-        builder.vertex(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
-        builder.vertex(matrix4f, dx, y, z).color(G, G, G, R).endVertex();
-        builder.vertex(matrix4f, dx, y, z).color(G, G, G, 0.0F).endVertex();
+        Matrix4f matrix4f = matrix.getLast().getMatrix();
+        builder.pos(matrix4f, x, y, z).color(G, G, G, 0.0F).endVertex();
+        builder.pos(matrix4f, x, y, z).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, y, z).color(G, B, B, R).endVertex();
+        builder.pos(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, x, y, z).color(B, B, G, R).endVertex();
+        builder.pos(matrix4f, x, dy, z).color(B, G, B, R).endVertex();
+        builder.pos(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, x, dy, z).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, y, z).color(G, G, G, R).endVertex();
+        builder.pos(matrix4f, dx, y, z).color(G, G, G, 0.0F).endVertex();
 
-        buffer.draw(); // @mcp: draw = finish
+        buffer.finish(); // @mcp: draw = finish
     }
 
     private void renderPaste(MatrixStack matrices, Vector3d cameraView, PlayerEntity player, ItemStack heldItem) {
@@ -154,7 +154,7 @@ public class CopyPasteRender extends BaseRenderer {
             }
 
             matrix.translate(startPos.getX(), startPos.getY(), startPos.getZ());
-            renderBuffer.render(matrix.peek().getModel()); //Actually draw whats in the buffer
+            renderBuffer.render(matrix.getLast().getMatrix()); //Actually draw whats in the buffer
             return;
         }
 
@@ -196,16 +196,16 @@ public class CopyPasteRender extends BaseRenderer {
                         for (Direction direction : Direction.values()) {
                             if (Block.shouldSideBeRendered(state, context.getWorld(), targetPos, direction) && !(context.getWorld().getBlockState(targetPos.offset(direction)).getBlock().equals(state.getBlock()))) {
                                 if (state.getMaterial().isOpaque()) {
-                                    renderModelBrightnessColorQuads(stack.peek(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                                    renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                                 } else {
-                                    renderModelBrightnessColorQuads(stack.peek(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                                    renderModelBrightnessColorQuads(stack.getLast(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                                 }
                             }
                         }
                         if (state.getMaterial().isOpaque())
-                            renderModelBrightnessColorQuads(stack.peek(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                            renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                         else
-                            renderModelBrightnessColorQuads(stack.peek(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                            renderModelBrightnessColorQuads(stack.getLast(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                     }
                 } catch (Exception e) {
                     BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
@@ -223,7 +223,7 @@ public class CopyPasteRender extends BaseRenderer {
 //        } catch (Exception ignored) {
 //        }
         matrix.translate(startPos.getX(), startPos.getY(), startPos.getZ());
-        renderBuffer.render(matrix.peek().getModel()); //Actually draw whats in the buffer
+        renderBuffer.render(matrix.getLast().getMatrix()); //Actually draw whats in the buffer
     }
 
     @Override
@@ -291,13 +291,13 @@ public class CopyPasteRender extends BaseRenderer {
             buffers.forEach((rt, vbo) -> {
                 VertexFormat fmt = rt.getVertexFormat();
 
-                rt.startDrawing();
+                rt.setupRenderState();
                 vbo.bindBuffer();
-                fmt.startDrawing(0L);
+                fmt.setupBufferState(0L);
                 vbo.draw(matrix, rt.getDrawMode());
                 DireVertexBuffer.unbindBuffer();
-                fmt.endDrawing();
-                rt.endDrawing();
+                fmt.clearBufferState();
+                rt.clearRenderState();
             });
         }
 

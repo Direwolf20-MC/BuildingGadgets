@@ -33,7 +33,7 @@ public class ConstructionBakedModel implements IDynamicBakedModel {
 
     // No idea, required for bakeModel
     @Override
-    public boolean isSideLit() {
+    public boolean func_230044_c_() {
         return false;
     }
 
