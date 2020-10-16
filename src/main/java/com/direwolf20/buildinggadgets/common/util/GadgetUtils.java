@@ -34,8 +34,6 @@ import net.minecraft.util.*;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.*;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -185,7 +183,7 @@ public class GadgetUtils {
             return;
 
         InventoryLinker.Result result = InventoryLinker.linkInventory(player.world, stack, lookingAt);
-        player.sendStatusMessage(result.getI18n().componentTranslation(world.getBlockState(lookingAt.getPos()).getBlock().getTranslatedName()), true);
+        player.sendStatusMessage(result.getI18n().componentTranslation(), true);
     }
 
     public static ActionResult<Block> selectBlock(ItemStack stack, PlayerEntity player) {

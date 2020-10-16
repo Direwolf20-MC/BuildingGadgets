@@ -53,5 +53,7 @@ public final class SplitPacketUpdateTemplate extends UUIDPacket {
             else
                 SaveManager.INSTANCE.getTemplateProvider().setTemplate(new TemplateKey(getId()), template);
         });
+
+        contextSupplier.get().setPacketHandled(true);
     }
 }

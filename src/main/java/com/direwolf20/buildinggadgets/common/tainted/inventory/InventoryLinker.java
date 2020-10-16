@@ -41,7 +41,7 @@ public class InventoryLinker {
 
         // Set the relevant data
         CompoundNBT compound = stack.getOrCreateTag();
-        compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, world.getDimensionKey().func_240901_a_().toString());
+        compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, world.getDimensionKey().getRegistryName().toString());
         compound.put(NBTKeys.REMOTE_INVENTORY_POS, NBTUtil.writeBlockPos(trace.getPos()));
         return Result.success();
     }
@@ -105,7 +105,7 @@ public class InventoryLinker {
             return null;
         }
 
-        RegistryKey<World> dimKey = RegistryKey.func_240903_a_(Registry.WORLD_KEY, new ResourceLocation(compound.getString(NBTKeys.REMOTE_INVENTORY_DIM)));
+        RegistryKey<World> dimKey = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compound.getString(NBTKeys.REMOTE_INVENTORY_DIM)));
         return Pair.of(
             NBTUtil.readBlockPos(compound.getCompound(NBTKeys.REMOTE_INVENTORY_POS)),
             dimKey

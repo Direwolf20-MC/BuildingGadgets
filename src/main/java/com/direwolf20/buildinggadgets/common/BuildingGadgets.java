@@ -70,13 +70,13 @@ public final class BuildingGadgets {
     public BuildingGadgets() {
         IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
+        ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
+        ModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_CONFIG);
+
         OurBlocks.BLOCKS.register(eventBus);
         OurItems.ITEMS.register(eventBus);
         OurTileEntities.TILE_ENTITIES.register(eventBus);
         OurContainers.CONTAINERS.register(eventBus);
-
-        ModLoadingContext.get().registerConfig(Type.SERVER, Config.SERVER_CONFIG);
-        ModLoadingContext.get().registerConfig(Type.CLIENT, Config.CLIENT_CONFIG);
 
         MinecraftForge.EVENT_BUS.addListener(this::serverLoad);
         MinecraftForge.EVENT_BUS.addListener(this::serverLoaded);

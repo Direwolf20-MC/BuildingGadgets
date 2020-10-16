@@ -22,6 +22,7 @@ public class PacketBindTool {
                 if (player == null)
                     return;
 
+                System.out.println(ctx.get().getDirection());
                 ItemStack stack = AbstractGadget.getGadget(player);
                 if (!(stack.getItem() instanceof GadgetDestruction))
                     GadgetUtils.linkToInventory(stack, player);

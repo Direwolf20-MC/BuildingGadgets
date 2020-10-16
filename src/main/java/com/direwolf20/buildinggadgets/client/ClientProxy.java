@@ -91,9 +91,8 @@ public class ClientProxy {
                 return false;
             }
 
-            // no clue
             @Override
-            public boolean func_230044_c_() { //isSideLit maybe?
+            public boolean isSideLit() { //isSideLit maybe?
                 return false;
             }
 
@@ -149,7 +148,7 @@ public class ClientProxy {
             }
 
             @Override
-            public boolean func_230044_c_() {
+            public boolean isSideLit() {
                 return false;
             } // is side lit maybe?
 

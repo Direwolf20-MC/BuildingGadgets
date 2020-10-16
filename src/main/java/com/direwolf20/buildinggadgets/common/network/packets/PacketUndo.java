@@ -26,6 +26,8 @@ public class PacketUndo {
             ItemStack stack = AbstractGadget.getGadget(player);
             if (! stack.isEmpty() && !(stack.getItem() instanceof GadgetExchanger))
                 ((AbstractGadget) stack.getItem()).undo(player.world, player, stack);
+
+            ctx.get().setPacketHandled(true);
         }
     }
 }
