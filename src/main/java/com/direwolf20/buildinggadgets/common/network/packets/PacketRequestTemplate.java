@@ -26,5 +26,7 @@ public final class PacketRequestTemplate extends UUIDPacket {
             else
                 SaveManager.INSTANCE.getTemplateProvider().requestRemoteUpdate(new TemplateKey(getId()));
         });
+
+        contextSupplier.get().setPacketHandled(true);
     }
 }

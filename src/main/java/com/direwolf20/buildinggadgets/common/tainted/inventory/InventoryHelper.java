@@ -21,10 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
+import net.minecraft.item.*;
 import net.minecraft.state.Property;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
@@ -47,14 +44,11 @@ import java.util.function.Supplier;
 public class InventoryHelper {
     public static final MaterialList PASTE_LIST = MaterialList.of(new UniqueItem(OurItems.CONSTRUCTION_PASTE_ITEM.get()));
 
-    private static final Set<Property<?>> SAFE_PROPERTIES =
-            ImmutableSet.of(SlabBlock.TYPE, StairsBlock.HALF, BlockStateProperties.AXIS, DirectionalBlock.FACING, StairsBlock.FACING, TrapDoorBlock.HALF, TrapDoorBlock.OPEN, StairsBlock.SHAPE, LeverBlock.POWERED, RepeaterBlock.DELAY, PaneBlock.EAST, PaneBlock.WEST, PaneBlock.NORTH, PaneBlock.SOUTH);
-
-    private static final Set<Property<?>> SAFE_PROPERTIES_COPY_PASTE =
-            ImmutableSet.<Property<?>>builder().addAll(SAFE_PROPERTIES).add(RailBlock.SHAPE, PoweredRailBlock.SHAPE, ChestBlock.TYPE).build();
-
     private static final Set<Property<?>> UNSAFE_PROPERTIES =
-            ImmutableSet.<Property<?>>builder().add(CropsBlock.AGE).build();
+            ImmutableSet.<Property<?>>builder()
+                    .add(CropsBlock.AGE)
+                    .add(DoublePlantBlock.HALF)
+                    .build();
 
     public static final CreativeItemIndex CREATIVE_INDEX = new CreativeItemIndex();
 

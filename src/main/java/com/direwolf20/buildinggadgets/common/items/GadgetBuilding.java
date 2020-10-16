@@ -257,7 +257,7 @@ public class GadgetBuilding extends AbstractGadget {
         }
 
         BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getDimensionKey(), world, pos);
-        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP) || ! world.isBlockModifiable(player, pos) || !this.canUse(heldItem, player))
+        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP) || ! world.isBlockModifiable(player, pos) || !this.canUse(heldItem, player) || !setBlock.getState().isValidPosition(world, pos))
             return;
 
         this.applyDamage(heldItem, player);

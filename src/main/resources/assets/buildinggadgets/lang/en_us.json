@@ -138,7 +138,7 @@
   "buildinggadgets.message.boundTE": "Bound Gadget to Inventory",
   "buildinggadgets.message.unboundTE": "Unbound Gadget from Inventory",
   "buildinggadgets.message.failed_to_bind": "Failed to bind to inventory",
-  "buildinggadgets.message.invalid_inventory": "%s is not a valid inventory",
+  "buildinggadgets.message.invalid_inventory": "This block is not a valid inventory",
   "buildinggadgets.message.first_copy": "First Position set",
   "buildinggadgets.easter_eggs.9x9.for_the_collection": "Another 9 by 9 for Dire'S collection... Go submit it!",
   "buildinggadgets.easter_eggs.9x9.just_like_dire": "A 9 by 9 just like Dire's.",

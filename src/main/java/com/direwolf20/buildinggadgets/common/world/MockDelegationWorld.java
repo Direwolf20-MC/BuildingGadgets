@@ -118,10 +118,9 @@ public class MockDelegationWorld implements IWorld {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public int func_242414_af() {
-        return delegate.func_242414_af();
+    public int getMoonPhase() {
+        return delegate.getMoonPhase();
     }
-
 
     @Override
     public ITickList<Block> getPendingBlockTicks() {
@@ -245,8 +244,8 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public DimensionType func_230315_m_() {
-        return delegate.func_230315_m_();
+    public DimensionType getDimensionType() {
+        return delegate.getDimensionType();
     }
 
     @Override

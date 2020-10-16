@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.network.split.SplitPacket;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
@@ -22,12 +23,12 @@ public class PacketHandler {
     private static short index = 0;
     private static final PacketSplitManager SPLIT_MANAGER = new PacketSplitManager();
 
-    public static final SimpleChannel HANDLER = NetworkRegistry.ChannelBuilder
-            .named(Reference.NETWORK_CHANNEL_ID_MAIN)
-            .clientAcceptedVersions(PROTOCOL_VERSION::equals)
-            .serverAcceptedVersions(PROTOCOL_VERSION::equals)
-            .networkProtocolVersion(() -> PROTOCOL_VERSION)
-            .simpleChannel();
+    public static final SimpleChannel HANDLER = NetworkRegistry.newSimpleChannel(
+            new ResourceLocation(Reference.MODID, "main"),
+            () -> PROTOCOL_VERSION,
+            PROTOCOL_VERSION::equals,
+            PROTOCOL_VERSION::equals
+    );
 
     public static PacketSplitManager getSplitManager() {
         return SPLIT_MANAGER;
@@ -62,7 +63,7 @@ public class PacketHandler {
 
     public static void sendTo(Object msg, ServerPlayerEntity player) {
         if (!(player instanceof FakePlayer))
-            HANDLER.sendTo(msg, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+            HANDLER.sendTo(msg, player.connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
     }
 
     public static void sendToServer(Object msg) {

@@ -20,6 +20,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.ImmutableList;
+import net.minecraft.block.BedBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -34,8 +35,6 @@ import net.minecraft.util.*;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.math.*;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -51,6 +50,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class GadgetUtils {
+    private static final ImmutableList<Block> DISALLOWED_BLOCKS = ImmutableList.of(
+        Blocks.END_PORTAL, Blocks.NETHER_PORTAL, Blocks.END_PORTAL_FRAME, Blocks.BEDROCK
+    );
+
     private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http","www");
 
     public static boolean mightBeLink(final String s) {
@@ -185,7 +188,7 @@ public class GadgetUtils {
             return;
 
         InventoryLinker.Result result = InventoryLinker.linkInventory(player.world, stack, lookingAt);
-        player.sendStatusMessage(result.getI18n().componentTranslation(world.getBlockState(lookingAt.getPos()).getBlock().getTranslatedName()), true);
+        player.sendStatusMessage(result.getI18n().componentTranslation(), true);
     }
 
     public static ActionResult<Block> selectBlock(ItemStack stack, PlayerEntity player) {
@@ -198,6 +201,14 @@ public class GadgetUtils {
         BlockState state = world.getBlockState(lookingAt.getPos());
         if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock()) || state.getBlock() instanceof EffectBlock)
             return ActionResult.resultFail(state.getBlock());
+
+        if (DISALLOWED_BLOCKS.contains(state.getBlock())) {
+            return ActionResult.resultFail(state.getBlock());
+        }
+
+        if (state.getBlockHardness(world, lookingAt.getPos()) < 0) {
+            return ActionResult.resultFail(state.getBlock());
+        }
 
         Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getPos(), player.getActiveHand());
         data.ifPresent(placeState -> {
