@@ -21,10 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
+import net.minecraft.item.*;
 import net.minecraft.state.Property;
 import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
@@ -50,7 +47,7 @@ public class InventoryHelper {
     private static final Set<Property<?>> UNSAFE_PROPERTIES =
             ImmutableSet.<Property<?>>builder()
                     .add(CropsBlock.AGE)
-                    .add(BlockStateProperties.HALF)
+                    .add(DoublePlantBlock.HALF)
                     .build();
 
     public static final CreativeItemIndex CREATIVE_INDEX = new CreativeItemIndex();
