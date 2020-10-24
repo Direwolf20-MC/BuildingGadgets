@@ -61,6 +61,9 @@ import java.util.stream.Collectors;
 
 public class GadgetUtils {
     private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http","www");
+    private static final ImmutableList<Block> DISALLOWED_BLOCKS = ImmutableList.of(
+            Blocks.END_PORTAL, Blocks.NETHER_PORTAL, Blocks.END_PORTAL_FRAME, Blocks.BEDROCK
+    );
 
     public static boolean mightBeLink(final String s) {
         return LINK_STARTS.stream().anyMatch(s::startsWith);
@@ -206,6 +209,14 @@ public class GadgetUtils {
         BlockState state = world.getBlockState(lookingAt.getPos());
         if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock()) || state.getBlock() instanceof EffectBlock)
             return ActionResult.resultFail(state.getBlock());
+
+        if (DISALLOWED_BLOCKS.contains(state.getBlock())) {
+            return ActionResult.resultFail(state.getBlock());
+        }
+
+        if (state.getBlockHardness(world, lookingAt.getPos()) < 0) {
+            return ActionResult.resultFail(state.getBlock());
+        }
 
         Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getPos(), player.getActiveHand());
         data.ifPresent(placeState -> {

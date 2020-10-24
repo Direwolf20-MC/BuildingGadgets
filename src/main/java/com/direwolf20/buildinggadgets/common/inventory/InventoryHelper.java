@@ -25,6 +25,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.IProperty;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -46,16 +47,12 @@ import java.util.function.Supplier;
  */
 public class InventoryHelper {
     public static final MaterialList PASTE_LIST = MaterialList.of(new UniqueItem(OurItems.CONSTRUCTION_PASTE_ITEM.get()));
-    private static IProperty AXIS = EnumProperty.create("axis", Direction.Axis.class);
-
-    private static final Set<IProperty> SAFE_PROPERTIES =
-            ImmutableSet.of(SlabBlock.TYPE, StairsBlock.HALF, LogBlock.AXIS, AXIS, DirectionalBlock.FACING, StairsBlock.FACING, TrapDoorBlock.HALF, TrapDoorBlock.OPEN, StairsBlock.SHAPE, LeverBlock.POWERED, RepeaterBlock.DELAY, PaneBlock.EAST, PaneBlock.WEST, PaneBlock.NORTH, PaneBlock.SOUTH);
-
-    private static final Set<IProperty> SAFE_PROPERTIES_COPY_PASTE =
-            ImmutableSet.<IProperty>builder().addAll(SAFE_PROPERTIES).add(RailBlock.SHAPE, PoweredRailBlock.SHAPE, ChestBlock.TYPE).build();
 
     private static final Set<IProperty<?>> UNSAFE_PROPERTIES =
-            ImmutableSet.<IProperty<?>>builder().add(CropsBlock.AGE).build();
+            ImmutableSet.<IProperty<?>>builder()
+                    .add(CropsBlock.AGE)
+                    .add(BlockStateProperties.HALF)
+                    .build();
 
     public static final CreativeItemIndex CREATIVE_INDEX = new CreativeItemIndex();
 
