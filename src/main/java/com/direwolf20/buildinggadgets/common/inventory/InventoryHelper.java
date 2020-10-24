@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.inventory;
 
+import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.building.BlockData;
 import com.direwolf20.buildinggadgets.common.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.inventory.handle.IHandleProvider;
@@ -7,8 +8,10 @@ import com.direwolf20.buildinggadgets.common.inventory.handle.IObjectHandle;
 import com.direwolf20.buildinggadgets.common.inventory.handle.ItemHandlerProvider;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
-import com.direwolf20.buildinggadgets.common.items.*;
-import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
+import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
+import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.registry.TopologicalRegistryBuilder;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.CommonUtils;
@@ -16,18 +19,18 @@ import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.block.*;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.CropsBlock;
+import net.minecraft.block.DoublePlantBlock;
+import net.minecraft.block.FlowingFluidBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
-import net.minecraft.state.EnumProperty;
 import net.minecraft.state.IProperty;
-import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
@@ -37,7 +40,6 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -51,7 +53,7 @@ public class InventoryHelper {
     private static final Set<IProperty<?>> UNSAFE_PROPERTIES =
             ImmutableSet.<IProperty<?>>builder()
                     .add(CropsBlock.AGE)
-                    .add(BlockStateProperties.HALF)
+                    .add(DoublePlantBlock.HALF)
                     .build();
 
     public static final CreativeItemIndex CREATIVE_INDEX = new CreativeItemIndex();
