@@ -18,11 +18,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
@@ -159,46 +162,45 @@ public class EventTooltip {
 
     private static int renderRequiredBlocks(ItemStack itemStack, int x, int y, int count, int req) {
         Minecraft mc = Minecraft.getInstance();
-        RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
-
         ItemRenderer render = mc.getItemRenderer();
-        //The zLevel is the position that the item is drawn on. If too low, it'll draw behind other items in the GUI. Bump it up and then back down to draw this on top of everything else
-        render.zLevel += 500f;
-        net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
-        render.renderItemIntoGUI(itemStack, x, y);
-        render.zLevel -= 500f;
-        //String s1 = req == Integer.MAX_VALUE ? "\u221E" : TextFormatting.BOLD + Integer.toString((int) ((float) req));
+
         String s1 = req == Integer.MAX_VALUE ? "\u221E" : Integer.toString(req);
         int w1 = mc.fontRenderer.getStringWidth(s1);
-        int color = 0xFFFFFF;
 
         boolean hasReq = req > 0;
-        RenderSystem.pushMatrix();
-        //translating on the z axis here works like above. If too low, it'll draw the text behind items in the GUI. Items are drawn around zlevel 200 btw
-        RenderSystem.translatef(x + 8 - w1 / 4, y + (hasReq ? 12 : 14), 500);
-        RenderSystem.scalef(0.5F, 0.5F, 0.5F);
-        mc.fontRenderer.drawStringWithShadow(s1, 0, 0, color);
-        RenderSystem.popMatrix();
+
+        render.zLevel += 201f;
+        render.renderItemAndEffectIntoGUI(mc.player, itemStack, x, y);
+        render.renderItemOverlays(mc.fontRenderer, itemStack, x, y);
+        render.zLevel -= 201f;
+
+        MatrixStack matrixstack = new MatrixStack();
+
+        matrixstack.push();
+        matrixstack.translate(x + 8 - w1 / 4f, y + (hasReq ? 12 : 14), render.zLevel + 600.0F);
+        matrixstack.scale(.5f, .5f, 0);
+        IRenderTypeBuffer.Impl irendertypebuffer$impl = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
+        mc.fontRenderer.renderString(s1, 0, 0, 0xFFFFFF, true, matrixstack.getLast().getMatrix(), irendertypebuffer$impl, false, 0, 15728880);
+        matrixstack.pop();
 
         int missingCount = 0;
-
         if (hasReq) {
             if (count < req) {
                 String fs = Integer.toString(req - count);
                 String s2 = "(" + fs + ")";
                 int w2 = mc.fontRenderer.getStringWidth(s2);
 
-                RenderSystem.pushMatrix();
-                RenderSystem.translatef(x + 8 - w2 / 4, y + 17, 500);
-                RenderSystem.scalef(0.5F, 0.5F, 0.5F);
-                mc.fontRenderer.drawStringWithShadow(s2, 0, 0, 0xFF0000);
-                RenderSystem.popMatrix();
+                matrixstack.push();
+                matrixstack.translate(x + 8 - w2 / 4f, y + 17, render.zLevel + 600.0F);
+                matrixstack.scale(.5f, .5f, 0);
+                mc.fontRenderer.renderString(s2, 0, 0, 0xFF0000, true, matrixstack.getLast().getMatrix(), irendertypebuffer$impl, false, 0, 15728880);
+                matrixstack.pop();
+
                 missingCount = (req - count);
             }
         }
-        RenderSystem.enableDepthTest();
-        RenderSystem.depthMask(true);
+
+        irendertypebuffer$impl.finish();
         return missingCount;
     }
 }
