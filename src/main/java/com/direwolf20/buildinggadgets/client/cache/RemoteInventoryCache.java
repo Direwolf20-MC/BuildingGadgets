@@ -1,11 +1,10 @@
 package com.direwolf20.buildinggadgets.client.cache;
 
-import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper.IRemoteInventoryProvider;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketSetRemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Multiset;
 import net.minecraft.item.ItemStack;
@@ -19,17 +18,17 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-public class RemoteInventoryCache implements IRemoteInventoryProvider {
+public class RemoteInventoryCache {
     private boolean isCopyPaste, forceUpdate;
     private Pair<ResourceLocation, BlockPos> locCached;
-    private Multiset<UniqueItem> cache;
+    private Multiset<IUniqueObject<?>> cache;
     private Stopwatch timer;
 
     public RemoteInventoryCache(boolean isCopyPaste) {
         this.isCopyPaste = isCopyPaste;
     }
 
-    public void setCache(Multiset<UniqueItem> cache) {
+    public void setCache(Multiset<IUniqueObject<?>> cache) {
         this.cache = cache;
     }
 
@@ -37,13 +36,16 @@ public class RemoteInventoryCache implements IRemoteInventoryProvider {
         forceUpdate = true;
     }
 
-    @Override
-    public int countItem(ItemStack tool, ItemStack stack) {
+    public Multiset<IUniqueObject<?>> getCache() {
+        return cache;
+    }
+
+    public boolean maintainCache(ItemStack tool) {
         Pair<ResourceLocation, BlockPos> loc = getInventoryLocation(tool);
         if (isCacheOld(loc))
             updateCache(loc);
 
-        return cache == null ? 0 : cache.count(new UniqueItem(stack.getItem()));
+        return loc != null;
     }
 
     private void updateCache(Pair<ResourceLocation, BlockPos> loc) {

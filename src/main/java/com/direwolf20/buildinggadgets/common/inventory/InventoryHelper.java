@@ -158,34 +158,6 @@ public class InventoryHelper {
         return inv.addItemStackToInventory(giveItemStack);
     }
 
-    public interface IRemoteInventoryProvider {
-        int countItem(ItemStack tool, ItemStack stack);
-    }
-
-    public static int countItem(ItemStack itemStack, PlayerEntity player, IRemoteInventoryProvider remoteInventory) {
-        if (player.isCreative())
-            return Integer.MAX_VALUE;
-
-        long count = remoteInventory.countItem(AbstractGadget.getGadget(player), itemStack);
-        PlayerInventory inv = player.inventory;
-        List<Integer> slots = findItem(itemStack.getItem(), inv);
-        List<IItemHandler> invContainers = findInvContainers(inv);
-        if (slots.size() == 0 && invContainers.size() == 0 && count == 0) {
-            return 0;
-        }
-        if (invContainers.size() > 0) {
-            for (IItemHandler container : invContainers) {
-                count += countInContainer(container, itemStack.getItem());
-            }
-        }
-
-        for (int slot : slots) {
-            ItemStack stackInSlot = inv.getStackInSlot(slot);
-            count += stackInSlot.getCount();
-        }
-        return longToInt(count);
-    }
-
     public static int countPaste(PlayerEntity player) {
         if (player.isCreative())
             return Integer.MAX_VALUE;

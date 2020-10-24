@@ -8,12 +8,16 @@ import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.inventory.materials.MaterialList;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.google.common.collect.Multiset;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
@@ -23,6 +27,7 @@ import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.Vec3d;
@@ -119,9 +124,14 @@ public class BuildRender extends BaseRenderer {
         if (!player.isCreative()) {
             IVertexBuilder builder;
 
+            SimpleBuildContext context = new SimpleBuildContext(player.world, player, heldItem);
+
+            boolean hasLinkedInventory = getCacheInventory().maintainCache(heldItem);
+            int remainingCached = getCacheInventory().getCache() == null ? -1 : getCacheInventory().getCache().count(new UniqueItem(data.getState().getBlock().asItem()));
+
             // Figure out how many of the block we're rendering we have in the inventory of the player.
             IItemIndex index = new RecordingItemIndex(InventoryHelper.index(heldItem, player));
-            MaterialList materials = data.getRequiredItems(new SimpleBuildContext(player.world, player, heldItem), null, null);
+            MaterialList materials = data.getRequiredItems(context, null, null);
             int hasEnergy = getEnergy(player, heldItem);
 
             LazyOptional<IEnergyStorage> energyCap = heldItem.getCapability(CapabilityEnergy.ENERGY);
@@ -135,7 +145,12 @@ public class BuildRender extends BaseRenderer {
                 if (!match.isSuccess())
                     match = index.tryMatch(InventoryHelper.PASTE_LIST);
                 if (!match.isSuccess() || hasEnergy < 0) {
-                    renderMissingBlock(matrix.getLast().getMatrix(), builder, coordinate);
+                    // I hate this but meh.
+                    if (hasLinkedInventory && remainingCached > 0) {
+                        remainingCached --;
+                    } else {
+                        renderMissingBlock(matrix.getLast().getMatrix(), builder, coordinate);
+                    }
                 } else {
                     index.applyMatch(match); //notify the recording index that this counts
                     renderBoxSolid(matrix.getLast().getMatrix(), builder, coordinate, .97f, 1f, .99f, .1f);

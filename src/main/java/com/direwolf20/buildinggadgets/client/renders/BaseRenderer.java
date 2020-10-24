@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.client.renders;
 
 import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.world.MockTileEntityRenderWorld;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.google.common.collect.Multiset;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -197,7 +197,7 @@ public abstract class BaseRenderer {
         return cacheInventory;
     }
 
-    public static void setInventoryCache(Multiset<UniqueItem> cache) {
+    public static void setInventoryCache(Multiset<IUniqueObject<?>> cache) {
         BaseRenderer.cacheInventory.setCache(cache);
     }
 

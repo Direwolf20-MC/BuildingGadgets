@@ -3,9 +3,10 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.IUniqueObject;
+import com.direwolf20.buildinggadgets.common.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
@@ -26,11 +27,11 @@ import java.util.function.Supplier;
 
 public class PacketSetRemoteInventoryCache {
 
-    private boolean isCopyPaste;
-    private Multiset<UniqueItem> cache;
+    private final boolean isCopyPaste;
+    private Multiset<IUniqueObject<?>> cache;
     private Pair<ResourceLocation, BlockPos> loc;
 
-    public PacketSetRemoteInventoryCache(Multiset<UniqueItem> cache, boolean isCopyPaste) {
+    public PacketSetRemoteInventoryCache(Multiset<IUniqueObject<?>> cache, boolean isCopyPaste) {
         this.cache = cache;
         this.isCopyPaste = isCopyPaste;
     }
@@ -47,11 +48,11 @@ public class PacketSetRemoteInventoryCache {
             return new PacketSetRemoteInventoryCache(loc, isCopyPaste);
         }
         int len = buf.readInt();
-        ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
+        ImmutableMultiset.Builder<IUniqueObject<?>> builder = ImmutableMultiset.builder();
         for (int i = 0; i < len; i++)
             builder.addCopies(new UniqueItem(Item.getItemById(buf.readInt())), buf.readInt());
 
-        Multiset<UniqueItem> cache = builder.build();
+        Multiset<IUniqueObject<?>> cache = builder.build();
         return new PacketSetRemoteInventoryCache(cache, isCopyPaste);
     }
 
@@ -64,11 +65,11 @@ public class PacketSetRemoteInventoryCache {
             buf.writeLong(msg.getLoc().getRight().toLong());
             return;
         }
-        Set<Entry<UniqueItem>> items = msg.getCache().entrySet();
+        Set<Entry<IUniqueObject<?>>> items = msg.getCache().entrySet();
         buf.writeInt(items.size());
-        for (Entry<UniqueItem> entry : items) {
-            UniqueItem uniqueItem = entry.getElement();
-            buf.writeInt(Item.getIdFromItem(uniqueItem.getItem()));
+        for (Entry<IUniqueObject<?>> entry : items) {
+            IUniqueObject<?> uniqueItem = entry.getElement();
+            buf.writeInt(Item.getIdFromItem(uniqueItem.createStack().getItem()));
             buf.writeInt(entry.getCount());
         }
     }
@@ -77,7 +78,7 @@ public class PacketSetRemoteInventoryCache {
         return isCopyPaste;
     }
 
-    public Multiset<UniqueItem> getCache() {
+    public Multiset<IUniqueObject<?>> getCache() {
         return cache;
     }
 
@@ -91,7 +92,7 @@ public class PacketSetRemoteInventoryCache {
                 ServerPlayerEntity player = ctx.get().getSender();
                 if (player != null) {
                     Set<UniqueItem> itemTypes = new HashSet<>();
-                    ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
+                    ImmutableMultiset.Builder<IUniqueObject<?>> builder = ImmutableMultiset.builder();
                     IItemHandler remoteInventory = GadgetUtils.getRemoteInventory(msg.loc.getRight(), msg.loc.getLeft(), player.world);
                     if (remoteInventory != null) {
                         for (int i = 0; i < remoteInventory.getSlots(); i++) {
@@ -114,6 +115,8 @@ public class PacketSetRemoteInventoryCache {
                 else
                     BaseRenderer.setInventoryCache(msg.getCache());
             });
+
+            ctx.get().setPacketHandled(true);
         }
     }
 }
