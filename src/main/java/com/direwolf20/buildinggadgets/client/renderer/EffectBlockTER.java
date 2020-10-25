@@ -56,9 +56,11 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
             renderBlockState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
 
         OurRenderTypes.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new OurRenderTypes.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().getRenderTypeBuffers().getBufferSource(), .55f);
-        dispatcher.renderBlock(
-                renderBlockState, stack, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE
-        );
+        try {
+            dispatcher.renderBlock(
+                    renderBlockState, stack, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE
+            );
+        } catch (Exception ignored) {} // if it fails to render then we'll get a bug report I'm sure.
 
         stack.pop();
         stack.push();

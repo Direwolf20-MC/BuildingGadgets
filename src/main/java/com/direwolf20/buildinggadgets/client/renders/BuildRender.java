@@ -110,9 +110,11 @@ public class BuildRender extends BaseRenderer {
             }
 
             OurRenderTypes.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new OurRenderTypes.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().getRenderTypeBuffers().getBufferSource(), .55f);
-            dispatcher.renderBlock(
-                    state, matrix, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE
-            );
+            try {
+                dispatcher.renderBlock(
+                        state, matrix, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE
+                );
+            } catch (Exception ignored) {} // if it fails to render then we'll get a bug report I'm sure.
 
             //Move the render position back to where it was
             matrix.pop();
