@@ -8,6 +8,10 @@
     <a href="https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/LICENSE.md"><img alt="GitHub license" src="https://img.shields.io/github/license/direwolf20-MC/buildinggadgets"></a>
     <a href="https://github.com/direwolf20-MC/buildinggadgets/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/direwolf20-MC/buildinggadgets"></a>
     <a href="https://github.com/direwolf20-MC/buildinggadgets/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/direwolf20-MC/buildinggadgets"></a>
+    <a href="https://discord.gg/qqUUtu3"><img alt="discord" src="https://img.shields.io/discord/541740767761399808" ></a>
+    <a href="https://github.com/Direwolf20-MC/BuildingGadgets/commits/master"><img alt="activity" src="https://img.shields.io/github/last-commit/direwolf20-mc/buildinggadgets" ></a>
+    <a href="https://github.com/Direwolf20-MC/BuildingGadgets/releases/latest"><img alt="GitHub Release Date" src="https://img.shields.io/github/release-date/direwolf20-mc/buildinggadgets"></a>
+    <a href="https://github.com/Direwolf20-MC/BuildingGadgets/tree/master/src/main/java/com/direwolf20/buildinggadgets"><img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/direwolf20-mc/buildinggadgets"></a>
 </p>
 
 <p data-comment="this fakes a line break">&zwnj;</p>
