@@ -101,7 +101,7 @@ public final class BlockData {
         return new BlockData(state, data);
     }
 
-    private final BlockState state;
+    private BlockState state;
     private final ITileEntityData tileData;
 
     /**
@@ -113,6 +113,11 @@ public final class BlockData {
     public BlockData(BlockState state, ITileEntityData tileData) {
         this.state = Objects.requireNonNull(state);
         this.tileData = Objects.requireNonNull(tileData);
+    }
+
+    // This will annoy major :D
+    public void setState(BlockState state) {
+        this.state = state;
     }
 
     /**
