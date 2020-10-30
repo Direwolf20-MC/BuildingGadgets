@@ -19,6 +19,7 @@ import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public class InventoryLinker {
     /**
@@ -41,7 +42,7 @@ public class InventoryLinker {
 
         // Set the relevant data
         CompoundNBT compound = stack.getOrCreateTag();
-        compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, world.getDimensionKey().getRegistryName().toString());
+        compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, world.getDimensionKey().getLocation().toString());
         compound.put(NBTKeys.REMOTE_INVENTORY_POS, NBTUtil.writeBlockPos(trace.getPos()));
         return Result.success();
     }
@@ -50,20 +51,31 @@ public class InventoryLinker {
      * Directly fetch the linked inventory if the tile exists (removes if not) and if the tile holds
      * a capability.
      */
-    public static LazyOptional<IItemHandler> getLinkedInventory(World world, ItemStack stack) {
-        Pair<BlockPos, RegistryKey<World>> dataFromStack = getDataFromStack(stack);
-        if (dataFromStack == null || !world.getDimensionKey().equals(dataFromStack.getValue())) {
+    public static LazyOptional<IItemHandler> getLinkedInventory(World world, BlockPos pos, RegistryKey<World> registry, @Nullable ItemStack stack) {
+        if (!world.getDimensionKey().equals(registry)) {
             return LazyOptional.empty();
         }
 
-        TileEntity tileEntity = world.getTileEntity(dataFromStack.getKey());
+        TileEntity tileEntity = world.getTileEntity(pos);
         if (tileEntity == null) {
             // Unlink if the tile entity no longer exists
-            removeDataFromStack(stack);
+            if (stack != null) {
+                removeDataFromStack(stack);
+            }
+
             return LazyOptional.empty();
         }
 
         return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+    }
+
+    public static LazyOptional<IItemHandler> getLinkedInventory(World world, ItemStack stack) {
+        Pair<BlockPos, RegistryKey<World>> dataFromStack = getDataFromStack(stack);
+        if (dataFromStack == null) {
+            return LazyOptional.empty();
+        }
+
+        return getLinkedInventory(world, dataFromStack.getKey(), dataFromStack.getValue(), stack);
     }
 
     /**

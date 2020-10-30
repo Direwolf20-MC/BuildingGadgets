@@ -113,8 +113,9 @@ public class GadgetBuilding extends AbstractGadget {
         addEnergyInformation(tooltip, stack);
 
         tooltip.add(TooltipTranslation.GADGET_MODE
-                .componentTranslation((mode == BuildingModes.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
-                        .format(new TranslationTextComponent(mode.getTranslationKey())) : new TranslationTextComponent(mode.getTranslationKey())))
+                .componentTranslation((mode == BuildingModes.SURFACE && getConnectedArea(stack)
+                        ? TooltipTranslation.GADGET_CONNECTED.format(new TranslationTextComponent(mode.getTranslationKey()).getString())
+                        : new TranslationTextComponent(mode.getTranslationKey())))
                 .setStyle(Styles.AQUA));
 
         tooltip.add(TooltipTranslation.GADGET_BLOCK
@@ -209,7 +210,7 @@ public class GadgetBuilding extends AbstractGadget {
 
             Direction sideHit = lookingAt.getFace();
             coords = getToolMode(stack).getMode().getCollection(
-                    new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, sideHit, placeAtop(stack)),
+                    new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, sideHit, placeAtop(stack), getConnectedArea(stack)),
                     player
             );
         }

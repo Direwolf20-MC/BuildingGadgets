@@ -118,17 +118,18 @@ public abstract class AbstractMode {
     }
 
     public static class UseContext {
-        private World world;
-        private BlockState setState;
-        private BlockPos startPos;
-        private Direction hitSide;
+        private final World world;
+        private final BlockState setState;
+        private final BlockPos startPos;
+        private final Direction hitSide;
 
-        private boolean isFuzzy;
-        private boolean placeOnTop;
-        private int range;
-        private boolean rayTraceFluid;
+        private final boolean isFuzzy;
+        private final boolean placeOnTop;
+        private final int range;
+        private final boolean rayTraceFluid;
+        private final boolean isConnected;
 
-        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean placeOnTop) {
+        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean placeOnTop, boolean isConnected) {
             this.world = world;
             this.setState = setState;
             this.startPos = startPos;
@@ -138,11 +139,12 @@ public abstract class AbstractMode {
             this.rayTraceFluid = AbstractGadget.shouldRayTraceFluid(gadget);
             this.hitSide = hitSide;
 
+            this.isConnected = isConnected;
             this.placeOnTop = placeOnTop;
         }
 
-        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide) {
-            this(world, setState, startPos, gadget, hitSide, false);
+        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean isConnected) {
+            this(world, setState, startPos, gadget, hitSide, false, isConnected);
         }
 
         public BlockItemUseContext createBlockUseContext(PlayerEntity player) {
@@ -153,6 +155,10 @@ public abstract class AbstractMode {
                             VectorHelper.getLookingAt(player, this.rayTraceFluid)
                     )
             );
+        }
+
+        public boolean isConnected() {
+            return isConnected;
         }
 
         public BlockState getWorldState(BlockPos pos) {

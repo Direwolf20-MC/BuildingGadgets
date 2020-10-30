@@ -335,9 +335,9 @@ public final class Region implements Serializable {
 //     * @see #contains(int, int, int)
 //     */
 //    @Override
-//    public boolean mayContain(int x, int y, int z) {
-//        return contains(x, y, z);
-//    }
+    public boolean mayContain(int x, int y, int z) {
+        return contains(x, y, z);
+    }
 
     /**
      * @param x X
@@ -348,6 +348,10 @@ public final class Region implements Serializable {
      */
     public boolean contains(int x, int y, int z) {
         return containsX(x) && containsY(y) && containsZ(z);
+    }
+
+    public boolean contains(Vector3i vec) {
+        return mayContain(vec.getX(), vec.getY(), vec.getZ());
     }
 
     public boolean intersectsWith(Region other) {

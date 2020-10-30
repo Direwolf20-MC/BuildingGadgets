@@ -214,7 +214,9 @@ public class GadgetUtils {
         data.ifPresent(placeState -> {
             BlockState actualState = placeState.getState(); //.getExtendedState(world, lookingAt.getPos()); 1.14 @todo: fix?
 
-            setToolBlock(stack, placeState);
+            BlockData defaultStateData = new BlockData(placeState.getState().getBlock().getDefaultState(), placeState.getTileData());
+
+            setToolBlock(stack, defaultStateData);
             setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));
         });
 
@@ -257,7 +259,7 @@ public class GadgetUtils {
             return false;
 
         BlockData blockData = getToolBlock(stack);
-        AbstractMode.UseContext context = new AbstractMode.UseContext(player.world, blockData.getState(), startBlock, stack, sideHit, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack));
+        AbstractMode.UseContext context = new AbstractMode.UseContext(player.world, blockData.getState(), startBlock, stack, sideHit, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack), stack.getItem() instanceof GadgetBuilding ? GadgetBuilding.getConnectedArea(stack) : GadgetExchanger.getConnectedArea(stack));
 
         List<BlockPos> coords = stack.getItem() instanceof GadgetBuilding
                 ? GadgetBuilding.getToolMode(stack).getMode().getCollection(context, player)

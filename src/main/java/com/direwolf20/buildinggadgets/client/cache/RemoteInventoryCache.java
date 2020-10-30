@@ -2,16 +2,15 @@ package com.direwolf20.buildinggadgets.client.cache;
 
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketSetRemoteInventoryCache;
-import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryLinker;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Multiset;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import org.apache.commons.lang3.tuple.ImmutablePair;
+import net.minecraft.world.World;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -20,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RemoteInventoryCache {
     private boolean isCopyPaste, forceUpdate;
-    private Pair<ResourceLocation, BlockPos> locCached;
+    private Pair<BlockPos, RegistryKey<World>> locCached;
     private Multiset<UniqueItem> cache;
     private Stopwatch timer;
 
@@ -36,15 +35,19 @@ public class RemoteInventoryCache {
         forceUpdate = true;
     }
 
-    public int countItem(ItemStack tool, ItemStack stack) {
-        Pair<ResourceLocation, BlockPos> loc = getInventoryLocation(tool);
+    public boolean maintainCache(ItemStack tool) {
+        Pair<BlockPos, RegistryKey<World>> loc = InventoryLinker.getDataFromStack(tool);
         if (isCacheOld(loc))
             updateCache(loc);
 
-        return cache == null ? 0 : cache.count(new UniqueItem(stack.getItem()));
+        return loc != null;
     }
 
-    private void updateCache(Pair<ResourceLocation, BlockPos> loc) {
+    public Multiset<UniqueItem> getCache() {
+        return cache;
+    }
+
+    private void updateCache(Pair<BlockPos, RegistryKey<World>> loc) {
         locCached = loc;
         if (loc == null)
             cache = null;
@@ -53,7 +56,7 @@ public class RemoteInventoryCache {
         }
     }
 
-    private boolean isCacheOld(@Nullable Pair<ResourceLocation, BlockPos> loc) {
+    private boolean isCacheOld(@Nullable Pair<BlockPos, RegistryKey<World>> loc) {
         if (!Objects.equals(locCached, loc)) {
             timer = loc == null ? null : Stopwatch.createStarted();
             return true;
@@ -68,12 +71,5 @@ public class RemoteInventoryCache {
             return overtime;
         }
         return false;
-    }
-
-    @Nullable
-    private Pair<ResourceLocation, BlockPos> getInventoryLocation(ItemStack stack) {
-        ResourceLocation dim = GadgetUtils.getDIMFromNBT(stack, NBTKeys.REMOTE_INVENTORY_POS);
-        BlockPos pos = GadgetUtils.getPOSFromNBT(stack, NBTKeys.REMOTE_INVENTORY_POS);
-        return dim == null || pos == null ? null : new ImmutablePair<>(dim, pos);
     }
 }

@@ -62,37 +62,15 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
 
         BlockState renderBlockState = renderData.getState();
 
-        BlockColors blockColors = Minecraft.getInstance().getBlockColors();
-        int color = blockColors.getColor(renderBlockState, tile.getWorld(), tile.getPos(), 0);
-        float f = (float) (color >> 16 & 255) / 255.0F;
-        float f1 = (float) (color >> 8 & 255) / 255.0F;
-        float f2 = (float) (color & 255) / 255.0F;
-
         if (tile.isUsingPaste() && toolMode == EffectBlock.Mode.PLACE)
             renderBlockState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
 
-        builder = buffer2.getBuffer(OurRenderTypes.RenderBlock);
-        if (!renderData.getState().hasTileEntity()) {
-            IBakedModel ibakedmodel = dispatcher.getModelForState(renderBlockState);
-            for (Direction direction : Direction.values()) {
-                renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 1f, ibakedmodel.getQuads(renderBlockState, direction, new Random(MathHelper.getPositionRandom(tile.getPos())), EmptyModelData.INSTANCE), 15728640, 655360);
-            }
-            renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 1f, ibakedmodel.getQuads(renderBlockState, null, new Random(MathHelper.getPositionRandom(tile.getPos())), EmptyModelData.INSTANCE), 15728640, 655360);
-        } else {
-            TileEntity te = BaseRenderer.getTileEntityWorld().getTileEntity(renderBlockState);
-            TileEntityRenderer<TileEntity> teRender = BaseRenderer.getTileEntityWorld().getTileEntityRender(renderBlockState);
-
-            if (teRender != null) {
-                te.setPos(tile.getPos());
-                stack.push();
-                try {
-                    teRender.render(te, partialTicks, stack, buffer, 15728880, OverlayTexture.NO_OVERLAY);
-                } catch (Exception e) {
-                    BuildingGadgets.LOG.warn("TER Exception with block type: " + renderBlockState);
-                }
-                stack.pop();
-            }
-        }
+        OurRenderTypes.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new OurRenderTypes.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().getRenderTypeBuffers().getBufferSource(), .55f);
+        try {
+            dispatcher.renderBlock(
+                    renderBlockState, stack, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE
+            );
+        } catch (Exception ignored) {} // if it fails to render then we'll get a bug report I'm sure.
 
         stack.pop();
         stack.push();
