@@ -550,9 +550,10 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }
 
         runAfterUpdate(0, () -> { //we are copying form 0 to 1 => slot 0 needs to be the recent one
+            System.out.println("hi");
             templateProvider.ifPresent(provider -> {
                 left.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                    Template templateToSave = provider.getTemplateForKey(key);
+                    Template templateToSave = provider.getTemplateForKey(key).withName(nameField.getText());
                     pasteTemplateToStack(provider, right, templateToSave, replaced);
                 });
             });
@@ -580,7 +581,6 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     private void onCopy() {
         runAfterUpdate(0, () -> { //we are copying from slot 1 => slot 1 needs to be updated
-
             ItemStack stack = container.getSlot(0).getStack();
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 templateProvider.ifPresent(provider -> {
