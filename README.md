@@ -8,6 +8,10 @@
     <a href="https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/LICENSE.md"><img alt="GitHub license" src="https://img.shields.io/github/license/direwolf20-MC/buildinggadgets"></a>
     <a href="https://github.com/direwolf20-MC/buildinggadgets/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/direwolf20-MC/buildinggadgets"></a>
     <a href="https://github.com/direwolf20-MC/buildinggadgets/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/direwolf20-MC/buildinggadgets"></a>
+    <a href="https://discord.gg/qqUUtu3"><img alt="discord" src="https://img.shields.io/discord/541740767761399808" ></a>
+    <a href="https://github.com/Direwolf20-MC/BuildingGadgets/commits/master"><img alt="activity" src="https://img.shields.io/github/last-commit/direwolf20-mc/buildinggadgets" ></a>
+    <a href="https://github.com/Direwolf20-MC/BuildingGadgets/releases/latest"><img alt="GitHub Release Date" src="https://img.shields.io/github/release-date/direwolf20-mc/buildinggadgets"></a>
+    <a href="https://github.com/Direwolf20-MC/BuildingGadgets/tree/master/src/main/java/com/direwolf20/buildinggadgets"><img alt="Lines of code" src="https://img.shields.io/tokei/lines/github/direwolf20-mc/buildinggadgets"></a>
 </p>
 
 <p data-comment="this fakes a line break">&zwnj;</p>
@@ -26,6 +30,9 @@ To see how to use Dire's `Building Gadgets` refer to our [Wiki](https://github.c
 
 ### Using the Gadgets
 Building gadgets has grown a lot since its initial release to the point that we have multiple tools for every occasion, Our wiki has a great set of instructions on how to use each of our Gadgets, check out the [Building Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Building-Gadget), the [Exchanger Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Exchanger-Gadget), the [Copy Paste Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Copy-Paste-Gadget), or the [Destruction Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Destruction-Gadget)
+
+## Support
+As we have grown to support multiple versions of Minecraft, we have had to create a hard stop on where we drop support for the past version's of Minecraft and of the mod. From this point on we will not support any versions of Minecraft that Forge themselves no longer support. Forge works in a `Latest & Latest minus one major` pattern that we will be adopting as well. For example, if we have a version of the mod on 1.16.3, this means that we officially support 1.16.3 as our `Latest` version and in conjunction is the version that'll receive new features and bug fixes. We will also maintain 1.15.2 for bug fixes as that'll be the `latest MC version minus one Major release`. Hopefully, that isn't too confusing! We hope this helps us focus more on growing the mod that trying to support every version of the mod.
 
 ## Contributing
 We welcome anyone and everyone that is willing to lend a hand and help out with maintaining and building our(Dire's) mod. If you'd like to suggest a [new feature](https://github.com/Direwolf20-MC/BuildingGadgets/issues/new?template=feature-request.md) or [report a bug](https://github.com/Direwolf20-MC/BuildingGadgets/issues/new?template=bug-report.md) then please do so with a [new issue](https://github.com/Direwolf20-MC/BuildingGadgets/issues/new) on our [issue tracker](https://github.com/Direwolf20-MC/BuildingGadgets/issues).
