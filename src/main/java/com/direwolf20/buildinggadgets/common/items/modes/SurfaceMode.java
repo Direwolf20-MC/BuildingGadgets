@@ -1,6 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items.modes;
 
 import com.direwolf20.buildinggadgets.common.building.Region;
+import com.direwolf20.buildinggadgets.common.building.placement.ConnectedSurface;
+import com.direwolf20.buildinggadgets.common.building.placement.IPositionPlacementSequence;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -13,7 +15,6 @@ public class SurfaceMode extends AbstractMode {
 
     @Override
     List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
-        List<BlockPos> coordinates = new ArrayList<>();
 
         int bound = context.getRange() / 2;
 
@@ -24,7 +25,10 @@ public class SurfaceMode extends AbstractMode {
                 bound * (1 - Math.abs(context.getHitSide().getZOffset()))
         );
 
-        area.spliterator().forEachRemaining(coordinates::add);
+        IPositionPlacementSequence blockPos = ConnectedSurface.create(context.getWorld(), start, context.getHitSide().getOpposite(), context.getRange(), context.isFuzzy());
+        List<BlockPos> coordinates = new ArrayList<>(blockPos.collect());
+
+//        area.spliterator().forEachRemaining(coordinates::add);
         return coordinates;
     }
 

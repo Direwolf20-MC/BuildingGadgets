@@ -16,7 +16,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.World;
 
 import java.util.Comparator;
@@ -115,20 +114,22 @@ public abstract class AbstractMode {
     }
 
     public static class UseContext {
-        private World world;
-        private BlockState setState;
-        private BlockPos startPos;
-        private Direction hitSide;
+        private final World world;
+        private final BlockState setState;
+        private final BlockPos startPos;
+        private final Direction hitSide;
+        private final boolean isConnected;
 
-        private boolean isFuzzy;
-        private boolean placeOnTop;
-        private int range;
-        private boolean rayTraceFluid;
+        private final boolean isFuzzy;
+        private final boolean placeOnTop;
+        private final int range;
+        private final boolean rayTraceFluid;
 
-        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean placeOnTop) {
+        public UseContext(World world, BlockState setState, BlockPos startPos, boolean isConnected, ItemStack gadget, Direction hitSide, boolean placeOnTop) {
             this.world = world;
             this.setState = setState;
             this.startPos = startPos;
+            this.isConnected = isConnected;
 
             this.range = GadgetUtils.getToolRange(gadget);
             this.isFuzzy = AbstractGadget.getFuzzy(gadget);
@@ -138,8 +139,8 @@ public abstract class AbstractMode {
             this.placeOnTop = placeOnTop;
         }
 
-        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide) {
-            this(world, setState, startPos, gadget, hitSide, false);
+        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean isConnected) {
+            this(world, setState, startPos, isConnected, gadget, hitSide, false);
         }
 
         public BlockItemUseContext createBlockUseContext(PlayerEntity player) {
@@ -150,6 +151,10 @@ public abstract class AbstractMode {
                             VectorHelper.getLookingAt(player, this.rayTraceFluid)
                     )
             );
+        }
+
+        public boolean isConnected() {
+            return isConnected;
         }
 
         public BlockState getWorldState(BlockPos pos) {
