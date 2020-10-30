@@ -68,7 +68,7 @@ public final class UndoScheduler extends SteppedScheduler {
             data = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
         } else
             data = TileSupport.createBlockData(state, te);
-        if (! data.equals(entry.getValue().getPlacedData())) {
+        if (data.getState().getBlock().getDefaultState() != entry.getValue().getPlacedData().getState().getBlock().getDefaultState()) {
             lastWasSuccess = false;
             return;
         }
