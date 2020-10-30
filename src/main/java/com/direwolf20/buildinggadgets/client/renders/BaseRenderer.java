@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.client.renders;
 import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryLinker;
-import com.direwolf20.buildinggadgets.common.util.tools.UniqueItem;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.direwolf20.buildinggadgets.common.world.MockTileEntityRenderWorld;
 import com.google.common.collect.Multiset;
@@ -39,7 +39,7 @@ public abstract class BaseRenderer {
     private static final MockBuilderWorld builderWorld = new MockBuilderWorld();
     private static final Set<TileEntity> invalidTileEntities = new HashSet<>();
 
-    private static RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
+    private static final RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
 
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
         // This is necessary to prevent issues with not rendering the overlay's at all (when Botania being present) - See #329 for more information
@@ -90,25 +90,6 @@ public abstract class BaseRenderer {
 
         return energy.map(IEnergyStorage::getEnergyStored).orElse(0);
     }
-
-    /*protected BufferBuilder setupMissingRender() {
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        RenderSystem.alphaFunc(GL11.GL_GREATER, 0.0001F);
-        RenderSystem.disableTexture();
-        RenderSystem.depthMask(false);
-        RenderSystem.enableBlend();
-        RenderSystem.blendFunc(GL14.GL_CONSTANT_ALPHA, GL14.GL_ONE_MINUS_CONSTANT_ALPHA);
-        GL14.glBlendColor(1F, 1F, 1F, 0.3f); //Set the alpha of the blocks we are rendering
-        bufferBuilder.begin(GL14.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        return bufferBuilder;
-    }
-
-    protected void teardownMissingRender() {
-        Tessellator.getInstance().draw();
-        GlStateManager.depthMask(true);
-        GlStateManager.enableTexture();
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-    }*/
 
     protected static void renderMissingBlock(Matrix4f matrix, IVertexBuilder builder, BlockPos pos) {
         renderBoxSolid(matrix, builder, pos, 1f, 0f, 0f, 0.35f);
@@ -185,10 +166,6 @@ public abstract class BaseRenderer {
         return Minecraft.getInstance();
     }
 
-    public static MockTileEntityRenderWorld getTileEntityWorld() {
-        return tileEntityWorld;
-    }
-
     static MockBuilderWorld getBuilderWorld() {
         return builderWorld;
     }
@@ -203,9 +180,5 @@ public abstract class BaseRenderer {
 
     public static void updateInventoryCache() {
         cacheInventory.forceUpdate();
-    }
-
-    static Set<TileEntity> getInvalidTileEntities() {
-        return invalidTileEntities;
     }
 }

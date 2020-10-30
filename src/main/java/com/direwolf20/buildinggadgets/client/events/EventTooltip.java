@@ -50,7 +50,7 @@ public class EventTooltip {
     private static final int STACKS_PER_LINE = 8;
     private static RemoteInventoryCache cache = new RemoteInventoryCache(true);
 
-    public static void setCache(Multiset<com.direwolf20.buildinggadgets.common.util.tools.UniqueItem> cache) {
+    public static void setCache(Multiset<UniqueItem> cache) {
         EventTooltip.cache.setCache(cache);
     }
 
