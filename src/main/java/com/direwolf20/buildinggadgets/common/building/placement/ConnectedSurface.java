@@ -30,12 +30,11 @@ public final class ConnectedSurface {
      *
      * @return IPositionPlacementSequence
      */
-    public static IPositionPlacementSequence create(IBlockReader world, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
-        return create(world, pos -> pos.offset(side), searchingCenter, side, range, fuzzy);
+    public static IPositionPlacementSequence create(Region searchingRegion, IBlockReader world, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
+        return create(searchingRegion, world, pos -> pos.offset(side), searchingCenter, side, range, fuzzy);
     }
 
-    public static IPositionPlacementSequence create(IBlockReader world, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
-        Region searchingRegion = createRegion(searchingCenter, side, MathUtils.floorToOdd(range) / 2).getBoundingBox();
+    public static IPositionPlacementSequence create(Region searchingRegion, IBlockReader world, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
         return create(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
     }
 
@@ -45,12 +44,5 @@ public final class ConnectedSurface {
 
     public static IPositionPlacementSequence create(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, BiPredicate<BlockState, BlockPos> predicate) {
         return new ConnectedSurfaceSequence(world, searchingRegion, searching2referenceMapper, searchingCenter, side, predicate);
-    }
-
-    private static IPositionPlacementSequence createRegion(BlockPos posHit, Direction side, int radius) {
-        return new Region(posHit).expand(
-                radius * (1 - Math.abs(side.getXOffset())),
-                radius * (1 - Math.abs(side.getYOffset())),
-                radius * (1 - Math.abs(side.getZOffset())));
     }
 }

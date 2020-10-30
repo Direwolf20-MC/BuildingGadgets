@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
+import com.google.common.base.MoreObjects;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,6 +17,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.World;
 
 import java.util.Comparator;
@@ -23,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class AbstractMode {
-    private boolean isExchanging;
+    private final boolean isExchanging;
 
     public AbstractMode(boolean isExchanging) {
         this.isExchanging = isExchanging;
@@ -118,18 +120,21 @@ public abstract class AbstractMode {
         private final BlockState setState;
         private final BlockPos startPos;
         private final Direction hitSide;
-        private final boolean isConnected;
 
         private final boolean isFuzzy;
         private final boolean placeOnTop;
         private final int range;
         private final boolean rayTraceFluid;
+        private final boolean isConnected;
 
-        public UseContext(World world, BlockState setState, BlockPos startPos, boolean isConnected, ItemStack gadget, Direction hitSide, boolean placeOnTop) {
+        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean isConnected) {
+            this(world, setState, startPos, gadget, hitSide, false, isConnected);
+        }
+
+        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean placeOnTop, boolean isConnected) {
             this.world = world;
             this.setState = setState;
             this.startPos = startPos;
-            this.isConnected = isConnected;
 
             this.range = GadgetUtils.getToolRange(gadget);
             this.isFuzzy = AbstractGadget.getFuzzy(gadget);
@@ -137,10 +142,7 @@ public abstract class AbstractMode {
             this.hitSide = hitSide;
 
             this.placeOnTop = placeOnTop;
-        }
-
-        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean isConnected) {
-            this(world, setState, startPos, isConnected, gadget, hitSide, false);
+            this.isConnected = isConnected;
         }
 
         public BlockItemUseContext createBlockUseContext(PlayerEntity player) {
@@ -195,16 +197,17 @@ public abstract class AbstractMode {
 
         @Override
         public String toString() {
-            return "UseContext{" +
-                    "world=" + world +
-                    ", setState=" + setState +
-                    ", startPos=" + startPos +
-                    ", hitSide=" + hitSide +
-                    ", isFuzzy=" + isFuzzy +
-                    ", placeOnTop=" + placeOnTop +
-                    ", range=" + range +
-                    ", rayTraceFluid=" + rayTraceFluid +
-                    '}';
+            return MoreObjects.toStringHelper(this)
+                    .add("world", world)
+                    .add("setState", setState)
+                    .add("startPos", startPos)
+                    .add("hitSide", hitSide)
+                    .add("isFuzzy", isFuzzy)
+                    .add("placeOnTop", placeOnTop)
+                    .add("range", range)
+                    .add("rayTraceFluid", rayTraceFluid)
+                    .add("isConnected", isConnected)
+                    .toString();
         }
     }
 }
