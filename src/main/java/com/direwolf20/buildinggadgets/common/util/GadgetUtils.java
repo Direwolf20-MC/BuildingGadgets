@@ -214,7 +214,9 @@ public class GadgetUtils {
         data.ifPresent(placeState -> {
             BlockState actualState = placeState.getState(); //.getExtendedState(world, lookingAt.getPos()); 1.14 @todo: fix?
 
-            setToolBlock(stack, placeState);
+            BlockData defaultStateData = new BlockData(placeState.getState().getBlock().getDefaultState(), placeState.getTileData());
+
+            setToolBlock(stack, defaultStateData);
             setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));
         });
 

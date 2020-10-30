@@ -62,12 +62,6 @@ public class EffectBlockTER extends TileEntityRenderer<EffectBlockTileEntity> {
 
         BlockState renderBlockState = renderData.getState();
 
-        BlockColors blockColors = Minecraft.getInstance().getBlockColors();
-        int color = blockColors.getColor(renderBlockState, tile.getWorld(), tile.getPos(), 0);
-        float f = (float) (color >> 16 & 255) / 255.0F;
-        float f1 = (float) (color >> 8 & 255) / 255.0F;
-        float f2 = (float) (color & 255) / 255.0F;
-
         if (tile.isUsingPaste() && toolMode == EffectBlock.Mode.PLACE)
             renderBlockState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
 
