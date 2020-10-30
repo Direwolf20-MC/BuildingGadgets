@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.BuildRender;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
+import com.direwolf20.buildinggadgets.common.items.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
@@ -137,8 +138,9 @@ public class GadgetExchanger extends AbstractGadget {
 
         ExchangingModes mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
-                .componentTranslation((mode == ExchangingModes.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
-                        .format(new TranslationTextComponent(mode.getTranslationKey()).getUnformattedComponentText()) : new TranslationTextComponent(mode.getTranslationKey())))
+                .componentTranslation((mode == ExchangingModes.SURFACE && getConnectedArea(stack)
+                        ? TooltipTranslation.GADGET_CONNECTED.format(new TranslationTextComponent(mode.getTranslationKey()).getString())
+                        : new TranslationTextComponent(mode.getTranslationKey())))
                 .setStyle(Styles.AQUA));
 
         tooltip.add(TooltipTranslation.GADGET_BLOCK

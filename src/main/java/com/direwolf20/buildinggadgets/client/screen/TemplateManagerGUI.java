@@ -38,6 +38,7 @@ import com.google.common.collect.Multiset;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -58,6 +59,9 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -72,6 +76,7 @@ import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
@@ -614,9 +619,20 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             return;
         }
 
+        // Attempt to parse into nbt first to check for old 1.12 pastes
+        try {
+            JsonToNBT.getTagFromJson(CBString);
+
+            BuildingGadgets.LOG.error("Attempted to use a 1.12 compound on a newer MC version");
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
+                    .componentTranslation("(1.12.x)", Minecraft.getInstance().getMinecraftGame().getVersion().getName()).setStyle(Styles.RED), false);
+            return;
+        } catch (CommandSyntaxException ignored) {}
+
         // todo: this needs to be put onto some kind of readTemplateFromJson(input stream).onError(e -> error)
         try {
-            Template readTemplate = TemplateIO.readTemplateFromJson(CBString).clearMaterials();
+            Template template = TemplateIO.readTemplateFromJson(CBString);
+            Template readTemplate = template.clearMaterials();
             if (! nameField.getText().isEmpty())
                 readTemplate = readTemplate.withName(nameField.getText());
             boolean replaced = replaceStack();

@@ -131,14 +131,14 @@ public final class TemplateIO {
         }
 
         private Template getTemplate() throws TemplateReadException {
-            byte[] bytes = Base64.getDecoder().decode(body);
-            CompoundNBT nbt;
             try {
+                byte[] bytes = Base64.getDecoder().decode(body);
+                CompoundNBT nbt;
                 nbt = CompressedStreamTools.readCompressed(new ByteArrayInputStream(bytes));
-            } catch (IOException e) {
+                return Template.deserialize(nbt, header, true);
+            } catch (IOException | NullPointerException e) {
                 throw new CorruptDataException(e, body);
             }
-            return Template.deserialize(nbt, header, true);
         }
     }
 }

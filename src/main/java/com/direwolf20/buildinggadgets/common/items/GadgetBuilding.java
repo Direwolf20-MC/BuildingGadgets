@@ -113,8 +113,9 @@ public class GadgetBuilding extends AbstractGadget {
         addEnergyInformation(tooltip, stack);
 
         tooltip.add(TooltipTranslation.GADGET_MODE
-                .componentTranslation((mode == BuildingModes.SURFACE && getConnectedArea(stack) ? TooltipTranslation.GADGET_CONNECTED
-                        .format(new TranslationTextComponent(mode.getTranslationKey())) : new TranslationTextComponent(mode.getTranslationKey())))
+                .componentTranslation((mode == BuildingModes.SURFACE && getConnectedArea(stack)
+                        ? TooltipTranslation.GADGET_CONNECTED.format(new TranslationTextComponent(mode.getTranslationKey()).getString())
+                        : new TranslationTextComponent(mode.getTranslationKey())))
                 .setStyle(Styles.AQUA));
 
         tooltip.add(TooltipTranslation.GADGET_BLOCK
