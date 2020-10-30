@@ -354,7 +354,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         regionOpt.ifPresent(region -> tryCopy(stack, world, player, region));
     }
 
-    private void tryCopy(ItemStack stack, World world, PlayerEntity player, Region region) {
+    public void tryCopy(ItemStack stack, World world, PlayerEntity player, Region region) {
         BuildContext context = BuildContext.builder()
                 .player(player)
                 .stack(stack)

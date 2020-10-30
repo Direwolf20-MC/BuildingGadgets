@@ -10,6 +10,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class PacketCopyCoords {
@@ -47,6 +48,11 @@ public class PacketCopyCoords {
                 } else {
                     GadgetCopyPaste.setSelectedRegion(heldItem, new Region(startPos, endPos));
                 }
+
+                Optional<Region> regionOpt = GadgetCopyPaste.getSelectedRegion(heldItem);
+                if (! regionOpt.isPresent()) //notify of single copy
+                    playerEntity.sendStatusMessage(MessageTranslation.FIRST_COPY.componentTranslation().setStyle(Styles.DK_GREEN), true);
+                regionOpt.ifPresent(region -> ((GadgetCopyPaste) heldItem.getItem()).tryCopy(heldItem, playerEntity.world, playerEntity, region));
             });
 
             ctx.get().setPacketHandled(true);
