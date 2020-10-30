@@ -1,10 +1,12 @@
 package com.direwolf20.buildinggadgets.common.items.modes;
 
 import com.direwolf20.buildinggadgets.common.tainted.building.Region;
+import com.direwolf20.buildinggadgets.common.tainted.building.placement.ConnectedSurface;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +24,17 @@ public class SurfaceMode extends AbstractMode {
                 bound * (1 - Math.abs(context.getHitSide().getZOffset()))
         );
 
-        return area.stream().collect(Collectors.toList());
+        if (!context.isConnected()) {
+            return area.stream().map(BlockPos::toImmutable).collect(Collectors.toList());
+        }
+
+        List<BlockPos> coords = new ArrayList<>();
+
+        ConnectedSurface.create(area, context.getWorld(), pos -> isExchanging() ? pos : pos.offset(context.getHitSide().getOpposite()), start, context.getHitSide().getOpposite(), context.getRange(), context.isFuzzy())
+                .spliterator()
+                .forEachRemaining(coords::add);
+
+        return coords;
     }
 
     @Override

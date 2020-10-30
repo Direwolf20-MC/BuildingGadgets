@@ -210,7 +210,7 @@ public class GadgetBuilding extends AbstractGadget {
 
             Direction sideHit = lookingAt.getFace();
             coords = getToolMode(stack).getMode().getCollection(
-                    new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, sideHit, placeAtop(stack)),
+                    new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, sideHit, placeAtop(stack), getConnectedArea(stack)),
                     player
             );
         }
