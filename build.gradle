@@ -15,14 +15,18 @@ apply plugin: 'maven-publish'
 apply plugin: 'net.minecraftforge.gradle'
 
 version = "$version"
+group = 'com.direwolf20.buildinggadgets'
+archivesBaseName = "buildinggadgets-${minecraft_version}"
+
+def forge_major = forge_version.tokenize('.')[0]
+
+// Used for CI/CD
 def env = System.getenv()
 if (env.BUILD_NUMBER) {
     version = version + "-" + "${env.BUILD_NUMBER}"
 }
-group = 'com.direwolf20.buildinggadgets'
-archivesBaseName = 'buildinggadgets'
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
     mappings channel: 'snapshot', version: "${mcp_mappings}"
@@ -68,27 +72,17 @@ minecraft {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+
 repositories {
-    maven {
-        url "https://maven.tterrag.com/"
-    }
     maven {
         // JEI
         name = "Progwml6 maven"
         url = "https://dvs1.progwml6.com/files/maven/"
     }
-    maven {
-        //JEI fallback
-        name = "ModMaven"
-        url = "https://modmaven.k-4u.nl"
-    }
-    maven { // gigaherz mappings maven
-        url 'https://www.dogforce-games.com/maven/'
-    }
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_major}.${forge_minor}"
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     //JEI
     compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
@@ -100,11 +94,11 @@ dependencies {
 // Processes main only resources
 processResources {
     inputs.property('version', project.version)
-    inputs.property('forge_major', project.forge_major)
+    inputs.property('forge_major', forge_major)
 
     from(sourceSets.main.resources.srcDirs) {
         include 'META-INF/mods.toml'
-        expand 'version':project.version, 'forge_major':project.forge_major
+        expand 'version':project.version, 'forge_major':forge_major
     }
     
     from(sourceSets.main.resources.srcDirs) {
@@ -115,19 +109,22 @@ processResources {
 jar {
     group = 'artifact'
     manifest {
-        attributes(["Specification-Title": "Buildinggadgets",
+        attributes(["Specification-Title": "BuildingGadgets",
                     "Specification-Version": forge_major, // We are version 1 of the modlauncher specification
                     "Implementation-Title": project.archivesBaseName,
                     "Implementation-Version": project.version,
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
     }
+
     from sourceSets.main.output
     dependsOn classes
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    group = 'artifact'
-    manifest = jar.manifest
-    classifier = 'sources'
     from sourceSets.main.allSource
+    archiveName = "${baseName}-${version}-sources.${extension}"
+}
+
+artifacts {
+    archives sourcesJar
 }
