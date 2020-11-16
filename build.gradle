@@ -17,10 +17,10 @@ apply plugin: 'net.minecraftforge.gradle'
 version = "$version"
 def env = System.getenv()
 if (env.BUILD_NUMBER) {
-    version = version + "-" + "${env.BUILD_NUMBER}"
+    version = version + "-SNAPSHOT-" + "${env.BUILD_NUMBER}"
 }
 group = 'com.direwolf20.buildinggadgets'
-archivesBaseName = 'buildinggadgets'
+archivesBaseName = "buildinggadgets-${minecraft_version}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -126,8 +126,6 @@ jar {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    group = 'artifact'
-    manifest = jar.manifest
-    classifier = 'sources'
-    from sourceSets.main.allSource
+	classifier = "sources"
+	from sourceSets.main.allSource
 }
