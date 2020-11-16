@@ -8,9 +8,7 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v2
     - name: Set up JDK 1.8
@@ -21,5 +19,5 @@ jobs:
       run: ./gradlew build
     - uses: actions/upload-artifact@v2
       with:
-        name: Package
+        name: BuildingGadgets-${GITHUB_REF##*/}-SNAPSHOT-${ GITHUB_RUN_NUMBER }
         path: build/libs
