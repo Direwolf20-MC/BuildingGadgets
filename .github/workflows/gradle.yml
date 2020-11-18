@@ -17,6 +17,14 @@ jobs:
         java-version: 1.8
     - name: Build with Gradle
       run: ./gradlew build
+    - uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
     - name: Setting mod version
       run: |
         cat $GITHUB_WORKSPACE/gradle.properties | grep ^version= >> $GITHUB_ENV
