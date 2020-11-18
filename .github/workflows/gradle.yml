@@ -15,8 +15,6 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Build with Gradle
-      run: ./gradlew build
     - uses: actions/cache@v2
       with:
         path: |
@@ -25,6 +23,8 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
+    - name: Build with Gradle
+      run: ./gradlew build
     - name: Setting mod version
       run: |
         cat $GITHUB_WORKSPACE/gradle.properties | grep ^version= >> $GITHUB_ENV
