@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.ItemReference;
 import com.google.common.base.Preconditions;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Container;
@@ -83,8 +84,8 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
-        super.deserializeNBT(nbt);
+    public void read(BlockState state, CompoundNBT nbt) {
+        super.read(state, nbt);
 
         if (nbt.contains(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
             itemStackHandler.deserializeNBT(nbt.getCompound(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));
