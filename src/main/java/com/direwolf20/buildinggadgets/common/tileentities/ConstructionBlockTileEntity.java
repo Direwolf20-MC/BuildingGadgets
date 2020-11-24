@@ -61,7 +61,6 @@ public class ConstructionBlockTileEntity extends TileEntity {
     public void deserializeNBT(CompoundNBT compound) {
         super.deserializeNBT(compound);
         blockState = BlockData.tryDeserialize(compound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE), true);
-        actualBlockState = BlockData.tryDeserialize(compound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL), true);
         markDirtyClient();
     }
 
@@ -70,8 +69,6 @@ public class ConstructionBlockTileEntity extends TileEntity {
     public CompoundNBT write(@Nonnull CompoundNBT compound) {
         if (blockState != null) {
             compound.put(NBTKeys.TE_CONSTRUCTION_STATE, blockState.serialize(true));
-            if (actualBlockState != null)
-                compound.put(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL, actualBlockState.serialize(true));
         }
         return super.write(compound);
     }
