@@ -16,24 +16,22 @@ import javax.annotation.Nonnull;
 public class ConstructionBlockTileEntity extends TileEntity {
 
     private BlockData blockState;
-    private BlockData actualBlockState;
     public static final ModelProperty<BlockState> FACADE_STATE = new ModelProperty<>();
 
     public ConstructionBlockTileEntity() {
         super(OurTileEntities.CONSTRUCTION_BLOCK_TILE_ENTITY.get());
     }
 
-    public void setBlockState(BlockData state, BlockData actualState) {
+    public void setBlockState(BlockData state) {
         blockState = state;
-        actualBlockState = actualState;
         markDirtyClient();
     }
 
+    // TODO: query simulated Tile, if exists, and relay model data...
     @Nonnull
     @Override
     public IModelData getModelData() {
-        BlockState state = getActualBlockData().getState();
-        //TODO: query simulated Tile, if exists, and relay model data...
+        BlockState state = blockState.getState();
         return new ModelDataMap.Builder().withInitial(FACADE_STATE, state).build();
     }
 
@@ -50,18 +48,10 @@ public class ConstructionBlockTileEntity extends TileEntity {
         return blockState;
     }
 
-    @Nonnull
-    public BlockData getActualBlockData() {
-        if (actualBlockState == null)
-            return BlockData.AIR;
-        return actualBlockState;
-    }
-
     @Override
     public void read(BlockState state, CompoundNBT nbt) {
         super.read(state, nbt);
         blockState = BlockData.tryDeserialize(nbt.getCompound(NBTKeys.TE_CONSTRUCTION_STATE), true);
-        actualBlockState = BlockData.tryDeserialize(nbt.getCompound(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL), true);
         markDirtyClient();
     }
 
@@ -96,6 +86,8 @@ public class ConstructionBlockTileEntity extends TileEntity {
         write(nbtTag);
         return new SUpdateTileEntityPacket(getPos(), 1, nbtTag);
     }
+
+
 
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {

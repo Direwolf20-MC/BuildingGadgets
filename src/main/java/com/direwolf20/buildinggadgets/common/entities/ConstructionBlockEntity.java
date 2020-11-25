@@ -78,14 +78,13 @@ public class ConstructionBlockEntity extends EntityBase {
                     boolean ambient = false; //TODO Find a better way to get the proper ambient Occlusion value. This is client side only so can't be done here.
                     if (opaque || neighborBrightness || ! ambient) {
                         BlockData tempSetBlock = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
-                        BlockData tempActualSetBlock = ((ConstructionBlockTileEntity) te).getActualBlockData();
                         world.setBlockState(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().getDefaultState()
                                 .with(ConstructionBlock.BRIGHT, ! opaque)
                                 .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness)
                                 .with(ConstructionBlock.AMBIENT_OCCLUSION, ambient));
                         te = world.getTileEntity(targetPos);
                         if (te instanceof ConstructionBlockTileEntity) {
-                            ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock, tempActualSetBlock);
+                            ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock);
                         }
                     }
                 }

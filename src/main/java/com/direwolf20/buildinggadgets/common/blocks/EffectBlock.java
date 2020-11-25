@@ -48,7 +48,7 @@ public class EffectBlock extends Block {
                     world.setBlockState(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().getDefaultState());
                     TileEntity te = world.getTileEntity(targetPos);
                     if (te instanceof ConstructionBlockTileEntity) {
-                        ((ConstructionBlockTileEntity) te).setBlockState(targetBlock, targetBlock);
+                        ((ConstructionBlockTileEntity) te).setBlockState(targetBlock);
                     }
                     world.addEntity(new ConstructionBlockEntity(world, targetPos, false));
                 } else {

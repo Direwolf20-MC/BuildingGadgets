@@ -204,8 +204,7 @@ public class GadgetUtils {
             return ActionResultType.PASS;
 
         if (setTool && te instanceof ConstructionBlockTileEntity) {
-            ((ConstructionBlockTileEntity) te).getConstructionBlockData();
-            setToolBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockData());
+            setToolBlock(stack, ((ConstructionBlockTileEntity) te).getConstructionBlockData());
             return ActionResultType.SUCCESS;
         }
 
