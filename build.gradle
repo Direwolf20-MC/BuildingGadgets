@@ -22,9 +22,11 @@ def forge_major = forge_version.tokenize('.')[0]
 
 // Used for CI/CD
 def env = System.getenv()
-if (env.BUILD_NUMBER) {
-    version = version + "-" + "${env.BUILD_NUMBER}"
+if (env.GITHUB_RUN_NUMBER) {
+    version = version + "-SNAPSHOT-" + "${env.GITHUB_RUN_NUMBER}"
 }
+group = 'com.direwolf20.buildinggadgets'
+archivesBaseName = "buildinggadgets-${minecraft_version}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
@@ -120,11 +122,17 @@ jar {
     dependsOn classes
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    from sourceSets.main.allSource
+task deobfJar(type: Jar) {
+    from(sourceSets.main.output)
+    archiveName = "${baseName}-${version}-deobf.${extension}"
+}
+
+task sourcesJar(type: Jar) {
+    from(sourceSets.main.allSource)
     archiveName = "${baseName}-${version}-sources.${extension}"
 }
 
 artifacts {
+    archives deobfJar
     archives sourcesJar
 }
