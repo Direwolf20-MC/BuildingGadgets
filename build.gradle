@@ -25,8 +25,6 @@ def env = System.getenv()
 if (env.GITHUB_RUN_NUMBER) {
     version = version + "-SNAPSHOT-" + "${env.GITHUB_RUN_NUMBER}"
 }
-group = 'com.direwolf20.buildinggadgets'
-archivesBaseName = "buildinggadgets-${minecraft_version}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 

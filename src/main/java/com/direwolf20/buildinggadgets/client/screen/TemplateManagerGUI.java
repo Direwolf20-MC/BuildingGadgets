@@ -621,12 +621,14 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         // Attempt to parse into nbt first to check for old 1.12 pastes
         try {
-            JsonToNBT.getTagFromJson(CBString);
+            CompoundNBT tagFromJson = JsonToNBT.getTagFromJson(CBString);
+            if (!tagFromJson.contains("header")) {
+                BuildingGadgets.LOG.error("Attempted to use a 1.12 compound on a newer MC version");
+                getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
+                        .componentTranslation("(1.12.x)", Minecraft.getInstance().getMinecraftGame().getVersion().getName()).setStyle(Styles.RED), false);
+                return;
 
-            BuildingGadgets.LOG.error("Attempted to use a 1.12 compound on a newer MC version");
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
-                    .componentTranslation("(1.12.x)", Minecraft.getInstance().getMinecraftGame().getVersion().getName()).setStyle(Styles.RED), false);
-            return;
+            }
         } catch (CommandSyntaxException ignored) {}
 
         // todo: this needs to be put onto some kind of readTemplateFromJson(input stream).onError(e -> error)
