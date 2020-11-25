@@ -58,9 +58,10 @@ public class ConstructionBlockTileEntity extends TileEntity {
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT compound) {
-        super.deserializeNBT(compound);
-        blockState = BlockData.tryDeserialize(compound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE), true);
+    public void read(BlockState state, CompoundNBT nbt) {
+        super.read(state, nbt);
+        blockState = BlockData.tryDeserialize(nbt.getCompound(NBTKeys.TE_CONSTRUCTION_STATE), true);
+        actualBlockState = BlockData.tryDeserialize(nbt.getCompound(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL), true);
         markDirtyClient();
     }
 
