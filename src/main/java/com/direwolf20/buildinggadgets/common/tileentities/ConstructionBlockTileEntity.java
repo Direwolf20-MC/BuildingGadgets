@@ -70,8 +70,6 @@ public class ConstructionBlockTileEntity extends TileEntity {
     public CompoundNBT write(@Nonnull CompoundNBT compound) {
         if (blockState != null) {
             compound.put(NBTKeys.TE_CONSTRUCTION_STATE, blockState.serialize(true));
-            if (actualBlockState != null)
-                compound.put(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL, actualBlockState.serialize(true));
         }
         return super.write(compound);
     }
