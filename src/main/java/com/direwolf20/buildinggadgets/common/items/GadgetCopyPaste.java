@@ -111,7 +111,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     private static final Joiner CHUNK_JOINER = Joiner.on("; ");
 
     public GadgetCopyPaste() {
-        super(OurItems.nonStackableItemProperties().maxDamage(1),
+        super(OurItems.nonStackableItemProperties(),
                 Config.GADGETS.GADGET_COPY_PASTE.undoSize::get,
                 Reference.SaveReference.UNDO_COPY_PASTE,
                 TagReference.WHITELIST_COPY_PASTE,

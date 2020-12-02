@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 public class GadgetDestruction extends AbstractGadget {
 
     public GadgetDestruction() {
-        super(OurItems.nonStackableItemProperties().maxDamage(1),
+        super(OurItems.nonStackableItemProperties(),
                 Config.GADGETS.GADGET_DESTRUCTION.undoSize::get,
                 Reference.SaveReference.UNDO_DESTRUCTION,
                 TagReference.WHITELIST_DESTRUCTION,

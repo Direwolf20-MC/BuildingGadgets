@@ -60,7 +60,7 @@ public class GadgetBuilding extends AbstractGadget {
     private static final MockBuilderWorld fakeWorld = new MockBuilderWorld();
 
     public GadgetBuilding() {
-        super(OurItems.nonStackableItemProperties().maxDamage(1),
+        super(OurItems.nonStackableItemProperties(),
                 Config.GADGETS.GADGET_BUILDING.undoSize::get,
                 Reference.SaveReference.UNDO_BUILDING,
                 TagReference.WHITELIST_BUILDING,
