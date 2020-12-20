@@ -67,7 +67,7 @@ public abstract class AbstractGadget extends Item {
     private Supplier<UndoWorldSave> saveSupplier;
 
     public AbstractGadget(Properties builder, IntSupplier undoLengthSupplier, String undoName, ResourceLocation whiteListTag, ResourceLocation blackListTag) {
-        super(builder);
+        super(builder.setNoRepair());
 
         renderer = DistExecutor.runForDist(this::createRenderFactory, () -> () -> null);
         this.whiteList = BlockTags.makeWrapperTag(whiteListTag.toString());
@@ -119,16 +119,6 @@ public abstract class AbstractGadget extends Item {
         charged.getOrCreateTag().putDouble(NBTKeys.ENERGY, this.getEnergyMax());
         items.add(charged);
     }
-
-    @Override
-    public boolean isDamageable() {
-        return getMaxDamage() > 0;
-    }
-
-    /*@Override
-    public boolean isRepairable() {
-        return false;
-    }*/
 
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {

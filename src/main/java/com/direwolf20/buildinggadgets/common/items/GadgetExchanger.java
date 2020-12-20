@@ -78,7 +78,7 @@ public class GadgetExchanger extends AbstractGadget {
     private static final MockBuilderWorld fakeWorld = new MockBuilderWorld();
 
     public GadgetExchanger() {
-        super(OurItems.nonStackableItemProperties().maxDamage(1),
+        super(OurItems.nonStackableItemProperties(),
                 () -> 0,
                 "",
                 TagReference.WHITELIST_EXCHANGING,
