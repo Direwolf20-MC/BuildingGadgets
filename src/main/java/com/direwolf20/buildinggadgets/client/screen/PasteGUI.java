@@ -6,6 +6,7 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.client.screen.components.GuiIncrementer;
+import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketPasteGUI;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
@@ -14,6 +15,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.AbstractButton;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 
 import java.util.ArrayList;
@@ -22,9 +25,11 @@ import java.util.List;
 public class PasteGUI extends Screen {
     private GuiIncrementer X, Y, Z;
     private List<GuiIncrementer> fields = new ArrayList<>();
+    private ItemStack copyPasteTool;
 
-    PasteGUI() {
+    PasteGUI(ItemStack tool) {
         super(new StringTextComponent(""));
+        this.copyPasteTool = tool;
     }
 
     @Override
@@ -37,6 +42,11 @@ public class PasteGUI extends Screen {
         fields.add(X = new GuiIncrementer(x - (GuiIncrementer.WIDTH + (GuiIncrementer.WIDTH / 2)) - 10, y - 10, -16, 16, this::onChange));
         fields.add(Y = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y - 10, -16, 16, this::onChange));
         fields.add(Z = new GuiIncrementer(x + (GuiIncrementer.WIDTH / 2) + 10, y - 10, -16, 16, this::onChange));
+
+        BlockPos currentOffset = GadgetCopyPaste.getRelativeVector(this.copyPasteTool);
+        X.setValue(currentOffset.getX());
+        Y.setValue(currentOffset.getY());
+        Z.setValue(currentOffset.getZ());
 
         List<AbstractButton> buttons = new ArrayList<AbstractButton>() {{
             add(new CopyGUI.CenteredButton(y + 20, 70, GuiTranslation.SINGLE_CONFIRM.componentTranslation(), (button) -> {
