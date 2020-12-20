@@ -157,7 +157,7 @@ public class ModeRadialMenu extends Screen {
                 if (GadgetCopyPaste.getToolMode(tool) == GadgetCopyPaste.ToolMode.COPY)
                     getMinecraft().displayGuiScreen(new CopyGUI(tool));
                 else
-                    getMinecraft().displayGuiScreen(new PasteGUI());
+                    getMinecraft().displayGuiScreen(new PasteGUI(tool));
                 return true;
             }));
         }
