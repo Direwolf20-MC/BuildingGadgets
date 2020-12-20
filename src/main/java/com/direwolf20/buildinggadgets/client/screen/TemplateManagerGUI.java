@@ -646,10 +646,10 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_JSON
                     .componentTranslation().setStyle(Styles.RED), false);
         } catch (IllegalMinecraftVersionException e) {
-            BuildingGadgets.LOG.error("Attempted to parse Template for Minecraft version {} but expected {}.",
-                    e.getMinecraftVersion(), e.getExpectedVersion(), e);
+            BuildingGadgets.LOG.error("Attempted to parse Template for Minecraft version {} but expected between {} and {}.",
+                    e.getMinecraftVersion(), TemplateHeader.LOWEST_MC_VERSION, TemplateHeader.HIGHEST_MC_VERSION, e);
             getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
-                    .componentTranslation(e.getMinecraftVersion(), e.getExpectedVersion()).setStyle(Styles.RED), false);
+                    .componentTranslation(e.getMinecraftVersion(), TemplateHeader.LOWEST_MC_VERSION, TemplateHeader.HIGHEST_MC_VERSION).setStyle(Styles.RED), false);
         } catch (UnknownTemplateVersionException e) {
             BuildingGadgets.LOG.error("Attempted to parse Template version {} but newest is {}.",
                     e.getTemplateVersion(), TemplateHeader.VERSION, e);

@@ -33,7 +33,7 @@ public enum MessageTranslation implements ITranslationProvider {
     NOTHING_TO_UNDO("nothing_to_undo"),
     PASTE_FAILED("paste_failed", 0),
     PASTE_FAILED_LINK_COPIED("paste_failed.link_copied", 0),
-    PASTE_FAILED_WRONG_MC_VERSION("paste_failed.wrong_mc_version", 2),
+    PASTE_FAILED_WRONG_MC_VERSION("paste_failed.wrong_mc_version", 3),
     PASTE_FAILED_TOO_RECENT_VERSION("paste_failed.too_recent_version", 2),
     PASTE_FAILED_CORRUPT_JSON("paste_failed.corrupt_json", 0),
     PASTE_FAILED_INVALID_JSON("paste_failed.invalid_json", 0),

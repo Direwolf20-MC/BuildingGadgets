@@ -14,26 +14,19 @@ public class TemplateParseException extends JsonParseException {
 
     public static final class IllegalMinecraftVersionException extends TemplateParseException {
         private final String minecraftVersion;
-        private final String expectedVersion;
 
-        public IllegalMinecraftVersionException(String minecraftVersion, String expectedVersion) {
+        public IllegalMinecraftVersionException(String minecraftVersion) {
             super("Attempted to load Template for illegal minecraft version " + minecraftVersion + "!");
             this.minecraftVersion = minecraftVersion;
-            this.expectedVersion = expectedVersion;
         }
 
-        public IllegalMinecraftVersionException(Throwable cause, String minecraftVersion, String expectedVersion) {
+        public IllegalMinecraftVersionException(Throwable cause, String minecraftVersion) {
             super("Attempted to load Template for illegal minecraft version " + minecraftVersion + "!", cause);
             this.minecraftVersion = minecraftVersion;
-            this.expectedVersion = expectedVersion;
         }
 
         public String getMinecraftVersion() {
             return minecraftVersion;
-        }
-
-        public String getExpectedVersion() {
-            return expectedVersion;
         }
     }
 

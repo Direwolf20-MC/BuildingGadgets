@@ -10,6 +10,7 @@ import com.direwolf20.buildinggadgets.common.util.tools.JsonBiDiSerializer;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multiset;
 import com.google.gson.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -23,14 +24,30 @@ import java.util.Objects;
 
 /**
  * In-Memory representation of the '.th' (TemplateHeader) written in json Format to disk, in order to allow users to have some more general Information about the
- * {@link Template}. Only the  boundingBox information is required. However it is advised to provide Users with as
+ * {@link Template}. Only the boundingBox information is required. However it is advised to provide Users with as
  * much information as possible about the {@link Template} they would like to use.
  */
 public final class TemplateHeader {
-    public static final String VERSION = "2-beta";
-    private static final String MC_VERSION = "1.16.4";
+    public static final String VERSION = "2.1.0";
+
+    /**
+     * So we never have to handle updating this again, it won't work for snapshots but meh.
+     *
+     * Note: This can now be done because we support loading older templates meaning small x.x.1 revisions
+     *       will no longer be rejected unless it's higher than the current game version
+     */
+    public static final String HIGHEST_MC_VERSION = Minecraft.getInstance().getMinecraftGame().getVersion().getName();
+
+    /**
+     * The lowest possible minecraft version we support. This could be lower but seeing as the mod only uses
+     * this new schema from 1.14+, this seems like a good starting point. If the game changes anything dramatically
+     * then this will need to be bumped up to reject older, likely broken versions
+     */
+    public static final String LOWEST_MC_VERSION = "1.14.4";
     
     private static final ComparableVersion COMP_VERSION = new ComparableVersion(VERSION);
+    private static final ComparableVersion HIGHEST_MC_COMP = new ComparableVersion(HIGHEST_MC_VERSION);
+    private static final ComparableVersion LOWEST_MC_COMP = new ComparableVersion(LOWEST_MC_VERSION);
 
     // todo: add support for previous templates from older versions
     private static final JsonBiDiSerializer<TemplateHeader> BI_DI_SERIALIZER = new JsonBiDiSerializer<TemplateHeader>() {
@@ -39,8 +56,10 @@ public final class TemplateHeader {
             JsonObject data = json.getAsJsonObject();
 
             String mcVersion = data.getAsJsonPrimitive(JsonKeys.HEADER_MC_VERSION).getAsString();
-            if (! mcVersion.equals(MC_VERSION))
-                throw new IllegalMinecraftVersionException(mcVersion, MC_VERSION);
+            ComparableVersion templateMcVersion = new ComparableVersion(mcVersion);
+
+            if (templateMcVersion.compareTo(LOWEST_MC_COMP) < 0 || templateMcVersion.compareTo(HIGHEST_MC_COMP) > 0)
+                throw new IllegalMinecraftVersionException(mcVersion);
 
             String version = data.getAsJsonPrimitive(JsonKeys.HEADER_VERSION).getAsString();
             if (new ComparableVersion(version).compareTo(COMP_VERSION) > 0)
@@ -68,7 +87,7 @@ public final class TemplateHeader {
         public JsonElement serialize(TemplateHeader src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject object = new JsonObject();
             object.addProperty(JsonKeys.HEADER_VERSION, VERSION);
-            object.addProperty(JsonKeys.HEADER_MC_VERSION, MC_VERSION);
+            object.addProperty(JsonKeys.HEADER_MC_VERSION, HIGHEST_MC_VERSION);
             if (src.getName() != null)
                 object.addProperty(JsonKeys.HEADER_NAME, src.getName());
             if (src.getAuthor() != null)
