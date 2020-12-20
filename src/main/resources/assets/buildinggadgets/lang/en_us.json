@@ -70,6 +70,7 @@
 
   "_comment": "radial-menu",
   "buildinggadgets.radialmenu.destruction_overlay": "Show Overlay",
+  "buildinggadgets.radialmenu.fluid_only": "Fluid Only Mode",
   "buildinggadgets.radialmenu.rotate": "Rotate",
   "buildinggadgets.radialmenu.mirror": "Mirror",
   "buildinggadgets.radialmenu.fuzzy": "Fuzzy",

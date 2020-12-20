@@ -94,6 +94,13 @@ public class ModeRadialMenu extends Screen {
 
                 return GadgetDestruction.getOverlay(getGadget());
             }));
+
+            addButton(new PositionedIconActionable(RadialTranslation.FLUID_ONLY, "fluid_only", right, send -> {
+                if (send)
+                    PacketHandler.sendToServer(new PacketToggleFluidOnly());
+
+                return GadgetDestruction.getIsFluidOnly(getGadget());
+            }));
         } else {
             addButton(new PositionedIconActionable(RadialTranslation.ROTATE, "rotate", left, false, send -> {
                 if (send)
