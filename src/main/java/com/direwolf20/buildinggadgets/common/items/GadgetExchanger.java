@@ -228,10 +228,6 @@ public class GadgetExchanger extends AbstractGadget {
                 () -> getToolMode(stack).getMode().getCollection(new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, lookingAt.getFace(), getConnectedArea(heldItem)), player)
         );
 
-        if (anchor.isPresent()) {
-            setAnchor(stack); // Remove the anchor
-        }
-
         IItemIndex index = InventoryHelper.index(stack, player);
 
         //TODO replace fakeWorld
