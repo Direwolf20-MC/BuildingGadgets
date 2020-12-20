@@ -30,10 +30,7 @@ public final class TemplateHeader {
     public static final String VERSION = "2.1.0";
 
     /**
-     * So we never have to handle updating this again, it won't work for snapshots but meh.
-     *
-     * Note: This can now be done because we support loading older templates meaning small x.x.1 revisions
-     *       will no longer be rejected unless it's higher than the current game version
+     * Must be updated for each new MC version :cry:
      */
     public static final String HIGHEST_MC_VERSION = "1.16.4";
 
