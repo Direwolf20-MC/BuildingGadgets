@@ -4,23 +4,22 @@ import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.BuildRender;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
-import com.direwolf20.buildinggadgets.common.items.modes.BuildingModes;
+import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
+import com.direwolf20.buildinggadgets.common.items.modes.ExchangingModes;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.ITileEntityData;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObject;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
-import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
-import com.direwolf20.buildinggadgets.common.items.modes.ExchangingModes;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -227,6 +226,10 @@ public class GadgetExchanger extends AbstractGadget {
         List<BlockPos> coords = anchor.orElseGet(
                 () -> getToolMode(stack).getMode().getCollection(new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, lookingAt.getFace(), getConnectedArea(heldItem)), player)
         );
+
+        if (anchor.isPresent()) {
+            setAnchor(stack); // Remove the anchor
+        }
 
         IItemIndex index = InventoryHelper.index(stack, player);
 
