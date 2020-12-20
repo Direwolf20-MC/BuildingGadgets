@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.common.blocks;
 
+import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.entities.ConstructionBlockEntity;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.tileentities.EffectBlockTileEntity;
 import mcp.MethodsReturnNonnullByDefault;
@@ -17,6 +17,9 @@ import net.minecraft.loot.LootContext;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -48,16 +51,19 @@ public class EffectBlock extends Block {
                     world.setBlockState(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().getDefaultState());
                     TileEntity te = world.getTileEntity(targetPos);
                     if (te instanceof ConstructionBlockTileEntity) {
-                        ((ConstructionBlockTileEntity) te).setBlockState(targetBlock, targetBlock);
+                        ((ConstructionBlockTileEntity) te).setBlockState(targetBlock);
                     }
                     world.addEntity(new ConstructionBlockEntity(world, targetPos, false));
                 } else {
-                    world.removeBlock(targetPos, false);
-
-                    if( targetBlock.getState().getBlock() instanceof LeavesBlock)
+                    if( targetBlock.getState().getBlock() instanceof LeavesBlock) {
                         targetBlock = new BlockData(targetBlock.getState().with(LeavesBlock.PERSISTENT, true), targetBlock.getTileData());
+                    }
 
                     targetBlock.placeIn(BuildContext.builder().build(world), targetPos);
+
+                    // Instead of removing the block, we just sync the client & server to know that the block has been replaced
+                    world.notifyBlockUpdate(targetPos, targetBlock.getState(), targetBlock.getState(), Constants.BlockFlags.DEFAULT);
+
                     BlockPos upPos = targetPos.up();
                     world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos, false);
                 }
@@ -121,7 +127,9 @@ public class EffectBlock extends Block {
     }
 
     public EffectBlock() {
-        super(Block.Properties.create(EFFECT_BLOCK_MATERIAL).hardnessAndResistance(20f).notSolid().noDrops());
+        super(Block.Properties.create(EFFECT_BLOCK_MATERIAL)
+                .hardnessAndResistance(20f)
+                .noDrops());
     }
 
     @Override
@@ -133,6 +141,16 @@ public class EffectBlock extends Block {
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
         return new EffectBlockTileEntity();
+    }
+
+    @Override
+    public VoxelShape getRenderShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
+        return VoxelShapes.empty();
+    }
+
+    @Override
+    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
+        return VoxelShapes.fullCube();
     }
 
     /**
@@ -180,5 +198,4 @@ public class EffectBlock extends Block {
     public float getAmbientOcclusionLightValue(BlockState state, IBlockReader worldIn, BlockPos pos) {
         return 1.0f;
     }
-
 }

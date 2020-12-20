@@ -70,6 +70,7 @@
 
   "_comment": "radial-menu",
   "buildinggadgets.radialmenu.destruction_overlay": "Show Overlay",
+  "buildinggadgets.radialmenu.fluid_only": "Fluid Only Mode",
   "buildinggadgets.radialmenu.rotate": "Rotate",
   "buildinggadgets.radialmenu.mirror": "Mirror",
   "buildinggadgets.radialmenu.fuzzy": "Fuzzy",
@@ -124,7 +125,7 @@
   "buildinggadgets.message.undo_failed": "Undo Failed (Too far away?)",
   "buildinggadgets.message.nothing_to_undo": "Nothing To Undo",
   "buildinggadgets.message.paste_failed": "Failed to paste Template to clipboard.",
-  "buildinggadgets.message.paste_failed.wrong_mc_version": "Paste Failed, MC Version %s is not supported. Please use only templates that were build for the current version (%s).",
+  "buildinggadgets.message.paste_failed.wrong_mc_version": "Paste Failed, MC Version %s is not supported. Please use only templates that were build for (%s) -> (%s)",
   "buildinggadgets.message.paste_failed.too_recent_version": "Paste Failed, Template version %s is unknown to this instance. Please use only Templates that were build up to format version %s.",
   "buildinggadgets.message.paste_failed.invalid_json": "Paste Failed, Invalid JSON",
   "buildinggadgets.message.paste_failed.corrupt_json": "Paste Failed, Corrupt JSON",

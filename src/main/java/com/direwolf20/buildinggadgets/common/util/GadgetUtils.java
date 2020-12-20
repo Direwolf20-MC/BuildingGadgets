@@ -134,7 +134,6 @@ public class GadgetUtils {
 
     public static void rotateOrMirrorToolBlock(ItemStack stack, PlayerEntity player, PacketRotateMirror.Operation operation) {
         setToolBlock(stack, rotateOrMirrorBlock(player, operation, getToolBlock(stack)));
-        setToolActualBlock(stack, rotateOrMirrorBlock(player, operation, getToolActualBlock(stack)));
     }
 
     private static void setToolBlock(ItemStack stack, @Nullable BlockData data) {
@@ -148,34 +147,13 @@ public class GadgetUtils {
         stack.setTag(tagCompound);
     }
 
-    private static void setToolActualBlock(ItemStack stack, @Nullable BlockData data) {
-        // Store the selected block actual state in the tool's NBT
-        CompoundNBT tagCompound = stack.getOrCreateTag();
-        if (data == null)
-            data = BlockData.AIR;
-
-        CompoundNBT dataTag = data.serialize(true);
-        tagCompound.put(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL, dataTag);
-        stack.setTag(tagCompound);
-    }
 
     @Nonnull
     public static BlockData getToolBlock(ItemStack stack) {
         CompoundNBT tagCompound = stack.getOrCreateTag();
         BlockData res = BlockData.tryDeserialize(tagCompound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE), true);
         if (res == null) {
-            setToolActualBlock(stack, BlockData.AIR);
-            return BlockData.AIR;
-        }
-        return res;
-    }
-
-    @Nonnull
-    public static BlockData getToolActualBlock(ItemStack stack) {
-        CompoundNBT tagCompound = stack.getOrCreateTag();
-        BlockData res = BlockData.tryDeserialize(tagCompound.getCompound(NBTKeys.TE_CONSTRUCTION_STATE_ACTUAL), true);
-        if (res == null) {
-            setToolActualBlock(stack, BlockData.AIR);
+            setToolBlock(stack, BlockData.AIR);
             return BlockData.AIR;
         }
         return res;
@@ -214,10 +192,7 @@ public class GadgetUtils {
         data.ifPresent(placeState -> {
             BlockState actualState = placeState.getState(); //.getExtendedState(world, lookingAt.getPos()); 1.14 @todo: fix?
 
-            BlockData defaultStateData = new BlockData(placeState.getState().getBlock().getDefaultState(), placeState.getTileData());
-
-            setToolBlock(stack, defaultStateData);
-            setToolActualBlock(stack, new BlockData(actualState, placeState.getTileData()));
+            setToolBlock(stack, new BlockData(actualState, placeState.getTileData()));
         });
 
         return ActionResult.resultSuccess(state.getBlock());
@@ -229,9 +204,7 @@ public class GadgetUtils {
             return ActionResultType.PASS;
 
         if (setTool && te instanceof ConstructionBlockTileEntity) {
-            ((ConstructionBlockTileEntity) te).getConstructionBlockData();
-            setToolBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockData());
-            setToolActualBlock(stack, ((ConstructionBlockTileEntity) te).getActualBlockData());
+            setToolBlock(stack, ((ConstructionBlockTileEntity) te).getConstructionBlockData());
             return ActionResultType.SUCCESS;
         }
 

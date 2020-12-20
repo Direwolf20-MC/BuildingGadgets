@@ -1,14 +1,14 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
+import com.direwolf20.buildinggadgets.client.renders.DestructionRender;
 import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
+import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
-import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
-import com.direwolf20.buildinggadgets.client.renders.DestructionRender;
-import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tainted.save.Undo;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -38,6 +38,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ import java.util.stream.Collectors;
 public class GadgetDestruction extends AbstractGadget {
 
     public GadgetDestruction() {
-        super(OurItems.nonStackableItemProperties().maxDamage(1),
+        super(OurItems.nonStackableItemProperties(),
                 Config.GADGETS.GADGET_DESTRUCTION.undoSize::get,
                 Reference.SaveReference.UNDO_DESTRUCTION,
                 TagReference.WHITELIST_DESTRUCTION,
@@ -149,6 +150,14 @@ public class GadgetDestruction extends AbstractGadget {
                 .componentTranslation(newOverlay).setStyle(Styles.AQUA), true);
     }
 
+    public static boolean getIsFluidOnly(ItemStack stack) {
+        return stack.getOrCreateTag().getBoolean(NBTKeys.GADGET_FLUID_ONLY);
+    }
+
+    public static void toggleFluidMode(ItemStack stack) {
+        stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_FLUID_ONLY, !getIsFluidOnly(stack));
+    }
+
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
@@ -209,10 +218,23 @@ public class GadgetDestruction extends AbstractGadget {
                 .offset(down, getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN))
                 .offset(incomingSide.getOpposite(), depth - 1);
 
+        boolean isFluidOnly = getIsFluidOnly(stack);
         return new Region(first, second).stream()
-                .filter(e -> isValidBlock(world, e, player, world.getBlockState(e)))
+                .filter(e ->
+                        isFluidOnly
+                            ? isFluidBlock(world, e)
+                            : isValidBlock(world, e, player, world.getBlockState(e))
+                )
                 .sorted(Comparator.comparing(player.getPosition()::distanceSq))
                 .collect(Collectors.toList());
+    }
+
+    public static boolean isFluidBlock(World world, BlockPos pos) {
+        if (world.getFluidState(pos).isEmpty()) {
+            return false;
+        }
+
+        return ForgeRegistries.FLUIDS.containsKey(world.getBlockState(pos).getBlock().getRegistryName());
     }
 
     public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, BlockState currentBlock) {

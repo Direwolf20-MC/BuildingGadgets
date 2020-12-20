@@ -111,7 +111,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     private static final Joiner CHUNK_JOINER = Joiner.on("; ");
 
     public GadgetCopyPaste() {
-        super(OurItems.nonStackableItemProperties().maxDamage(1),
+        super(OurItems.nonStackableItemProperties(),
                 Config.GADGETS.GADGET_COPY_PASTE.undoSize::get,
                 Reference.SaveReference.UNDO_COPY_PASTE,
                 TagReference.WHITELIST_COPY_PASTE,
@@ -468,7 +468,6 @@ public class GadgetCopyPaste extends AbstractGadget {
     private void onBuildFinished(ItemStack stack, PlayerEntity player, Region bounds) {
         if (! Additions.sizeInvalid(player, bounds))
             sendMessage(stack, player, MessageTranslation.TEMPLATE_BUILD, Styles.DK_GREEN);
-        onAnchorRemoved(stack, player); //clear the anchor after a successful build
     }
 
     private void sendMessage(ItemStack stack, PlayerEntity player, ITranslationProvider messageSource, Style style) {

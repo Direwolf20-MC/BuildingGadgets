@@ -621,12 +621,14 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         // Attempt to parse into nbt first to check for old 1.12 pastes
         try {
-            JsonToNBT.getTagFromJson(CBString);
+            CompoundNBT tagFromJson = JsonToNBT.getTagFromJson(CBString);
+            if (!tagFromJson.contains("header")) {
+                BuildingGadgets.LOG.error("Attempted to use a 1.12 compound on a newer MC version");
+                getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
+                        .componentTranslation("(1.12.x)", Minecraft.getInstance().getMinecraftGame().getVersion().getName()).setStyle(Styles.RED), false);
+                return;
 
-            BuildingGadgets.LOG.error("Attempted to use a 1.12 compound on a newer MC version");
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
-                    .componentTranslation("(1.12.x)", Minecraft.getInstance().getMinecraftGame().getVersion().getName()).setStyle(Styles.RED), false);
-            return;
+            }
         } catch (CommandSyntaxException ignored) {}
 
         // todo: this needs to be put onto some kind of readTemplateFromJson(input stream).onError(e -> error)
@@ -644,10 +646,10 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_JSON
                     .componentTranslation().setStyle(Styles.RED), false);
         } catch (IllegalMinecraftVersionException e) {
-            BuildingGadgets.LOG.error("Attempted to parse Template for Minecraft version {} but expected {}.",
-                    e.getMinecraftVersion(), e.getExpectedVersion(), e);
+            BuildingGadgets.LOG.error("Attempted to parse Template for Minecraft version {} but expected between {} and {}.",
+                    e.getMinecraftVersion(), TemplateHeader.LOWEST_MC_VERSION, TemplateHeader.HIGHEST_MC_VERSION, e);
             getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
-                    .componentTranslation(e.getMinecraftVersion(), e.getExpectedVersion()).setStyle(Styles.RED), false);
+                    .componentTranslation(e.getMinecraftVersion(), TemplateHeader.LOWEST_MC_VERSION, TemplateHeader.HIGHEST_MC_VERSION).setStyle(Styles.RED), false);
         } catch (UnknownTemplateVersionException e) {
             BuildingGadgets.LOG.error("Attempted to parse Template version {} but newest is {}.",
                     e.getTemplateVersion(), TemplateHeader.VERSION, e);

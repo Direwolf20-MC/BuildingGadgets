@@ -70,7 +70,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     private BlockState getActualMimicBlock(IBlockReader blockAccess, BlockPos pos) {
         TileEntity te = blockAccess.getTileEntity(pos);
         if (te instanceof ConstructionBlockTileEntity) {
-            return ((ConstructionBlockTileEntity) te).getActualBlockData().getState();
+            return ((ConstructionBlockTileEntity) te).getConstructionBlockData().getState();
         }
         return null;
     }

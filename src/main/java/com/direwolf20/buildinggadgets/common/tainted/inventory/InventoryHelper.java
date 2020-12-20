@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tainted.inventory;
 
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
+import com.direwolf20.buildinggadgets.common.items.*;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.handle.IHandleProvider;
@@ -8,10 +9,6 @@ import com.direwolf20.buildinggadgets.common.tainted.inventory.handle.IObjectHan
 import com.direwolf20.buildinggadgets.common.tainted.inventory.handle.ItemHandlerProvider;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
-import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
-import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
-import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.tainted.registry.TopologicalRegistryBuilder;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.CommonUtils;
@@ -46,8 +43,19 @@ public class InventoryHelper {
 
     private static final Set<Property<?>> UNSAFE_PROPERTIES =
             ImmutableSet.<Property<?>>builder()
+                    .add(BlockStateProperties.SOUTH)
+                    .add(BlockStateProperties.EAST)
+                    .add(BlockStateProperties.WEST)
+                    .add(BlockStateProperties.NORTH)
+                    .add(BlockStateProperties.UP)
+                    .add(BlockStateProperties.DOWN)
+                    .build();
+
+    private static final Set<Property<?>> BASE_UNSAFE_PROPERTIES =
+            ImmutableSet.<Property<?>>builder()
                     .add(CropsBlock.AGE)
                     .add(DoublePlantBlock.HALF)
+                    .add(BlockStateProperties.WATERLOGGED)
                     .build();
 
     public static final CreativeItemIndex CREATIVE_INDEX = new CreativeItemIndex();
@@ -255,26 +263,23 @@ public class InventoryHelper {
 
     public static Optional<BlockData> getSafeBlockData(PlayerEntity player, BlockPos pos, BlockItemUseContext useContext) {
         World world = player.world;
+        Boolean isCopyPasteGadget = (AbstractGadget.getGadget(player).getItem() instanceof GadgetCopyPaste);
         BlockState state = world.getBlockState(pos);
-        if (state.getBlock() instanceof FlowingFluidBlock || ! state.getFluidState().isEmpty() )
+        if (state.getBlock() instanceof FlowingFluidBlock)
             return Optional.empty();
         if (state.getBlock() == OurBlocks.CONSTRUCTION_BLOCK.get()) {
             TileEntity te = world.getTileEntity(pos);
             if (te instanceof ConstructionBlockTileEntity) //should already be checked
                 return Optional.of(((ConstructionBlockTileEntity) te).getConstructionBlockData());
         }
-        BlockState placeState = null;
-        try {
-            placeState = state.getBlock().getStateForPlacement(useContext);
-        } catch (Exception e) {
-            ; //this can happen if the context doesn't match how it should be
-        }
-        if (placeState == null)
-            placeState = state.getBlock().getDefaultState();
+        BlockState placeState = state.getBlock().getDefaultState();
         for (Property<?> prop : placeState.getProperties()) {
-            if (! UNSAFE_PROPERTIES.contains(prop))
-                placeState = applyProperty(placeState, state, prop);
+            if (BASE_UNSAFE_PROPERTIES.contains(prop) || !isCopyPasteGadget && UNSAFE_PROPERTIES.contains(prop)) {
+                continue;
+            }
+            placeState = applyProperty(placeState, state, prop);
         }
+
 
         return Optional.of(new BlockData(placeState, TileSupport.createTileData(world, pos)));
     }

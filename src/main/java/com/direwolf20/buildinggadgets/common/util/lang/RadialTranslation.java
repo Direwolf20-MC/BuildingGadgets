@@ -4,6 +4,7 @@ import net.minecraft.client.resources.I18n;
 
 public enum RadialTranslation implements ITranslationProvider {
     DESTRUCTION_OVERLAY("destruction_overlay"),
+    FLUID_ONLY("fluid_only"),
     ROTATE("rotate"),
     MIRROR("mirror"),
     FUZZY("fuzzy"),

@@ -127,20 +127,20 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT compound) {
-        super.deserializeNBT(compound);
+    public void read(BlockState state, CompoundNBT nbt) {
+        super.read(state, nbt);
 
-        if (compound.contains(NBTKeys.GADGET_TICKS, NBT.TAG_INT) &&
-                compound.contains(NBTKeys.GADGET_MODE, NBT.TAG_INT) &&
-                compound.contains(NBTKeys.GADGET_SOURCE_BLOCK, NBT.TAG_COMPOUND) &&
-                compound.contains(NBTKeys.GADGET_REPLACEMENT_BLOCK, NBT.TAG_COMPOUND) &&
-                compound.contains(NBTKeys.GADGET_USE_PASTE)) {
+        if (nbt.contains(NBTKeys.GADGET_TICKS, NBT.TAG_INT) &&
+                nbt.contains(NBTKeys.GADGET_MODE, NBT.TAG_INT) &&
+                nbt.contains(NBTKeys.GADGET_SOURCE_BLOCK, NBT.TAG_COMPOUND) &&
+                nbt.contains(NBTKeys.GADGET_REPLACEMENT_BLOCK, NBT.TAG_COMPOUND) &&
+                nbt.contains(NBTKeys.GADGET_USE_PASTE)) {
 
-            ticks = compound.getInt(NBTKeys.GADGET_TICKS);
-            mode = Mode.VALUES[compound.getInt(NBTKeys.GADGET_MODE)];
-            renderedBlock = BlockData.tryDeserialize(compound.getCompound(NBTKeys.GADGET_REPLACEMENT_BLOCK), true);
-            sourceBlock = BlockData.tryDeserialize(compound.getCompound(NBTKeys.GADGET_SOURCE_BLOCK), true);
-            usePaste = compound.getBoolean(NBTKeys.GADGET_USE_PASTE);
+            ticks = nbt.getInt(NBTKeys.GADGET_TICKS);
+            mode = Mode.VALUES[nbt.getInt(NBTKeys.GADGET_MODE)];
+            renderedBlock = BlockData.tryDeserialize(nbt.getCompound(NBTKeys.GADGET_REPLACEMENT_BLOCK), true);
+            sourceBlock = BlockData.tryDeserialize(nbt.getCompound(NBTKeys.GADGET_SOURCE_BLOCK), true);
+            usePaste = nbt.getBoolean(NBTKeys.GADGET_USE_PASTE);
         }
     }
 
