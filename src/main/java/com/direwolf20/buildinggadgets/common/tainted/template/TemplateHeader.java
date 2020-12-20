@@ -10,7 +10,6 @@ import com.direwolf20.buildinggadgets.common.util.tools.JsonBiDiSerializer;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multiset;
 import com.google.gson.*;
-import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -36,7 +35,7 @@ public final class TemplateHeader {
      * Note: This can now be done because we support loading older templates meaning small x.x.1 revisions
      *       will no longer be rejected unless it's higher than the current game version
      */
-    public static final String HIGHEST_MC_VERSION = Minecraft.getInstance().getMinecraftGame().getVersion().getName();
+    public static final String HIGHEST_MC_VERSION = "1.16.4";
 
     /**
      * The lowest possible minecraft version we support. This could be lower but seeing as the mod only uses
