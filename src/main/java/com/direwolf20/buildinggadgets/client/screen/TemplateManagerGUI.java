@@ -615,7 +615,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         String CBString = getMinecraft().keyboardListener.getClipboardString();
         if (GadgetUtils.mightBeLink(CBString)) {
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.RED), false);
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_LINK_COPIED.componentTranslation().setStyle(Styles.RED), false);
             return;
         }
 
