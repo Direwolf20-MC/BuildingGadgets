@@ -4,12 +4,16 @@ import com.direwolf20.buildinggadgets.client.renderer.DireBufferBuilder;
 import com.direwolf20.buildinggadgets.client.renderer.DireVertexBuffer;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.common.tainted.building.Region;
-import com.direwolf20.buildinggadgets.common.tainted.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.tainted.building.Region;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.IBuildView;
+import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
+import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider;
+import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider.IUpdateListener;
+import com.direwolf20.buildinggadgets.common.tainted.template.Template;
 import com.direwolf20.buildinggadgets.common.world.MockDelegationWorld;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -42,10 +46,21 @@ import java.util.function.Consumer;
 
 import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 
-public class CopyPasteRender extends BaseRenderer {
+public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
     private MultiVBORenderer renderBuffer;
     private int tickTrack = 0;
+    private UUID lastRendered = null;
 
+    @Override
+    public void onTemplateUpdate(ITemplateProvider provider, ITemplateKey key, Template template) {
+        if (provider.getId(key).equals(lastRendered))
+            renderBuffer = null;
+    }
+
+    @Override
+    public void onTemplateUpdateSend(ITemplateProvider provider, ITemplateKey key, Template template) {
+        onTemplateUpdate(provider, key, template);
+    }
 
     @Override
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
@@ -61,6 +76,7 @@ public class CopyPasteRender extends BaseRenderer {
         stack.translate(-cameraView.getX(), -cameraView.getY(), -cameraView.getZ()); //Sets render position to 0,0,0
 
         if (GadgetCopyPaste.getToolMode(heldItem) == GadgetCopyPaste.ToolMode.COPY) {
+            renderBuffer = null; //fix the surroundings not being taken into account when you've walked around a bit
             GadgetCopyPaste.getSelectedRegion(heldItem).ifPresent(region ->
                     renderCopy(stack, region));
         } else
@@ -134,8 +150,11 @@ public class CopyPasteRender extends BaseRenderer {
                         targets.add(target);
                     }
                 }
-
+                UUID id = provider.getId(key);
+                if (! id.equals(lastRendered))
+                    renderBuffer = null;
                 renderTargets(matrices, cameraView, context, targets, startPos);
+                lastRendered = id;
             });
         }));
     }
