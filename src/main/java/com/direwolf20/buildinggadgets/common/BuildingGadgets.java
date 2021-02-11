@@ -5,6 +5,7 @@ import com.direwolf20.buildinggadgets.client.renderer.EffectBlockTER;
 import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.commands.OverrideBuildSizeCommand;
 import com.direwolf20.buildinggadgets.common.commands.OverrideCopySizeCommand;
@@ -102,6 +103,7 @@ public final class BuildingGadgets {
         theMod = (BuildingGadgets) ModLoadingContext.get().getActiveContainer().getMod();
 
         CapabilityTemplate.register();
+        OurCapabilities.register();
         PacketHandler.register();
     }
 

@@ -2,12 +2,13 @@ package com.direwolf20.buildinggadgets.common.items;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
-import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
+import com.direwolf20.buildinggadgets.common.capability.GadgetCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -18,6 +19,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 
@@ -37,7 +39,7 @@ public abstract class AbstractGadget extends Item {
         if (this.usesPower()) {
             // Show tooltip for Forge Energy
             if (!this.usesDurability()) {
-                stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(energy -> tooltip.add(TooltipTranslation.GADGET_ENERGY
+                this.getEnergy(stack).ifPresent(energy -> tooltip.add(TooltipTranslation.GADGET_ENERGY
                     .componentTranslation(withSuffix(energy.getEnergyStored()), withSuffix(energy.getMaxEnergyStored()))
                     .setStyle(Styles.GRAY)));
             } else {
@@ -45,10 +47,14 @@ public abstract class AbstractGadget extends Item {
                 tooltip.add(TooltipTranslation.GADGET_DURABILITY.componentTranslation(stack.getMaxDamage() - stack.getDamage(), stack.getMaxDamage()).setStyle(Styles.GRAY));
             }
         } else {
+            // Show a creative text for anything not using energy
             tooltip.add(TooltipTranslation.GADGET_CREATIVE.componentTranslation().setStyle(Styles.LT_PURPLE));
         }
     }
 
+    /**
+     * Fill the creative tab with charged gadgets
+     */
     @Override
     public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
         super.fillItemGroup(group, items);
@@ -63,7 +69,7 @@ public abstract class AbstractGadget extends Item {
     @Nullable
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
-        return new CapabilityProviderEnergy(stack, this.config.maxEnergy::get);
+        return new GadgetCapabilityProvider(stack, this.config.maxEnergy::get, this instanceof CopyGadgetItem);
     }
 
     @Override
@@ -85,7 +91,7 @@ public abstract class AbstractGadget extends Item {
             return super.getDurabilityForDisplay(stack);
         }
 
-        return stack.getCapability(CapabilityEnergy.ENERGY)
+        return this.getEnergy(stack)
             .map(e -> 1D - (e.getEnergyStored() / (double) e.getMaxEnergyStored()))
             .orElse(super.getDurabilityForDisplay(stack));
     }
@@ -103,8 +109,8 @@ public abstract class AbstractGadget extends Item {
             return super.getRGBDurabilityForDisplay(stack);
         }
 
-        int power = stack.getCapability(CapabilityEnergy.ENERGY).map(IEnergyStorage::getEnergyStored).orElse(0);
-        int maxPower = stack.getCapability(CapabilityEnergy.ENERGY).map(IEnergyStorage::getMaxEnergyStored).orElse(0);
+        int power = this.getEnergy(stack).map(IEnergyStorage::getEnergyStored).orElse(0);
+        int maxPower = this.getEnergy(stack).map(IEnergyStorage::getMaxEnergyStored).orElse(0);
 
         return MathHelper.hsvToRGB(Math.max(0.0F, power / (float) maxPower) / 3.0F, 1.0F, 1.0F);
     }
@@ -151,5 +157,67 @@ public abstract class AbstractGadget extends Item {
      */
     private boolean usesDurability() {
         return this.config.useDurability.get();
+    }
+
+    /**
+     * Determines if the current gadget has enough power (durability or energy)
+     * to perform a single action based on it's `cost per operation`
+     */
+    private boolean hasRequiredPower(ItemStack stack, PlayerEntity player) {
+        return hasRequiredPowerAtCost(stack, player, getCostPerOperation(player));
+    }
+
+    /**
+     * Determines if the current gadget has enough power (durability or energy)
+     * to perform a mass action... based on a custom cost param
+     */
+    private boolean hasRequiredPowerAtCost(ItemStack stack, PlayerEntity player, int costOfOperation) {
+        // If we're in creative or the gadget is set to be creative then pass
+        if (this.avoidsPower(player)) {
+            return true;
+        }
+
+        int remainingPower = this.usesDurability()
+            ? (stack.getMaxDamage() - stack.getDamage()) - costOfOperation
+            : this.getEnergy(stack).map(IEnergyStorage::getEnergyStored).orElse(0) - costOfOperation;
+
+        return remainingPower > 0;
+    }
+
+    /**
+     * Gets the specific cost per operation from the config, ignored if creative or no power requirement.
+     */
+    private int getCostPerOperation(PlayerEntity player) {
+        if (this.avoidsPower(player)) {
+            return 0;
+        }
+
+        return this.usesDurability()
+            ? this.config.durabilityCost.get()
+            : this.config.energyCost.get();
+    }
+
+    /**
+     * Performs the correct power reduction method.
+     */
+    private void removePower(ItemStack stack, PlayerEntity player, int amount) {
+        if (this.avoidsPower(player)) {
+            return;
+        }
+
+        if (this.usesDurability()) {
+            this.setDamage(stack, stack.getDamage() - amount);
+            return;
+        }
+
+        this.getEnergy(stack).ifPresent(energy -> energy.extractEnergy(amount, false));
+    }
+
+    private LazyOptional<IEnergyStorage> getEnergy(ItemStack stack) {
+        return stack.getCapability(CapabilityEnergy.ENERGY);
+    }
+
+    private boolean avoidsPower(PlayerEntity player) {
+        return player.isCreative() || !this.usesPower();
     }
 }
