@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
-import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.items.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.items.GadgetDestruction;
-import com.direwolf20.buildinggadgets.common.items.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.old_items.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.old_items.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.old_items.GadgetDestruction;
+import com.direwolf20.buildinggadgets.common.old_items.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;

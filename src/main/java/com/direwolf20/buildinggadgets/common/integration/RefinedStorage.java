@@ -4,7 +4,7 @@
 //import com.direwolf20.buildinggadgets.common.integration.IntegrationHandler.IntegratedMod;
 //import com.direwolf20.buildinggadgets.common.util.tools.NetworkIO;
 //import net.minecraft.tileentity.TileEntity;
-//import net.minecraftforge.items.IItemHandler;
+//import net.minecraftforge.old_items.IItemHandler;
 //
 //import javax.annotation.Nullable;
 //

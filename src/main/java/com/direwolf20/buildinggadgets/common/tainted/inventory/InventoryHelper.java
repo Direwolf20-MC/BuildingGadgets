@@ -1,7 +1,10 @@
 package com.direwolf20.buildinggadgets.common.tainted.inventory;
 
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
-import com.direwolf20.buildinggadgets.common.items.*;
+import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
+import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
+import com.direwolf20.buildinggadgets.common.old_items.*;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.handle.IHandleProvider;
@@ -24,7 +27,6 @@ import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.items.CapabilityItemHandler;

@@ -24,7 +24,6 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.*;
@@ -98,7 +97,7 @@ public class EventTooltip {
         if (!Screen.hasShiftDown())
             return;
 
-        //This method will draw items on the tooltip
+        //This method will draw old_items on the tooltip
         ItemStack stack = event.getStack();
         Minecraft mc = Minecraft.getInstance();
         MatrixStack matrices = event.getMatrixStack();

@@ -9,10 +9,10 @@ import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
-import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.items.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.items.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
+import com.direwolf20.buildinggadgets.common.old_items.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.old_items.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.old_items.GadgetExchanger;
+import com.direwolf20.buildinggadgets.common.building.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -119,7 +119,7 @@ public class BuildRender extends BaseRenderer {
             buffer.finish(); // @mcp: finish (mcp) = draw (yarn)
         }
 
-        // Don't even waste the time checking to see if we have the right energy, items, etc for creative mode
+        // Don't even waste the time checking to see if we have the right energy, old_items, etc for creative mode
         if (!player.isCreative()) {
             IVertexBuilder builder;
 

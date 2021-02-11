@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.old_items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;

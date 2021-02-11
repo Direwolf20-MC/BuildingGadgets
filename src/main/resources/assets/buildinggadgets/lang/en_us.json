@@ -36,6 +36,8 @@
   "tooltip.gadget.destroyshowoverlay": "Showing Overlay: %s",
   "tooltip.gadget.destroywarning": "WARNING: This tool voids blocks.",
   "tooltip.gadget.energy": "Energy: %s/%s",
+  "tooltip.gadget.durability": "Durability: %s/%s",
+  "tooltip.gadget.creative": "Creative ∞",
   "tooltip.gadget.mode": "Mode: %s",
   "tooltip.gadget.rotate": "Rotate",
   "tooltip.gadget.mirror": "Mirror",

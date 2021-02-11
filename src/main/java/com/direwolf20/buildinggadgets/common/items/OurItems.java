@@ -16,10 +16,10 @@ public final class OurItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Reference.MODID);
 
     // Gadgets
-    public static final RegistryObject<Item> BUILDING_GADGET_ITEM = ITEMS.register("gadget_building", GadgetBuilding::new);
-    public static final RegistryObject<Item> EXCHANGING_GADGET_ITEM = ITEMS.register("gadget_exchanging", GadgetExchanger::new);
-    public static final RegistryObject<Item> COPY_PASTE_GADGET_ITEM = ITEMS.register("gadget_copy_paste", GadgetCopyPaste::new);
-    public static final RegistryObject<Item> DESTRUCTION_GADGET_ITEM = ITEMS.register("gadget_destruction", GadgetDestruction::new);
+    public static final RegistryObject<Item> BUILDING_GADGET_ITEM = ITEMS.register("gadget_building", BuildingGadgetItem::new);
+    public static final RegistryObject<Item> EXCHANGING_GADGET_ITEM = ITEMS.register("gadget_exchanging", ExchangingGadgetItem::new);
+    public static final RegistryObject<Item> COPY_PASTE_GADGET_ITEM = ITEMS.register("gadget_copy_paste", CopyGadgetItem::new);
+    public static final RegistryObject<Item> DESTRUCTION_GADGET_ITEM = ITEMS.register("gadget_destruction", DestructionGadgetItem::new);
 
     // Construction Paste Containers
     public static final RegistryObject<Item> PASTE_CONTAINER_T1_ITEM

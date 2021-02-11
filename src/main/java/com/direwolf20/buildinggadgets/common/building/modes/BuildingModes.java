@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.items.modes;
+package com.direwolf20.buildinggadgets.common.building.modes;
 
 import java.util.Arrays;
 

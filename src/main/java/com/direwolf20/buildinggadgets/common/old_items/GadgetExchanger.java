@@ -1,12 +1,15 @@
-package com.direwolf20.buildinggadgets.common.items;
+package com.direwolf20.buildinggadgets.common.old_items;
+
+import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.BuildRender;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
+import com.direwolf20.buildinggadgets.common.building.modes.AbstractMode;
+import com.direwolf20.buildinggadgets.common.building.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
-import com.direwolf20.buildinggadgets.common.items.modes.ExchangingModes;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
@@ -71,13 +74,12 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
-
 public class GadgetExchanger extends AbstractGadget {
     private static final MockBuilderWorld fakeWorld = new MockBuilderWorld();
 
     public GadgetExchanger() {
-        super(OurItems.nonStackableItemProperties(),
+        super(
+            OurItems.nonStackableItemProperties(),
                 () -> 0,
                 "",
                 TagReference.WHITELIST_EXCHANGING,

@@ -171,7 +171,7 @@ public class EffectBlock extends Block {
     }
 
     /**
-     * This gets a complete list of items dropped from this block.
+     * This gets a complete list of old_items dropped from this block.
      *
      * @param p_220076_1_ Current state
      */

@@ -42,7 +42,7 @@ public final class MatchResult {
      * in there will be available. If this match is not a success, then this will return the amount of found Items for all {@link IUniqueObject unique objects} across
      * all options.
      *
-     * @return The found items
+     * @return The found old_items
      */
     public ImmutableMultiset<IUniqueObject<?>> getFoundItems() {
         return foundItems;

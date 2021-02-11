@@ -19,7 +19,7 @@ public interface IItemIndex {
         return insert(items, false);
     }
 
-    //returns the remaining items
+    //returns the remaining old_items
     Multiset<IUniqueObject<?>> insert(Multiset<IUniqueObject<?>> items, boolean simulate);
 
     void reIndex();

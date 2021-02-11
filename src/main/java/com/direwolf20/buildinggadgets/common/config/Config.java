@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.config;
 
+import static net.minecraftforge.common.ForgeConfigSpec.*;
+
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-
-import static net.minecraftforge.common.ForgeConfigSpec.*;
 
 @EventBusSubscriber
 public class Config {
@@ -59,6 +59,7 @@ public class Config {
 
         private CategoryGadgets() {
             SERVER_BUILDER.comment("Configure the Gadgets").push("Gadgets");
+
             maxRange = SERVER_BUILDER
                     .comment("The max range of the Gadgets")
                     .defineInRange("Maximum allowed Range", 15, 1, 32);
@@ -71,8 +72,8 @@ public class Config {
                             "Of course decreasing this value will result in more time required to place large TemplateItem's.")
                     .defineInRange("Max Placement/Tick", 1024, 1, Integer.MAX_VALUE);
 
-            GADGET_BUILDING = new GadgetConfig("Building Gadget", 500000, 50, 10);
-            GADGET_EXCHANGER = new GadgetConfig("Exchanging Gadget", 500000, 100, 10);
+            GADGET_BUILDING = new GadgetConfig("Building Gadget", false, true, 500000, 2000, 50, 1, 10);
+            GADGET_EXCHANGER = new GadgetConfig("Exchanging Gadget", false, true, 500000, 2000, 100, 1, 10);
             GADGET_DESTRUCTION = new CategoryGadgetDestruction();
             GADGET_COPY_PASTE = new CategoryGadgetCopyPaste();
 
@@ -80,20 +81,47 @@ public class Config {
         }
 
         public static class GadgetConfig {
+            public final BooleanValue useDurability;
+            public final BooleanValue useEnergy;
             public final IntValue maxEnergy;
+            public final IntValue maxDurability;
             public final IntValue energyCost;
+            public final IntValue durabilityCost;
             public final IntValue undoSize;
 
-            public GadgetConfig(String name, int maxEnergy, int energyCost, int getMaxUndo) {
+            public GadgetConfig(String name, boolean useDurability, boolean useEnergy, int maxEnergy, int maxDurability, int energyCost, int durabilityCost, int getMaxUndo) {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the " + name).push(name);
 
+                this.useDurability = SERVER_BUILDER
+                    .comment("Determines if the gadget uses durability")
+                    .comment("If both Durability and Energy are set to false, the gadget will not use energy to power it.")
+                    .worldRestart()
+                    .define("Use Durability", useDurability);
+
+                this.useEnergy = SERVER_BUILDER
+                    .comment("Determines if the gadget uses energy")
+                    .worldRestart()
+                    .define("Use Energy", useEnergy);
+
                 this.maxEnergy = SERVER_BUILDER
-                        .comment("The max energy of the Gadget, set to 0 to disable energy usage")
+                        .comment("The max energy of the Gadget")
+                        .comment("Only active when Use Energy is set to true")
                         .defineInRange("Maximum Energy", maxEnergy, 0, Integer.MAX_VALUE);
 
+                this.maxDurability = SERVER_BUILDER
+                    .comment("The max durability of the Gadget")
+                    .comment("Only active when Use Durability is set to true")
+                    .defineInRange("Maximum Durability", maxDurability, 0, Integer.MAX_VALUE);
+
                 this.energyCost = SERVER_BUILDER
-                        .comment("The Gadget's Energy cost per Operation")
+                        .comment("The Gadget's Energy cost per Operation (block placed, destroyed, exchanged)")
+                        .comment("Only active when Use Energy is set to true")
                         .defineInRange("Energy Cost", energyCost, 0, Integer.MAX_VALUE);
+
+                this.durabilityCost = SERVER_BUILDER
+                    .comment("The Gadget's Durability cost per Operation (block placed, destroyed, exchanged)")
+                    .comment("Only active when Use Durability is set to true")
+                    .defineInRange("Durability Cost", durabilityCost, 0, Integer.MAX_VALUE);
 
                 this.undoSize = SERVER_BUILDER
                         .comment("The Gadget's Max Undo size (Note, the exchanger does not support undo)")
@@ -109,7 +137,7 @@ public class Config {
             public final BooleanValue nonFuzzyEnabled;
 
             private CategoryGadgetDestruction() {
-                super("Destruction Gadget", 1000000, 200, 1);
+                super("Destruction Gadget", false, true, 1000000, 4000, 200, 2, 1);
 
                 SERVER_BUILDER
                         .comment("Energy Cost, Durability & Maximum Energy of the Destruction Gadget")
@@ -140,7 +168,7 @@ public class Config {
             public final IntValue maxBuildSize;
 
             private CategoryGadgetCopyPaste() {
-                super("Copy-Paste Gadget", 500000, 50, 1);
+                super("Copy-Paste Gadget", false, true, 500000, 2000,50, 1, 1);
 
                 SERVER_BUILDER
                         .comment("Energy Cost & Durability of the Copy-Paste Gadget")

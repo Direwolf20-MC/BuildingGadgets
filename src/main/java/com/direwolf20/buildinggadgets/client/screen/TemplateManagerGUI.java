@@ -61,7 +61,6 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -76,7 +75,6 @@ import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
@@ -269,7 +267,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         MatchResult list = InventoryHelper.CREATIVE_INDEX.tryMatch(requirements);
         ImmutableMultiset<IUniqueObject<?>> foundItems = list.getFoundItems();
 
-        // Reverse sorted list of items required.
+        // Reverse sorted list of old_items required.
         List<Multiset.Entry<IUniqueObject<?>>> sortedEntries = ImmutableList.sortedCopyOf(Comparator
                 .<Multiset.Entry<IUniqueObject<?>>, Integer>comparing(Multiset.Entry::getCount)
                 .reversed(), list.getChosenOption().entrySet());

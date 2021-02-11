@@ -104,7 +104,7 @@ public final class NBTKeys {
     public static final String UNIQUE_ITEM_COUNT = "count";
 
     public static final String TE_CONSTRUCTION_STATE = MAP_STATE;
-    public static final String TE_TEMPLATE_MANAGER_ITEMS = "items";
+    public static final String TE_TEMPLATE_MANAGER_ITEMS = "old_items";
 
     public static final String ENTITY_DESPAWNING = "despawning";
     public static final String ENTITY_TICKS_EXISTED = "ticks_existed";

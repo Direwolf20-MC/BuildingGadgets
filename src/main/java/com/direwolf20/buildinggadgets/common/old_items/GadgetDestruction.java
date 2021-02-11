@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.items;
+package com.direwolf20.buildinggadgets.common.old_items;
 
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.DestructionRender;
@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
@@ -50,7 +51,8 @@ import java.util.stream.Collectors;
 public class GadgetDestruction extends AbstractGadget {
 
     public GadgetDestruction() {
-        super(OurItems.nonStackableItemProperties(),
+        super(
+            OurItems.nonStackableItemProperties(),
                 Config.GADGETS.GADGET_DESTRUCTION.undoSize::get,
                 Reference.SaveReference.UNDO_DESTRUCTION,
                 TagReference.WHITELIST_DESTRUCTION,

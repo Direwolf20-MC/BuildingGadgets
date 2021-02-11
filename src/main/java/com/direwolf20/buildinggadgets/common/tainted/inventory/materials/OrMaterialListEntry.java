@@ -32,7 +32,7 @@ class OrMaterialListEntry extends SubMaterialListEntry {
     }
 
     /**
-     * Applies an "or" by iterating over all contained entries in the order in which they appear, and then in-turn iterating over the items.
+     * Applies an "or" by iterating over all contained entries in the order in which they appear, and then in-turn iterating over the old_items.
      */
     @Override
     public PeekingIterator<ImmutableMultiset<IUniqueObject<?>>> iterator() {

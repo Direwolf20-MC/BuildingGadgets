@@ -1,21 +1,24 @@
-package com.direwolf20.buildinggadgets.common.items;
+package com.direwolf20.buildinggadgets.common.old_items;
 
+import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
+
+import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
+import com.direwolf20.buildinggadgets.client.renders.BuildRender;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
+import com.direwolf20.buildinggadgets.common.building.modes.AbstractMode;
+import com.direwolf20.buildinggadgets.common.building.modes.BuildingModes;
+import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObject;
-import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
-import com.direwolf20.buildinggadgets.common.items.modes.BuildingModes;
-import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
-import com.direwolf20.buildinggadgets.client.renders.BuildRender;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.tainted.save.Undo;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -53,14 +56,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
-
 public class GadgetBuilding extends AbstractGadget {
 
     private static final MockBuilderWorld fakeWorld = new MockBuilderWorld();
 
     public GadgetBuilding() {
-        super(OurItems.nonStackableItemProperties(),
+        super(
+            OurItems.nonStackableItemProperties(),
                 Config.GADGETS.GADGET_BUILDING.undoSize::get,
                 Reference.SaveReference.UNDO_BUILDING,
                 TagReference.WHITELIST_BUILDING,

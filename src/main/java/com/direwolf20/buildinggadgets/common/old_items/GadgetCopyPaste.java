@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.items;
+package com.direwolf20.buildinggadgets.common.old_items;
 
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.CopyPasteRender;
@@ -10,6 +10,7 @@ import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.commands.OverrideBuildSizeCommand;
 import com.direwolf20.buildinggadgets.common.commands.OverrideCopySizeCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
 import com.direwolf20.buildinggadgets.common.tainted.building.PlacementChecker;
@@ -111,7 +112,8 @@ public class GadgetCopyPaste extends AbstractGadget {
     private static final Joiner CHUNK_JOINER = Joiner.on("; ");
 
     public GadgetCopyPaste() {
-        super(OurItems.nonStackableItemProperties(),
+        super(
+            OurItems.nonStackableItemProperties(),
                 Config.GADGETS.GADGET_COPY_PASTE.undoSize::get,
                 Reference.SaveReference.UNDO_COPY_PASTE,
                 TagReference.WHITELIST_COPY_PASTE,

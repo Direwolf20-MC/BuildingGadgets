@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.client;
 
 import com.direwolf20.buildinggadgets.client.screen.TemplateManagerGUI;
-import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.old_items.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import mezz.jei.api.IModPlugin;

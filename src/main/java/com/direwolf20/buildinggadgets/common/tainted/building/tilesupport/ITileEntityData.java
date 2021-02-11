@@ -40,8 +40,8 @@ public interface ITileEntityData {
     boolean placeIn(BuildContext context, BlockState state, BlockPos position);
 
     /**
-     * @param context The context in which to query required items.
-     * @param state The {@link BlockState} to retrieve items for
+     * @param context The context in which to query required old_items.
+     * @param state The {@link BlockState} to retrieve old_items for
      * @param target {@link RayTraceResult} the target at which a click is simulated
      * @param pos The {@link BlockPos} where a block is simulated for this Method
      * @return A {@link Multiset} of required Items.

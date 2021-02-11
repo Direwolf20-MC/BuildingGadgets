@@ -6,7 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.event.ForgeEventFactory;
 
 /**
- * An {@link net.minecraftforge.items.IItemHandler} which inserts items into the PlayerInventory by making it pick up a freshly created ItemStack.
+ * An {@link net.minecraftforge.items.IItemHandler} which inserts old_items into the PlayerInventory by making it pick up a freshly created ItemStack.
  */
 public final class PlayerInventoryInsertProvider implements IInsertProvider {
     private final PlayerEntity player;
