@@ -1,6 +1,7 @@
-package com.direwolf20.buildinggadgets.common.capability.template;
+package com.direwolf20.buildinggadgets.common.capability;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.capability.gadget.GadgetMeta;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider;
 import com.direwolf20.buildinggadgets.common.tainted.template.InMemoryTemplateProvider;
@@ -10,13 +11,15 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.Capability.IStorage;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 
 import javax.annotation.Nullable;
 
-public class CapabilityTemplate {
+public class OurCapabilities {
+    @CapabilityInject(GadgetMeta.class)
+    public static Capability<GadgetMeta> GADGET_META = null;
+
     @CapabilityInject(ITemplateProvider.class)
     public static Capability<ITemplateProvider> TEMPLATE_PROVIDER_CAPABILITY = null;
 
@@ -24,21 +27,15 @@ public class CapabilityTemplate {
     public static Capability<ITemplateKey> TEMPLATE_KEY_CAPABILITY = null;
 
     public static void register() {
-        BuildingGadgets.LOG.debug("Registering TemplateItem Provider Capability");
-        CapabilityManager.INSTANCE.register(ITemplateProvider.class, new IStorage<ITemplateProvider>() {
-            @Nullable
-            @Override
-            public INBT writeNBT(Capability<ITemplateProvider> capability, ITemplateProvider instance, Direction side) {
-                return null;
-            }
+        BuildingGadgets.LOG.debug("Registering Provider Capabilities");
 
-            @Override
-            public void readNBT(Capability<ITemplateProvider> capability, ITemplateProvider instance, Direction side, INBT nbt) {
+        // Template provider
+        CapabilityManager.INSTANCE.register(ITemplateProvider.class, new BlankStorage<>(), InMemoryTemplateProvider::new);
 
-            }
-        }, InMemoryTemplateProvider::new);
+        // Gadget meta provider
+        CapabilityManager.INSTANCE.register(GadgetMeta.class, new BlankStorage<>(), () -> new GadgetMeta(null));
 
-        BuildingGadgets.LOG.debug("Registering TemplateItem Key Capability");
+        // Template Key provider
         CapabilityManager.INSTANCE.register(ITemplateKey.class, new Capability.IStorage<ITemplateKey>() {
             @Nullable
             @Override
@@ -63,5 +60,18 @@ public class CapabilityTemplate {
                 }
             }
         }, TemplateKey::new);
+    }
+
+    private static class BlankStorage<T> implements Capability.IStorage<T> {
+        @Nullable
+        @Override
+        public INBT writeNBT(Capability<T> capability, T instance, Direction side) {
+            return null;
+        }
+
+        @Override
+        public void readNBT(Capability<T> capability, T instance, Direction side, INBT nbt) {
+
+        }
     }
 }

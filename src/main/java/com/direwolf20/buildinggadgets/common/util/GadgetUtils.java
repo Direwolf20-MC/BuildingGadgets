@@ -2,15 +2,15 @@ package com.direwolf20.buildinggadgets.common.util;
 
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
-import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
-import com.direwolf20.buildinggadgets.common.capability.template.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryLinker;
+import com.direwolf20.buildinggadgets.common.building.modes.AbstractMode;
+import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.old_items.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.old_items.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.old_items.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.building.modes.AbstractMode;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
+import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryLinker;
 import com.direwolf20.buildinggadgets.common.tainted.template.Template;
 import com.direwolf20.buildinggadgets.common.tainted.template.TemplateHeader;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
@@ -32,7 +32,10 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
@@ -61,8 +64,8 @@ public class GadgetUtils {
 
     public static void addTooltipNameAndAuthor(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip) {
         if (world != null) {
-            world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-                stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+            world.getCapability(OurCapabilities.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+                stack.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                     Template template = provider.getTemplateForKey(key);
                     TemplateHeader header = template.getHeader();
                     if (header.getName() != null && ! header.getName().isEmpty())

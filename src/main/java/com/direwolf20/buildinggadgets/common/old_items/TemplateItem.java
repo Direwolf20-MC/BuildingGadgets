@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.old_items;
 
 import com.direwolf20.buildinggadgets.client.screen.GuiMod;
-import com.direwolf20.buildinggadgets.common.capability.template.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.capability.template.TemplateKeyProvider;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
@@ -53,11 +53,11 @@ public class TemplateItem extends Item {
 
     public static ItemStack getTemplateItem(PlayerEntity player) {
         ItemStack mainhand = player.getHeldItemMainhand();
-        if (mainhand.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
+        if (mainhand.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).isPresent())
             return mainhand;
 
         ItemStack offhand = player.getHeldItemOffhand();
-        if (offhand.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
+        if (offhand.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).isPresent())
             return offhand;
 
         return ItemStack.EMPTY;

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.capability.template.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
@@ -48,13 +48,13 @@ public final class PacketTemplateManagerTemplateCreated extends UUIDPacket {
                     if (tileEntity != null) {
                         tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
                             ItemStack stack = new ItemStack(OurItems.TEMPLATE_ITEM.get());
-                            ITemplateKey key = stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
+                            ITemplateKey key = stack.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
                             UUID id = key.getTemplateId(this::getId);
                             if (! id.equals(getId()))
                                 BuildingGadgets.LOG.error("Failed to apply Template id on server!");
                             else {
                                 ((IItemHandlerModifiable) handler).setStackInSlot(1, stack);
-                                world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider ->
+                                world.getCapability(OurCapabilities.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider ->
                                         provider.requestUpdate(key, PacketDistributor.PLAYER.with(() -> contextSupplier.get().getSender())));
                             }
                         });

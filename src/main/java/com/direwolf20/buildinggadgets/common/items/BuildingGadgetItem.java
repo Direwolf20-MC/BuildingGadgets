@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items;
 
-import com.direwolf20.buildinggadgets.common.capability.gadget.OurCapabilities;
+import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;

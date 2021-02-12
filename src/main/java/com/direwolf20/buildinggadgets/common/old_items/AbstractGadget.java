@@ -5,12 +5,11 @@ import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.building.modes.*;
 import com.direwolf20.buildinggadgets.common.capability.energy.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.capability.energy.IPrivateEnergy;
-import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.building.modes.*;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.concurrent.UndoScheduler;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
@@ -101,13 +100,13 @@ public abstract class AbstractGadget extends Item {
         providerBuilder.add(new CapabilityProviderEnergy(stack, this::getEnergyMax));
     }
 
-    @Override
-    @Nullable
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT tag) {
-        ImmutableList.Builder<ICapabilityProvider> providerBuilder = ImmutableList.builder();
-        addCapabilityProviders(providerBuilder, stack, tag);
-        return new MultiCapabilityProvider(providerBuilder.build());
-    }
+//    @Override
+//    @Nullable
+//    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT tag) {
+//        ImmutableList.Builder<ICapabilityProvider> providerBuilder = ImmutableList.builder();
+//        addCapabilityProviders(providerBuilder, stack, tag);
+//        return new MultiCapabilityProvider(providerBuilder.build());
+//    }
 
     @Override
     public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {

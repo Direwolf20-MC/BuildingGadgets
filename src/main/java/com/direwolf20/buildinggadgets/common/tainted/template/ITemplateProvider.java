@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tainted.template;
 
-import com.direwolf20.buildinggadgets.common.capability.template.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
@@ -13,7 +13,7 @@ public interface ITemplateProvider {
     Template getTemplateForKey(ITemplateKey key);
 
     default <T extends Throwable> Template getTemplateForKey(ICapabilityProvider provider, NonNullSupplier<? extends T> exceptionSupplier) throws T {
-        return getTemplateForKey(provider.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).orElseThrow(exceptionSupplier));
+        return getTemplateForKey(provider.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).orElseThrow(exceptionSupplier));
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.capability.template;
 
+import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider;
 import net.minecraft.util.Direction;
 import net.minecraftforge.common.capabilities.Capability;
@@ -19,7 +20,7 @@ public final class TemplateProviderCapabilityProvider implements ICapabilityProv
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-        if (cap == CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY)
+        if (cap == OurCapabilities.TEMPLATE_PROVIDER_CAPABILITY)
             return opt.cast();
         return LazyOptional.empty();
     }

@@ -6,18 +6,18 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.common.tainted.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.capability.template.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerTemplateCreated;
+import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObject;
-import com.direwolf20.buildinggadgets.common.items.OurItems;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerTemplateCreated;
 import com.direwolf20.buildinggadgets.common.tainted.template.*;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider.IUpdateListener;
 import com.direwolf20.buildinggadgets.common.tileentities.TemplateManagerTileEntity;
@@ -92,7 +92,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     private final TemplateManagerTileEntity te;
     private final TemplateManagerContainer container;
-    private final LazyOptional<ITemplateProvider> templateProvider = getWorld().getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);
+    private final LazyOptional<ITemplateProvider> templateProvider = getWorld().getCapability(OurCapabilities.TEMPLATE_PROVIDER_CAPABILITY);
 
     // It is so stupid I can't get the key from the template.
     private Template template;
@@ -164,7 +164,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             return;
         }
 
-        container.getSlot(0).getStack().getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
+        container.getSlot(0).getStack().getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
             // Make sure we're not re-creating the same cache.
             Template template = provider.getTemplateForKey(key);
             if( this.template == template )
@@ -300,12 +300,12 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void pasteTemplateToStack(World world, ItemStack stack, Template newTemplate, boolean replaced) {
-        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider ->
+        world.getCapability(OurCapabilities.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider ->
                 pasteTemplateToStack(provider, stack, newTemplate, replaced && world.isRemote()));
     }
 
     private void pasteTemplateToStack(ITemplateProvider provider, ItemStack stack, Template newTemplate, boolean replaced) {
-        stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+        stack.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
             provider.setTemplate(key, newTemplate);
             if (replaced)
                 PacketHandler.sendToServer(new PacketTemplateManagerTemplateCreated(provider.getId(key), te.getPos()));
@@ -319,7 +319,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         if (stack.isEmpty())
             return false;
 
-        if (stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
+        if (stack.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).isPresent())
             return false;
 
         else if (TemplateManagerTileEntity.TEMPLATE_CONVERTIBLES.contains(stack.getItem())) {
@@ -334,7 +334,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         if (nameField.getText().isEmpty())
             return;
 
-        stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
+        stack.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
             Template template = provider.getTemplateForKey(key);
             template = template.withName(nameField.getText());
             provider.setTemplate(key, template);
@@ -524,7 +524,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     // Events
     // we need to ensure that the Template we want to look at is recent, before we take any further action
     private void runAfterUpdate(int slot, Runnable runnable) {
-        container.getSlot(slot).getStack().getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
+        container.getSlot(slot).getStack().getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
             provider.registerUpdateListener(new IUpdateListener() {
                 @Override
                 public void onTemplateUpdate(ITemplateProvider provider, ITemplateKey updateKey, Template template) {
@@ -549,7 +549,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         runAfterUpdate(0, () -> { //we are copying form 0 to 1 => slot 0 needs to be the recent one
             templateProvider.ifPresent(provider -> {
-                left.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                left.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                     Template templateToSave = provider.getTemplateForKey(key).withName(nameField.getText());
                     pasteTemplateToStack(provider, right, templateToSave, replaced);
                 });
@@ -568,7 +568,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         runAfterUpdate(1, () -> { //we are copying form 1 to 0 => slot 1 needs to be the recent one
             templateProvider.ifPresent(provider -> {
-                right.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+                right.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                     Template templateToSave = provider.getTemplateForKey(key);
                     pasteTemplateToStack(provider, left, templateToSave, replaced);
                 });
@@ -579,7 +579,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     private void onCopy() {
         runAfterUpdate(0, () -> { //we are copying from slot 1 => slot 1 needs to be updated
             ItemStack stack = container.getSlot(0).getStack();
-            stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+            stack.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 templateProvider.ifPresent(provider -> {
                     PlayerEntity player = getMinecraft().player;
                     assert player != null;

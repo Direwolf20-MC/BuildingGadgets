@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.capability.template.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider;
 import com.direwolf20.buildinggadgets.common.tainted.template.Template;
@@ -64,7 +64,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
 
     public MaterialListGUI(ItemStack item) {
         super(MaterialListTranslation.TITLE.componentTranslation());
-        Preconditions.checkArgument(item.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent());
+        Preconditions.checkArgument(item.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).isPresent());
         this.item = item;
     }
 
@@ -161,9 +161,9 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         if( getMinecraft().world == null || getMinecraft().player == null )
             return null;
 
-        LazyOptional<ITemplateProvider> providerCap = getMinecraft().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);
+        LazyOptional<ITemplateProvider> providerCap = getMinecraft().world.getCapability(OurCapabilities.TEMPLATE_PROVIDER_CAPABILITY);
         if (providerCap.isPresent()) {
-            LazyOptional<ITemplateKey> keyCap = item.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY);
+            LazyOptional<ITemplateKey> keyCap = item.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY);
             ITemplateProvider provider = providerCap.orElseThrow(RuntimeException::new);
             if (keyCap.isPresent()) {
                 provider.registerUpdateListener(this);
@@ -188,7 +188,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
 
     @Override
     public void onTemplateUpdate(ITemplateProvider provider, ITemplateKey key, Template template) {
-        item.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(itemKey -> {
+        item.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).ifPresent(itemKey -> {
             UUID keyId = provider.getId(key);
             UUID itemId = provider.getId(itemKey);
             if (keyId.equals(itemId)) {

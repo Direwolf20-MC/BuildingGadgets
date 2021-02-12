@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.CopyPasteRender;
 import com.direwolf20.buildinggadgets.client.screen.GuiMod;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.capability.template.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.capability.template.TemplateKeyProvider;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.commands.OverrideBuildSizeCommand;
@@ -148,8 +148,8 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     @Override
     public boolean performRotate(ItemStack stack, PlayerEntity player) {
-        return player.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
-                stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).map(key -> {
+        return player.world.getCapability(OurCapabilities.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
+                stack.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).map(key -> {
                     Template template = provider.getTemplateForKey(key);
                     provider.setTemplate(key, template.rotate(Rotation.CLOCKWISE_90));
                     provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player));
@@ -160,8 +160,8 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     @Override
     public boolean performMirror(ItemStack stack, PlayerEntity player) {
-        return player.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
-                stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).map(key -> {
+        return player.world.getCapability(OurCapabilities.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
+                stack.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).map(key -> {
                     Template template = provider.getTemplateForKey(key);
                     provider.setTemplate(key, template.mirror(player.getHorizontalFacing().getAxis()));
                     provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player));
@@ -410,14 +410,14 @@ public class GadgetCopyPaste extends AbstractGadget {
     private void onCopyFinished(Template newTemplate, ItemStack stack, PlayerEntity player) {
         if (! Additions.sizeInvalid(player, newTemplate.getHeader().getBoundingBox()))
             sendMessage(stack, player, MessageTranslation.AREA_COPIED, Styles.DK_GREEN);
-        ITemplateKey key = stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
+        ITemplateKey key = stack.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
         SaveManager.INSTANCE.getTemplateProvider().setTemplate(key, newTemplate);
         SaveManager.INSTANCE.getTemplateProvider().requestRemoteUpdate(key, (ServerPlayerEntity) player);
     }
 
     private void build(ItemStack stack, World world, PlayerEntity player, BlockPos pos) {
-        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
-            stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+        world.getCapability(OurCapabilities.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+            stack.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 Template template = provider.getTemplateForKey(key);
                 BuildContext buildContext = BuildContext.builder()
                         .stack(stack)

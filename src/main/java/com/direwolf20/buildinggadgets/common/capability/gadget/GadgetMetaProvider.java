@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.capability.gadget;
 
+import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.capability.energy.ItemEnergyForge;
-import com.direwolf20.buildinggadgets.common.capability.template.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.capability.template.ItemTemplateKey;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
 import net.minecraft.item.ItemStack;
@@ -44,7 +44,7 @@ public class GadgetMetaProvider implements ICapabilitySerializable<CompoundNBT> 
             return energyCapability.cast();
         }
 
-        if (cap == CapabilityTemplate.TEMPLATE_KEY_CAPABILITY && this.hasTemplateKeySupport) {
+        if (cap == OurCapabilities.TEMPLATE_KEY_CAPABILITY && this.hasTemplateKeySupport) {
             return templateKeyCapability.cast();
         }
 

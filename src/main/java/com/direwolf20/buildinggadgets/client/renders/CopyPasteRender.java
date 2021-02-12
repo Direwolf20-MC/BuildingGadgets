@@ -1,10 +1,12 @@
 package com.direwolf20.buildinggadgets.client.renders;
 
+import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
+
 import com.direwolf20.buildinggadgets.client.renderer.DireBufferBuilder;
 import com.direwolf20.buildinggadgets.client.renderer.DireVertexBuffer;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.capability.template.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.old_items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.tainted.building.Region;
@@ -43,8 +45,6 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 import java.io.Closeable;
 import java.util.*;
 import java.util.function.Consumer;
-
-import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 
 public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
     private MultiVBORenderer renderBuffer;
@@ -133,7 +133,7 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
 
         // Check the template cap from the world
         // Fetch the template key (because for some reason this is it's own cap)
-        world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> heldItem.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
+        world.getCapability(OurCapabilities.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> heldItem.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
             // Finally get the data from the render.
             GadgetCopyPaste.getActivePos(player, heldItem).ifPresent(startPos -> {
                 MockDelegationWorld fakeWorld = new MockDelegationWorld(world);

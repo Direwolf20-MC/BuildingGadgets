@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tileentities;
 
-import com.direwolf20.buildinggadgets.common.capability.template.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.ItemReference;
@@ -48,7 +48,7 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
         }
 
         private boolean isTemplateStack(ItemStack stack) {
-            return stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent();
+            return stack.getCapability(OurCapabilities.TEMPLATE_KEY_CAPABILITY).isPresent();
         }
 
         @Override
