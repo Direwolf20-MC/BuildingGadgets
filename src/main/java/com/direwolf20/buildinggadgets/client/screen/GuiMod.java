@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
-import com.direwolf20.buildinggadgets.common.old_items.TemplateItem;
+import com.direwolf20.buildinggadgets.common.items.TemplateItem;
 import com.direwolf20.buildinggadgets.common.old_items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.old_items.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
@@ -17,7 +17,7 @@ public enum GuiMod {
     COPY(GadgetCopyPaste::getGadget, stack -> () -> new CopyGUI(stack)),
     PASTE(GadgetCopyPaste::getGadget, stack -> () -> new PasteGUI(stack)),
     DESTRUCTION(GadgetDestruction::getGadget, stack -> () -> new DestructionGUI(stack)),
-    MATERIAL_LIST(TemplateItem::getTemplateItem, stack -> () -> new MaterialListGUI(stack));
+    MATERIAL_LIST(TemplateItem::getFromHand, stack -> () -> new MaterialListGUI(stack));
 
     private Function<PlayerEntity, ItemStack> stackReader;
     private Function<ItemStack, Supplier<? extends Screen>> clientScreenProvider;
