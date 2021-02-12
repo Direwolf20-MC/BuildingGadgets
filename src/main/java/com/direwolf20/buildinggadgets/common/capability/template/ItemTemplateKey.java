@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.capability;
+package com.direwolf20.buildinggadgets.common.capability.template;
 
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;

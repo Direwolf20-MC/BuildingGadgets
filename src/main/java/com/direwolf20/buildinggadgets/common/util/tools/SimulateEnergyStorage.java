@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
-import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
+import com.direwolf20.buildinggadgets.common.capability.energy.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.tainted.Tainted;
 import net.minecraftforge.energy.IEnergyStorage;
 

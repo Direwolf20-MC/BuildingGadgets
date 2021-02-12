@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.old_items;
 
 import com.direwolf20.buildinggadgets.client.screen.GuiMod;
-import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
-import com.direwolf20.buildinggadgets.common.capability.provider.TemplateKeyProvider;
+import com.direwolf20.buildinggadgets.common.capability.template.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.capability.template.TemplateKeyProvider;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import net.minecraft.client.util.ITooltipFlag;

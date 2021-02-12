@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.capability;
+package com.direwolf20.buildinggadgets.common.capability.energy;
 
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.item.ItemStack;

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.events;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
-import com.direwolf20.buildinggadgets.common.capability.provider.TemplateProviderCapabilityProvider;
+import com.direwolf20.buildinggadgets.common.capability.template.TemplateProviderCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.tainted.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;

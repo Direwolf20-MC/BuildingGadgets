@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items;
 
-import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
+import com.direwolf20.buildinggadgets.common.capability.gadget.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -22,11 +22,11 @@ public class BuildingGadgetItem extends AbstractGadget {
 
         RayTraceResult pick = player.pick(50, 1f, false);
         if (player.isCrouching() && pick.getType() == RayTraceResult.Type.BLOCK) {
-            gadget.getCapability(OurCapabilities.GADGET_META).ifPresent(meta -> meta.setSelectedBlock(world.getBlockState(((BlockRayTraceResult) pick).getPos())));
+            gadget.getCapability(OurCapabilities.GADGET_META).ifPresent(meta -> meta.setBlockState(world.getBlockState(((BlockRayTraceResult) pick).getPos())));
         }
 
         if (!player.isCrouching()) {
-            gadget.getCapability(OurCapabilities.GADGET_META).ifPresent(meta -> System.out.println(meta.getSelectedBlock()));
+            gadget.getCapability(OurCapabilities.GADGET_META).ifPresent(meta -> System.out.println(meta.getBlockState()));
         }
 
         return super.onItemRightClick(world, player, hand);

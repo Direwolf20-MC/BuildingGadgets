@@ -5,8 +5,8 @@ import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
-import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
+import com.direwolf20.buildinggadgets.common.capability.energy.CapabilityProviderEnergy;
+import com.direwolf20.buildinggadgets.common.capability.energy.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
 import com.direwolf20.buildinggadgets.common.config.Config;

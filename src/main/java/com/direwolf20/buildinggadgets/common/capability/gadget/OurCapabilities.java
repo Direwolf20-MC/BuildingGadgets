@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.common.capability;
+package com.direwolf20.buildinggadgets.common.capability.gadget;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
@@ -10,21 +10,21 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import javax.annotation.Nullable;
 
 public class OurCapabilities {
-    @CapabilityInject(GadgetMetaCapability.class)
-    public static Capability<GadgetMetaCapability> GADGET_META = null;
+    @CapabilityInject(IGadgetMeta.class)
+    public static Capability<IGadgetMeta> GADGET_META = null;
 
     public static void register() {
-        CapabilityManager.INSTANCE.register(GadgetMetaCapability.class, new Capability.IStorage<GadgetMetaCapability>() {
+        CapabilityManager.INSTANCE.register(IGadgetMeta.class, new Capability.IStorage<IGadgetMeta>() {
             @Nullable
             @Override
-            public INBT writeNBT(Capability capability, GadgetMetaCapability instance, Direction side) {
+            public INBT writeNBT(Capability capability, IGadgetMeta instance, Direction side) {
                 return instance.serialize();
             }
 
             @Override
-            public void readNBT(Capability capability, GadgetMetaCapability instance, Direction side, INBT inbt) {
+            public void readNBT(Capability capability, IGadgetMeta instance, Direction side, INBT inbt) {
                 instance.deserialize((CompoundNBT) inbt);
             }
-        }, GadgetMetaCapability::new);
+        }, () -> new GadgetMeta(null));
     }
 }

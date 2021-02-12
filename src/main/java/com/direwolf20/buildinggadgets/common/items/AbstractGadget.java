@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.items;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
-import com.direwolf20.buildinggadgets.common.capability.GadgetCapabilityProvider;
+import com.direwolf20.buildinggadgets.common.capability.gadget.GadgetMetaProvider;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
@@ -69,7 +69,7 @@ public abstract class AbstractGadget extends Item {
     @Nullable
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
-        return new GadgetCapabilityProvider(stack, this.config.maxEnergy::get, this instanceof CopyGadgetItem);
+        return new GadgetMetaProvider(stack, this.config.maxEnergy::get, this instanceof CopyGadgetItem);
     }
 
     @Override

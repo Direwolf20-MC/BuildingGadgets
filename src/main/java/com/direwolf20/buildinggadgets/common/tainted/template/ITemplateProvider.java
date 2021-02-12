@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tainted.template;
 
-import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.capability.template.CapabilityTemplate;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;

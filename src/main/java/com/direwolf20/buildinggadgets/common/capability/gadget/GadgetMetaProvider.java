@@ -1,5 +1,8 @@
-package com.direwolf20.buildinggadgets.common.capability;
+package com.direwolf20.buildinggadgets.common.capability.gadget;
 
+import com.direwolf20.buildinggadgets.common.capability.template.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.capability.energy.ItemEnergyForge;
+import com.direwolf20.buildinggadgets.common.capability.template.ItemTemplateKey;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Direction;
@@ -16,16 +19,16 @@ import java.util.function.IntSupplier;
  * Capability Provider Designed for all the Gadgets with optional support for
  * the Template Key Capability.
  */
-public class GadgetCapabilityProvider implements ICapabilityProvider {
+public class GadgetMetaProvider implements ICapabilityProvider {
     private final LazyOptional<ItemEnergyForge> energyCapability;
     private final LazyOptional<ITemplateKey> templateKeyCapability;
-    private final LazyOptional<GadgetMetaCapability> gadgetMetaCapability;
+    private final LazyOptional<IGadgetMeta> gadgetMetaCapability;
 
     private final boolean hasTemplateKeySupport;
 
-    public GadgetCapabilityProvider(ItemStack stack, IntSupplier energyCapacity, boolean hasTemplateKeySupport) {
+    public GadgetMetaProvider(ItemStack stack, IntSupplier energyCapacity, boolean hasTemplateKeySupport) {
         this.energyCapability = LazyOptional.of(() -> new ItemEnergyForge(stack,energyCapacity));
-        this.gadgetMetaCapability = LazyOptional.of(GadgetMetaCapability::new);
+        this.gadgetMetaCapability = LazyOptional.of(() -> new GadgetMeta(stack));
         this.templateKeyCapability = hasTemplateKeySupport ? LazyOptional.of(() -> new ItemTemplateKey(stack)) : LazyOptional.empty();
         this.hasTemplateKeySupport = hasTemplateKeySupport;
     }
