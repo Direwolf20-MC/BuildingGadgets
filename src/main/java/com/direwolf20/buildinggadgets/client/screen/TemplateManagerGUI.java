@@ -548,7 +548,6 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }
 
         runAfterUpdate(0, () -> { //we are copying form 0 to 1 => slot 0 needs to be the recent one
-            System.out.println("hi");
             templateProvider.ifPresent(provider -> {
                 left.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                     Template templateToSave = provider.getTemplateForKey(key).withName(nameField.getText());

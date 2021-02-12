@@ -27,6 +27,7 @@ public class BuildingGadgetItem extends AbstractGadget {
 
         if (!player.isCrouching()) {
             gadget.getCapability(OurCapabilities.GADGET_META).ifPresent(meta -> System.out.println(meta.getBlockState()));
+            System.out.println(gadget.getOrCreateTag().toString());
         }
 
         return super.onItemRightClick(world, player, hand);
