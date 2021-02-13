@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
+import com.direwolf20.buildinggadgets.common.building.AbstractMode;
+import com.direwolf20.buildinggadgets.common.building.BuildingContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -13,7 +15,7 @@ public class HorizontalColumnMode extends AbstractMode {
     }
 
     @Override
-    List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
+    public List<BlockPos> collect(BuildingContext context, PlayerEntity player, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
         Direction side = XYZ.isAxisY(context.getHitSide()) ? player.getHorizontalFacing() : context.getHitSide().getOpposite();

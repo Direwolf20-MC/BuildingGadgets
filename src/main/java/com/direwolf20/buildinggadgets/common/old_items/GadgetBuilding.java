@@ -5,7 +5,7 @@ import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.BuildRender;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
-import com.direwolf20.buildinggadgets.common.building.modes.AbstractMode;
+import com.direwolf20.buildinggadgets.common.building.BuildingContext;
 import com.direwolf20.buildinggadgets.common.building.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
@@ -212,7 +212,7 @@ public class GadgetBuilding extends AbstractGadget {
 
             Direction sideHit = lookingAt.getFace();
             coords = getToolMode(stack).getMode().getCollection(
-                    new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, sideHit, placeAtop(stack), getConnectedArea(stack)),
+                    new BuildingContext(world, blockData.getState(), lookingAt.getPos(), heldItem, sideHit, placeAtop(stack), getConnectedArea(stack)),
                     player
             );
         }

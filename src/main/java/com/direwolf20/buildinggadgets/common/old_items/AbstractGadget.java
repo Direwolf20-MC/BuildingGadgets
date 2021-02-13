@@ -5,6 +5,7 @@ import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
+import com.direwolf20.buildinggadgets.common.building.AbstractMode;
 import com.direwolf20.buildinggadgets.common.building.modes.*;
 import com.direwolf20.buildinggadgets.common.capability.energy.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.capability.energy.IPrivateEnergy;

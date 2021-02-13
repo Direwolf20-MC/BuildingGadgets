@@ -93,8 +93,7 @@ public class Config {
                 SERVER_BUILDER.comment("Energy Cost & Durability of the " + name).push(name);
 
                 this.useDurability = SERVER_BUILDER
-                    .comment("Determines if the gadget uses durability")
-                    .comment("If both Durability and Energy are set to false, the gadget will not use energy to power it.")
+                    .comment("Determines if the gadget uses durability", "If both Durability and Energy are set to false, the gadget will not use energy to power it.")
                     .worldRestart()
                     .define("Use Durability", useDurability);
 
@@ -104,23 +103,19 @@ public class Config {
                     .define("Use Energy", useEnergy);
 
                 this.maxEnergy = SERVER_BUILDER
-                        .comment("The max energy of the Gadget")
-                        .comment("Only active when Use Energy is set to true")
+                        .comment("The max energy of the Gadget", "Only active when Use Energy is set to true")
                         .defineInRange("Maximum Energy", maxEnergy, 0, Integer.MAX_VALUE);
 
                 this.maxDurability = SERVER_BUILDER
-                    .comment("The max durability of the Gadget")
-                    .comment("Only active when Use Durability is set to true")
+                    .comment("The max durability of the Gadget", "Only active when Use Durability is set to true")
                     .defineInRange("Maximum Durability", maxDurability, 0, Integer.MAX_VALUE);
 
                 this.energyCost = SERVER_BUILDER
-                        .comment("The Gadget's Energy cost per Operation (block placed, destroyed, exchanged)")
-                        .comment("Only active when Use Energy is set to true")
+                        .comment("The Gadget's Energy cost per Operation (block placed, destroyed, exchanged)", "Only active when Use Energy is set to true")
                         .defineInRange("Energy Cost", energyCost, 0, Integer.MAX_VALUE);
 
                 this.durabilityCost = SERVER_BUILDER
-                    .comment("The Gadget's Durability cost per Operation (block placed, destroyed, exchanged)")
-                    .comment("Only active when Use Durability is set to true")
+                    .comment("The Gadget's Durability cost per Operation (block placed, destroyed, exchanged)", "Only active when Use Durability is set to true")
                     .defineInRange("Durability Cost", durabilityCost, 0, Integer.MAX_VALUE);
 
                 this.undoSize = SERVER_BUILDER

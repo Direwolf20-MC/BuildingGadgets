@@ -1,5 +1,8 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
+import com.direwolf20.buildinggadgets.common.building.AbstractMode;
+import com.direwolf20.buildinggadgets.common.building.BuildingActionContext;
+import com.direwolf20.buildinggadgets.common.building.BuildingContext;
 import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.tainted.building.placement.ConnectedSurface;
 import net.minecraft.block.BlockState;
@@ -14,7 +17,7 @@ public class SurfaceMode extends AbstractMode {
     public SurfaceMode(boolean isExchanging) { super(isExchanging); }
 
     @Override
-    List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
+    public List<BlockPos> collect(BuildingContext context, PlayerEntity player, BlockPos start) {
         int bound = context.getRange() / 2;
 
         // Grow the area. getXOffset will invert some math for us
@@ -38,16 +41,17 @@ public class SurfaceMode extends AbstractMode {
     }
 
     @Override
-    public boolean validator(PlayerEntity player, BlockPos pos, UseContext context) {
+    public boolean validate(BuildingActionContext actionContext) {
         // Do our default checks, then do our more complex fuzzy aware checks.
-        boolean topRow = super.validator(player, pos, context);
+        boolean topRow = super.validate(actionContext);
         if( this.isExchanging() )
             return topRow;
 
+        final BuildingContext context = actionContext.getContext();
         BlockState startState = context.getWorldState(context.getStartPos());
         if( context.isFuzzy() )
-            return topRow && !context.getWorld().isAirBlock(pos.offset(context.getHitSide().getOpposite()));
+            return topRow && !context.getWorld().isAirBlock(actionContext.getCurrentPos().offset(context.getHitSide().getOpposite()));
 
-        return topRow && context.getWorld().getBlockState(pos.offset(context.getHitSide().getOpposite())) == startState;
+        return topRow && context.getWorld().getBlockState(actionContext.getCurrentPos().offset(context.getHitSide().getOpposite())) == startState;
     }
 }

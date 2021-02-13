@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
+import com.direwolf20.buildinggadgets.common.building.AbstractMode;
+
 import java.util.Arrays;
 
 public enum BuildingModes {

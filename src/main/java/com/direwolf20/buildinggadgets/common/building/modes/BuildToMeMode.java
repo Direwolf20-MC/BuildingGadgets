@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
+import com.direwolf20.buildinggadgets.common.building.AbstractMode;
+import com.direwolf20.buildinggadgets.common.building.BuildingContext;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -11,7 +13,7 @@ public class BuildToMeMode extends AbstractMode {
     public BuildToMeMode() { super(false); }
 
     @Override
-    public List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
+    public List<BlockPos> collect(BuildingContext context, PlayerEntity player, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
         XYZ facingXYZ = XYZ.fromFacing(context.getHitSide());

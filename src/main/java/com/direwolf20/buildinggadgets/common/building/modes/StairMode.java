@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
+import com.direwolf20.buildinggadgets.common.building.AbstractMode;
+import com.direwolf20.buildinggadgets.common.building.BuildingContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -11,7 +13,7 @@ public class StairMode extends AbstractMode {
     public StairMode() { super(false); }
 
     @Override
-    List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
+    public List<BlockPos> collect(BuildingContext context, PlayerEntity player, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
         Direction side = context.getHitSide();
