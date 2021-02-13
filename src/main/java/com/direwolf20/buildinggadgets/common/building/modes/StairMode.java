@@ -1,15 +1,22 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
+import com.direwolf20.buildinggadgets.api.modes.IModeEntry;
 import com.direwolf20.buildinggadgets.common.building.AbstractMode;
 import com.direwolf20.buildinggadgets.common.building.BuildingContext;
+import com.direwolf20.buildinggadgets.common.building.ModeEntry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class StairMode extends AbstractMode {
+    private static final ResourceLocation name = new ResourceLocation(BuildingGadgetsAPI.MODID, "stairs");
+    private static final ModeEntry entry = new ModeEntry("stairs", name);
+
     public StairMode() { super(false); }
 
     @Override
@@ -39,5 +46,15 @@ public class StairMode extends AbstractMode {
     public BlockPos withOffset(BlockPos pos, Direction side, boolean placeOnTop) {
         // Is top / bottom? Do as normal. Not? then place on top or inside :D
         return XYZ.isAxisY(side) ? super.withOffset(pos, side, placeOnTop) : (placeOnTop ? pos.offset(Direction.UP) : pos);
+    }
+
+    @Override
+    public ResourceLocation identifier() {
+        return name;
+    }
+
+    @Override
+    public IModeEntry entry() {
+        return entry;
     }
 }

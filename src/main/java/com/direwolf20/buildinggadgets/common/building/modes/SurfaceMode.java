@@ -1,12 +1,16 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
+import com.direwolf20.buildinggadgets.api.modes.IModeEntry;
 import com.direwolf20.buildinggadgets.common.building.AbstractMode;
 import com.direwolf20.buildinggadgets.common.building.BuildingActionContext;
 import com.direwolf20.buildinggadgets.common.building.BuildingContext;
+import com.direwolf20.buildinggadgets.common.building.ModeEntry;
 import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.tainted.building.placement.ConnectedSurface;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
@@ -14,6 +18,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SurfaceMode extends AbstractMode {
+    public static final ResourceLocation name = new ResourceLocation(BuildingGadgetsAPI.MODID, "surface");
+    private static final ModeEntry entry = new ModeEntry("surface", name);
+
     public SurfaceMode(boolean isExchanging) { super(isExchanging); }
 
     @Override
@@ -53,5 +60,15 @@ public class SurfaceMode extends AbstractMode {
             return topRow && !context.getWorld().isAirBlock(actionContext.getCurrentPos().offset(context.getHitSide().getOpposite()));
 
         return topRow && context.getWorld().getBlockState(actionContext.getCurrentPos().offset(context.getHitSide().getOpposite())) == startState;
+    }
+
+    @Override
+    public ResourceLocation identifier() {
+        return name;
+    }
+
+    @Override
+    public IModeEntry entry() {
+        return entry;
     }
 }

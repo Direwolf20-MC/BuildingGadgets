@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.lang;
 
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -55,7 +55,7 @@ public enum MessageTranslation implements ITranslationProvider {
     FAILED_TO_BIND_TILE("failed_to_bind"),
     INVALID_BOUND_TILE("invalid_inventory");
 
-    private static final String PREFIX = Reference.MODID + ".message.";
+    private static final String PREFIX = BuildingGadgetsAPI.MODID + ".message.";
     private final String key;
     private final int argCount;
 

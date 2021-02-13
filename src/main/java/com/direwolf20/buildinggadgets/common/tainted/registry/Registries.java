@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tainted.registry;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.ITileDataFactory;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.ITileDataSerializer;
@@ -25,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-@EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
+@EventBusSubscriber(modid = BuildingGadgetsAPI.MODID, bus = Bus.MOD)
 public final class Registries {
 
     private Registries() {}

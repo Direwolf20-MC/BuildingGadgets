@@ -7,21 +7,22 @@ import com.direwolf20.buildinggadgets.common.old_items.AbstractGadget;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public class PacketToggleMode {
-    private final int mode;
+    private final ResourceLocation mode;
 
     public static void encode(PacketToggleMode msg, PacketBuffer buffer) {
-        buffer.writeInt(msg.mode);
+        buffer.writeResourceLocation(msg.mode);
     }
     public static PacketToggleMode decode(PacketBuffer buffer) {
-        return new PacketToggleMode(buffer.readInt());
+        return new PacketToggleMode(buffer.readResourceLocation());
     }
 
-    public PacketToggleMode(int mode) {
+    public PacketToggleMode(ResourceLocation mode) {
         this.mode = mode;
     }
 
@@ -43,7 +44,7 @@ public class PacketToggleMode {
                     gadgetExchanger.setMode(heldItem, msg.mode);
                 } else if (heldItem.getItem() instanceof GadgetCopyPaste) {
                     GadgetCopyPaste gadgetCopyPaste = (GadgetCopyPaste) (heldItem.getItem());
-                    gadgetCopyPaste.setMode(heldItem, msg.mode);
+//                    gadgetCopyPaste.setMode(heldItem, msg.mode);
                 }
             });
 

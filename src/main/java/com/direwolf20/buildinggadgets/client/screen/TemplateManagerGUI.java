@@ -5,6 +5,7 @@
 
 package com.direwolf20.buildinggadgets.client.screen;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
@@ -30,7 +31,6 @@ import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateWriteExcept
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Lists;
@@ -77,7 +77,7 @@ import java.util.List;
 import java.util.Random;
 
 public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
-    private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
+    private static final ResourceLocation background = new ResourceLocation(BuildingGadgetsAPI.MODID, "textures/gui/template_manager.png");
 
     private final Rectangle2d panel = new Rectangle2d((8 - 20), 12, 136, 80);
     private boolean panelClicked;

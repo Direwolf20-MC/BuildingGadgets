@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.ref;
 
+import static com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI.MODID;
+
 import com.direwolf20.buildinggadgets.common.tainted.Tainted;
 import net.minecraft.util.ResourceLocation;
 
@@ -9,13 +11,12 @@ import net.minecraft.util.ResourceLocation;
 
 @Tainted(reason = "Awful. Contains a large amount of unused data or single-query data")
 public final class Reference {
-    public static final String MODID = "buildinggadgets";
     public static final String MARKER_BEFORE = MODID + ":before";
     public static final ResourceLocation MARKER_BEFORE_RL = new ResourceLocation(MARKER_BEFORE);
     public static final String MARKER_AFTER = MODID + ":after";
     public static final ResourceLocation MARKER_AFTER_RL = new ResourceLocation(MARKER_AFTER);
 
-    public static final ResourceLocation NETWORK_CHANNEL_ID_MAIN = new ResourceLocation(Reference.MODID, "main_network_channel");
+    public static final ResourceLocation NETWORK_CHANNEL_ID_MAIN = new ResourceLocation(MODID, "main_network_channel");
     public static final ResourceLocation WORLD_TEMPLATE_PROVIDER_ID = new ResourceLocation(MODID, "template_provider");
 
     private Reference() {}
@@ -55,7 +56,7 @@ public final class Reference {
     }
 
     public static final class EntityReference {
-        public static final String CONSTRUCTION_BLOCK_ENTITY = Reference.MODID + ":construction_block_entity";
+        public static final String CONSTRUCTION_BLOCK_ENTITY = MODID + ":construction_block_entity";
 
         public static final ResourceLocation CONSTRUCTION_BLOCK_ENTITY_RL = new ResourceLocation(CONSTRUCTION_BLOCK_ENTITY);
 

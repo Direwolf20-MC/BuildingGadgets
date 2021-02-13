@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.client.screen.components;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.client.OurSounds;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -43,8 +43,8 @@ public class GuiIconActionable extends Button {
         // Set the selected and deselected textures.
         String assetLocation = "textures/gui/setting/%s.png";
 
-        this.deselectedTexture = new ResourceLocation(Reference.MODID, String.format(assetLocation, texture));
-        this.selectedTexture = !isSelectable ? this.deselectedTexture : new ResourceLocation(Reference.MODID, String.format(assetLocation, texture + "_selected"));
+        this.deselectedTexture = new ResourceLocation(BuildingGadgetsAPI.MODID, String.format(assetLocation, texture));
+        this.selectedTexture = !isSelectable ? this.deselectedTexture : new ResourceLocation(BuildingGadgetsAPI.MODID, String.format(assetLocation, texture + "_selected"));
     }
 
     /**

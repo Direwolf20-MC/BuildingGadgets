@@ -237,8 +237,8 @@ public class GadgetUtils {
         BuildingContext context = new BuildingContext(player.world, blockData.getState(), startBlock, stack, sideHit, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack), stack.getItem() instanceof GadgetBuilding ? GadgetBuilding.getConnectedArea(stack) : GadgetExchanger.getConnectedArea(stack));
 
         List<BlockPos> coords = stack.getItem() instanceof GadgetBuilding
-                ? GadgetBuilding.getToolMode(stack).getMode().getCollection(context, player)
-                : GadgetExchanger.getToolMode(stack).getMode().getCollection(context, player);
+                ? GadgetBuilding.getToolMode(stack).getCollection(context, player)
+                : GadgetExchanger.getToolMode(stack).getCollection(context, player);
 
         setAnchor(stack, coords); //Set the anchor NBT
         player.sendStatusMessage(MessageTranslation.ANCHOR_SET.componentTranslation().setStyle(Styles.AQUA), true);

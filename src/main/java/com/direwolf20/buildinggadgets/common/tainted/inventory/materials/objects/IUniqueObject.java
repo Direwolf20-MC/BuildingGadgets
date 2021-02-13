@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.handle.IObjectHandle;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -46,7 +46,7 @@ public interface IUniqueObject<T> {
         T indexObj = getIndexObject();
         if (indexObj instanceof IForgeRegistryEntry)
             return ((IForgeRegistryEntry) indexObj).getRegistryName();
-        return new ResourceLocation(Reference.MODID, getIndexClass().getSimpleName());
+        return new ResourceLocation(BuildingGadgetsAPI.MODID, getIndexClass().getSimpleName());
     }
 
     ItemStack createStack(int count);

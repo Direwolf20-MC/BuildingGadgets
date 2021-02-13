@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.util;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -25,7 +25,7 @@ public final class Additions {
         DIRE_WOULD_BE_PROUD(".dire_would_be_proud"),
         NO_DIRE_WIRE_PLEASE(".no_dire_wire");
         private static final List<ITranslationProvider> VALUES = ImmutableList.copyOf(values());
-        private static final String PREFIX = Reference.MODID + ".easter_eggs.9x9";
+        private static final String PREFIX = BuildingGadgetsAPI.MODID + ".easter_eggs.9x9";
         private final String key;
         private final int argCount;
 
@@ -55,7 +55,7 @@ public final class Additions {
         YOU_SURE_THATS_THE_CORRECT_SIZE(".correct_size"),
         THIS_TIME_NO_DIRE_WIRE(".no_dire_wire");
         private static final List<ITranslationProvider> VALUES = ImmutableList.copyOf(values());
-        private static final String PREFIX = Reference.MODID + ".easter_eggs.dire_9x9";
+        private static final String PREFIX = BuildingGadgetsAPI.MODID + ".easter_eggs.dire_9x9";
         private final String key;
         private final int argCount;
 

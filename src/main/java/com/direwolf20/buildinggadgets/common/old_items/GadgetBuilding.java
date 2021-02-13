@@ -2,11 +2,15 @@ package com.direwolf20.buildinggadgets.common.old_items;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
+import com.direwolf20.buildinggadgets.api.modes.GadgetModes;
+import com.direwolf20.buildinggadgets.api.modes.IMode;
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.BuildRender;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.building.BuildingContext;
-import com.direwolf20.buildinggadgets.common.building.modes.BuildingModes;
+import com.direwolf20.buildinggadgets.common.building.Modes;
+import com.direwolf20.buildinggadgets.common.building.modes.BuildToMeMode;
+import com.direwolf20.buildinggadgets.common.building.modes.SurfaceMode;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -39,14 +43,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -88,15 +88,15 @@ public class GadgetBuilding extends AbstractGadget {
         return shouldPlaceAtop(stack);
     }
 
-    private static void setToolMode(ItemStack tool, BuildingModes mode) {
+    private static void setToolMode(ItemStack tool, IMode mode) {
         //Store the tool's mode in NBT as a string
         CompoundNBT tagCompound = tool.getOrCreateTag();
-        tagCompound.putString("mode", mode.toString());
+        tagCompound.putString("mode", mode.identifier().toString());
     }
 
-    public static BuildingModes getToolMode(ItemStack tool) {
+    public static IMode getToolMode(ItemStack tool) {
         CompoundNBT tagCompound = tool.getOrCreateTag();
-        return BuildingModes.getFromName(tagCompound.getString("mode"));
+        return Modes.getFromName(GadgetModes.buildingModes, new ResourceLocation(tagCompound.getString("mode")));
     }
 
     public static boolean shouldPlaceAtop(ItemStack stack) {
@@ -111,13 +111,13 @@ public class GadgetBuilding extends AbstractGadget {
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         super.addInformation(stack, world, tooltip, flag);
-        BuildingModes mode = getToolMode(stack);
+        IMode mode = getToolMode(stack);
         addEnergyInformation(tooltip, stack);
 
         tooltip.add(TooltipTranslation.GADGET_MODE
-                .componentTranslation((mode == BuildingModes.SURFACE && getConnectedArea(stack)
-                        ? TooltipTranslation.GADGET_CONNECTED.format(new TranslationTextComponent(mode.getTranslationKey()).getString())
-                        : new TranslationTextComponent(mode.getTranslationKey())))
+                .componentTranslation((mode.identifier() == SurfaceMode.name && getConnectedArea(stack)
+                        ? TooltipTranslation.GADGET_CONNECTED.format(mode.entry().translatedName())
+                        : mode.entry().translatedName()))
                 .setStyle(Styles.AQUA));
 
         tooltip.add(TooltipTranslation.GADGET_BLOCK
@@ -125,12 +125,12 @@ public class GadgetBuilding extends AbstractGadget {
                 .setStyle(Styles.DK_GREEN));
 
         int range = getToolRange(stack);
-        if (getToolMode(stack) != BuildingModes.BUILD_TO_ME)
+        if (mode.identifier() != BuildToMeMode.name)
             tooltip.add(TooltipTranslation.GADGET_RANGE
-                    .componentTranslation(range, getRangeInBlocks(range, mode.getMode()))
+                    .componentTranslation(range, getRangeInBlocks(range, mode))
                     .setStyle(Styles.LT_PURPLE));
 
-        if (getToolMode(stack) == BuildingModes.SURFACE)
+        if (mode.identifier() == SurfaceMode.name)
             tooltip.add(TooltipTranslation.GADGET_FUZZY
                     .componentTranslation(String.valueOf(getFuzzy(stack)))
                     .setStyle(Styles.GOLD));
@@ -172,16 +172,20 @@ public class GadgetBuilding extends AbstractGadget {
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
 
-    public void setMode(ItemStack heldItem, int modeInt) {
+    public void setMode(ItemStack heldItem, ResourceLocation modeName) {
         //Called when we specify a mode with the radial menu
-        BuildingModes mode = BuildingModes.values()[modeInt];
+        IMode mode = Modes.getFromName(Modes.getBuildingModes(), modeName);
+        if (mode == null) {
+            return;
+        }
+
         setToolMode(heldItem, mode);
     }
 
     public static void rangeChange(PlayerEntity player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) != BuildingModes.SURFACE || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem).identifier() != SurfaceMode.name || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking())
             range = (range == 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         else
@@ -211,7 +215,7 @@ public class GadgetBuilding extends AbstractGadget {
                 return;
 
             Direction sideHit = lookingAt.getFace();
-            coords = getToolMode(stack).getMode().getCollection(
+            coords = getToolMode(stack).getCollection(
                     new BuildingContext(world, blockData.getState(), lookingAt.getPos(), heldItem, sideHit, placeAtop(stack), getConnectedArea(stack)),
                     player
             );

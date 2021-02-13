@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.client;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.common.items.TemplateItem;
 import com.direwolf20.buildinggadgets.common.old_items.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
@@ -43,7 +43,7 @@ public class KeyBindings {
     }
 
     private static String getKey(String name) {
-        return String.join(".", "key", Reference.MODID, name);
+        return String.join(".", "key", BuildingGadgetsAPI.MODID, name);
     }
 
     public static class KeyConflictContextGadget implements IKeyConflictContext

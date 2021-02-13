@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.lang;
 
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 
 import javax.annotation.Nonnull;
 
@@ -31,7 +31,7 @@ public enum GuiTranslation implements ITranslationProvider {
     FIELD_START("field.start"),
     FIELD_END("field.end");
 
-    private static final String PREFIX = "gui." + Reference.MODID + ".";
+    private static final String PREFIX = "gui." + BuildingGadgetsAPI.MODID + ".";
     private final String key;
     private final int argCount;
 

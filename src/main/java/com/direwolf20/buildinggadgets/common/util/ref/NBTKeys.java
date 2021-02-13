@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.common.util.ref;
 
 import net.minecraft.util.ResourceLocation;
 
-import static com.direwolf20.buildinggadgets.common.util.ref.Reference.MODID;
+import static com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI.MODID;
 
 public final class NBTKeys {
     public static final ResourceLocation AND_SERIALIZER_ID = new ResourceLocation(MODID, "sub_entries");

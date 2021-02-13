@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.lang;
 
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -15,7 +15,7 @@ public enum CommandTranslation implements ITranslationProvider {
     OVERRIDE_BUILD_SIZE_NO_PLAYER("override_build_size.no_player", 0),
     OVERRIDE_BUILD_SIZE_TOGGLED("override_build_size.toggled", 2),
     OVERRIDE_BUILD_SIZE_LIST("override_build_size.list", 2);
-    private static final String PREFIX = Reference.MODID + ".commands.";
+    private static final String PREFIX = BuildingGadgetsAPI.MODID + ".commands.";
     private final String key;
     private final int argCount;
 

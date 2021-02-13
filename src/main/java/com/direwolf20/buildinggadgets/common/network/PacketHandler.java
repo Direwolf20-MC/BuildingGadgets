@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.network;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.network.split.PacketSplitManager;
 import com.direwolf20.buildinggadgets.common.network.split.SplitPacket;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
@@ -24,7 +24,7 @@ public class PacketHandler {
     private static final PacketSplitManager SPLIT_MANAGER = new PacketSplitManager();
 
     public static final SimpleChannel HANDLER = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(Reference.MODID, "main"),
+            new ResourceLocation(BuildingGadgetsAPI.MODID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals

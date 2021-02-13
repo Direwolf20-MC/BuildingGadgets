@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.building;
 
+import com.direwolf20.buildinggadgets.api.modes.IMode;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
@@ -8,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class AbstractMode {
+public abstract class AbstractMode implements IMode {
     private boolean isExchanging;
 
     public AbstractMode(boolean isExchanging) {
@@ -21,6 +22,7 @@ public abstract class AbstractMode {
      * Gets the collection with filters applied stopping us having to handle the filters in the actual collection
      * method from having to handle the world etc.
      */
+    @Override
     public List<BlockPos> getCollection(BuildingContext context, PlayerEntity player) {
         BlockPos startPos = this.withOffset(context.getStartPos(), context.getHitSide(), context.isPlaceOnTop());
 

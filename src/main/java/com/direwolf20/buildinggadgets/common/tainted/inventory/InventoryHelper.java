@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tainted.inventory;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.items.ConstructionPaste;
 import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
@@ -96,7 +97,7 @@ public class InventoryHelper {
     }
 
     public static void registerHandleProviders() {
-        InterModComms.sendTo(Reference.MODID, Reference.HandleProviderReference.IMC_METHOD_HANDLE_PROVIDER, () -> (Supplier<TopologicalRegistryBuilder<IHandleProvider>>)
+        InterModComms.sendTo(BuildingGadgetsAPI.MODID, Reference.HandleProviderReference.IMC_METHOD_HANDLE_PROVIDER, () -> (Supplier<TopologicalRegistryBuilder<IHandleProvider>>)
                 (() -> TopologicalRegistryBuilder.<IHandleProvider>create()
                         .addMarker(Reference.MARKER_AFTER_RL)
                         .addValue(Reference.HandleProviderReference.STACK_HANDLER_ITEM_HANDLE_RL, new ItemHandlerProvider())

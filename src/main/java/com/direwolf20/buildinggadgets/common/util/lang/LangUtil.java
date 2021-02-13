@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.lang;
 
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 
@@ -8,7 +8,7 @@ public final class LangUtil {
     private LangUtil() {}
 
     public static String getLangKey(String type, String... args) {
-        return String.join(".", type, Reference.MODID, String.join(".", args));
+        return String.join(".", type, BuildingGadgetsAPI.MODID, String.join(".", args));
     }
 
     public static String getFormattedBlockName(BlockState block) {

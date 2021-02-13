@@ -1,8 +1,15 @@
 package com.direwolf20.buildinggadgets.client.renders;
 
+import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getAnchor;
+import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getToolBlock;
+
+import com.direwolf20.buildinggadgets.api.modes.IMode;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.building.BuildingContext;
+import com.direwolf20.buildinggadgets.common.old_items.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.old_items.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.old_items.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
@@ -10,10 +17,6 @@ import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.RecordingItemIndex;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
-import com.direwolf20.buildinggadgets.common.old_items.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.old_items.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.old_items.GadgetExchanger;
-import com.direwolf20.buildinggadgets.common.building.AbstractMode;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -37,9 +40,6 @@ import net.minecraftforge.energy.IEnergyStorage;
 
 import java.util.List;
 import java.util.Optional;
-
-import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getAnchor;
-import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getToolBlock;
 
 public class BuildRender extends BaseRenderer {
     private final boolean isExchanger;
@@ -69,7 +69,7 @@ public class BuildRender extends BaseRenderer {
 
         // Get the coordinates from the anchor. If the anchor isn't present then build the collector.
         List<BlockPos> coordinates = anchor.orElseGet(() -> {
-            AbstractMode mode = !this.isExchanger ? GadgetBuilding.getToolMode(heldItem).getMode() : GadgetExchanger.getToolMode(heldItem).getMode();
+            IMode mode = !this.isExchanger ? GadgetBuilding.getToolMode(heldItem) : GadgetExchanger.getToolMode(heldItem);
             return mode.getCollection(
                     new BuildingContext(player.world, renderBlockState, lookingAt.getPos(), heldItem, lookingAt.getFace(), !this.isExchanger && GadgetBuilding.shouldPlaceAtop(heldItem), !this.isExchanger ? GadgetBuilding.getConnectedArea(heldItem) : GadgetExchanger.getConnectedArea(heldItem)),
                     player

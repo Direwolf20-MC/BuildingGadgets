@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.RegistryObject;
@@ -13,7 +13,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public final class OurItems {
     private OurItems() {}
 
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, Reference.MODID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, BuildingGadgetsAPI.MODID);
 
     // Gadgets
     public static final RegistryObject<Item> BUILDING_GADGET_ITEM = ITEMS.register("gadget_building", BuildingGadgetItem::new);

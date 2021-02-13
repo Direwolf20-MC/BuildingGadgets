@@ -5,22 +5,20 @@
  */
 package com.direwolf20.buildinggadgets.client.screen;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
+import com.direwolf20.buildinggadgets.client.OurSounds;
 import com.direwolf20.buildinggadgets.client.screen.components.GuiIconActionable;
 import com.direwolf20.buildinggadgets.client.screen.components.GuiSliderInt;
 import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.old_items.*;
-import com.direwolf20.buildinggadgets.common.building.modes.BuildingModes;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
-import com.direwolf20.buildinggadgets.client.OurSounds;
+import com.direwolf20.buildinggadgets.common.old_items.*;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.RadialTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.matrix.MatrixStack;
@@ -38,15 +36,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.fml.ForgeI18n;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class ModeRadialMenu extends Screen {
     public enum ScreenPosition {
@@ -54,8 +49,8 @@ public class ModeRadialMenu extends Screen {
     }
 
     private static final ImmutableList<ResourceLocation> signsCopyPaste = ImmutableList.of(
-            new ResourceLocation(Reference.MODID, "textures/gui/mode/copy.png"),
-            new ResourceLocation(Reference.MODID, "textures/gui/mode/paste.png")
+            new ResourceLocation(BuildingGadgetsAPI.MODID, "textures/gui/mode/copy.png"),
+            new ResourceLocation(BuildingGadgetsAPI.MODID, "textures/gui/mode/paste.png")
     );
 
     private int timeIn = 0;
@@ -71,12 +66,12 @@ public class ModeRadialMenu extends Screen {
     }
 
     public void setSocketable(ItemStack stack) {
-        if (stack.getItem() instanceof GadgetBuilding)
-            segments = BuildingModes.values().length;
-        else if (stack.getItem() instanceof GadgetExchanger)
-            segments = ExchangingModes.values().length;
-        else if (stack.getItem() instanceof GadgetCopyPaste)
-            segments = GadgetCopyPaste.ToolMode.values().length;
+//        if (stack.getItem() instanceof GadgetBuilding)
+//            segments = BuildingModes.values().length;
+//        else if (stack.getItem() instanceof GadgetExchanger)
+//            segments = ExchangingModes.values().length;
+//        else if (stack.getItem() instanceof GadgetCopyPaste)
+//            segments = GadgetCopyPaste.ToolMode.values().length;
     }
 
     @Override
@@ -312,18 +307,18 @@ public class ModeRadialMenu extends Screen {
 
         slotSelected = -1;
 
-        List<ResourceLocation> signs;
-        int modeIndex;
-        if (tool.getItem() instanceof GadgetBuilding) {
-            modeIndex = GadgetBuilding.getToolMode(tool).ordinal();
-            signs = Arrays.stream(BuildingModes.values()).map(e -> new ResourceLocation(Reference.MODID, e.getIcon())).collect(Collectors.toList());
-        } else if (tool.getItem() instanceof GadgetExchanger) {
-            modeIndex = GadgetExchanger.getToolMode(tool).ordinal();
-            signs = Arrays.stream(ExchangingModes.values()).map(e -> new ResourceLocation(Reference.MODID, e.getIcon())).collect(Collectors.toList());
-        } else {
-            modeIndex = GadgetCopyPaste.getToolMode(tool).ordinal();
-            signs = signsCopyPaste;
-        }
+        List<ResourceLocation> signs = new ArrayList<>();
+        int modeIndex = 0;
+//        if (tool.getItem() instanceof GadgetBuilding) {
+//            modeIndex = GadgetBuilding.getToolMode(tool).ordinal();
+//            signs = Arrays.stream(BuildingModes.values()).map(e -> new ResourceLocation(BuildingGadgetsAPI.MODID, e.getIcon())).collect(Collectors.toList());
+//        } else if (tool.getItem() instanceof GadgetExchanger) {
+//            modeIndex = GadgetExchanger.getToolMode(tool).ordinal();
+//            signs = Arrays.stream(ExchangingModes.values()).map(e -> new ResourceLocation(BuildingGadgetsAPI.MODID, e.getIcon())).collect(Collectors.toList());
+//        } else {
+//            modeIndex = GadgetCopyPaste.getToolMode(tool).ordinal();
+//            signs = signsCopyPaste;
+//        }
 
         boolean shouldCenter = (segments + 2) % 4 == 0;
         int indexBottom = segments / 4;
@@ -374,13 +369,13 @@ public class ModeRadialMenu extends Screen {
             int xp = data.getX();
             int yp = data.getY();
 
-            String name;
-            if (tool.getItem() instanceof GadgetBuilding)
-                name = ForgeI18n.getPattern(BuildingModes.values()[i].getTranslationKey());
-            else if (tool.getItem() instanceof GadgetExchanger)
-                name = ForgeI18n.getPattern(ExchangingModes.values()[i].getTranslationKey());
-            else
-                name = GadgetCopyPaste.ToolMode.values()[i].getTranslation().format();
+            String name = "";
+//            if (tool.getItem() instanceof GadgetBuilding)
+//                name = ForgeI18n.getPattern(BuildingModes.values()[i].getTranslationKey());
+//            else if (tool.getItem() instanceof GadgetExchanger)
+//                name = ForgeI18n.getPattern(ExchangingModes.values()[i].getTranslationKey());
+//            else
+//                name = GadgetCopyPaste.ToolMode.values()[i].getTranslation().format();
 
             int xsp = xp - 4;
             int ysp = yp;
@@ -432,18 +427,18 @@ public class ModeRadialMenu extends Screen {
 
             // This should logically never fail but implementing a way to ensure that would
             // be a pretty solid idea for the next guy to touch this code.
-            String mode;
-            if (gadget instanceof GadgetBuilding)
-                mode = ForgeI18n.getPattern(BuildingModes.values()[slotSelected].getTranslationKey());
-            else if (gadget instanceof GadgetExchanger)
-                mode = ForgeI18n.getPattern(ExchangingModes.values()[slotSelected].getTranslationKey());
-            else
-                mode = GadgetCopyPaste.ToolMode.values()[slotSelected].getTranslation().format();
+            String mode = "mode";
+//            if (gadget instanceof GadgetBuilding)
+//                mode = ForgeI18n.getPattern(BuildingModes.values()[slotSelected].getTranslationKey());
+//            else if (gadget instanceof GadgetExchanger)
+//                mode = ForgeI18n.getPattern(ExchangingModes.values()[slotSelected].getTranslationKey());
+//            else
+//                mode = GadgetCopyPaste.ToolMode.values()[slotSelected].getTranslation().format();
 
             assert getMinecraft().player != null;
             getMinecraft().player.sendStatusMessage(MessageTranslation.MODE_SET.componentTranslation(mode).setStyle(Styles.AQUA), true);
 
-            PacketHandler.sendToServer(new PacketToggleMode(slotSelected));
+//            PacketHandler.sendToServer(new PacketToggleMode(slotSelected));
             OurSounds.BEEP.playSound();
         }
     }
@@ -473,18 +468,18 @@ public class ModeRadialMenu extends Screen {
 
         boolean curent;
         boolean changed = false;
-        for (int i = 0; i < conditionalButtons.size(); i++) {
-            Button button = conditionalButtons.get(i);
-            if (builder)
-                curent = GadgetBuilding.getToolMode(tool) == BuildingModes.SURFACE;
-            else
-                curent = i == 0 || GadgetExchanger.getToolMode(tool) == ExchangingModes.SURFACE;
-
-            if (button.visible != curent) {
-                button.visible = curent;
-                changed = true;
-            }
-        }
+//        for (int i = 0; i < conditionalButtons.size(); i++) {
+//            Button button = conditionalButtons.get(i);
+//            if (builder)
+//                curent = GadgetBuilding.getToolMode(tool) == BuildingModes.SURFACE;
+//            else
+//                curent = i == 0 || GadgetExchanger.getToolMode(tool) == ExchangingModes.SURFACE;
+//
+//            if (button.visible != curent) {
+//                button.visible = curent;
+//                changed = true;
+//            }
+//        }
         if (changed)
             updateButtons(tool);
     }

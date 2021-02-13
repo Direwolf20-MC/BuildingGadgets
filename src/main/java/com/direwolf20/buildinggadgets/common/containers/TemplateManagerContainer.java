@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.containers;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.common.tileentities.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.Slot;
@@ -18,8 +18,8 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 
 public class TemplateManagerContainer extends BaseContainer {
-    public static final String TEXTURE_LOC_SLOT_TOOL = Reference.MODID + ":gui/slot_copy_paste_gadget";
-    public static final String TEXTURE_LOC_SLOT_TEMPLATE = Reference.MODID + ":gui/slot_template";
+    public static final String TEXTURE_LOC_SLOT_TOOL = BuildingGadgetsAPI.MODID + ":gui/slot_copy_paste_gadget";
+    public static final String TEXTURE_LOC_SLOT_TEMPLATE = BuildingGadgetsAPI.MODID + ":gui/slot_template";
 
     private TemplateManagerTileEntity te;
 
@@ -94,7 +94,7 @@ public class TemplateManagerContainer extends BaseContainer {
 
         @Override
         public Slot setBackground(ResourceLocation atlas, ResourceLocation sprite) {
-            return super.setBackground(atlas, new ResourceLocation(Reference.MODID, this.backgroundLoc));
+            return super.setBackground(atlas, new ResourceLocation(BuildingGadgetsAPI.MODID, this.backgroundLoc));
         }
 
         @Override

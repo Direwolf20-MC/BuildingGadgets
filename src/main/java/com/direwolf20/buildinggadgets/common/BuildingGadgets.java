@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.client.renderer.EffectBlockTER;
 import com.direwolf20.buildinggadgets.client.screen.GuiMod;
@@ -18,7 +19,6 @@ import com.direwolf20.buildinggadgets.common.tainted.registry.Registries;
 import com.direwolf20.buildinggadgets.common.tainted.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.tileentities.OurTileEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.command.Commands;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -41,7 +41,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod(Reference.MODID)
+@Mod(BuildingGadgetsAPI.MODID)
 public final class BuildingGadgets {
 
     public static Logger LOG = LogManager.getLogger();
@@ -51,7 +51,7 @@ public final class BuildingGadgets {
      * building gadget to remove the damage / energy indicator from the creative
      * tabs icon.
      */
-    public static ItemGroup creativeTab = new ItemGroup(Reference.MODID) {
+    public static ItemGroup creativeTab = new ItemGroup(BuildingGadgetsAPI.MODID) {
         @Override
         public ItemStack createIcon() {
             ItemStack stack = new ItemStack(OurItems.BUILDING_GADGET_ITEM.get());
@@ -126,7 +126,7 @@ public final class BuildingGadgets {
 
     private void serverLoad(FMLServerStartingEvent event) {
         event.getServer().getCommandManager().getDispatcher().register(
-                Commands.literal(Reference.MODID)
+                Commands.literal(BuildingGadgetsAPI.MODID)
                         .then(OverrideBuildSizeCommand.registerToggle())
                         .then(OverrideCopySizeCommand.registerToggle())
                         .then(ForceUnloadedCommand.registerToggle())
@@ -147,7 +147,7 @@ public final class BuildingGadgets {
     private void onRecipeRegister(final RegistryEvent.Register<IRecipeSerializer<?>> e) {
         e.getRegistry().register(
                 Serializer.INSTANCE.setRegistryName(
-                    new ResourceLocation(Reference.MODID, "construction_paste")
+                    new ResourceLocation(BuildingGadgetsAPI.MODID, "construction_paste")
             )
         );
     }

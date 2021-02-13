@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
@@ -8,7 +9,6 @@ import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider;
 import com.direwolf20.buildinggadgets.common.tainted.template.Template;
 import com.direwolf20.buildinggadgets.common.tainted.template.TemplateHeader;
 import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -35,7 +35,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
     public static final int BUTTON_HEIGHT = 20;
     public static final int BUTTONS_PADDING = 4;
 
-    public static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(Reference.MODID, "textures/gui/material_list.png");
+    public static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation(BuildingGadgetsAPI.MODID, "textures/gui/material_list.png");
     public static final int BACKGROUND_WIDTH = 256;
     public static final int BACKGROUND_HEIGHT = 200;
     public static final int BORDER_SIZE = 4;

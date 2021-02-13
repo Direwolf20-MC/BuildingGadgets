@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.client;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.client.screen.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.old_items.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.gui.handlers.IGuiContainerHandler;
@@ -22,7 +22,7 @@ import java.util.List;
 public class BuildingGadgetsJEI implements IModPlugin {
     @Override
     public ResourceLocation getPluginUid() {
-        return new ResourceLocation(Reference.MODID, "jei_plugin");
+        return new ResourceLocation(BuildingGadgetsAPI.MODID, "jei_plugin");
     }
 
     @Override

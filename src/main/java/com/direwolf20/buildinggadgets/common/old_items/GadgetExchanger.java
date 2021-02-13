@@ -2,12 +2,16 @@ package com.direwolf20.buildinggadgets.common.old_items;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
+import com.direwolf20.buildinggadgets.api.modes.GadgetModes;
+import com.direwolf20.buildinggadgets.api.modes.IMode;
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.BuildRender;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.building.BuildingContext;
-import com.direwolf20.buildinggadgets.common.building.modes.ExchangingModes;
+import com.direwolf20.buildinggadgets.common.building.Modes;
+import com.direwolf20.buildinggadgets.common.building.modes.GridMode;
+import com.direwolf20.buildinggadgets.common.building.modes.SurfaceMode;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
@@ -48,10 +52,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceContext;
@@ -59,7 +60,6 @@ import net.minecraft.util.math.RayTraceContext.BlockMode;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
@@ -121,15 +121,15 @@ public class GadgetExchanger extends AbstractGadget {
         return enchantment == Enchantments.SILK_TOUCH || super.canApplyAtEnchantingTable(stack, enchantment);
     }
 
-    private static void setToolMode(ItemStack tool, ExchangingModes mode) {
+    private static void setToolMode(ItemStack tool, IMode mode) {
         //Store the tool's mode in NBT as a string
         CompoundNBT tagCompound = tool.getOrCreateTag();
-        tagCompound.putString("mode", mode.toString());
+        tagCompound.putString("mode", mode.identifier().toString());
     }
 
-    public static ExchangingModes getToolMode(ItemStack tool) {
+    public static IMode getToolMode(ItemStack tool) {
         CompoundNBT tagCompound = tool.getOrCreateTag();
-        return ExchangingModes.getFromName(tagCompound.getString("mode"));
+        return Modes.getFromName(GadgetModes.exchangingModes, new ResourceLocation(tagCompound.getString("mode")));
     }
 
     @Override
@@ -137,11 +137,11 @@ public class GadgetExchanger extends AbstractGadget {
         super.addInformation(stack, world, tooltip, flag);
         addEnergyInformation(tooltip, stack);
 
-        ExchangingModes mode = getToolMode(stack);
+        IMode mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
-                .componentTranslation((mode == ExchangingModes.SURFACE && getConnectedArea(stack)
-                        ? TooltipTranslation.GADGET_CONNECTED.format(new TranslationTextComponent(mode.getTranslationKey()).getString())
-                        : new TranslationTextComponent(mode.getTranslationKey())))
+                .componentTranslation((mode.identifier() == SurfaceMode.name && getConnectedArea(stack)
+                        ? TooltipTranslation.GADGET_CONNECTED.format(mode.entry().translatedName())
+                        : mode.entry().translatedName()))
                 .setStyle(Styles.AQUA));
 
         tooltip.add(TooltipTranslation.GADGET_BLOCK
@@ -150,7 +150,7 @@ public class GadgetExchanger extends AbstractGadget {
 
         int range = getToolRange(stack);
         tooltip.add(TooltipTranslation.GADGET_RANGE
-                            .componentTranslation(range, getRangeInBlocks(range, mode.getMode()))
+                            .componentTranslation(range, getRangeInBlocks(range, mode))
                             .setStyle(Styles.LT_PURPLE));
 
         tooltip.add(TooltipTranslation.GADGET_FUZZY
@@ -186,15 +186,18 @@ public class GadgetExchanger extends AbstractGadget {
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }
 
-    public void setMode(ItemStack heldItem, int modeInt) {
+    public void setMode(ItemStack heldItem, ResourceLocation modeIdentifier) {
         //Called when we specify a mode with the radial menu
-        ExchangingModes mode = ExchangingModes.values()[modeInt];
+        IMode mode = Modes.getFromName(Modes.getExchangingModes(), modeIdentifier);
+        if (mode == null) {
+            return;
+        }
         setToolMode(heldItem, mode);
     }
 
     public static void rangeChange(PlayerEntity player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem) == ExchangingModes.GRID || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem).identifier() == GridMode.name || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
             range = (range <= 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         } else {
@@ -226,7 +229,7 @@ public class GadgetExchanger extends AbstractGadget {
         // Get the anchor or build the collection
         Optional<List<BlockPos>> anchor = GadgetUtils.getAnchor(stack);
         List<BlockPos> coords = anchor.orElseGet(
-                () -> getToolMode(stack).getMode().getCollection(new BuildingContext(world, blockData.getState(), lookingAt.getPos(), heldItem, lookingAt.getFace(), getConnectedArea(heldItem)), player)
+                () -> getToolMode(stack).getCollection(new BuildingContext(world, blockData.getState(), lookingAt.getPos(), heldItem, lookingAt.getFace(), getConnectedArea(heldItem)), player)
         );
 
         if (anchor.isPresent()) {

@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.client;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.client.cache.CacheTemplateProvider;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.models.ConstructionBakedModel;
@@ -9,7 +10,6 @@ import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.containers.OurContainers;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
@@ -73,7 +73,7 @@ public class ClientProxy {
     }
 
     private static void bakeModels(ModelBakeEvent event) {
-        ResourceLocation ConstrName = new ResourceLocation(Reference.MODID, "construction_block");
+        ResourceLocation ConstrName = new ResourceLocation(BuildingGadgetsAPI.MODID, "construction_block");
         TextureAtlasSprite breakPart = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(Blocks.STONE.getDefaultState()).getParticleTexture();
         ModelResourceLocation ConstrLocation1 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=false,neighbor_brightness=false");
         ModelResourceLocation ConstrLocation1a = new ModelResourceLocation(ConstrName, "ambient_occlusion=true,bright=false,neighbor_brightness=false");

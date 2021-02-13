@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.client.events;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 import com.direwolf20.buildinggadgets.client.cache.RemoteInventoryCache;
 import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
@@ -12,7 +13,6 @@ import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.tainted.template.Template;
 import com.direwolf20.buildinggadgets.common.tainted.template.TemplateHeader;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
@@ -42,7 +42,7 @@ import java.util.List;
  * This class was adapted from code written by Vazkii
  * Thanks Vazkii!!
  */
-@Mod.EventBusSubscriber(modid = Reference.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = BuildingGadgetsAPI.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class EventTooltip {
     private static final String PLACE_HOLDER = "\u00a77\u00a7r\u00a7r\u00a7r\u00a7r\u00a7r";
     private static final Comparator<Multiset.Entry<IUniqueObject<?>>> ENTRY_COMPARATOR = Comparator

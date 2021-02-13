@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.lang;
 
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -21,7 +21,7 @@ public enum MaterialListTranslation implements ITranslationProvider {
     TITLE_NAME_ONLY("titleNameOnly", 1),
     TITLE("title", 2);
 
-    private static final String PREFIX = "gui." + Reference.MODID + ".materialList.";
+    private static final String PREFIX = "gui." + BuildingGadgetsAPI.MODID + ".materialList.";
     private final String key;
     private final int argCount;
 

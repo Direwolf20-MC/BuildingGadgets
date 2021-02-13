@@ -1,14 +1,21 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
+import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
+import com.direwolf20.buildinggadgets.api.modes.IModeEntry;
 import com.direwolf20.buildinggadgets.common.building.AbstractMode;
 import com.direwolf20.buildinggadgets.common.building.BuildingContext;
+import com.direwolf20.buildinggadgets.common.building.ModeEntry;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GridMode extends AbstractMode {
+    public static final ResourceLocation name = new ResourceLocation(BuildingGadgetsAPI.MODID, "grid_mode");
+    private static final ModeEntry entry = new ModeEntry("grid", name);
+
     public GridMode(boolean isExchanging) {
         super(isExchanging);
     }
@@ -30,5 +37,15 @@ public class GridMode extends AbstractMode {
         }
 
         return coordinates;
+    }
+
+    @Override
+    public ResourceLocation identifier() {
+        return name;
+    }
+
+    @Override
+    public IModeEntry entry() {
+        return entry;
     }
 }

@@ -3,10 +3,13 @@ package com.direwolf20.buildinggadgets.common.old_items;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
+import com.direwolf20.buildinggadgets.api.modes.IMode;
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.building.AbstractMode;
-import com.direwolf20.buildinggadgets.common.building.modes.*;
+import com.direwolf20.buildinggadgets.common.building.modes.GridMode;
+import com.direwolf20.buildinggadgets.common.building.modes.HorizontalColumnMode;
+import com.direwolf20.buildinggadgets.common.building.modes.StairMode;
+import com.direwolf20.buildinggadgets.common.building.modes.VerticalColumnMode;
 import com.direwolf20.buildinggadgets.common.capability.energy.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.capability.energy.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
@@ -300,7 +303,7 @@ public abstract class AbstractGadget extends Item {
     }
 
     // Todo: tweak and fix.
-    public static int getRangeInBlocks(int range, AbstractMode mode) {
+    public static int getRangeInBlocks(int range, IMode mode) {
         if( mode instanceof StairMode ||
                 mode instanceof VerticalColumnMode ||
                 mode instanceof HorizontalColumnMode)
