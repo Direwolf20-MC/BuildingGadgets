@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.old_items;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
-import com.direwolf20.buildinggadgets.api.modes.GadgetModes;
 import com.direwolf20.buildinggadgets.api.modes.IMode;
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.BuildRender;
@@ -129,7 +128,7 @@ public class GadgetExchanger extends AbstractGadget {
 
     public static IMode getToolMode(ItemStack tool) {
         CompoundNBT tagCompound = tool.getOrCreateTag();
-        return Modes.getFromName(GadgetModes.exchangingModes, new ResourceLocation(tagCompound.getString("mode")));
+        return Modes.getFromName(Modes.getExchangingModes(), new ResourceLocation(tagCompound.getString("mode")));
     }
 
     @Override

@@ -111,7 +111,7 @@ public class ModeRadialMenu extends Screen {
             }));
         }
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
-            if (!isDestruction || Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get()) {
+            if (!isDestruction) {
                 Button button = new PositionedIconActionable(RadialTranslation.FUZZY, "fuzzy", right, send -> {
                     if (send)
                         PacketHandler.sendToServer(new PacketToggleFuzzy());

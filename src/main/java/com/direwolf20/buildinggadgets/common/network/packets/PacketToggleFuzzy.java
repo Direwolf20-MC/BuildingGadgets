@@ -1,10 +1,8 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
-import com.direwolf20.buildinggadgets.common.config.Config;
-import com.direwolf20.buildinggadgets.common.old_items.GadgetBuilding;
-import com.direwolf20.buildinggadgets.common.old_items.GadgetDestruction;
-import com.direwolf20.buildinggadgets.common.old_items.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.old_items.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.old_items.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.old_items.GadgetExchanger;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -25,8 +23,7 @@ public class PacketToggleFuzzy {
                     return;
 
                 ItemStack stack = AbstractGadget.getGadget(player);
-                if (stack.getItem() instanceof GadgetExchanger || stack.getItem() instanceof GadgetBuilding
-                        || (stack.getItem() instanceof GadgetDestruction && Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get()))
+                if (stack.getItem() instanceof GadgetExchanger || stack.getItem() instanceof GadgetBuilding)
                     AbstractGadget.toggleFuzzy(player, stack);
             });
 

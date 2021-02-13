@@ -128,8 +128,6 @@ public class Config {
 
         public static final class CategoryGadgetDestruction extends GadgetConfig {
             public final IntValue destroySize;
-            public final DoubleValue nonFuzzyMultiplier;
-            public final BooleanValue nonFuzzyEnabled;
 
             private CategoryGadgetDestruction() {
                 super("Destruction Gadget", false, true, 1000000, 4000, 200, 2, 1);
@@ -142,15 +140,6 @@ public class Config {
                 destroySize = SERVER_BUILDER
                         .comment("The maximum dimensions, the Destruction Gadget can destroy.")
                         .defineInRange("Destroy Dimensions", 16, 0, 32);
-
-                nonFuzzyMultiplier = SERVER_BUILDER
-                        .comment("The cost in energy/durability will increase by this amount when not in fuzzy mode")
-                        .defineInRange("Non-Fuzzy Mode Multiplier", 2, 0, Double.MAX_VALUE);
-
-                nonFuzzyEnabled = SERVER_BUILDER
-                        .comment("If enabled, the Destruction Gadget can be taken out of fuzzy mode, allowing only instances of the block "
-                                + "clicked to be removed (at a higher cost)")
-                        .define("Non-Fuzzy Mode Enabled", false);
 
                 SERVER_BUILDER.pop();
 

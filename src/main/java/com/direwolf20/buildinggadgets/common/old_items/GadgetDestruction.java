@@ -75,7 +75,7 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     private int getCostMultiplier(ItemStack tool) {
-        return (int) (! getFuzzy(tool) ? Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyMultiplier.get() : 1);
+        return 1; //(int) (! getFuzzy(tool) ? Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyMultiplier.get() : 1);
     }
 
     @Override
@@ -95,10 +95,10 @@ public class GadgetDestruction extends AbstractGadget {
                             .componentTranslation(String.valueOf(getConnectedArea(stack)))
                             .setStyle(Styles.YELLOW));
 
-        if (Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get())
-            tooltip.add(TooltipTranslation.GADGET_FUZZY
-                                .componentTranslation(String.valueOf(getFuzzy(stack)))
-                                .setStyle(Styles.GOLD));
+//        if (Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get())
+//            tooltip.add(TooltipTranslation.GADGET_FUZZY
+//                                .componentTranslation(String.valueOf(getFuzzy(stack)))
+//                                .setStyle(Styles.GOLD));
 
         addInformationRayTraceFluid(tooltip, stack);
     }

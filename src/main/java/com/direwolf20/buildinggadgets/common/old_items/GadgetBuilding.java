@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.old_items;
 
 import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
-import com.direwolf20.buildinggadgets.api.modes.GadgetModes;
 import com.direwolf20.buildinggadgets.api.modes.IMode;
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.BuildRender;
@@ -96,7 +95,7 @@ public class GadgetBuilding extends AbstractGadget {
 
     public static IMode getToolMode(ItemStack tool) {
         CompoundNBT tagCompound = tool.getOrCreateTag();
-        return Modes.getFromName(GadgetModes.buildingModes, new ResourceLocation(tagCompound.getString("mode")));
+        return Modes.getFromName(Modes.getBuildingModes(), new ResourceLocation(tagCompound.getString("mode")));
     }
 
     public static boolean shouldPlaceAtop(ItemStack stack) {
@@ -142,6 +141,16 @@ public class GadgetBuilding extends AbstractGadget {
                 .setStyle(Styles.YELLOW));
     }
 
+    public void setMode(ItemStack heldItem, ResourceLocation modeName) {
+        //Called when we specify a mode with the radial menu
+        IMode mode = Modes.getFromName(Modes.getBuildingModes(), modeName);
+        if (mode == null) {
+            return;
+        }
+
+        setToolMode(heldItem, mode);
+    }
+
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when you right click a tool NOT on a block.
@@ -170,16 +179,6 @@ public class GadgetBuilding extends AbstractGadget {
             }
         }
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
-    }
-
-    public void setMode(ItemStack heldItem, ResourceLocation modeName) {
-        //Called when we specify a mode with the radial menu
-        IMode mode = Modes.getFromName(Modes.getBuildingModes(), modeName);
-        if (mode == null) {
-            return;
-        }
-
-        setToolMode(heldItem, mode);
     }
 
     public static void rangeChange(PlayerEntity player, ItemStack heldItem) {

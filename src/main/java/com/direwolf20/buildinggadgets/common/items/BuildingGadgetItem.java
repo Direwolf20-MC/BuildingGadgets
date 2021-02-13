@@ -1,7 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.api.modes.IMode;
+import com.direwolf20.buildinggadgets.common.building.Modes;
 import com.direwolf20.buildinggadgets.common.capability.OurCapabilities;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetAbilities;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
@@ -10,7 +13,10 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
+import java.util.Set;
+
 public class BuildingGadgetItem extends AbstractGadget {
+    private static final GadgetAbilities ABILITIES = new GadgetAbilities(true, true, true, false, false, false);
 
     public BuildingGadgetItem() {
         super(Config.GADGETS.GADGET_BUILDING);
@@ -31,5 +37,15 @@ public class BuildingGadgetItem extends AbstractGadget {
         }
 
         return super.onItemRightClick(world, player, hand);
+    }
+
+    @Override
+    public Set<IMode> getModes() {
+        return Modes.getBuildingModes();
+    }
+
+    @Override
+    public GadgetAbilities getAbilities() {
+        return ABILITIES;
     }
 }
