@@ -73,7 +73,7 @@ public abstract class AbstractGadget extends Item {
             tooltip.add(TooltipTranslation.GADGET_CREATIVE.componentTranslation().setStyle(Styles.LT_PURPLE));
         }
 
-        this.getMeta(stack).ifPresent(meta -> tooltip.addAll(this.addMetaInformation(meta, stack, world)));
+        getMeta(stack).ifPresent(meta -> tooltip.addAll(this.addMetaInformation(meta, stack, world)));
     }
 
     /**
@@ -90,9 +90,9 @@ public abstract class AbstractGadget extends Item {
         // Mode
         if (this.getAbilities().canChangeModes() && !(meta.getMode() instanceof EmptyMode)) {
             tips.add(TooltipTranslation.GADGET_MODE
-                .componentTranslation((meta.getMode().identifier() == SurfaceMode.name && meta.isConnectedArea()
-                    ? TooltipTranslation.GADGET_CONNECTED.format(meta.getMode().entry().translatedName())
-                    : meta.getMode().entry().translatedName()))
+                .componentTranslation((meta.getMode().getRegistryName() == SurfaceMode.name && meta.isConnectedArea()
+                    ? TooltipTranslation.GADGET_CONNECTED.format(meta.getMode().getUiEntry().translatedName())
+                    : meta.getMode().getUiEntry().translatedName()))
                 .setStyle(Styles.AQUA));
         }
 
@@ -124,7 +124,7 @@ public abstract class AbstractGadget extends Item {
         ActionResult<ItemStack> result;
 
         ItemStack gadget = player.getHeldItem(handIn);
-        RayTraceResult cast = player.pick(Config.GENERAL.rayTraceRange.get(), 1.0f, this.getMeta(gadget).map(GadgetMeta::canFluidTrace).orElse(false));
+        RayTraceResult cast = player.pick(Config.GENERAL.rayTraceRange.get(), 1.0f, getMeta(gadget).map(GadgetMeta::canFluidTrace).orElse(false));
         if (world.isRemote) {
             result = player.isSneaking()
                 ? this.onShiftClientAction(world, player, gadget, cast)
@@ -328,7 +328,7 @@ public abstract class AbstractGadget extends Item {
         return stack.getCapability(CapabilityEnergy.ENERGY);
     }
 
-    private LazyOptional<GadgetMeta> getMeta(ItemStack stack) {
+    public static LazyOptional<GadgetMeta> getMeta(ItemStack stack) {
         return stack.getCapability(OurCapabilities.GADGET_META);
     }
 

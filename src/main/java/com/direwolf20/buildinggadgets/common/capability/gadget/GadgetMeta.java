@@ -130,7 +130,7 @@ public class GadgetMeta {
         }
 
         compound.putBoolean("fluid_trace", this.fluidTrace);
-        compound.putString("mode", mode.identifier().toString());
+        compound.putString("mode", mode.getRegistryName().toString());
         if (this.anchor != null) {
             compound.put("anchor", NBTUtil.writeBlockPos(this.anchor));
         }

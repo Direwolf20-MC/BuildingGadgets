@@ -23,10 +23,10 @@ public interface IMode {
     /**
      * Used for identification NOT translation
      */
-    ResourceLocation identifier();
+    ResourceLocation getRegistryName();
 
     /**
      * The modes active interface entry
      */
-    IModeEntry entry();
+    IModeUiEntry getUiEntry();
 }

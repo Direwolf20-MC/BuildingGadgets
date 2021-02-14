@@ -7,8 +7,9 @@ import com.direwolf20.buildinggadgets.api.modes.IMode;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.building.BuildingContext;
-import com.direwolf20.buildinggadgets.common.old_items.AbstractGadget;
-import com.direwolf20.buildinggadgets.common.old_items.GadgetBuilding;
+import com.direwolf20.buildinggadgets.common.capability.gadget.GadgetMeta;
+import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.items.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.old_items.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
@@ -52,6 +53,9 @@ public class BuildRender extends BaseRenderer {
     @Override
     public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
         super.render(evt, player, heldItem);
+
+        AbstractGadget gadget = (AbstractGadget) heldItem.getItem();
+        LazyOptional<GadgetMeta> meta = AbstractGadget.getMeta(heldItem);
 
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
 

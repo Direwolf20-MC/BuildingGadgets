@@ -123,7 +123,7 @@ public class GadgetExchanger extends AbstractGadget {
     private static void setToolMode(ItemStack tool, IMode mode) {
         //Store the tool's mode in NBT as a string
         CompoundNBT tagCompound = tool.getOrCreateTag();
-        tagCompound.putString("mode", mode.identifier().toString());
+        tagCompound.putString("mode", mode.getRegistryName().toString());
     }
 
     public static IMode getToolMode(ItemStack tool) {
@@ -138,9 +138,9 @@ public class GadgetExchanger extends AbstractGadget {
 
         IMode mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
-                .componentTranslation((mode.identifier() == SurfaceMode.name && getConnectedArea(stack)
-                        ? TooltipTranslation.GADGET_CONNECTED.format(mode.entry().translatedName())
-                        : mode.entry().translatedName()))
+                .componentTranslation((mode.getRegistryName() == SurfaceMode.name && getConnectedArea(stack)
+                        ? TooltipTranslation.GADGET_CONNECTED.format(mode.getUiEntry().translatedName())
+                        : mode.getUiEntry().translatedName()))
                 .setStyle(Styles.AQUA));
 
         tooltip.add(TooltipTranslation.GADGET_BLOCK
@@ -196,7 +196,7 @@ public class GadgetExchanger extends AbstractGadget {
 
     public static void rangeChange(PlayerEntity player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem).identifier() == GridMode.name || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem).getRegistryName() == GridMode.name || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking()) {
             range = (range <= 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         } else {

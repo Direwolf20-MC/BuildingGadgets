@@ -6,7 +6,7 @@ import net.minecraft.util.ResourceLocation;
  * This interface is the core component to how a Gadget can interface with it's it's modes
  * each {@link IMode} will provide an entry to support the gadgets interfaces.
  */
-public interface IModeEntry {
+public interface IModeUiEntry {
     /**
      * Forms a link between a IMode and a IModeEntry
      */

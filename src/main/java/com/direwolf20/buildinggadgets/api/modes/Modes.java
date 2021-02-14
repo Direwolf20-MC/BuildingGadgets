@@ -5,7 +5,7 @@ import com.google.common.collect.Sets;
 
 import java.util.Set;
 
-public class GadgetModes {
+public class Modes {
     /**
      * The Building Gadget will query this list directly allowing you to actually remove
      * modes from our default list of modes.

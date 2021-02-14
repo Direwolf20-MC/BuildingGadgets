@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
 import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
-import com.direwolf20.buildinggadgets.api.modes.IModeEntry;
+import com.direwolf20.buildinggadgets.api.modes.IModeUiEntry;
 import com.direwolf20.buildinggadgets.common.building.AbstractMode;
 import com.direwolf20.buildinggadgets.common.building.BuildingContext;
-import com.direwolf20.buildinggadgets.common.building.ModeEntry;
+import com.direwolf20.buildinggadgets.common.building.ModeUiEntry;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
@@ -15,7 +15,7 @@ import java.util.List;
 
 public class BuildToMeMode extends AbstractMode {
     public static final ResourceLocation name = new ResourceLocation(BuildingGadgetsAPI.MODID, "build_to_me_mode");
-    private static final ModeEntry entry = new ModeEntry("build_to_me", name);
+    private static final ModeUiEntry entry = new ModeUiEntry("build_to_me", name);
 
     public BuildToMeMode() { super(false); }
 
@@ -37,12 +37,12 @@ public class BuildToMeMode extends AbstractMode {
     }
 
     @Override
-    public ResourceLocation identifier() {
+    public ResourceLocation getRegistryName() {
         return name;
     }
 
     @Override
-    public IModeEntry entry() {
+    public IModeUiEntry getUiEntry() {
         return entry;
     }
 }

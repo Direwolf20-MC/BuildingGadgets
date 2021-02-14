@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
 import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
-import com.direwolf20.buildinggadgets.api.modes.IModeEntry;
+import com.direwolf20.buildinggadgets.api.modes.IModeUiEntry;
 import com.direwolf20.buildinggadgets.common.building.AbstractMode;
 import com.direwolf20.buildinggadgets.common.building.BuildingContext;
-import com.direwolf20.buildinggadgets.common.building.ModeEntry;
+import com.direwolf20.buildinggadgets.common.building.ModeUiEntry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class EmptyMode extends AbstractMode {
     public static final ResourceLocation name = new ResourceLocation(BuildingGadgetsAPI.MODID, "empty");
-    private static final ModeEntry entry = new ModeEntry("empty", name);
+    private static final ModeUiEntry entry = new ModeUiEntry("empty", name);
 
     public EmptyMode() { super(false); }
 
@@ -24,12 +24,12 @@ public class EmptyMode extends AbstractMode {
     }
 
     @Override
-    public ResourceLocation identifier() {
+    public ResourceLocation getRegistryName() {
         return name;
     }
 
     @Override
-    public IModeEntry entry() {
+    public IModeUiEntry getUiEntry() {
         return entry;
     }
 }

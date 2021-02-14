@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.common.building.modes;
 
 import com.direwolf20.buildinggadgets.api.BuildingGadgetsAPI;
-import com.direwolf20.buildinggadgets.api.modes.IModeEntry;
+import com.direwolf20.buildinggadgets.api.modes.IModeUiEntry;
 import com.direwolf20.buildinggadgets.common.building.AbstractMode;
 import com.direwolf20.buildinggadgets.common.building.BuildingActionContext;
 import com.direwolf20.buildinggadgets.common.building.BuildingContext;
-import com.direwolf20.buildinggadgets.common.building.ModeEntry;
+import com.direwolf20.buildinggadgets.common.building.ModeUiEntry;
 import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.tainted.building.placement.ConnectedSurface;
 import net.minecraft.block.BlockState;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class SurfaceMode extends AbstractMode {
     public static final ResourceLocation name = new ResourceLocation(BuildingGadgetsAPI.MODID, "surface");
-    private static final ModeEntry entry = new ModeEntry("surface", name);
+    private static final ModeUiEntry entry = new ModeUiEntry("surface", name);
 
     public SurfaceMode(boolean isExchanging) { super(isExchanging); }
 
@@ -63,12 +63,12 @@ public class SurfaceMode extends AbstractMode {
     }
 
     @Override
-    public ResourceLocation identifier() {
+    public ResourceLocation getRegistryName() {
         return name;
     }
 
     @Override
-    public IModeEntry entry() {
+    public IModeUiEntry getUiEntry() {
         return entry;
     }
 }

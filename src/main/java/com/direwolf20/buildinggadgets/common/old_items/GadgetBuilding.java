@@ -90,7 +90,7 @@ public class GadgetBuilding extends AbstractGadget {
     private static void setToolMode(ItemStack tool, IMode mode) {
         //Store the tool's mode in NBT as a string
         CompoundNBT tagCompound = tool.getOrCreateTag();
-        tagCompound.putString("mode", mode.identifier().toString());
+        tagCompound.putString("mode", mode.getRegistryName().toString());
     }
 
     public static IMode getToolMode(ItemStack tool) {
@@ -114,9 +114,9 @@ public class GadgetBuilding extends AbstractGadget {
         addEnergyInformation(tooltip, stack);
 
         tooltip.add(TooltipTranslation.GADGET_MODE
-                .componentTranslation((mode.identifier() == SurfaceMode.name && getConnectedArea(stack)
-                        ? TooltipTranslation.GADGET_CONNECTED.format(mode.entry().translatedName())
-                        : mode.entry().translatedName()))
+                .componentTranslation((mode.getRegistryName() == SurfaceMode.name && getConnectedArea(stack)
+                        ? TooltipTranslation.GADGET_CONNECTED.format(mode.getUiEntry().translatedName())
+                        : mode.getUiEntry().translatedName()))
                 .setStyle(Styles.AQUA));
 
         tooltip.add(TooltipTranslation.GADGET_BLOCK
@@ -124,12 +124,12 @@ public class GadgetBuilding extends AbstractGadget {
                 .setStyle(Styles.DK_GREEN));
 
         int range = getToolRange(stack);
-        if (mode.identifier() != BuildToMeMode.name)
+        if (mode.getRegistryName() != BuildToMeMode.name)
             tooltip.add(TooltipTranslation.GADGET_RANGE
                     .componentTranslation(range, getRangeInBlocks(range, mode))
                     .setStyle(Styles.LT_PURPLE));
 
-        if (mode.identifier() == SurfaceMode.name)
+        if (mode.getRegistryName() == SurfaceMode.name)
             tooltip.add(TooltipTranslation.GADGET_FUZZY
                     .componentTranslation(String.valueOf(getFuzzy(stack)))
                     .setStyle(Styles.GOLD));
@@ -184,7 +184,7 @@ public class GadgetBuilding extends AbstractGadget {
     public static void rangeChange(PlayerEntity player, ItemStack heldItem) {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
-        int changeAmount = (getToolMode(heldItem).identifier() != SurfaceMode.name || (range % 2 == 0)) ? 1 : 2;
+        int changeAmount = (getToolMode(heldItem).getRegistryName() != SurfaceMode.name || (range % 2 == 0)) ? 1 : 2;
         if (player.isSneaking())
             range = (range == 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         else
