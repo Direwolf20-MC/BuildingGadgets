@@ -3,12 +3,17 @@ package com.direwolf20.buildinggadgets.common.capability.gadget;
 import com.direwolf20.buildinggadgets.api.modes.IMode;
 import com.direwolf20.buildinggadgets.common.building.Modes;
 import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Optional;
 
@@ -18,6 +23,7 @@ public class GadgetMeta {
     private IMode mode;
     private BlockState selectedBlock;
     private BlockPos anchor;
+    private Pair<BlockPos, RegistryKey<World>> linkedInventory;
     private int range = 1;
     private boolean fuzzy = false;
     private boolean connectedArea = false;
@@ -108,6 +114,18 @@ public class GadgetMeta {
         this.showOverlay = showOverlay;
     }
 
+    public Optional<Pair<BlockPos, RegistryKey<World>>> getLinkedInventory() {
+        if (this.linkedInventory == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(linkedInventory);
+    }
+
+    public void setLinkedInventory(Pair<BlockPos, RegistryKey<World>> linkedInventory) {
+        this.linkedInventory = linkedInventory;
+    }
+
     public void deserialize(CompoundNBT compound) {
         this.selectedBlock = NBTUtil.readBlockState(compound.getCompound("selected"));
         if (compound.contains("anchor")) {
@@ -120,6 +138,13 @@ public class GadgetMeta {
         this.placeOnTop = compound.getBoolean("on_top");
         this.showOverlay = compound.getBoolean("show_overlay");
         this.mode = Modes.getFromName(((AbstractGadget) this.gadget.getItem()).getModes(), new ResourceLocation(compound.getString("mode")));
+
+        if (compound.contains(NBTKeys.REMOTE_INVENTORY_POS) && compound.contains(NBTKeys.REMOTE_INVENTORY_DIM)) {
+            this.linkedInventory = Pair.of(
+                NBTUtil.readBlockPos(compound.getCompound(NBTKeys.REMOTE_INVENTORY_POS)),
+                RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compound.getString(NBTKeys.REMOTE_INVENTORY_DIM)))
+            );
+        }
     }
 
     public CompoundNBT serialize() {
@@ -140,6 +165,10 @@ public class GadgetMeta {
         compound.putBoolean("connected", this.connectedArea);
         compound.putBoolean("on_top", this.placeOnTop);
         compound.putBoolean("show_overlay", this.showOverlay);
+        if (this.linkedInventory != null) {
+            compound.put(NBTKeys.REMOTE_INVENTORY_POS, NBTUtil.writeBlockPos(this.linkedInventory.getKey()));
+            compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, this.linkedInventory.getValue().getLocation().toString());
+        }
 
         return compound;
     }

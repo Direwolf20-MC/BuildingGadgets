@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class CopyGadgetItem extends AbstractGadget {
-    private static final GadgetAbilities ABILITIES = new GadgetAbilities(true, false, false, false, true, false);
+    private static final GadgetAbilities ABILITIES = new GadgetAbilities(true, false, false, false, true, false, true);
 
     public CopyGadgetItem() {
         super(Config.GADGETS.GADGET_COPY_PASTE);

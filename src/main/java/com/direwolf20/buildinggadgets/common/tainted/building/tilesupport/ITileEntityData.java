@@ -47,6 +47,7 @@ public interface ITileEntityData {
      * @return A {@link Multiset} of required Items.
      */
     default MaterialList getRequiredItems(BuildContext context, BlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
+        
         ItemStack stack = null;
         try {
             stack = state.getBlock().getPickBlock(state, target, context.getWorld(), pos, context.getPlayer());

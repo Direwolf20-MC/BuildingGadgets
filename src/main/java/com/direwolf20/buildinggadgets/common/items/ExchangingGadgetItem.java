@@ -8,7 +8,7 @@ import com.direwolf20.buildinggadgets.common.items.gadgets.GadgetAbilities;
 import java.util.Set;
 
 public class ExchangingGadgetItem extends AbstractGadget {
-    private static final GadgetAbilities ABILITIES = new GadgetAbilities(true, true, true, false, false, true);
+    private static final GadgetAbilities ABILITIES = new GadgetAbilities(true, true, true, false, false, true, true);
 
     public ExchangingGadgetItem() {
         super(Config.GADGETS.GADGET_EXCHANGER);

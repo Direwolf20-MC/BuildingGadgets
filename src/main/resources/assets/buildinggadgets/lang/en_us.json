@@ -40,6 +40,7 @@
   "tooltip.gadget.creative": "Creative ∞",
   "tooltip.gadget.mode": "Mode: %s",
   "tooltip.gadget.rotate": "Rotate",
+  "tooltip.gadget.link_pos": "Linked to: %s",
   "tooltip.gadget.mirror": "Mirror",
   "tooltip.gadget.range": "Range: %s (%s blocks)",
   "tooltip.gadget.anchor": "Anchor",

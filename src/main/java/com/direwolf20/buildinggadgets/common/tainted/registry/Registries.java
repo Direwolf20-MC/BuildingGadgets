@@ -116,6 +116,7 @@ public final class Registries {
                 .addValue(Reference.TileDataFactoryReference.DATA_PROVIDER_FACTORY_RL, TileSupport.dataProviderFactory())
                 .addDependency(Reference.MARKER_AFTER_RL, Reference.TileDataFactoryReference.DATA_PROVIDER_FACTORY_RL)
                 .addDependency(Reference.MARKER_BEFORE_RL, Reference.MARKER_AFTER_RL);
+
         handleProviderBuilder
                 .addMarker(Reference.MARKER_BEFORE_RL)
                 .addMarker(Reference.MARKER_AFTER_RL)

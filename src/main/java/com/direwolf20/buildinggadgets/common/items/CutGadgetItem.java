@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class CutGadgetItem extends AbstractGadget {
-    private static final GadgetAbilities ABILITIES = new GadgetAbilities(true, false, false, false, true, false);
+    private static final GadgetAbilities ABILITIES = new GadgetAbilities(true, false, false, false, true, false, true);
 
     public CutGadgetItem() {
         super(Config.GADGETS.GADGET_COPY_PASTE);

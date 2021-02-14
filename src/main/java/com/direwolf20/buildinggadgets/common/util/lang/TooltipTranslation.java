@@ -31,7 +31,8 @@ public enum TooltipTranslation implements ITranslationProvider {
     TEMPLATE_AUTHOR("template.author", 1),
     CHARGER_ENERGY("charger.energy", 1),
     CHARGER_BURN("charger.burn_time", 1),
-    CHARGER_EMPTY("charger.fuel_empty", 0);
+    CHARGER_EMPTY("charger.fuel_empty", 0),
+    GADGET_LINK_POS("gadget.link_pos", 1);
 
     private static final String PREFIX = "tooltip.";
     private final String key;

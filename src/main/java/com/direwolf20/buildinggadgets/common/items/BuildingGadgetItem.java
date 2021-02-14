@@ -16,7 +16,7 @@ import net.minecraft.world.World;
 import java.util.Set;
 
 public class BuildingGadgetItem extends AbstractGadget {
-    private static final GadgetAbilities ABILITIES = new GadgetAbilities(true, true, true, false, false, false);
+    private static final GadgetAbilities ABILITIES = new GadgetAbilities(true, true, true, false, false, false, true);
 
     public BuildingGadgetItem() {
         super(Config.GADGETS.GADGET_BUILDING);

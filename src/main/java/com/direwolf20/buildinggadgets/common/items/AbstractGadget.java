@@ -107,13 +107,17 @@ public abstract class AbstractGadget extends Item {
         }
 
         // Place on top of blocks
-        if (this.getAbilities().isPlaceOnTop()) {
+        if (this.getAbilities().canPlaceOnTop()) {
             tips.add(TooltipTranslation.GADGET_BUILDING_PLACE_ATOP.componentTranslation(String.valueOf(meta.isPlaceOnTop())).mergeStyle(TextFormatting.YELLOW));
         }
 
         // Should trace water
-        if (this.getAbilities().isCanTraceWater()) {
+        if (this.getAbilities().canTraceWater()) {
             tips.add(TooltipTranslation.GADGET_RAYTRACE_FLUID.componentTranslation(String.valueOf(meta.canFluidTrace())).mergeStyle(TextFormatting.BLUE));
+        }
+
+        if (this.getAbilities().canLink()) {
+            meta.getLinkedInventory().ifPresent(pair -> tips.add(TooltipTranslation.GADGET_LINK_POS.componentTranslation(pair.getKey().toString())));
         }
 
         return tips;
