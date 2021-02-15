@@ -32,7 +32,7 @@ public final class TemplateHeader {
     /**
      * Must be updated for each new MC version :cry:
      */
-    public static final String HIGHEST_MC_VERSION = "1.16.4";
+    public static final String HIGHEST_MC_VERSION = "1.16.5";
 
     /**
      * The lowest possible minecraft version we support. This could be lower but seeing as the mod only uses
