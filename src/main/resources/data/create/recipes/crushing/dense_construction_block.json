@@ -1,0 +1,27 @@
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:crushing",
+  "group": "minecraft:misc",
+  "ingredients": [
+    {
+      "item": "buildinggadgets:construction_block_dense"
+    }
+  ],
+  "results": [
+    {
+      "item": "buildinggadgets:construction_paste",
+      "count": 4
+    },
+    {
+      "item": "buildinggadgets:construction_paste",
+      "count": 1,
+      "chance": 0.1
+    }
+  ],
+  "processingTime": 50
+}

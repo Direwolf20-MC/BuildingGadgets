@@ -31,6 +31,10 @@ public class ConstructionBlockTileEntity extends TileEntity {
     @Nonnull
     @Override
     public IModelData getModelData() {
+        if (blockState == null) {
+            return super.getModelData();
+        }
+
         BlockState state = blockState.getState();
         return new ModelDataMap.Builder().withInitial(FACADE_STATE, state).build();
     }

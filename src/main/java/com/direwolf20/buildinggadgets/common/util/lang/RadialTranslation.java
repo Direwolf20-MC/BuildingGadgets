@@ -11,6 +11,7 @@ public enum RadialTranslation implements ITranslationProvider {
     CONNECTED_AREA("connected_area"),
     CONNECTED_SURFACE("connected_surface"),
     OPEN_GUI("open_gui"),
+    OPEN_MATERIAL_LIST("open_material-list"),
     RAYTRACE_FLUID("raytrace_fluid"),
     PLACE_ON_TOP("place_on_top"),
     ANCHOR("anchor"),

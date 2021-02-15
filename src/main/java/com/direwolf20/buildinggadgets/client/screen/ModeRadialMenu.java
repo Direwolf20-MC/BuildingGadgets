@@ -167,6 +167,16 @@ public class ModeRadialMenu extends Screen {
                     getMinecraft().displayGuiScreen(new PasteGUI(tool));
                 return true;
             }));
+            addButton(new PositionedIconActionable(RadialTranslation.OPEN_MATERIAL_LIST, "copypaste_materiallist", right, send -> {
+                if (!send)
+                    return false;
+
+                assert getMinecraft().player != null;
+
+                getMinecraft().player.closeScreen();
+                getMinecraft().displayGuiScreen(new MaterialListGUI(tool));
+                return true;
+            }));
         }
         addButton(new PositionedIconActionable(RadialTranslation.RAYTRACE_FLUID, "raytrace_fluid", right, send -> {
             if (send)

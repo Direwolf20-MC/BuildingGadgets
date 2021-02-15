@@ -6,18 +6,18 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
-import com.direwolf20.buildinggadgets.common.tainted.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerTemplateCreated;
+import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObject;
-import com.direwolf20.buildinggadgets.common.items.OurItems;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketTemplateManagerTemplateCreated;
 import com.direwolf20.buildinggadgets.common.tainted.template.*;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider.IUpdateListener;
 import com.direwolf20.buildinggadgets.common.tileentities.TemplateManagerTileEntity;
@@ -61,7 +61,6 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -76,7 +75,6 @@ import java.awt.*;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
@@ -550,7 +548,6 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }
 
         runAfterUpdate(0, () -> { //we are copying form 0 to 1 => slot 0 needs to be the recent one
-            System.out.println("hi");
             templateProvider.ifPresent(provider -> {
                 left.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                     Template templateToSave = provider.getTemplateForKey(key).withName(nameField.getText());
@@ -615,7 +612,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         String CBString = getMinecraft().keyboardListener.getClipboardString();
         if (GadgetUtils.mightBeLink(CBString)) {
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.RED), false);
+            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_LINK_COPIED.componentTranslation().setStyle(Styles.RED), false);
             return;
         }
 

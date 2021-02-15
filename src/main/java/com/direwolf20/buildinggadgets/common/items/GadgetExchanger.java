@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
+
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.BuildRender;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
@@ -70,8 +72,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
 public class GadgetExchanger extends AbstractGadget {
     private static final MockBuilderWorld fakeWorld = new MockBuilderWorld();
@@ -213,10 +213,11 @@ public class GadgetExchanger extends AbstractGadget {
         // Don't attempt to do anything if we can't actually do it.
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
         TileEntity tileEntity = world.getTileEntity(lookingAt.getPos());
-        Block lookAtBlock = player.world.getBlockState(lookingAt.getPos()).getBlock();
+        BlockState lookingAtState = player.world.getBlockState(lookingAt.getPos());
+        Block lookAtBlock = lookingAtState.getBlock();
         if (blockData.getState() == Blocks.AIR.getDefaultState()
                 || lookAtBlock == OurBlocks.EFFECT_BLOCK.get()
-                || blockData.getState().getBlock() == lookAtBlock
+                || blockData.getState() == lookingAtState
                 || tileEntity != null) {
             return;
         }

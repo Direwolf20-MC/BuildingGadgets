@@ -77,6 +77,7 @@
   "buildinggadgets.radialmenu.connected_area": "Connected Area",
   "buildinggadgets.radialmenu.connected_surface": "Connected Surface",
   "buildinggadgets.radialmenu.open_gui": "Open Gui",
+  "buildinggadgets.radialmenu.open_material-list": "Open Material List",
   "buildinggadgets.radialmenu.raytrace_fluid": "Raytrace Fluid",
   "buildinggadgets.radialmenu.place_on_top": "Place on Top",
   "buildinggadgets.radialmenu.anchor": "Anchor",

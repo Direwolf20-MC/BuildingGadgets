@@ -119,8 +119,15 @@ public class EffectBlock extends Block {
     private static void spawnEffectBlock(@Nullable TileEntity curTe, BlockState curState, IWorld world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
         BlockState state = OurBlocks.EFFECT_BLOCK.get().getDefaultState();
         world.setBlockState(spawnPos, state, 3);
-        assert world.getTileEntity(spawnPos) != null;
-        ((EffectBlockTileEntity) world.getTileEntity(spawnPos)).initializeData(curState, curTe, spawnBlock, mode, usePaste);
+
+        TileEntity tile = world.getTileEntity(spawnPos);
+        if (!(tile instanceof EffectBlockTileEntity)) {
+            // Fail safely by replacing with air. Kinda voids but meh...
+            world.setBlockState(spawnPos, Blocks.AIR.getDefaultState(), 3);
+            return;
+        }
+
+        ((EffectBlockTileEntity) tile).initializeData(curState, curTe, spawnBlock, mode, usePaste);
         // Send data to client
         if (world instanceof World)
             ((World) world).notifyBlockUpdate(spawnPos, state, state, Constants.BlockFlags.DEFAULT);

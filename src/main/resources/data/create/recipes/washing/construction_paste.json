@@ -1,0 +1,21 @@
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:splashing",
+  "group": "minecraft:misc",
+  "ingredients": [
+    {
+      "item": "buildinggadgets:construction_block_powder"
+    }
+  ],
+  "results": [
+    {
+      "item": "buildinggadgets:construction_block_dense",
+      "count": 1
+    }
+  ]
+}

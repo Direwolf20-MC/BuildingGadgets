@@ -7,7 +7,10 @@ import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.particle.DiggingParticle;
+import net.minecraft.client.particle.ParticleManager;
 import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.pathfinding.PathType;
 import net.minecraft.state.BooleanProperty;
@@ -15,7 +18,10 @@ import net.minecraft.state.Property;
 import net.minecraft.state.StateContainer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
@@ -24,9 +30,9 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
+import java.util.Random;
 
 //@Optional.Interface(iface = "team.chisel.ctm.api.IFacade", modid = "ctm-api")
 public class ConstructionBlock extends Block /*implements IFacade*/ {
@@ -36,8 +42,55 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public static final Property<Boolean> AMBIENT_OCCLUSION = BooleanProperty.create("ambient_occlusion");
 
     public ConstructionBlock() {
-        super(Block.Properties.create(Material.SAND).hardnessAndResistance(2f, 0f).harvestTool(ToolType.SHOVEL));
+        super(Block.Properties.create(Material.SAND).hardnessAndResistance(1.5F, 6.0F));
         setDefaultState(this.getStateContainer().getBaseState().with(BRIGHT, true).with(NEIGHBOR_BRIGHTNESS, false).with(AMBIENT_OCCLUSION, false));
+    }
+
+    @Override
+    public boolean addDestroyEffects(BlockState state, World world, BlockPos pos, ParticleManager manager) {
+        TileEntity tileEntity = world.getTileEntity(pos);
+        if (!(tileEntity instanceof ConstructionBlockTileEntity)) {
+            return super.addDestroyEffects(state, world, pos, manager);
+        }
+
+        manager.addBlockDestroyEffects(pos, tileEntity.getBlockState());
+        return true;
+    }
+
+    @Override
+    public boolean addHitEffects(BlockState state, World world, RayTraceResult target, ParticleManager manager) {
+        if (target.getType() != RayTraceResult.Type.BLOCK) {
+            return super.addHitEffects(state, world, target, manager);
+        }
+
+        BlockPos pos = ((BlockRayTraceResult) target).getPos();
+        TileEntity tileEntity = world.getTileEntity(pos);
+        if (!(tileEntity instanceof ConstructionBlockTileEntity)) {
+            return super.addHitEffects(state, world, target, manager);
+        }
+
+        this.addBlockHitEffects(world, pos, tileEntity.getBlockState(), ((BlockRayTraceResult) target).getFace(), manager);
+        return true;
+    }
+
+    /**
+     * Stolen from the particle manager to handle the custom state (minified code a bit)
+     */
+    public void addBlockHitEffects(World world, BlockPos pos, BlockState blockstate, Direction side, ParticleManager manager) {
+        if (blockstate.getRenderType() == BlockRenderType.INVISIBLE) return;
+        Random rand = new Random();
+        int i = pos.getX(), j = pos.getY(), k = pos.getZ();
+        AxisAlignedBB axisalignedbb = blockstate.getShape(world, pos).getBoundingBox();
+        double x = (double)i + rand.nextDouble() * (axisalignedbb.maxX - axisalignedbb.minX - (double)0.2F) + (double)0.1F + axisalignedbb.minX;
+        double y = (double)j + rand.nextDouble() * (axisalignedbb.maxY - axisalignedbb.minY - (double)0.2F) + (double)0.1F + axisalignedbb.minY;
+        double z = (double)k + rand.nextDouble() * (axisalignedbb.maxZ - axisalignedbb.minZ - (double)0.2F) + (double)0.1F + axisalignedbb.minZ;
+        if (side == Direction.DOWN || side == Direction.UP)
+            y = side == Direction.DOWN ? (double)j + axisalignedbb.minY - (double)0.1F : (double)j + axisalignedbb.maxY + (double)0.1F;
+        if (side == Direction.NORTH || side == Direction.SOUTH)
+            z = side == Direction.NORTH ? (double)k + axisalignedbb.minZ - (double)0.1F : (double)k + axisalignedbb.maxZ + (double)0.1F;
+        if (side == Direction.WEST || side == Direction.EAST)
+            x = side == Direction.WEST ? (double)i + axisalignedbb.minX - (double)0.1F : (double)i + axisalignedbb.maxX + (double)0.1F;
+        manager.addEffect((new DiggingParticle((ClientWorld) world, x, y, z, 0.0D, 0.0D, 0.0D, blockstate)).setBlockPos(pos).multiplyVelocity(0.2F).multiplyParticleScaleBy(0.6F));
     }
 
     @Override

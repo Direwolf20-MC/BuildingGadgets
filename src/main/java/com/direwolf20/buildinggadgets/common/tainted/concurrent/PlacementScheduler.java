@@ -2,13 +2,19 @@ package com.direwolf20.buildinggadgets.common.tainted.concurrent;
 
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock.Mode;
-import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.PlacementChecker;
 import com.direwolf20.buildinggadgets.common.tainted.building.PlacementChecker.CheckResult;
+import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
+import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.tainted.save.Undo;
 import com.direwolf20.buildinggadgets.common.tainted.save.Undo.Builder;
 import com.google.common.base.Preconditions;
+import net.minecraft.block.DoorBlock;
+import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.state.properties.DoubleBlockHalf;
 
 import java.util.Objects;
 import java.util.Spliterator;
@@ -69,6 +75,12 @@ public final class PlacementScheduler extends SteppedScheduler {
         if (lastWasSuccess) {
             undoBuilder.record(view.getContext().getWorld(), target.getPos(), target.getData(), res.getMatch().getChosenOption(), res.getInsertedItems());
             EffectBlock.spawnEffectBlock(view.getContext(), target, Mode.PLACE, res.isUsingPaste());
+
+            BuildContext context = view.getContext();
+            BlockData targetBlock = target.getData();
+            if (target.getData().getState().getBlock() instanceof DoorBlock && targetBlock.getState().get(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER && context.getWorld().isAirBlock(target.getPos().up())) {
+                EffectBlock.spawnEffectBlock(context.getWorld(), target.getPos().up(), new BlockData(targetBlock.getState().with(BlockStateProperties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.UPPER), TileSupport.dummyTileEntityData()), Mode.PLACE, false);
+            }
         }
     }
 }

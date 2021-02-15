@@ -1,0 +1,26 @@
+{
+  "conditions": [
+    {
+      "type": "forge:mod_loaded",
+      "modid": "create"
+    }
+  ],
+  "type": "create:milling",
+  "ingredients": [
+    {
+      "item": "buildinggadgets:construction_block_dense"
+    }
+  ],
+  "results": [
+    {
+      "item": "buildinggadgets:construction_paste",
+      "count": 3
+    },
+    {
+      "item": "buildinggadgets:construction_paste",
+      "count": 1,
+      "chance": 0.1
+    }
+  ],
+  "processingTime": 50
+}
