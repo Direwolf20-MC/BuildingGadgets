@@ -18,13 +18,16 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.*;
+import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.state.Property;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.state.properties.DoubleBlockHalf;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -267,11 +270,18 @@ public class InventoryHelper {
         BlockState state = world.getBlockState(pos);
         if (state.getBlock() instanceof FlowingFluidBlock)
             return Optional.empty();
+
         if (state.getBlock() == OurBlocks.CONSTRUCTION_BLOCK.get()) {
             TileEntity te = world.getTileEntity(pos);
             if (te instanceof ConstructionBlockTileEntity) //should already be checked
                 return Optional.of(((ConstructionBlockTileEntity) te).getConstructionBlockData());
         }
+
+        // Support doors
+        if (state.getBlock() instanceof DoorBlock && state.get(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.UPPER) {
+            return Optional.empty();
+        }
+
         BlockState placeState = state.getBlock().getDefaultState();
         for (Property<?> prop : placeState.getProperties()) {
             if (BASE_UNSAFE_PROPERTIES.contains(prop) || !isCopyPasteGadget && UNSAFE_PROPERTIES.contains(prop)) {
@@ -279,7 +289,6 @@ public class InventoryHelper {
             }
             placeState = applyProperty(placeState, state, prop);
         }
-
 
         return Optional.of(new BlockData(placeState, TileSupport.createTileData(world, pos)));
     }
