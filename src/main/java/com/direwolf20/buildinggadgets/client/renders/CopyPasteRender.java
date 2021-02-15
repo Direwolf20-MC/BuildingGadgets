@@ -1,5 +1,7 @@
 package com.direwolf20.buildinggadgets.client.renders;
 
+import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
+
 import com.direwolf20.buildinggadgets.client.renderer.DireBufferBuilder;
 import com.direwolf20.buildinggadgets.client.renderer.DireVertexBuffer;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
@@ -43,8 +45,6 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 import java.io.Closeable;
 import java.util.*;
 import java.util.function.Consumer;
-
-import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 
 public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
     private MultiVBORenderer renderBuffer;
@@ -180,13 +180,10 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
 //        List<BlockPos> blockPosList = sorter.getSortedTargets().stream().map(PlacementTarget::getPos).collect(Collectors.toList());
 
         tickTrack = 0;
-//        System.out.println("Creating cache");
         if (renderBuffer != null) //Reset Render Buffer before rebuilding
             renderBuffer.close();
 
         renderBuffer = MultiVBORenderer.of((buffer) -> {
-//            System.out.println("Building again");
-
             IVertexBuilder builder = buffer.getBuffer(OurRenderTypes.RenderBlock);
             IVertexBuilder noDepthbuilder = buffer.getBuffer(OurRenderTypes.CopyPasteRenderBlock);
 
