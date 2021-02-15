@@ -30,7 +30,6 @@ import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
 import java.util.Random;
@@ -43,7 +42,7 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     public static final Property<Boolean> AMBIENT_OCCLUSION = BooleanProperty.create("ambient_occlusion");
 
     public ConstructionBlock() {
-        super(Block.Properties.create(Material.SAND).hardnessAndResistance(2f, 0f).harvestTool(ToolType.SHOVEL));
+        super(Block.Properties.create(Material.SAND).hardnessAndResistance(1.5F, 6.0F));
         setDefaultState(this.getStateContainer().getBaseState().with(BRIGHT, true).with(NEIGHBOR_BRIGHTNESS, false).with(AMBIENT_OCCLUSION, false));
     }
 

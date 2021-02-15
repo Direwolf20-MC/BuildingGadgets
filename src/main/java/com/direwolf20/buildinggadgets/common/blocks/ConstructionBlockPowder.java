@@ -15,16 +15,15 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class ConstructionBlockPowder extends FallingBlock {
     public ConstructionBlockPowder() {
-        super(Block.Properties.create(Material.SAND).hardnessAndResistance(10f));
+        super(Block.Properties.create(Material.SAND).hardnessAndResistance(0.5F).harvestTool(ToolType.SHOVEL));
     }
 
     @Override
