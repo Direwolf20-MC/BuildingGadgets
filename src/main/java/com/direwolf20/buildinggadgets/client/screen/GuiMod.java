@@ -17,7 +17,7 @@ public enum GuiMod {
     COPY(GadgetCopyPaste::getGadget, stack -> () -> new CopyGUI(stack)),
     PASTE(GadgetCopyPaste::getGadget, stack -> () -> new PasteGUI(stack)),
     DESTRUCTION(GadgetDestruction::getGadget, stack -> () -> new DestructionGUI(stack)),
-    MATERIAL_LIST(TemplateItem::getTemplateItem, stack -> () -> new MaterialListGUI(stack));
+    MATERIAL_LIST(TemplateItem::getTemplateItem, stack -> () -> new ChangeMaterialsScreen(stack));
 
     private Function<PlayerEntity, ItemStack> stackReader;
     private Function<ItemStack, Supplier<? extends Screen>> clientScreenProvider;

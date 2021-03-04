@@ -72,6 +72,10 @@ public final class Template {
         this(ImmutableMap.of(), TemplateHeader.builder(Region.singleZero()).build());
     }
 
+    public ImmutableMap<BlockPos, BlockData> getMap() {
+        return map;
+    }
+
     public TemplateHeader getHeaderAndForceMaterials(BuildContext context) {
         if (header.getRequiredItems() == null) {
             MaterialList materialList = CommonUtils.estimateRequiredItems(
