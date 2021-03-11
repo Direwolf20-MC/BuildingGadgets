@@ -23,68 +23,68 @@ public class OurRenderTypes extends RenderType {
 
     private static final LineState THICK_LINES = new LineState(OptionalDouble.of(3.0D));
 
-    public static final RenderType RenderBlock = makeType("GadgetRenderBlock",
+    public static final RenderType RenderBlock = create("GadgetRenderBlock",
             DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 256,
-            RenderType.State.getBuilder()
-                    .shadeModel(SHADE_ENABLED)
-                    .lightmap(LIGHTMAP_ENABLED)
-                    .texture(BLOCK_SHEET_MIPPED) //BLOCK_SHEET_MIPPED (mcp) = BLOCK_SHEET_MIPPED (yarn)
-                    .layer(field_239235_M_) // view_offset_z_layering
-                    .transparency(TRANSLUCENT_TRANSPARENCY)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_DISABLED)
-                    .writeMask(COLOR_DEPTH_WRITE)
-                    .build(false));
+            RenderType.State.builder()
+                    .setShadeModelState(SMOOTH_SHADE)
+                    .setLightmapState(LIGHTMAP)
+                    .setTextureState(BLOCK_SHEET_MIPPED) //BLOCK_SHEET_MIPPED (mcp) = BLOCK_SHEET_MIPPED (yarn)
+                    .setLayeringState(VIEW_OFFSET_Z_LAYERING) // view_offset_z_layering
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setDepthTestState(LEQUAL_DEPTH_TEST)
+                    .setCullState(NO_CULL)
+                    .setWriteMaskState(COLOR_DEPTH_WRITE)
+                    .createCompositeState(false));
 
-    public static final RenderType MissingBlockOverlay = makeType("GadgetMissingBlockOverlay",
+    public static final RenderType MissingBlockOverlay = create("GadgetMissingBlockOverlay",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 256,
-            RenderType.State.getBuilder()
-                    .layer(field_239235_M_) // view_offset_z_layering
-                    .transparency(TRANSLUCENT_TRANSPARENCY)
-                    .texture(NO_TEXTURE)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_DISABLED)
-                    .lightmap(LIGHTMAP_DISABLED)
-                    .writeMask(COLOR_WRITE)
-                    .build(false));
+            RenderType.State.builder()
+                    .setLayeringState(VIEW_OFFSET_Z_LAYERING) // view_offset_z_layering
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setTextureState(NO_TEXTURE)
+                    .setDepthTestState(LEQUAL_DEPTH_TEST)
+                    .setCullState(NO_CULL)
+                    .setLightmapState(NO_LIGHTMAP)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(false));
 
-    public static final RenderType CopyGadgetLines = makeType("GadgetCopyLines",
+    public static final RenderType CopyGadgetLines = create("GadgetCopyLines",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINE_STRIP, 256,
-            RenderType.State.getBuilder()
-                    .line(new LineState(OptionalDouble.of(2.0D)))
-                    .layer(field_239235_M_) // view_offset_z_layering
-                    .transparency(TRANSLUCENT_TRANSPARENCY)
-                    .texture(NO_TEXTURE)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_DISABLED)
-                    .lightmap(LIGHTMAP_DISABLED)
-                    .writeMask(COLOR_WRITE)
-                    .build(false));
+            RenderType.State.builder()
+                    .setLineState(new LineState(OptionalDouble.of(2.0D)))
+                    .setLayeringState(VIEW_OFFSET_Z_LAYERING) // view_offset_z_layering
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setTextureState(NO_TEXTURE)
+                    .setDepthTestState(LEQUAL_DEPTH_TEST)
+                    .setCullState(NO_CULL)
+                    .setLightmapState(NO_LIGHTMAP)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(false));
 
-    public static final RenderType CopyPasteRenderBlock = makeType("CopyPasteRenderBlock",
+    public static final RenderType CopyPasteRenderBlock = create("CopyPasteRenderBlock",
             DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 256,
-            RenderType.State.getBuilder()
-                    .shadeModel(SHADE_ENABLED)
-                    .lightmap(LIGHTMAP_ENABLED)
-                    .texture(BLOCK_SHEET_MIPPED) //BLOCK_SHEET_MIPPED (mcp) = BLOCK_SHEET_MIPPED (yarn)
-                    .layer(field_239235_M_) // view_offset_z_layering
-                    .transparency(TRANSLUCENT_TRANSPARENCY)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_DISABLED)
-                    .writeMask(COLOR_WRITE)
-                    .build(false));
+            RenderType.State.builder()
+                    .setShadeModelState(SMOOTH_SHADE)
+                    .setLightmapState(LIGHTMAP)
+                    .setTextureState(BLOCK_SHEET_MIPPED) //BLOCK_SHEET_MIPPED (mcp) = BLOCK_SHEET_MIPPED (yarn)
+                    .setLayeringState(VIEW_OFFSET_Z_LAYERING) // view_offset_z_layering
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setDepthTestState(LEQUAL_DEPTH_TEST)
+                    .setCullState(NO_CULL)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(false));
 
-    public static final RenderType BlockOverlay = makeType("BGBlockOverlay",
+    public static final RenderType BlockOverlay = create("BGBlockOverlay",
             DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 256,
-            RenderType.State.getBuilder()
-                    .layer(field_239235_M_) // view_offset_z_layering
-                    .transparency(TRANSLUCENT_TRANSPARENCY)
-                    .texture(NO_TEXTURE)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_ENABLED)
-                    .lightmap(LIGHTMAP_DISABLED)
-                    .writeMask(COLOR_DEPTH_WRITE)
-                    .build(false));
+            RenderType.State.builder()
+                    .setLayeringState(VIEW_OFFSET_Z_LAYERING) // view_offset_z_layering
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setTextureState(NO_TEXTURE)
+                    .setDepthTestState(LEQUAL_DEPTH_TEST)
+                    .setCullState(CULL)
+                    .setLightmapState(NO_LIGHTMAP)
+                    .setWriteMaskState(COLOR_DEPTH_WRITE)
+                    .createCompositeState(false));
 
     /**
      * This is used for rendering blocks with an alpha value as the alpha currently isn't
@@ -109,13 +109,13 @@ public class OurRenderTypes extends RenderType {
             RenderType localType = type;
             if (localType instanceof Type) {
                 // all of this requires a lot of AT's so be aware of that on ports
-                ResourceLocation texture = ((Type) localType).renderState.texture.texture
-                        .orElse(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+                ResourceLocation texture = ((Type) localType).state.textureState.texture
+                        .orElse(PlayerContainer.BLOCK_ATLAS);
 
-                localType = getEntityTranslucentCull(texture);
+                localType = entityTranslucentCull(texture);
             }
-            else if (localType.toString().equals(Atlases.getTranslucentCullBlockType().toString())) {
-                localType = Atlases.getTranslucentCullBlockType();
+            else if (localType.toString().equals(Atlases.translucentCullBlockSheet().toString())) {
+                localType = Atlases.translucentCullBlockSheet();
             }
 
             return new MultiplyAlphaVertexBuilder(inner.getBuffer(localType), this.constantAlpha);
@@ -136,15 +136,15 @@ public class OurRenderTypes extends RenderType {
             }
 
             @Override
-            public IVertexBuilder pos(double x, double y, double z)
+            public IVertexBuilder vertex(double x, double y, double z)
             {
-                return inner.pos(x,y,z);
+                return inner.vertex(x,y,z);
             }
 
             @Override
-            public IVertexBuilder pos(Matrix4f matrixIn, float x, float y, float z)
+            public IVertexBuilder vertex(Matrix4f matrixIn, float x, float y, float z)
             {
-                return inner.pos(matrixIn, x, y, z);
+                return inner.vertex(matrixIn, x, y, z);
             }
 
             @Override
@@ -154,21 +154,21 @@ public class OurRenderTypes extends RenderType {
             }
 
             @Override
-            public IVertexBuilder tex(float u, float v) {
-                return inner.tex(u, v);
+            public IVertexBuilder uv(float u, float v) {
+                return inner.uv(u, v);
             }
 
             @Override
-            public IVertexBuilder overlay(int u, int v)
+            public IVertexBuilder overlayCoords(int u, int v)
             {
-                return inner.overlay(u, v);
+                return inner.overlayCoords(u, v);
             }
 
 
             @Override
-            public IVertexBuilder lightmap(int u, int v)
+            public IVertexBuilder uv2(int u, int v)
             {
-                return inner.lightmap(u, v);
+                return inner.uv2(u, v);
             }
 
             @Override

@@ -5,6 +5,11 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 
 import static net.minecraftforge.common.ForgeConfigSpec.*;
 
+import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
+import net.minecraftforge.common.ForgeConfigSpec.Builder;
+import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
+import net.minecraftforge.common.ForgeConfigSpec.IntValue;
+
 @EventBusSubscriber
 public class Config {
     private static final Builder SERVER_BUILDER = new Builder();

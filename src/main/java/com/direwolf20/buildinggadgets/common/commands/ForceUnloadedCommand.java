@@ -34,7 +34,7 @@ public class ForceUnloadedCommand {
 
     public static LiteralArgumentBuilder<CommandSource> registerToggle() {
         return Commands.literal("ForceLoadChunks")
-                .requires(commandSource -> commandSource.hasPermissionLevel(2))
+                .requires(commandSource -> commandSource.hasPermission(2))
                 .then(Commands.argument("player", EntityArgument.player())
                         .executes(context -> executeToggle(context, EntityArgument.getPlayer(context, "player")))
                 );
@@ -42,7 +42,7 @@ public class ForceUnloadedCommand {
 
     public static LiteralArgumentBuilder<CommandSource> registerList() {
         return Commands.literal("ForceLoadChunksList")
-                .requires(commandSource -> commandSource.hasPermissionLevel(2))
+                .requires(commandSource -> commandSource.hasPermission(2))
                 .executes(ForceUnloadedCommand::executeList);
     }
 

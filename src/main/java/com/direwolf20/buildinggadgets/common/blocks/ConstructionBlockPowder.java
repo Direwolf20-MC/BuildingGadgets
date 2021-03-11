@@ -23,34 +23,34 @@ import java.util.List;
 
 public class ConstructionBlockPowder extends FallingBlock {
     public ConstructionBlockPowder() {
-        super(Block.Properties.create(Material.SAND).hardnessAndResistance(0.5F).harvestTool(ToolType.SHOVEL));
+        super(Block.Properties.of(Material.SAND).strength(0.5F).harvestTool(ToolType.SHOVEL));
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+    public void appendHoverText(ItemStack stack, @Nullable IBlockReader worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
         tooltip.add(TooltipTranslation.CONSTRUCTIONBLOCKPOWDER_HELPTEXT.componentTranslation());
     }
 
     @Override
-    public void onEndFalling(World worldIn, BlockPos pos, BlockState p_176502_3_, BlockState p_176502_4_, FallingBlockEntity p_176502_5_) {
-        if (worldIn.getFluidState(pos).isTagged(FluidTags.WATER))
-            worldIn.addEntity(new ConstructionBlockEntity(worldIn, pos, true));
+    public void onLand(World worldIn, BlockPos pos, BlockState p_176502_3_, BlockState p_176502_4_, FallingBlockEntity p_176502_5_) {
+        if (worldIn.getFluidState(pos).is(FluidTags.WATER))
+            worldIn.addFreshEntity(new ConstructionBlockEntity(worldIn, pos, true));
     }
 
     private boolean tryTouchWater(World worldIn, BlockPos pos) {
         boolean foundWater = false;
 
         for (Direction enumFacing : Direction.values()) {
-            if (enumFacing != Direction.DOWN && worldIn.getFluidState(pos.offset(enumFacing)).isTagged(FluidTags.WATER)) {
+            if (enumFacing != Direction.DOWN && worldIn.getFluidState(pos.relative(enumFacing)).is(FluidTags.WATER)) {
                 foundWater = true;
                 break;
             }
         }
 
         if (foundWater) {
-            if (worldIn.getEntitiesWithinAABB(ConstructionBlockEntity.class, new AxisAlignedBB(pos.getX() - 0.5, pos.getY() - 0.5, pos.getZ() - 0.5, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)).isEmpty()) {
-                worldIn.addEntity(new ConstructionBlockEntity(worldIn, pos, true));
+            if (worldIn.getEntitiesOfClass(ConstructionBlockEntity.class, new AxisAlignedBB(pos.getX() - 0.5, pos.getY() - 0.5, pos.getZ() - 0.5, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)).isEmpty()) {
+                worldIn.addFreshEntity(new ConstructionBlockEntity(worldIn, pos, true));
             }
         }
 
@@ -63,14 +63,14 @@ public class ConstructionBlockPowder extends FallingBlock {
     }
 
     @Override
-    public void onBlockAdded(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean __a) {
+    public void onPlace(BlockState state, World worldIn, BlockPos pos, BlockState oldState, boolean __a) {
         if (!this.tryTouchWater(worldIn, pos)) {
-            super.onBlockAdded(state, worldIn, pos, oldState, __a);
+            super.onPlace(state, worldIn, pos, oldState, __a);
         }
     }
 
     @Override
-    public int getOpacity(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public int getLightBlock(BlockState state, IBlockReader worldIn, BlockPos pos) {
         return 0;
     }
 

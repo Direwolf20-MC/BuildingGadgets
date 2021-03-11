@@ -27,11 +27,11 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
         glEnable(GL_SCISSOR_TEST);
-        double guiScaleFactor = Minecraft.getInstance().getMainWindow().getGuiScaleFactor();
+        double guiScaleFactor = Minecraft.getInstance().getWindow().getGuiScale();
 
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         GL11.glScissor((int)(getLeft()  * guiScaleFactor),
-                (int)(Minecraft.getInstance().getMainWindow().getFramebufferHeight() - (getBottom() * guiScaleFactor)),
+                (int)(Minecraft.getInstance().getWindow().getHeight() - (getBottom() * guiScaleFactor)),
                 (int)(width * guiScaleFactor),
                 (int)(height * guiScaleFactor));
 
@@ -45,7 +45,7 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
         RenderSystem.disableLighting();
         RenderSystem.disableFog();
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
+        BufferBuilder bufferbuilder = tessellator.getBuilder();
 
         renderContentBackground(matrices, tessellator, bufferbuilder);
 
@@ -69,21 +69,21 @@ public class EntryList<E extends AbstractListEntry<E>> extends ExtendedList<E> {
 
             RenderSystem.disableTexture();
             bufferbuilder.begin(GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-            bufferbuilder.pos(x1, getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.pos(x2, getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.pos(x2, getTop(), 0.0D).color(0, 0, 0, 255).endVertex();
-            bufferbuilder.pos(x1, getTop(), 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(x1, getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(x2, getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(x2, getTop(), 0.0D).color(0, 0, 0, 255).endVertex();
+            bufferbuilder.vertex(x1, getTop(), 0.0D).color(0, 0, 0, 255).endVertex();
 
-            bufferbuilder.pos(x1, (l1 + k1), 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.pos(x2, (l1 + k1), 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.pos(x2, l1, 0.0D).color(128, 128, 128, 255).endVertex();
-            bufferbuilder.pos(x1, l1, 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(x1, (l1 + k1), 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(x2, (l1 + k1), 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(x2, l1, 0.0D).color(128, 128, 128, 255).endVertex();
+            bufferbuilder.vertex(x1, l1, 0.0D).color(128, 128, 128, 255).endVertex();
 
-            bufferbuilder.pos(x1, (l1 + k1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.pos((x2 - 1), (l1 + k1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.pos((x2 - 1), l1, 0.0D).color(192, 192, 192, 255).endVertex();
-            bufferbuilder.pos(x1, l1, 0.0D).color(192, 192, 192, 255).endVertex();
-            tessellator.draw();
+            bufferbuilder.vertex(x1, (l1 + k1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex((x2 - 1), (l1 + k1 - 1), 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex((x2 - 1), l1, 0.0D).color(192, 192, 192, 255).endVertex();
+            bufferbuilder.vertex(x1, l1, 0.0D).color(192, 192, 192, 255).endVertex();
+            tessellator.end();
         }
 
         renderDecorations(matrices, mouseX, mouseX);

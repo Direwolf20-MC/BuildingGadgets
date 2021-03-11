@@ -71,13 +71,13 @@ public class ConstructionPasteContainer extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        ItemStack heldItem = player.getHeldItem(hand);
-        player.setActiveHand(hand);
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+        ItemStack heldItem = player.getItemInHand(hand);
+        player.startUsingItem(hand);
         PlayerInventory inv = player.inventory;
-        if (!world.isRemote) {
+        if (!world.isClientSide) {
             for (int i = 0; i < 36; ++i) { // todo: this is awful. hardcoded int
-                ItemStack itemStack = inv.getStackInSlot(i);
+                ItemStack itemStack = inv.getItem(i);
                 if (itemStack.getItem() instanceof ConstructionPaste) {
                     InventoryHelper.addPasteToContainer(player, itemStack);
                 }
@@ -87,7 +87,7 @@ public class ConstructionPasteContainer extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flag) {
         TranslationTextComponent key = isCreative
                 ? TooltipTranslation.PASTECONTAINER_CREATIVE_AMOUNT.componentTranslation()
                 : TooltipTranslation.PASTECONTAINER_AMOUNT.componentTranslation(getPasteCount(stack), getMaxCapacity());

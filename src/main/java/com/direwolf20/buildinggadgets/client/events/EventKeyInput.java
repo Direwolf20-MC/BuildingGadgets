@@ -26,7 +26,7 @@ public class EventKeyInput {
         if (mc.player == null || event.phase == Phase.START)
             return;
 
-        if (KeyBindings.materialList.isDown()) {
+        if (KeyBindings.materialList.consumeClick()) {
             GuiMod.MATERIAL_LIST.openScreen(mc.player);
             return;
         }
@@ -36,20 +36,20 @@ public class EventKeyInput {
             return;
 
         KeyBinding mode = KeyBindings.menuSettings;
-        if (!(mc.screen instanceof ModeRadialMenu) && mode.isDown() && ((mode.getKeyModifier() == KeyModifier.NONE
+        if (!(mc.screen instanceof ModeRadialMenu) && mode.consumeClick() && ((mode.getKeyModifier() == KeyModifier.NONE
                 && KeyModifier.getActiveModifier() == KeyModifier.NONE) || mode.getKeyModifier() != KeyModifier.NONE)) {
                 mc.setScreen(new ModeRadialMenu(tool));
-        } else if (KeyBindings.range.isDown()) {
+        } else if (KeyBindings.range.consumeClick()) {
             PacketHandler.sendToServer(new PacketChangeRange());
-        } else if (KeyBindings.rotateMirror.isDown()) {
+        } else if (KeyBindings.rotateMirror.consumeClick()) {
             PacketHandler.sendToServer(new PacketRotateMirror());
-        } else if (KeyBindings.undo.isDown()) {
+        } else if (KeyBindings.undo.consumeClick()) {
             PacketHandler.sendToServer(new PacketUndo());
-        } else if (KeyBindings.anchor.isDown()) {
+        } else if (KeyBindings.anchor.consumeClick()) {
             PacketHandler.sendToServer(new PacketAnchor());
-        } else if (KeyBindings.fuzzy.isDown()) {
+        } else if (KeyBindings.fuzzy.consumeClick()) {
             PacketHandler.sendToServer(new PacketToggleFuzzy());
-        } else if (KeyBindings.connectedArea.isDown()) {
+        } else if (KeyBindings.connectedArea.consumeClick()) {
             PacketHandler.sendToServer(new PacketToggleConnectedArea());
         }
     }

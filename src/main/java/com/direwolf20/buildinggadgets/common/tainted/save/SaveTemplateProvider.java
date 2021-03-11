@@ -19,6 +19,8 @@ import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider.IUpdateListener;
+
 public final class SaveTemplateProvider implements ITemplateProvider {
     private final Supplier<TemplateSave> save;
     private final Set<IUpdateListener> updateListeners;

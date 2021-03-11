@@ -40,7 +40,7 @@ final class AllowPlayerOverrideManager {
     }
 
     void toggleAllowOverride(PlayerEntity player) {
-        toggleAllowOverride(player.getUniqueID());
+        toggleAllowOverride(player.getUUID());
     }
 
     void toggleAllowOverride(UUID uuid) {
@@ -57,16 +57,16 @@ final class AllowPlayerOverrideManager {
     }
 
     boolean mayOverride(PlayerEntity player) {
-        return mayOverride(player.getUniqueID());
+        return mayOverride(player.getUUID());
     }
 
     int executeToggle(CommandContext<CommandSource> context, PlayerEntity player) {
         if (player == null) {
-            context.getSource().sendErrorMessage(noPlayerTranslation.componentTranslation().setStyle(Styles.RED));
+            context.getSource().sendFailure(noPlayerTranslation.componentTranslation().setStyle(Styles.RED));
             return 0;
         }
         toggleAllowOverride(player);
-        context.getSource().sendFeedback(toggledTranslation.componentTranslation(player.getDisplayName(), mayOverride(player))
+        context.getSource().sendSuccess(toggledTranslation.componentTranslation(player.getDisplayName(), mayOverride(player))
                 .setStyle(Styles.AQUA), true);
         return 1;
     }
@@ -75,7 +75,7 @@ final class AllowPlayerOverrideManager {
         for (Map.Entry<UUID, Boolean> entry : allowPlayerOverrideCache.asMap().entrySet()) {
             TranslationTextComponent component = listTranslation.componentTranslation(entry.getKey(), entry.getValue());
             component = (TranslationTextComponent) (entry.getValue() ? component.setStyle(Styles.BLUE) : component.setStyle(Styles.DK_GREEN));
-            context.getSource().sendFeedback(component, true);
+            context.getSource().sendSuccess(component, true);
         }
         return 1;
     }

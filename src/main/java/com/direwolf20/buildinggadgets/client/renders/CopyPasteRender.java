@@ -68,12 +68,12 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
         super.render(evt, player, heldItem);
 
         // Provide this as both renders require the data.
-        Vector3d cameraView = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+        Vector3d cameraView = getMc().gameRenderer.getMainCamera().getPosition();
 
         // translate the matric to the projected view
         MatrixStack stack = evt.getMatrixStack(); //Get current matrix position from the evt call
-        stack.push(); //Save the render position from RenderWorldLast
-        stack.translate(-cameraView.getX(), -cameraView.getY(), -cameraView.getZ()); //Sets render position to 0,0,0
+        stack.pushPose(); //Save the render position from RenderWorldLast
+        stack.translate(-cameraView.x(), -cameraView.y(), -cameraView.z()); //Sets render position to 0,0,0
 
         if (GadgetCopyPaste.getToolMode(heldItem) == GadgetCopyPaste.ToolMode.COPY) {
             renderBuffer = null; //fix the surroundings not being taken into account when you've walked around a bit
@@ -82,7 +82,7 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
         } else
             renderPaste(stack, cameraView, player, heldItem);
 
-        stack.pop();
+        stack.popPose();
     }
 
     private void renderCopy(MatrixStack matrix, Region region) {
@@ -102,34 +102,34 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
 
         int R = 255, G = 223, B = 127;
 
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         IVertexBuilder builder = buffer.getBuffer(OurRenderTypes.CopyGadgetLines);
 
-        Matrix4f matrix4f = matrix.getLast().getMatrix();
-        builder.pos(matrix4f, x, y, z).color(G, G, G, 0.0F).endVertex();
-        builder.pos(matrix4f, x, y, z).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, y, z).color(G, B, B, R).endVertex();
-        builder.pos(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, x, y, z).color(B, B, G, R).endVertex();
-        builder.pos(matrix4f, x, dy, z).color(B, G, B, R).endVertex();
-        builder.pos(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, x, dy, z).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, y, z).color(G, G, G, R).endVertex();
-        builder.pos(matrix4f, dx, y, z).color(G, G, G, 0.0F).endVertex();
+        Matrix4f matrix4f = matrix.last().pose();
+        builder.vertex(matrix4f, x, y, z).color(G, G, G, 0.0F).endVertex();
+        builder.vertex(matrix4f, x, y, z).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, y, z).color(G, B, B, R).endVertex();
+        builder.vertex(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, x, y, z).color(B, B, G, R).endVertex();
+        builder.vertex(matrix4f, x, dy, z).color(B, G, B, R).endVertex();
+        builder.vertex(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, x, dy, z).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, x, dy, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, x, y, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, y, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, dy, dz).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, dy, z).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, y, z).color(G, G, G, R).endVertex();
+        builder.vertex(matrix4f, dx, y, z).color(G, G, G, 0.0F).endVertex();
 
-        buffer.finish(); // @mcp: draw = finish
+        buffer.endBatch(); // @mcp: draw = finish
     }
 
     private void renderPaste(MatrixStack matrices, Vector3d cameraView, PlayerEntity player, ItemStack heldItem) {
-        World world = player.world;
+        World world = player.level;
 
         // Check the template cap from the world
         // Fetch the template key (because for some reason this is it's own cap)
@@ -167,13 +167,13 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
                     Vector3d projectedView2 = projectedView;
                     Vector3d startPosView = new Vector3d(startPos.getX(), startPos.getY(), startPos.getZ());
                     projectedView2 = projectedView2.subtract(startPosView);
-                    renderBuffer.sort((float) projectedView2.getX(), (float) projectedView2.getY(), (float) projectedView2.getZ());
+                    renderBuffer.sort((float) projectedView2.x(), (float) projectedView2.y(), (float) projectedView2.z());
                 } catch (Exception ignored) {
                 }
             }
 
             matrix.translate(startPos.getX(), startPos.getY(), startPos.getZ());
-            renderBuffer.render(matrix.getLast().getMatrix()); //Actually draw whats in the buffer
+            renderBuffer.render(matrix.last().pose()); //Actually draw whats in the buffer
             return;
         }
 
@@ -187,20 +187,20 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
             IVertexBuilder builder = buffer.getBuffer(OurRenderTypes.RenderBlock);
             IVertexBuilder noDepthbuilder = buffer.getBuffer(OurRenderTypes.CopyPasteRenderBlock);
 
-            BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
+            BlockRendererDispatcher dispatcher = getMc().getBlockRenderer();
 
             MatrixStack stack = new MatrixStack(); //Create a new matrix stack for use in the buffer building process
-            stack.push(); //Save position
+            stack.pushPose(); //Save position
 
             for (PlacementTarget target : targets) {
                 BlockPos targetPos = target.getPos();
                 BlockState state = context.getWorld().getBlockState(target.getPos());
 
-                stack.push(); //Save position again
+                stack.pushPose(); //Save position again
                 //matrix.translate(-startPos.getX(), -startPos.getY(), -startPos.getZ());
                 stack.translate(targetPos.getX(), targetPos.getY(), targetPos.getZ());
 
-                IBakedModel ibakedmodel = dispatcher.getModelForState(state);
+                IBakedModel ibakedmodel = dispatcher.getBlockModel(state);
                 BlockColors blockColors = Minecraft.getInstance().getBlockColors();
                 int color = blockColors.getColor(state, context.getWorld(), targetPos, 0);
 
@@ -208,38 +208,38 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
                 float f1 = (float) (color >> 8 & 255) / 255.0F;
                 float f2 = (float) (color & 255) / 255.0F;
                 try {
-                    if (state.getRenderType() == BlockRenderType.MODEL) {
+                    if (state.getRenderShape() == BlockRenderType.MODEL) {
                         for (Direction direction : Direction.values()) {
-                            if (Block.shouldSideBeRendered(state, context.getWorld(), targetPos, direction) && !(context.getWorld().getBlockState(targetPos.offset(direction)).getBlock().equals(state.getBlock()))) {
-                                if (state.getMaterial().isOpaque()) {
-                                    renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                            if (Block.shouldRenderFace(state, context.getWorld(), targetPos, direction) && !(context.getWorld().getBlockState(targetPos.relative(direction)).getBlock().equals(state.getBlock()))) {
+                                if (state.getMaterial().isSolidBlocking()) {
+                                    renderModelBrightnessColorQuads(stack.last(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getSeed(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                                 } else {
-                                    renderModelBrightnessColorQuads(stack.getLast(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                                    renderModelBrightnessColorQuads(stack.last(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(MathHelper.getSeed(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                                 }
                             }
                         }
-                        if (state.getMaterial().isOpaque())
-                            renderModelBrightnessColorQuads(stack.getLast(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                        if (state.getMaterial().isSolidBlocking())
+                            renderModelBrightnessColorQuads(stack.last(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getSeed(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                         else
-                            renderModelBrightnessColorQuads(stack.getLast(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getPositionRandom(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
+                            renderModelBrightnessColorQuads(stack.last(), noDepthbuilder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, null, new Random(MathHelper.getSeed(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                     }
                 } catch (Exception e) {
                     BuildingGadgets.LOG.trace("Caught exception whilst rendering {}.", state, e);
                 }
 
-                stack.pop(); // Load the position we saved earlier
+                stack.popPose(); // Load the position we saved earlier
             }
-            stack.pop(); //Load after loop
+            stack.popPose(); //Load after loop
         });
 //        try {
-            Vector3d projectedView2 = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+            Vector3d projectedView2 = getMc().gameRenderer.getMainCamera().getPosition();
             Vector3d startPosView = new Vector3d(startPos.getX(), startPos.getY(), startPos.getZ());
             projectedView2 = projectedView2.subtract(startPosView);
-            renderBuffer.sort((float) projectedView2.getX(), (float) projectedView2.getY(), (float) projectedView2.getZ());
+            renderBuffer.sort((float) projectedView2.x(), (float) projectedView2.y(), (float) projectedView2.z());
 //        } catch (Exception ignored) {
 //        }
         matrix.translate(startPos.getX(), startPos.getY(), startPos.getZ());
-        renderBuffer.render(matrix.getLast().getMatrix()); //Actually draw whats in the buffer
+        renderBuffer.render(matrix.last().pose()); //Actually draw whats in the buffer
     }
 
     @Override
@@ -258,7 +258,7 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
 
             vertexProducer.accept(rt -> builders.computeIfAbsent(rt, (_rt) -> {
                 DireBufferBuilder builder = new DireBufferBuilder(BUFFER_SIZE);
-                builder.begin(_rt.getDrawMode(), _rt.getVertexFormat());
+                builder.begin(_rt.mode(), _rt.format());
 
                 return builder;
             }));
@@ -270,7 +270,7 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
                 sortCaches.put(rt, builder.getVertexState());
 
                 builder.finishDrawing();
-                VertexFormat fmt = rt.getVertexFormat();
+                VertexFormat fmt = rt.format();
                 DireVertexBuffer vbo = new DireVertexBuffer(fmt);
 
                 vbo.upload(builder);
@@ -293,7 +293,7 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
                 RenderType rt = kv.getKey();
                 DireBufferBuilder.State state = kv.getValue();
                 DireBufferBuilder builder = new DireBufferBuilder(BUFFER_SIZE);
-                builder.begin(rt.getDrawMode(), rt.getVertexFormat());
+                builder.begin(rt.mode(), rt.format());
                 builder.setVertexState(state);
                 builder.sortVertexData(x, y, z);
                 builder.finishDrawing();
@@ -305,12 +305,12 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
 
         public void render(Matrix4f matrix) {
             buffers.forEach((rt, vbo) -> {
-                VertexFormat fmt = rt.getVertexFormat();
+                VertexFormat fmt = rt.format();
 
                 rt.setupRenderState();
                 vbo.bindBuffer();
                 fmt.setupBufferState(0L);
-                vbo.draw(matrix, rt.getDrawMode());
+                vbo.draw(matrix, rt.mode());
                 DireVertexBuffer.unbindBuffer();
                 fmt.clearBufferState();
                 rt.clearRenderState();

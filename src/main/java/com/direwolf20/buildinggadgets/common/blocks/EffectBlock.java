@@ -41,30 +41,30 @@ public class EffectBlock extends Block {
         PLACE() {
             @Override
             public void onBuilderRemoved(EffectBlockTileEntity builder) {
-                World world = builder.getWorld();
+                World world = builder.getLevel();
                 if( world == null )
                     return;
 
-                BlockPos targetPos = builder.getPos();
+                BlockPos targetPos = builder.getBlockPos();
                 BlockData targetBlock = builder.getRenderedBlock();
                 if (builder.isUsingPaste()) {
-                    world.setBlockState(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().getDefaultState());
-                    TileEntity te = world.getTileEntity(targetPos);
+                    world.setBlockAndUpdate(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().defaultBlockState());
+                    TileEntity te = world.getBlockEntity(targetPos);
                     if (te instanceof ConstructionBlockTileEntity) {
                         ((ConstructionBlockTileEntity) te).setBlockState(targetBlock);
                     }
-                    world.addEntity(new ConstructionBlockEntity(world, targetPos, false));
+                    world.addFreshEntity(new ConstructionBlockEntity(world, targetPos, false));
                 } else {
                     if( targetBlock.getState().getBlock() instanceof LeavesBlock) {
-                        targetBlock = new BlockData(targetBlock.getState().with(LeavesBlock.PERSISTENT, true), targetBlock.getTileData());
+                        targetBlock = new BlockData(targetBlock.getState().setValue(LeavesBlock.PERSISTENT, true), targetBlock.getTileData());
                     }
 
                     targetBlock.placeIn(BuildContext.builder().build(world), targetPos);
 
                     // Instead of removing the block, we just sync the client & server to know that the block has been replaced
-                    world.notifyBlockUpdate(targetPos, targetBlock.getState(), targetBlock.getState(), Constants.BlockFlags.DEFAULT);
+                    world.sendBlockUpdated(targetPos, targetBlock.getState(), targetBlock.getState(), Constants.BlockFlags.DEFAULT);
 
-                    BlockPos upPos = targetPos.up();
+                    BlockPos upPos = targetPos.above();
                     world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos, false);
                 }
             }
@@ -72,13 +72,13 @@ public class EffectBlock extends Block {
         REMOVE() {
             @Override
             public void onBuilderRemoved(EffectBlockTileEntity builder) {
-                builder.getWorld().removeBlock(builder.getPos(), false);
+                builder.getLevel().removeBlock(builder.getBlockPos(), false);
             }
         },
         REPLACE() {
             @Override
             public void onBuilderRemoved(EffectBlockTileEntity builder) {
-                spawnEffectBlock(builder.getWorld(), builder.getPos(), builder.getSourceBlock(), PLACE, builder.isUsingPaste());
+                spawnEffectBlock(builder.getLevel(), builder.getBlockPos(), builder.getSourceBlock(), PLACE, builder.isUsingPaste());
             }
         };
 
@@ -91,14 +91,14 @@ public class EffectBlock extends Block {
      * As the effect block is effectively air it needs to have a material just like Air.
      * We don't use Material.AIR as this is replaceable.
      */
-    private static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MaterialColor.AIR).notSolid().build();
+    private static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MaterialColor.NONE).nonSolid().build();
 
     public static void spawnUndoBlock(BuildContext context, PlacementTarget target) {
         BlockState state = context.getWorld().getBlockState(target.getPos());
 
-        TileEntity curTe = context.getWorld().getTileEntity(target.getPos());
+        TileEntity curTe = context.getWorld().getBlockEntity(target.getPos());
         //can't use .isAir, because it's not build yet
-        if (target.getData().getState() != Blocks.AIR.getDefaultState()) {
+        if (target.getData().getState() != Blocks.AIR.defaultBlockState()) {
             Mode mode = state.isAir(context.getWorld(), target.getPos()) ? Mode.PLACE : Mode.REPLACE;
             spawnEffectBlock(curTe, state, context.getWorld(), target.getPos(), target.getData(), mode, false);
         } else if (! state.isAir(context.getWorld(), target.getPos())) {
@@ -112,30 +112,30 @@ public class EffectBlock extends Block {
 
     public static void spawnEffectBlock(IWorld world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
         BlockState state = world.getBlockState(spawnPos);
-        TileEntity curTe = world.getTileEntity(spawnPos);
+        TileEntity curTe = world.getBlockEntity(spawnPos);
         spawnEffectBlock(curTe, state, world, spawnPos, spawnBlock, mode, usePaste);
     }
 
     private static void spawnEffectBlock(@Nullable TileEntity curTe, BlockState curState, IWorld world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
-        BlockState state = OurBlocks.EFFECT_BLOCK.get().getDefaultState();
-        world.setBlockState(spawnPos, state, 3);
+        BlockState state = OurBlocks.EFFECT_BLOCK.get().defaultBlockState();
+        world.setBlock(spawnPos, state, 3);
 
-        TileEntity tile = world.getTileEntity(spawnPos);
+        TileEntity tile = world.getBlockEntity(spawnPos);
         if (!(tile instanceof EffectBlockTileEntity)) {
             // Fail safely by replacing with air. Kinda voids but meh...
-            world.setBlockState(spawnPos, Blocks.AIR.getDefaultState(), 3);
+            world.setBlock(spawnPos, Blocks.AIR.defaultBlockState(), 3);
             return;
         }
 
         ((EffectBlockTileEntity) tile).initializeData(curState, curTe, spawnBlock, mode, usePaste);
         // Send data to client
         if (world instanceof World)
-            ((World) world).notifyBlockUpdate(spawnPos, state, state, Constants.BlockFlags.DEFAULT);
+            ((World) world).sendBlockUpdated(spawnPos, state, state, Constants.BlockFlags.DEFAULT);
     }
 
     public EffectBlock() {
-        super(Block.Properties.create(EFFECT_BLOCK_MATERIAL)
-                .hardnessAndResistance(20f)
+        super(Block.Properties.of(EFFECT_BLOCK_MATERIAL)
+                .strength(20f)
                 .noDrops());
     }
 
@@ -151,13 +151,13 @@ public class EffectBlock extends Block {
     }
 
     @Override
-    public VoxelShape getRenderShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public VoxelShape getOcclusionShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
         return VoxelShapes.empty();
     }
 
     @Override
     public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        return VoxelShapes.fullCube();
+        return VoxelShapes.block();
     }
 
     /**
@@ -167,13 +167,13 @@ public class EffectBlock extends Block {
      */
     @Override
     @SuppressWarnings("deprecation")
-    public BlockRenderType getRenderType(BlockState state) {
+    public BlockRenderType getRenderShape(BlockState state) {
         // We still make effect blocks invisible because all effects (scaling block, transparent box) are dynamic so they has to be in the TER
         return BlockRenderType.INVISIBLE;
     }
 
     @Override
-    public boolean isSideInvisible(BlockState p_200122_1_, BlockState p_200122_2_, Direction p_200122_3_) {
+    public boolean skipRendering(BlockState p_200122_1_, BlockState p_200122_2_, Direction p_200122_3_) {
         return true;
     }
 
@@ -191,18 +191,18 @@ public class EffectBlock extends Block {
      * @deprecated call via {@link BlockState#getPushReaction()} whenever possible. Implementing/overriding is fine.
      */
     @Override
-    public PushReaction getPushReaction(BlockState state) {
+    public PushReaction getPistonPushReaction(BlockState state) {
         return PushReaction.BLOCK;
     }
 
     @Override
-    public int getOpacity(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public int getLightBlock(BlockState state, IBlockReader worldIn, BlockPos pos) {
         return 0;
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public float getAmbientOcclusionLightValue(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public float getShadeBrightness(BlockState state, IBlockReader worldIn, BlockPos pos) {
         return 1.0f;
     }
 }

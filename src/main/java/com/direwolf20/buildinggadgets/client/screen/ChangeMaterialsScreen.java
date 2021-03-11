@@ -38,7 +38,7 @@ public class ChangeMaterialsScreen extends Screen {
     }
 
     private <T extends Comparable<T>, V extends T> BlockState getStateWithProperty(BlockState state, Property<?> property, Comparable<?> value) {
-        return state.with((Property<T>) property, (V) value);
+        return state.setValue((Property<T>) property, (V) value);
     }
 
     @Override

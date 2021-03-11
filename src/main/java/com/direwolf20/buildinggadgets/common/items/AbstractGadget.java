@@ -1,18 +1,20 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 
+import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
+
+import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
-import com.direwolf20.buildinggadgets.common.tainted.concurrent.UndoScheduler;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.modes.*;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
+import com.direwolf20.buildinggadgets.common.tainted.concurrent.UndoScheduler;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.items.modes.*;
-import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.tainted.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.tainted.save.Undo;
 import com.direwolf20.buildinggadgets.common.tainted.save.UndoWorldSave;
@@ -58,8 +60,6 @@ import java.util.UUID;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
-import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
-
 public abstract class AbstractGadget extends Item {
     private BaseRenderer renderer;
     private final ITag.INamedTag<Block> whiteList;
@@ -70,8 +70,8 @@ public abstract class AbstractGadget extends Item {
         super(builder.setNoRepair());
 
         renderer = DistExecutor.runForDist(this::createRenderFactory, () -> () -> null);
-        this.whiteList = BlockTags.makeWrapperTag(whiteListTag.toString());
-        this.blackList = BlockTags.makeWrapperTag(blackListTag.toString());
+        this.whiteList = BlockTags.bind(whiteListTag.toString());
+        this.blackList = BlockTags.bind(blackListTag.toString());
         saveSupplier = SaveManager.INSTANCE.registerUndoSave(w -> SaveManager.getUndoSave(w, undoLengthSupplier, undoName));
     }
 
@@ -110,9 +110,9 @@ public abstract class AbstractGadget extends Item {
     }
 
     @Override
-    public void fillItemGroup(ItemGroup group, NonNullList<ItemStack> items) {
-        super.fillItemGroup(group, items);
-        if( !isInGroup(group) )
+    public void fillItemCategory(ItemGroup group, NonNullList<ItemStack> items) {
+        super.fillItemCategory(group, items);
+        if( !allowdedIn(group) )
             return;
 
         ItemStack charged = new ItemStack(this);
@@ -137,7 +137,7 @@ public abstract class AbstractGadget extends Item {
             return super.getRGBDurabilityForDisplay(stack);
 
         Pair<Integer, Integer> energyStorage = cap.map(e -> Pair.of(e.getEnergyStored(), e.getMaxEnergyStored())).orElse(Pair.of(0, 0));
-        return MathHelper.hsvToRGB(Math.max(0.0F, energyStorage.getLeft() / (float) energyStorage.getRight()) / 3.0F, 1.0F, 1.0F);
+        return MathHelper.hsvToRgb(Math.max(0.0F, energyStorage.getLeft() / (float) energyStorage.getRight()) / 3.0F, 1.0F, 1.0F);
     }
 
     @Override
@@ -164,20 +164,20 @@ public abstract class AbstractGadget extends Item {
     }
 
     @Override
-    public boolean getIsRepairable(ItemStack toRepair, ItemStack repair) {
+    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
         return !toRepair.getCapability(CapabilityEnergy.ENERGY).isPresent() && repair.getItem() == Items.DIAMOND;
     }
 
     public boolean isAllowedBlock(Block block) {
-        if (getWhiteList().getAllElements().isEmpty())
+        if (getWhiteList().getValues().isEmpty())
             return ! getBlackList().contains(block);
         return getWhiteList().contains(block);
     }
 
     public static ItemStack getGadget(PlayerEntity player) {
-        ItemStack heldItem = player.getHeldItemMainhand();
+        ItemStack heldItem = player.getMainHandItem();
         if (!(heldItem.getItem() instanceof AbstractGadget)) {
-            heldItem = player.getHeldItemOffhand();
+            heldItem = player.getOffhandItem();
             if (!(heldItem.getItem() instanceof AbstractGadget)) {
                 return ItemStack.EMPTY;
             }
@@ -231,7 +231,7 @@ public abstract class AbstractGadget extends Item {
     public final void onAnchor(ItemStack stack, PlayerEntity player) {
         if (getAnchor(stack) == null) {
             BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            if ((player.world.isAirBlock(lookingAt.getPos())))
+            if ((player.level.isEmptyBlock(lookingAt.getBlockPos())))
                 return;
             onAnchorSet(stack, player, lookingAt);
             player.displayClientMessage(MessageTranslation.ANCHOR_SET.componentTranslation().setStyle(Styles.AQUA), true);
@@ -242,7 +242,7 @@ public abstract class AbstractGadget extends Item {
     }
 
     protected void onAnchorSet(ItemStack stack, PlayerEntity player, BlockRayTraceResult lookingAt) {
-        GadgetUtils.writePOSToNBT(stack, lookingAt.getPos(), NBTKeys.GADGET_ANCHOR);
+        GadgetUtils.writePOSToNBT(stack, lookingAt.getBlockPos(), NBTKeys.GADGET_ANCHOR);
     }
 
     protected void onAnchorRemoved(ItemStack stack, PlayerEntity player) {
@@ -291,12 +291,12 @@ public abstract class AbstractGadget extends Item {
     //this should only be called Server-Side!!!
     public UUID getUUID(ItemStack stack) {
         CompoundNBT nbt = stack.getOrCreateTag();
-        if (! nbt.hasUniqueId(NBTKeys.GADGET_UUID)) {
+        if (! nbt.hasUUID(NBTKeys.GADGET_UUID)) {
             UUID newId = getUndoSave().getFreeUUID();
-            nbt.putUniqueId(NBTKeys.GADGET_UUID, newId);
+            nbt.putUUID(NBTKeys.GADGET_UUID, newId);
             return newId;
         }
-        return nbt.getUniqueId(NBTKeys.GADGET_UUID);
+        return nbt.getUUID(NBTKeys.GADGET_UUID);
     }
 
     // Todo: tweak and fix.

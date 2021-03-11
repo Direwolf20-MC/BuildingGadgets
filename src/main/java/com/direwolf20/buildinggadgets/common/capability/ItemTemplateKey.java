@@ -18,11 +18,11 @@ public final class ItemTemplateKey implements ITemplateKey {
     @Override
     public UUID getTemplateId(Supplier<UUID> freeIdAllocator) {
         CompoundNBT nbt = stack.getOrCreateTag();
-        if (! nbt.hasUniqueId(NBTKeys.TEMPLATE_KEY_ID)) {
+        if (! nbt.hasUUID(NBTKeys.TEMPLATE_KEY_ID)) {
             UUID newID = freeIdAllocator.get();
-            nbt.putUniqueId(NBTKeys.TEMPLATE_KEY_ID, newID);
+            nbt.putUUID(NBTKeys.TEMPLATE_KEY_ID, newID);
             return newID;
         }
-        return nbt.getUniqueId(NBTKeys.TEMPLATE_KEY_ID);
+        return nbt.getUUID(NBTKeys.TEMPLATE_KEY_ID);
     }
 }

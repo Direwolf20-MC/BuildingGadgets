@@ -37,7 +37,7 @@ public class KeyBindings {
     }
 
     private static KeyBinding createBinding(String name, int key) {
-        KeyBinding keyBinding = new KeyBinding(getKey(name), CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(key), getKey("category"));
+        KeyBinding keyBinding = new KeyBinding(getKey(name), CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrCreate(key), getKey("category"));
         ClientRegistry.registerKeyBinding(keyBinding);
         return keyBinding;
     }
@@ -53,7 +53,7 @@ public class KeyBindings {
             PlayerEntity player = Minecraft.getInstance().player;
             return !KeyConflictContext.GUI.isActive() && player != null
                     && (!AbstractGadget.getGadget(player).isEmpty()
-                        || (player.getHeldItem(Hand.MAIN_HAND).getItem() instanceof TemplateItem || player.getHeldItem(Hand.OFF_HAND).getItem() instanceof TemplateItem));
+                        || (player.getItemInHand(Hand.MAIN_HAND).getItem() instanceof TemplateItem || player.getItemInHand(Hand.OFF_HAND).getItem() instanceof TemplateItem));
         }
 
         @Override

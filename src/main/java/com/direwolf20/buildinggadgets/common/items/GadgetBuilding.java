@@ -1,21 +1,23 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
+
+import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
+import com.direwolf20.buildinggadgets.client.renders.BuildRender;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
+import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
+import com.direwolf20.buildinggadgets.common.items.modes.BuildingModes;
+import com.direwolf20.buildinggadgets.common.network.PacketHandler;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
+import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObject;
-import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
-import com.direwolf20.buildinggadgets.common.items.modes.BuildingModes;
-import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
-import com.direwolf20.buildinggadgets.client.renders.BuildRender;
-import com.direwolf20.buildinggadgets.common.network.PacketHandler;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketBindTool;
-import com.direwolf20.buildinggadgets.common.network.packets.PacketRotateMirror;
 import com.direwolf20.buildinggadgets.common.tainted.save.Undo;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
@@ -52,8 +54,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-
-import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.*;
 
 public class GadgetBuilding extends AbstractGadget {
 
@@ -107,8 +107,8 @@ public class GadgetBuilding extends AbstractGadget {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
-        super.addInformation(stack, world, tooltip, flag);
+    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
+        super.appendHoverText(stack, world, tooltip, flag);
         BuildingModes mode = getToolMode(stack);
         addEnergyInformation(tooltip, stack);
 
@@ -141,25 +141,25 @@ public class GadgetBuilding extends AbstractGadget {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         //On item use, if sneaking, select the block clicked on, else build -- This is called when you right click a tool NOT on a block.
-        ItemStack itemstack = player.getHeldItem(hand);
+        ItemStack itemstack = player.getItemInHand(hand);
 
-        player.setActiveHand(hand);
-        if (!world.isRemote) {
+        player.startUsingItem(hand);
+        if (!world.isClientSide) {
             // Debug code for free energy
             //itemstack.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> e.receiveEnergy(15000000, false));
-            if (player.isSneaking()) {
+            if (player.isShiftKeyDown()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
-                if( !result.getType().isSuccessOrConsume() ) {
-                    player.displayClientMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
-                    return super.onItemRightClick(world, player, hand);
+                if( !result.getResult().consumesAction() ) {
+                    player.displayClientMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().name()).setStyle(Styles.AQUA), true);
+                    return super.use(world, player, hand);
                 }
             } else if (player instanceof ServerPlayerEntity) {
                 build((ServerPlayerEntity) player, itemstack);
             }
         } else {
-            if (!player.isSneaking()) {
+            if (!player.isShiftKeyDown()) {
                 BaseRenderer.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown()) {
@@ -180,7 +180,7 @@ public class GadgetBuilding extends AbstractGadget {
         //Called when the range change hotkey is pressed
         int range = getToolRange(heldItem);
         int changeAmount = (getToolMode(heldItem) != BuildingModes.SURFACE || (range % 2 == 0)) ? 1 : 2;
-        if (player.isSneaking())
+        if (player.isShiftKeyDown())
             range = (range == 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         else
             range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;
@@ -191,7 +191,7 @@ public class GadgetBuilding extends AbstractGadget {
 
     private void build(ServerPlayerEntity player, ItemStack stack) {
         //Build the blocks as shown in the visual render
-        World world = player.world;
+        World world = player.level;
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
             return;
@@ -199,18 +199,18 @@ public class GadgetBuilding extends AbstractGadget {
         List<BlockPos> coords = GadgetUtils.getAnchor(heldItem).orElse(new ArrayList<>());
 
         BlockData blockData = getToolBlock(heldItem);
-        if (blockData.getState() == Blocks.AIR.getDefaultState()) {
+        if (blockData.getState() == Blocks.AIR.defaultBlockState()) {
             return;
         }
 
         if (coords.size() == 0) {  //If we don't have an anchor, build in the current spot
             BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            if (world.isAirBlock(lookingAt.getPos())) //If we aren't looking at anything, exit
+            if (world.isEmptyBlock(lookingAt.getBlockPos())) //If we aren't looking at anything, exit
                 return;
 
-            Direction sideHit = lookingAt.getFace();
+            Direction sideHit = lookingAt.getDirection();
             coords = getToolMode(stack).getMode().getCollection(
-                    new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, sideHit, placeAtop(stack), getConnectedArea(stack)),
+                    new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getBlockPos(), heldItem, sideHit, placeAtop(stack), getConnectedArea(stack)),
                     player
             );
         }
@@ -221,7 +221,7 @@ public class GadgetBuilding extends AbstractGadget {
         IItemIndex index = InventoryHelper.index(stack, player);
 
          //TODO replace with a better TileEntity supporting Fake IWorld
-        fakeWorld.setWorldAndState(player.world, blockData.getState(), coords); // Initialize the fake world's blocks
+        fakeWorld.setWorldAndState(player.level, blockData.getState(), coords); // Initialize the fake world's blocks
         for (BlockPos coordinate : coords) {
             //Get the extended block state in the fake world
             //Disabled to fix Chisel
@@ -233,7 +233,7 @@ public class GadgetBuilding extends AbstractGadget {
     }
 
     private void placeBlock(World world, ServerPlayerEntity player, IItemIndex index, Undo.Builder builder, BlockPos pos, BlockData setBlock) {
-        if ((pos.getY() > world.getHeight() || pos.getY() < 0) || !player.isAllowEdit())
+        if ((pos.getY() > world.getHeight() || pos.getY() < 0) || !player.mayBuild())
             return;
 
         ItemStack heldItem = getGadget(player);
@@ -257,8 +257,8 @@ public class GadgetBuilding extends AbstractGadget {
                 useConstructionPaste = true;
         }
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getDimensionKey(), world, pos);
-        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP) || ! world.isBlockModifiable(player, pos) || !this.canUse(heldItem, player) || !setBlock.getState().isValidPosition(world, pos))
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(world.dimension(), world, pos);
+        if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP) || ! world.mayInteract(player, pos) || !this.canUse(heldItem, player) || !setBlock.getState().canSurvive(world, pos))
             return;
 
         this.applyDamage(heldItem, player);

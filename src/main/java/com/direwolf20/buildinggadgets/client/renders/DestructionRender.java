@@ -27,31 +27,31 @@ public class DestructionRender extends BaseRenderer {
             return;
 
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
-        World world = player.world;
+        World world = player.level;
         BlockPos anchor = ((AbstractGadget) heldItem.getItem()).getAnchor(heldItem);
 
-        if (world.getBlockState(VectorHelper.getLookingAt(player, heldItem).getPos()) == AIR && anchor == null)
+        if (world.getBlockState(VectorHelper.getLookingAt(player, heldItem).getBlockPos()) == AIR && anchor == null)
             return;
 
-        BlockPos startBlock = (anchor == null) ? lookingAt.getPos() : anchor;
-        Direction facing = (GadgetDestruction.getAnchorSide(heldItem) == null) ? lookingAt.getFace() : GadgetDestruction.getAnchorSide(heldItem);
-        if (world.getBlockState(startBlock) == OurBlocks.EFFECT_BLOCK.get().getDefaultState())
+        BlockPos startBlock = (anchor == null) ? lookingAt.getBlockPos() : anchor;
+        Direction facing = (GadgetDestruction.getAnchorSide(heldItem) == null) ? lookingAt.getDirection() : GadgetDestruction.getAnchorSide(heldItem);
+        if (world.getBlockState(startBlock) == OurBlocks.EFFECT_BLOCK.get().defaultBlockState())
             return;
 
-        Vector3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
+        Vector3d playerPos = getMc().gameRenderer.getMainCamera().getPosition();
 
         MatrixStack stack = evt.getMatrixStack();
-        stack.push();
-        stack.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
+        stack.pushPose();
+        stack.translate(-playerPos.x(), -playerPos.y(), -playerPos.z());
 
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         IVertexBuilder builder = buffer.getBuffer(OurRenderTypes.MissingBlockOverlay);
 
         GadgetDestruction.getArea(world, startBlock, facing, player, heldItem)
-                .forEach(pos -> renderMissingBlock(stack.getLast().getMatrix(), builder, pos));
+                .forEach(pos -> renderMissingBlock(stack.last().pose(), builder, pos));
 
-        stack.pop();
+        stack.popPose();
         RenderSystem.disableDepthTest();
-        buffer.finish(); // @mcp: draw = finish
+        buffer.endBatch(); // @mcp: draw = finish
     }
 }

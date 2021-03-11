@@ -77,8 +77,8 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
-        super.addInformation(stack, world, tooltip, flag);
+    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
+        super.appendHoverText(stack, world, tooltip, flag);
         addEnergyInformation(tooltip, stack);
 
         tooltip.add(TooltipTranslation.GADGET_DESTROYWARNING
@@ -110,7 +110,7 @@ public class GadgetDestruction extends AbstractGadget {
         if (side == null)
             tag.remove(NBTKeys.GADGET_ANCHOR_SIDE);
         else
-            tag.putString(NBTKeys.GADGET_ANCHOR_SIDE, side.getName2());
+            tag.putString(NBTKeys.GADGET_ANCHOR_SIDE, side.getName());
     }
 
     public static Direction getAnchorSide(ItemStack stack) {
@@ -159,12 +159,12 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        player.setActiveHand(hand);
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        player.startUsingItem(hand);
 
-        if (!world.isRemote) {
-            if (! player.isSneaking()) {
+        if (!world.isClientSide) {
+            if (! player.isShiftKeyDown()) {
                 BlockPos anchorPos = getAnchor(stack);
                 Direction anchorSide = getAnchorSide(stack);
                 if (anchorPos != null && anchorSide != null) {
@@ -174,15 +174,15 @@ public class GadgetDestruction extends AbstractGadget {
                 }
 
                 BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-                if (! world.isAirBlock(lookingAt.getPos())) {
-                    clearArea(world, lookingAt.getPos(), lookingAt.getFace(), (ServerPlayerEntity) player, stack);
+                if (! world.isEmptyBlock(lookingAt.getBlockPos())) {
+                    clearArea(world, lookingAt.getBlockPos(), lookingAt.getDirection(), (ServerPlayerEntity) player, stack);
                     onAnchorRemoved(stack, player);
                     return new ActionResult<>(ActionResultType.SUCCESS, stack);
                 }
 
                 return new ActionResult<>(ActionResultType.FAIL, stack);
             }
-        } else if (player.isSneaking()) {
+        } else if (player.isShiftKeyDown()) {
             GuiMod.DESTRUCTION.openScreen(player);
         }
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
@@ -191,7 +191,7 @@ public class GadgetDestruction extends AbstractGadget {
     @Override
     protected void onAnchorSet(ItemStack stack, PlayerEntity player, BlockRayTraceResult lookingAt) {
         super.onAnchorSet(stack, player, lookingAt);
-        setAnchorSide(stack, lookingAt.getFace());
+        setAnchorSide(stack, lookingAt.getDirection());
     }
 
     @Override
@@ -204,19 +204,19 @@ public class GadgetDestruction extends AbstractGadget {
         ItemStack tool = getGadget(player);
         int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
 
-        if (tool.isEmpty() || depth == 0 || ! player.isAllowEdit())
+        if (tool.isEmpty() || depth == 0 || ! player.mayBuild())
             return new ArrayList<>();
 
         boolean vertical = incomingSide.getAxis().isVertical();
-        Direction up = vertical ? player.getHorizontalFacing() : Direction.UP;
+        Direction up = vertical ? player.getDirection() : Direction.UP;
         Direction down = up.getOpposite();
-        Direction right = vertical ? up.rotateY() : incomingSide.rotateYCCW();
+        Direction right = vertical ? up.getClockWise() : incomingSide.getCounterClockWise();
         Direction left = right.getOpposite();
 
-        BlockPos first = pos.offset(left, getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT)).offset(up, getToolValue(stack, NBTKeys.GADGET_VALUE_UP));
-        BlockPos second = pos.offset(right, getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT))
-                .offset(down, getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN))
-                .offset(incomingSide.getOpposite(), depth - 1);
+        BlockPos first = pos.relative(left, getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT)).relative(up, getToolValue(stack, NBTKeys.GADGET_VALUE_UP));
+        BlockPos second = pos.relative(right, getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT))
+                .relative(down, getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN))
+                .relative(incomingSide.getOpposite(), depth - 1);
 
         boolean isFluidOnly = getIsFluidOnly(stack);
         return new Region(first, second).stream()
@@ -225,7 +225,7 @@ public class GadgetDestruction extends AbstractGadget {
                             ? isFluidBlock(world, e)
                             : isValidBlock(world, e, player, world.getBlockState(e))
                 )
-                .sorted(Comparator.comparing(player.getPosition()::distanceSq))
+                .sorted(Comparator.comparing(player.blockPosition()::distSqr))
                 .collect(Collectors.toList());
     }
 
@@ -238,17 +238,17 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, BlockState currentBlock) {
-        if (world.isAirBlock(voidPos) ||
-                currentBlock.equals(OurBlocks.EFFECT_BLOCK.get().getDefaultState()) ||
-                currentBlock.getBlockHardness(world, voidPos) < 0 ||
-                ! world.isBlockModifiable(player, voidPos)) return false;
+        if (world.isEmptyBlock(voidPos) ||
+                currentBlock.equals(OurBlocks.EFFECT_BLOCK.get().defaultBlockState()) ||
+                currentBlock.getDestroySpeed(world, voidPos) < 0 ||
+                ! world.mayInteract(player, voidPos)) return false;
 
-        TileEntity te = world.getTileEntity(voidPos);
+        TileEntity te = world.getBlockEntity(voidPos);
         if ((te != null) && ! (te instanceof ConstructionBlockTileEntity))
             return false;
 
-        if (! world.isRemote) {
-            BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getDimensionKey(), world, voidPos);
+        if (! world.isClientSide) {
+            BlockSnapshot blockSnapshot = BlockSnapshot.create(world.dimension(), world, voidPos);
             if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP))
                 return false;
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);
@@ -263,7 +263,7 @@ public class GadgetDestruction extends AbstractGadget {
 
         for (BlockPos clearPos : positions) {
             BlockState state = world.getBlockState(clearPos);
-            TileEntity te = world.getTileEntity(clearPos);
+            TileEntity te = world.getBlockEntity(clearPos);
             if (!isAllowedBlock(state.getBlock()))
                 continue;
             if (te == null || state.getBlock() == OurBlocks.CONSTRUCTION_BLOCK.get() && te instanceof ConstructionBlockTileEntity) {
@@ -275,7 +275,7 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     private boolean destroyBlock(World world, BlockPos voidPos, ServerPlayerEntity player, Undo.Builder builder) {
-        if (world.isAirBlock(voidPos))
+        if (world.isEmptyBlock(voidPos))
             return false;
 
         ItemStack tool = getGadget(player);

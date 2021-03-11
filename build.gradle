@@ -91,7 +91,7 @@ dependencies {
     //JEI
     compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
-    runtimeOnly fg.deobf("curse.maven:create-328085:3158185")
+//    runtimeOnly fg.deobf("curse.maven:create-328085:3158185")
     // deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
     // deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
     // runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"

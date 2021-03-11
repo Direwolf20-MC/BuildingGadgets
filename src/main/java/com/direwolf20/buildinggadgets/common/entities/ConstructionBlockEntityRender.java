@@ -25,40 +25,40 @@ public class ConstructionBlockEntityRender extends EntityRenderer<ConstructionBl
 
     public ConstructionBlockEntityRender(EntityRendererManager renderManager) {
         super(renderManager);
-        this.shadowSize = 0F;
+        this.shadowRadius = 0F;
     }
 
     @Override
     public void render(ConstructionBlockEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-        BlockRendererDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRendererDispatcher();
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        BlockRendererDispatcher blockrendererdispatcher = Minecraft.getInstance().getBlockRenderer();
+        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         IVertexBuilder builder;
         Minecraft mc = Minecraft.getInstance();
         builder = buffer.getBuffer(OurRenderTypes.RenderBlock);
-        BlockState renderBlockState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
-        int teCounter = entityIn.ticksExisted;
+        BlockState renderBlockState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().defaultBlockState();
+        int teCounter = entityIn.tickCount;
         int maxLife = entityIn.getMaxLife();
         teCounter = Math.min(teCounter, maxLife);
         float scale = (float) (maxLife - teCounter) / maxLife;
         if (entityIn.getMakingPaste())
             scale = (float) teCounter / maxLife;
-        matrixStackIn.push();
+        matrixStackIn.pushPose();
         matrixStackIn.translate(-0.0005f, -0.0005f, -0.0005f);
         matrixStackIn.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
         BlockColors blockColors = Minecraft.getInstance().getBlockColors();
-        int color = blockColors.getColor(renderBlockState, mc.player.world, entityIn.getPosition(), 0);
+        int color = blockColors.getColor(renderBlockState, mc.player.level, entityIn.blockPosition(), 0);
         float f = (float) (color >> 16 & 255) / 255.0F;
         float f1 = (float) (color >> 8 & 255) / 255.0F;
         float f2 = (float) (color & 255) / 255.0F;
-        IBakedModel ibakedmodel = blockrendererdispatcher.getModelForState(renderBlockState);
+        IBakedModel ibakedmodel = blockrendererdispatcher.getBlockModel(renderBlockState);
         for (Direction direction : Direction.values()) {
-            renderModelBrightnessColorQuads(matrixStackIn.getLast(), builder, f, f1, f2, scale, ibakedmodel.getQuads(renderBlockState, direction, new Random(MathHelper.getPositionRandom(entityIn.getPosition())), EmptyModelData.INSTANCE), 15728640, 655360);
+            renderModelBrightnessColorQuads(matrixStackIn.last(), builder, f, f1, f2, scale, ibakedmodel.getQuads(renderBlockState, direction, new Random(MathHelper.getSeed(entityIn.blockPosition())), EmptyModelData.INSTANCE), 15728640, 655360);
         }
-        matrixStackIn.pop();
+        matrixStackIn.popPose();
     }
 
     @Override
-    public ResourceLocation getEntityTexture(ConstructionBlockEntity entity) {
+    public ResourceLocation getTextureLocation(ConstructionBlockEntity entity) {
         return null;
     }
 }

@@ -52,7 +52,7 @@ public final class Undo {
         DataDecompressor<ITileDataSerializer> serializerReverseObjectIncrementer = new DataDecompressor<>(
                 (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_DATA_SERIALIZER_LIST),
                 inbt -> {
-                    String s = inbt.getString();
+                    String s = inbt.getAsString();
                     ITileDataSerializer serializer = RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), s);
                     if (serializer == null) {
                         BuildingGadgets.LOG.warn("Found unknown serializer {}. Replacing with dummy!", s);
@@ -71,7 +71,7 @@ public final class Undo {
         DataDecompressor<IUniqueObjectSerializer> itemSerializerIncrementer = new DataDecompressor<>(
                 (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_ITEMS_SERIALIZER_LIST),
                 inbt -> {
-                    String s = inbt.getString();
+                    String s = inbt.getAsString();
                     IUniqueObjectSerializer serializer = RegistryUtils.getFromString(Registries.getUniqueObjectSerializers(), s);
                     if (serializer == null)
                         return SerialisationSupport.uniqueItemSerializer();
@@ -90,7 +90,7 @@ public final class Undo {
                 inbt -> NBTUtil.readBlockPos((CompoundNBT) inbt),
                 inbt -> BlockInfo.deserialize((CompoundNBT) inbt, dataReverseObjectIncrementer, itemSetReverseObjectIncrementer));
 
-        RegistryKey<World> dim = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(nbt.getString(NBTKeys.WORLD_SAVE_DIM)));
+        RegistryKey<World> dim = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(nbt.getString(NBTKeys.WORLD_SAVE_DIM)));
         Region bounds = Region.deserializeFrom(nbt.getCompound(NBTKeys.WORLD_SAVE_UNDO_BOUNDS));
         return new Undo(dim, map, bounds);
     }
@@ -215,7 +215,7 @@ public final class Undo {
 
         public Builder record(IBlockReader reader, BlockPos pos, BlockData placeData, Multiset<IUniqueObject<?>> requiredItems, Multiset<IUniqueObject<?>> producedItems) {
             BlockState state = reader.getBlockState(pos);
-            TileEntity te = reader.getTileEntity(pos);
+            TileEntity te = reader.getBlockEntity(pos);
             ITileEntityData data = te != null ? NBTTileEntityData.ofTile(te) : TileSupport.dummyTileEntityData();
             return record(pos, new BlockData(state, data), placeData, requiredItems, producedItems);
         }
@@ -229,7 +229,7 @@ public final class Undo {
         }
 
         public Undo build(World dim) {
-            return new Undo(dim.getDimensionKey(), mapBuilder.build(), regionBuilder != null ? regionBuilder.build() : Region.singleZero());
+            return new Undo(dim.dimension(), mapBuilder.build(), regionBuilder != null ? regionBuilder.build() : Region.singleZero());
         }
     }
 }

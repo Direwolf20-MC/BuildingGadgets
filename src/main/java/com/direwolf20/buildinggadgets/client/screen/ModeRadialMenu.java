@@ -160,11 +160,11 @@ public class ModeRadialMenu extends Screen {
 
                 assert getMinecraft().player != null;
 
-                getMinecraft().player.closeScreen();
+                getMinecraft().player.closeContainer();
                 if (GadgetCopyPaste.getToolMode(tool) == GadgetCopyPaste.ToolMode.COPY)
-                    getMinecraft().displayGuiScreen(new CopyGUI(tool));
+                    getMinecraft().setScreen(new CopyGUI(tool));
                 else
-                    getMinecraft().displayGuiScreen(new PasteGUI(tool));
+                    getMinecraft().setScreen(new PasteGUI(tool));
                 return true;
             }));
             addButton(new PositionedIconActionable(RadialTranslation.OPEN_MATERIAL_LIST, "copypaste_materiallist", right, send -> {
@@ -173,8 +173,8 @@ public class ModeRadialMenu extends Screen {
 
                 assert getMinecraft().player != null;
 
-                getMinecraft().player.closeScreen();
-                getMinecraft().displayGuiScreen(new MaterialListGUI(tool));
+                getMinecraft().player.closeContainer();
+                getMinecraft().setScreen(new MaterialListGUI(tool));
                 return true;
             }));
         }
@@ -241,7 +241,7 @@ public class ModeRadialMenu extends Screen {
             button.setWidth(dim);
             button.setHeight(dim);
             if (isDestruction)
-                button.y = height / 2 + (isRight ? 10 : -button.getHeightRealms() - 10);
+                button.y = height / 2 + (isRight ? 10 : -button.getHeight() - 10);
             else
                 button.x = width / 2 + offset;
         }
@@ -394,7 +394,7 @@ public class ModeRadialMenu extends Screen {
 
             int xsp = xp - 4;
             int ysp = yp;
-            int width = font.getStringWidth(name);
+            int width = font.width(name);
 
             if (xsp < x)
                 xsp -= width - 8;
@@ -403,29 +403,29 @@ public class ModeRadialMenu extends Screen {
 
             Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
             if (data.isSelected())
-                font.drawStringWithShadow(matrices, name, xsp + (data.isCentralized() ? width / 2f - 4 : 0), ysp, color.getRGB());
+                font.drawShadow(matrices, name, xsp + (data.isCentralized() ? width / 2f - 4 : 0), ysp, color.getRGB());
 
             double mod = 0.7;
             int xdp = (int) ((xp - x) * mod + x);
             int ydp = (int) ((yp - y) * mod + y);
 
-            getMinecraft().getTextureManager().bindTexture(signs.get(i));
+            getMinecraft().getTextureManager().bind(signs.get(i));
             RenderSystem.color4f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
-            getMinecraft().getTextureManager().bindTexture(signs.get(i));
+            getMinecraft().getTextureManager().bind(signs.get(i));
             blit(matrices, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
         }
 
         RenderSystem.enableRescaleNormal();
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-        RenderHelper.enableStandardItemLighting();
+        RenderHelper.turnBackOn();
 
         float s = 2.25F * fract;
         RenderSystem.scalef(s, s, s);
         RenderSystem.translatef(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
-        itemRenderer.renderItemAndEffectIntoGUI(tool, 0, 0);
+        itemRenderer.renderAndDecorateItem(tool, 0, 0);
 
-        RenderHelper.disableStandardItemLighting();
+        RenderHelper.turnOff();
         RenderSystem.disableBlend();
         RenderSystem.disableRescaleNormal();
 
@@ -466,14 +466,14 @@ public class ModeRadialMenu extends Screen {
 
     @Override
     public void tick() {
-        if (!InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), KeyBindings.menuSettings.getKey().getKeyCode())) {
-            closeScreen();
+        if (!InputMappings.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), KeyBindings.menuSettings.getKey().getValue())) {
+            onClose();
             changeMode();
         }
 
-        ImmutableSet<KeyBinding> set = ImmutableSet.of(getMinecraft().gameSettings.keyBindForward, getMinecraft().gameSettings.keyBindLeft, getMinecraft().gameSettings.keyBindBack, getMinecraft().gameSettings.keyBindRight, getMinecraft().gameSettings.keyBindSneak, getMinecraft().gameSettings.keyBindSprint, getMinecraft().gameSettings.keyBindJump);
+        ImmutableSet<KeyBinding> set = ImmutableSet.of(getMinecraft().options.keyUp, getMinecraft().options.keyLeft, getMinecraft().options.keyDown, getMinecraft().options.keyRight, getMinecraft().options.keyShift, getMinecraft().options.keySprint, getMinecraft().options.keyJump);
         for (KeyBinding k : set)
-            KeyBinding.setKeyBindState(k.getKey(), k.isKeyDown());
+            KeyBinding.set(k.getKey(), k.isDown());
 
         timeIn++;
         ItemStack tool = getGadget();

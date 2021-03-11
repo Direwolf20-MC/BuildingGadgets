@@ -53,7 +53,7 @@ public class DireVertexBuffer implements AutoCloseable {
         Pair<DireBufferBuilder.DrawState, ByteBuffer> pair = bufferIn.getNextBuffer();
         if (this.glBufferId != -1) {
             ByteBuffer bytebuffer = pair.getSecond();
-            this.count = bytebuffer.remaining() / this.vertexFormat.getSize();
+            this.count = bytebuffer.remaining() / this.vertexFormat.getVertexSize();
             this.bindBuffer();
             RenderSystem.glBufferData(34962, bytebuffer, 35044);
             unbindBuffer();

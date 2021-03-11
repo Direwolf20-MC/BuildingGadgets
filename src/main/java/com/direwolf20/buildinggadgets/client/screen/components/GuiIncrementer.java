@@ -36,10 +36,10 @@ public class GuiIncrementer extends Widget {
         this.onChange = onChange;
 
         this.minusButton = new DireButton(this.x, this.y - 1, 12, 17, new StringTextComponent("-"), (button) -> this.updateValue(true));
-        this.field = new GuiTextFieldBase(Minecraft.getInstance().fontRenderer, x + 13, y, 40).setDefaultInt(this.value).restrictToNumeric();
+        this.field = new GuiTextFieldBase(Minecraft.getInstance().font, x + 13, y, 40).setDefaultInt(this.value).restrictToNumeric();
         this.plusButton = new DireButton(this.x + 40 + 14, this.y - 1, 12, 17, new StringTextComponent("+"), (button) -> this.updateValue(false));
 
-        this.field.setText(String.valueOf(this.value));
+        this.field.setValue(String.valueOf(this.value));
     }
 
     public GuiIncrementer(int x, int y) {
@@ -65,7 +65,7 @@ public class GuiIncrementer extends Widget {
             return;
 
         this.value = MathHelper.clamp(value, this.min, this.max);
-        this.field.setText(String.valueOf(this.value));
+        this.field.setValue(String.valueOf(this.value));
 
         if( this.onChange != null )
             this.onChange.onChange(value);
@@ -102,11 +102,11 @@ public class GuiIncrementer extends Widget {
             return false;
 
         this.field.charTyped(p_charTyped_1_, p_charTyped_2_);
-        if( this.field.getText().length() > 1 && this.field.getText().charAt(0) == '0' )
-            this.field.setText(String.valueOf(this.field.getInt()));
+        if( this.field.getValue().length() > 1 && this.field.getValue().charAt(0) == '0' )
+            this.field.setValue(String.valueOf(this.field.getInt()));
 
         if( this.field.getInt() > this.max )
-            this.field.setText(String.valueOf(this.max));
+            this.field.setValue(String.valueOf(this.max));
 
         return true;
     }

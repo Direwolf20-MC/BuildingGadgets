@@ -24,8 +24,8 @@ public class ConstructionBlockEntity extends EntityBase {
     @ObjectHolder(Reference.EntityReference.CONSTRUCTION_BLOCK_ENTITY)
     public static EntityType<ConstructionBlockEntity> TYPE;
 
-    private static final DataParameter<BlockPos> FIXED = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BLOCK_POS);
-    private static final DataParameter<Boolean> MAKING = EntityDataManager.createKey(ConstructionBlockEntity.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<BlockPos> FIXED = EntityDataManager.defineId(ConstructionBlockEntity.class, DataSerializers.BLOCK_POS);
+    private static final DataParameter<Boolean> MAKING = EntityDataManager.defineId(ConstructionBlockEntity.class, DataSerializers.BOOLEAN);
 
     public ConstructionBlockEntity(EntityType<?> type, World world) {
         super(type, world);
@@ -34,7 +34,7 @@ public class ConstructionBlockEntity extends EntityBase {
     public ConstructionBlockEntity(World world, BlockPos spawnPos, boolean makePaste) {
         this(TYPE, world);
         
-        setPosition(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
+        setPos(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
         targetPos = spawnPos;
         setMakingPaste(makePaste);
     }
@@ -45,9 +45,9 @@ public class ConstructionBlockEntity extends EntityBase {
     }
 
     @Override
-    protected void registerData() {
-        dataManager.register(FIXED, BlockPos.ZERO);
-        dataManager.register(MAKING, false);
+    protected void defineSynchedData() {
+        entityData.define(FIXED, BlockPos.ZERO);
+        entityData.define(MAKING, false);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class ConstructionBlockEntity extends EntityBase {
         if (targetPos == null)
             return false;
 
-        Block block = world.getBlockState(targetPos).getBlock();
+        Block block = level.getBlockState(targetPos).getBlock();
         return !(block instanceof ConstructionBlock) && !(block instanceof ConstructionBlockPowder);
     }
 
@@ -66,11 +66,11 @@ public class ConstructionBlockEntity extends EntityBase {
     protected void onSetDespawning() {
         if (targetPos != null) {
             if (!getMakingPaste()) {
-                TileEntity te = world.getTileEntity(targetPos);
+                TileEntity te = level.getBlockEntity(targetPos);
                 if (te instanceof ConstructionBlockTileEntity) {
                     BlockData tempState = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
 
-                    boolean opaque = tempState.getState().isOpaqueCube(world, targetPos);
+                    boolean opaque = tempState.getState().isSolidRender(level, targetPos);
                     boolean neighborBrightness = false;//tempState.useNeighbourBrightness(world, targetPos); //TODO find replacement
                     //IBakedModel model;
                     //model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(tempState.getState());
@@ -78,44 +78,44 @@ public class ConstructionBlockEntity extends EntityBase {
                     boolean ambient = false; //TODO Find a better way to get the proper ambient Occlusion value. This is client side only so can't be done here.
                     if (opaque || neighborBrightness || ! ambient) {
                         BlockData tempSetBlock = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
-                        world.setBlockState(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().getDefaultState()
-                                .with(ConstructionBlock.BRIGHT, ! opaque)
-                                .with(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness)
-                                .with(ConstructionBlock.AMBIENT_OCCLUSION, ambient));
-                        te = world.getTileEntity(targetPos);
+                        level.setBlockAndUpdate(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().defaultBlockState()
+                                .setValue(ConstructionBlock.BRIGHT, ! opaque)
+                                .setValue(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness)
+                                .setValue(ConstructionBlock.AMBIENT_OCCLUSION, ambient));
+                        te = level.getBlockEntity(targetPos);
                         if (te instanceof ConstructionBlockTileEntity) {
                             ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock);
                         }
                     }
                 }
-            } else if (world.getBlockState(targetPos) == OurBlocks.CONSTRUCTION_POWDER_BLOCK.get().getDefaultState()) {
-                world.setBlockState(targetPos, OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState());
+            } else if (level.getBlockState(targetPos) == OurBlocks.CONSTRUCTION_POWDER_BLOCK.get().defaultBlockState()) {
+                level.setBlockAndUpdate(targetPos, OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().defaultBlockState());
             }
         }
     }
 
     public void setMakingPaste(boolean paste) {
-        dataManager.set(MAKING, paste);
+        entityData.set(MAKING, paste);
     }
 
     public boolean getMakingPaste() {
-        return dataManager.get(MAKING);
+        return entityData.get(MAKING);
     }
 
     @Override
-    protected void readAdditional(CompoundNBT compound) {
-        super.readAdditional(compound);
+    protected void readAdditionalSaveData(CompoundNBT compound) {
+        super.readAdditionalSaveData(compound);
         setMakingPaste(compound.getBoolean(NBTKeys.ENTITY_CONSTRUCTION_MAKING_PASTE));
     }
 
     @Override
-    protected void writeAdditional(CompoundNBT compound) {
-        super.writeAdditional(compound);
+    protected void addAdditionalSaveData(CompoundNBT compound) {
+        super.addAdditionalSaveData(compound);
         compound.putBoolean(NBTKeys.ENTITY_CONSTRUCTION_MAKING_PASTE, getMakingPaste());
     }
 
     @Override
-    public IPacket<?> createSpawnPacket() {
+    public IPacket<?> getAddEntityPacket() {
         return NetworkHooks.getEntitySpawningPacket(this);
     }
 }

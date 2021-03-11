@@ -9,14 +9,12 @@ import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.ForgeI18n;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -56,13 +54,13 @@ public class DestructionGUI extends Screen {
 
             if (isWithinBounds()) {
                 PacketHandler.sendToServer(new PacketDestructionGUI(left.getValueInt(), right.getValueInt(), up.getValueInt(), down.getValueInt(), depth.getValueInt()));
-                this.closeScreen();
+                this.onClose();
             }
             else
                 Minecraft.getInstance().player.displayClientMessage(MessageTranslation.DESTRCUT_TOO_LARGE.componentTranslation(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), true);
         }));
 
-        this.addButton(new Button((x - 30) - 32, y + 65, 60, 20, new TranslationTextComponent(GuiMod.getLangKeySingle("cancel")), b -> closeScreen()));
+        this.addButton(new Button((x - 30) - 32, y + 65, 60, 20, new TranslationTextComponent(GuiMod.getLangKeySingle("cancel")), b -> onClose()));
 
         sliders.clear();
         sliders.add(depth   = new GuiDestructionSlider(x - (GuiDestructionSlider.width / 2), y - (GuiDestructionSlider.height / 2), GuiTranslation.SINGLE_DEPTH.format() + ":", GadgetDestruction.getToolValue(destructionTool, "depth")));

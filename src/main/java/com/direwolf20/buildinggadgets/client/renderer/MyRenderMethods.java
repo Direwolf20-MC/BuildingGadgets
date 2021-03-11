@@ -13,7 +13,7 @@ public class MyRenderMethods {
             float f1;
             float f2;
 
-            if (bakedquad.hasTintIndex()) {
+            if (bakedquad.isTinted()) {
                 f = red * 1f;
                 f1 = green * 1f;
                 f2 = blue * 1f;

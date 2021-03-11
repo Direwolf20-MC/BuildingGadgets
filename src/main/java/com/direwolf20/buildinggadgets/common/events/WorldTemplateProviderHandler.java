@@ -18,7 +18,7 @@ public final class WorldTemplateProviderHandler {
 
     @SubscribeEvent
     public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event) {
-        if (event.getObject().isRemote())
+        if (event.getObject().isClientSide())
             insertProvider(event, ClientProxy.CACHE_TEMPLATE_PROVIDER);
         else
             insertProvider(event, SaveManager.INSTANCE.getTemplateProvider());

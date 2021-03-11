@@ -15,8 +15,8 @@ public class ConstructionPaste extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        ItemStack itemstack = player.getHeldItem(hand);
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+        ItemStack itemstack = player.getItemInHand(hand);
         itemstack = InventoryHelper.addPasteToContainer(player, itemstack);
         return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
     }

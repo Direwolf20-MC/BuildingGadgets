@@ -47,7 +47,7 @@ public class CapabilityTemplate {
                     TemplateKey templateKey = (TemplateKey) instance;
                     CompoundNBT nbt = new CompoundNBT();
                     if (templateKey.getId() != null)
-                        nbt.putUniqueId(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_ID, templateKey.getId());
+                        nbt.putUUID(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_ID, templateKey.getId());
                     return nbt;
                 }
                 return null;
@@ -58,8 +58,8 @@ public class CapabilityTemplate {
                 if (instance instanceof TemplateKey && inbt instanceof CompoundNBT) {
                     TemplateKey templateKey = (TemplateKey) instance;
                     CompoundNBT nbt = (CompoundNBT) inbt;
-                    if (nbt.hasUniqueId(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_ID))
-                        templateKey.setUUID(nbt.getUniqueId(NBTKeys.KEY_ID));
+                    if (nbt.hasUUID(com.direwolf20.buildinggadgets.common.util.ref.NBTKeys.KEY_ID))
+                        templateKey.setUUID(nbt.getUUID(NBTKeys.KEY_ID));
                 }
             }
         }, TemplateKey::new);

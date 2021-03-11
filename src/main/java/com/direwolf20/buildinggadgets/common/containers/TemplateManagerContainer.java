@@ -27,7 +27,7 @@ public class TemplateManagerContainer extends BaseContainer {
         super(OurContainers.TEMPLATE_MANAGER_CONTAINER.get(), windowId);
         BlockPos pos = extraData.readBlockPos();
 
-        this.te = (TemplateManagerTileEntity) playerInventory.player.world.getTileEntity(pos);
+        this.te = (TemplateManagerTileEntity) playerInventory.player.level.getBlockEntity(pos);
         addOwnSlots();
         addPlayerSlots(playerInventory, -12, 70);
     }
@@ -41,7 +41,7 @@ public class TemplateManagerContainer extends BaseContainer {
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn) {
+    public boolean stillValid(PlayerEntity playerIn) {
         return getTe().canInteractWith(playerIn);
     }
 
@@ -54,26 +54,26 @@ public class TemplateManagerContainer extends BaseContainer {
 
     @Override
     @Nonnull
-    public ItemStack transferStackInSlot(PlayerEntity player, int index) {
+    public ItemStack quickMoveStack(PlayerEntity player, int index) {
         ItemStack itemstack = ItemStack.EMPTY;
-        Slot slot = this.inventorySlots.get(index);
+        Slot slot = this.slots.get(index);
 
-        if (slot != null && slot.getHasStack()) {
-            ItemStack currentStack = slot.getStack();
+        if (slot != null && slot.hasItem()) {
+            ItemStack currentStack = slot.getItem();
             itemstack = currentStack.copy();
 
             if (index < TemplateManagerTileEntity.SIZE) {
-                if (! this.mergeItemStack(currentStack, TemplateManagerTileEntity.SIZE, this.inventorySlots.size(), true)) {
+                if (! this.moveItemStackTo(currentStack, TemplateManagerTileEntity.SIZE, this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (! this.mergeItemStack(currentStack, 0, TemplateManagerTileEntity.SIZE, false)) {
+            } else if (! this.moveItemStackTo(currentStack, 0, TemplateManagerTileEntity.SIZE, false)) {
                 return ItemStack.EMPTY;
             }
 
             if (currentStack.isEmpty()) {
-                slot.putStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             } else {
-                slot.onSlotChanged();
+                slot.setChanged();
             }
         }
 
@@ -98,7 +98,7 @@ public class TemplateManagerContainer extends BaseContainer {
         }
 
         @Override
-        public int getSlotStackLimit() {
+        public int getMaxStackSize() {
             return 1;
         }
     }

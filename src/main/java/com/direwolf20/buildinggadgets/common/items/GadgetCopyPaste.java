@@ -146,7 +146,7 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     @Override
     public boolean performRotate(ItemStack stack, PlayerEntity player) {
-        return player.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
+        return player.level.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
                 stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).map(key -> {
                     Template template = provider.getTemplateForKey(key);
                     provider.setTemplate(key, template.rotate(Rotation.CLOCKWISE_90));
@@ -158,10 +158,10 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     @Override
     public boolean performMirror(ItemStack stack, PlayerEntity player) {
-        return player.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
+        return player.level.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
                 stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).map(key -> {
                     Template template = provider.getTemplateForKey(key);
-                    provider.setTemplate(key, template.mirror(player.getHorizontalFacing().getAxis()));
+                    provider.setTemplate(key, template.mirror(player.getDirection().getAxis()));
                     provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player));
                     return true;
                 }).orElse(false))
@@ -200,9 +200,9 @@ public class GadgetCopyPaste extends AbstractGadget {
             BlockRayTraceResult res = VectorHelper.getLookingAt(playerEntity, stack);
             if (res == null || res.getType() == Type.MISS)
                 return Optional.empty();
-            pos = res.getPos().offset(res.getFace());
+            pos = res.getBlockPos().relative(res.getDirection());
         }
-        return Optional.of(pos).map(p -> p.add(getRelativeVector(stack)));
+        return Optional.of(pos).map(p -> p.offset(getRelativeVector(stack)));
     }
 
     public static Optional<Region> getSelectedRegion(ItemStack stack) {
@@ -279,7 +279,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     @Override
     protected void onAnchorSet(ItemStack stack, PlayerEntity player, BlockRayTraceResult lookingAt) {
         //offset by one
-        super.onAnchorSet(stack, player, new BlockRayTraceResult(lookingAt.getHitVec(), lookingAt.getFace(), lookingAt.getPos().offset(lookingAt.getFace()), lookingAt.isInside()));
+        super.onAnchorSet(stack, player, new BlockRayTraceResult(lookingAt.getLocation(), lookingAt.getDirection(), lookingAt.getBlockPos().relative(lookingAt.getDirection()), lookingAt.isInside()));
     }
 
     public static ItemStack getGadget(PlayerEntity player) {
@@ -291,8 +291,8 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
-        super.addInformation(stack, world, tooltip, flag);
+    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
+        super.appendHoverText(stack, world, tooltip, flag);
         addEnergyInformation(tooltip, stack);
 
         tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack).translation.format()).setStyle(Styles.AQUA));
@@ -307,34 +307,34 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        player.setActiveHand(hand);
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        player.startUsingItem(hand);
 
         BlockRayTraceResult posLookingAt = VectorHelper.getLookingAt(player, stack);
-        TileEntity tileEntity = world.getTileEntity(posLookingAt.getPos());
+        TileEntity tileEntity = world.getBlockEntity(posLookingAt.getBlockPos());
         boolean lookingAtInventory = tileEntity != null && tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).isPresent();
 
-        if (! world.isRemote()) {
-            if (player.isSneaking() && lookingAtInventory) {
-                return ActionResult.resultPass(stack);
+        if (! world.isClientSide()) {
+            if (player.isShiftKeyDown() && lookingAtInventory) {
+                return ActionResult.pass(stack);
             }
 
             if (getToolMode(stack) == ToolMode.COPY) {
-                if (world.getBlockState(posLookingAt.getPos()) != Blocks.AIR.getDefaultState())
-                    setRegionAndCopy(stack, world, player, posLookingAt.getPos());
-            } else if (getToolMode(stack) == ToolMode.PASTE && ! player.isSneaking())
+                if (world.getBlockState(posLookingAt.getBlockPos()) != Blocks.AIR.defaultBlockState())
+                    setRegionAndCopy(stack, world, player, posLookingAt.getBlockPos());
+            } else if (getToolMode(stack) == ToolMode.PASTE && ! player.isShiftKeyDown())
                 getActivePos(player, stack).ifPresent(pos -> build(stack, world, player, pos));
         } else {
-            if (player.isSneaking() && Screen.hasControlDown() && lookingAtInventory) {
+            if (player.isShiftKeyDown() && Screen.hasControlDown() && lookingAtInventory) {
                 PacketHandler.sendToServer(new PacketBindTool());
-                return ActionResult.resultPass(stack);
+                return ActionResult.pass(stack);
             }
 
             if (getToolMode(stack) == ToolMode.COPY) {
-                if (player.isSneaking() && world.getBlockState(posLookingAt.getPos()) == Blocks.AIR.getDefaultState())
+                if (player.isShiftKeyDown() && world.getBlockState(posLookingAt.getBlockPos()) == Blocks.AIR.defaultBlockState())
                     GuiMod.COPY.openScreen(player);
-            } else if (player.isSneaking()) {
+            } else if (player.isShiftKeyDown()) {
                 GuiMod.PASTE.openScreen(player);
             } else {
                 BaseRenderer.updateInventoryCache();
@@ -344,7 +344,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void setRegionAndCopy(ItemStack stack, World world, PlayerEntity player, BlockPos lookedAt) {
-        if (player.isSneaking()) {
+        if (player.isShiftKeyDown()) {
             if (getLowerRegionBound(stack) != null && ! checkCopy(world, player, new Region(lookedAt, getLowerRegionBound(stack))))
                 return;
             setUpperRegionBound(stack, lookedAt);
@@ -365,7 +365,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                 .stack(stack)
                 .build(world);
         WorldBuildView buildView = WorldBuildView.create(context, region,
-                (c, p) -> InventoryHelper.getSafeBlockData(player, p, player.getActiveHand()));
+                (c, p) -> InventoryHelper.getSafeBlockData(player, p, player.getUsedItemHand()));
         performCopy(stack, buildView);
     }
 
@@ -399,7 +399,7 @@ public class GadgetCopyPaste extends AbstractGadget {
             Template newTemplate = new Template(map,
                     TemplateHeader.builder(region)
                             .name("Copy " + getAndIncrementCopyCounter(stack))
-                            .author(player.getName().getUnformattedComponentText())
+                            .author(player.getName().getString())
                             .build());
             onCopyFinished(newTemplate.normalize(), stack, player);
         }, buildView, Config.GADGETS.GADGET_COPY_PASTE.copySteps.get());
@@ -461,7 +461,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                 stack.getCapability(CapabilityEnergy.ENERGY),
                 t -> energyCost,
                 index,
-                (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).isReplaceable(useContext) : c.getWorld().isAirBlock(t.getPos()),
+                (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).canBeReplaced(useContext) : c.getWorld().isEmptyBlock(t.getPos()),
                 true);
         PlacementScheduler.schedulePlacement(view, checker, Config.GADGETS.placeSteps.get())
                 .withFinisher(p -> {

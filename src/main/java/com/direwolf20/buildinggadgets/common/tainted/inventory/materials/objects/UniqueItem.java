@@ -45,7 +45,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
             public boolean match(CompoundNBT nbt, @Nullable CompoundNBT other) {
                 if (other == null)
                     return false;
-                for (String key : nbt.keySet()) {
+                for (String key : nbt.getAllKeys()) {
                     INBT val = nbt.get(key);
                     if (val == null) {
                         if (other.get(key) != null) return false;
@@ -55,7 +55,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
                         return false;
                     if (val.getId() == NBT.TAG_COMPOUND && ! match((CompoundNBT) val, other.getCompound(key)))
                         return false;
-                    else if (val.getId() != NBT.TAG_COMPOUND && ! val.getString().equals(other.get(key).getString()))
+                    else if (val.getId() != NBT.TAG_COMPOUND && ! val.getAsString().equals(other.get(key).getAsString()))
                         return false;
                 }
                 return true;
@@ -86,7 +86,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
 
     public static UniqueItem ofStack(ItemStack stack) {
         CompoundNBT nbt = new CompoundNBT();
-        stack.write(nbt);
+        stack.save(nbt);
         return new UniqueItem(stack.getItem(), stack.getTag(), ComparisonMode.EXACT_MATCH, nbt.getCompound("ForgeCaps"), ComparisonMode.EXACT_MATCH);
     }
 
@@ -155,7 +155,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
         if (forgeCaps != null) {
             //There's no getter for this, so we need to hack or way into it...
             CompoundNBT container = new CompoundNBT();
-            stack.write(container);
+            stack.save(container);
             CompoundNBT otherCapNBT = container.getCompound("ForgeCaps");
             return capMatch.match(forgeCaps, otherCapNBT);
         }
@@ -246,7 +246,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
                 UniqueItem element = (UniqueItem) uobj;
                 Item item = element.getIndexObject();
                 if (printName)
-                    obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NAME, I18n.format(item.getTranslationKey(element.createStack())));
+                    obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NAME, I18n.get(item.getDescriptionId(element.createStack())));
                 obj.add(JsonKeys.MATERIAL_LIST_ITEM_ID, context.serialize(element.getIndexObject().getRegistryName()));
                 if (extended) {
                     if (element.tagCompound != null && ! element.tagCompound.isEmpty()) {
@@ -274,7 +274,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
                 ComparisonMode tagMatch = ComparisonMode.EXACT_MATCH;
                 if (object.has(JsonKeys.MATERIAL_LIST_ITEM_NBT)) {
                     try {
-                        tagCompound = JsonToNBT.getTagFromJson(object.getAsJsonPrimitive(JsonKeys.MATERIAL_LIST_ITEM_NBT).getAsString());
+                        tagCompound = JsonToNBT.parseTag(object.getAsJsonPrimitive(JsonKeys.MATERIAL_LIST_ITEM_NBT).getAsString());
                         tagMatch = context.deserialize(object.get(JsonKeys.MATERIAL_LIST_ITEM_NBT_MATCH), ComparisonMode.class);
                     } catch (CommandSyntaxException e) {
                         e.printStackTrace();
@@ -284,7 +284,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
                 ComparisonMode capMatch = ComparisonMode.EXACT_MATCH;
                 if (object.has(JsonKeys.MATERIAL_LIST_CAP_NBT)) {
                     try {
-                        forgeCaps = JsonToNBT.getTagFromJson(object.getAsJsonPrimitive(JsonKeys.MATERIAL_LIST_CAP_NBT).getAsString());
+                        forgeCaps = JsonToNBT.parseTag(object.getAsJsonPrimitive(JsonKeys.MATERIAL_LIST_CAP_NBT).getAsString());
                         capMatch = context.deserialize(object.get(JsonKeys.MATERIAL_LIST_CAP_NBT_MATCH), ComparisonMode.class);
                     } catch (CommandSyntaxException e) {
                         e.printStackTrace();

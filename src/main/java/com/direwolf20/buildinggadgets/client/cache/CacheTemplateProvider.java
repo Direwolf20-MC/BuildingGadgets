@@ -23,6 +23,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider.IUpdateListener;
+
 @Tainted(reason = "Uses template system")
 public final class CacheTemplateProvider implements ITemplateProvider {
     private final Cache<UUID, Template> cache;

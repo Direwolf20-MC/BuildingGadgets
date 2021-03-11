@@ -69,7 +69,7 @@ public class GuiIconActionable extends Button {
 
     @Override
     public void playDownSound(SoundHandler soundHandler) {
-        soundHandler.play(SimpleSound.master(OurSounds.BEEP.getSound(), selected ? .6F: 1F));
+        soundHandler.play(SimpleSound.forUI(OurSounds.BEEP.getSound(), selected ? .6F: 1F));
     }
 
     @Override
@@ -98,10 +98,10 @@ public class GuiIconActionable extends Button {
         RenderSystem.enableTexture();
 
         RenderSystem.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, alpha);
-        Minecraft.getInstance().getTextureManager().bindTexture(selected ? selectedTexture : deselectedTexture);
+        Minecraft.getInstance().getTextureManager().bind(selected ? selectedTexture : deselectedTexture);
         blit(matrices, this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
 
         if( mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height )
-            drawString(matrices, Minecraft.getInstance().fontRenderer, this.getMessage().getString(), mouseX > (Minecraft.getInstance().getMainWindow().getScaledWidth() / 2) ?  mouseX + 2 : mouseX - Minecraft.getInstance().fontRenderer.getStringWidth(getMessage().getString()), mouseY - 10, activeColor.getRGB());
+            drawString(matrices, Minecraft.getInstance().font, this.getMessage().getString(), mouseX > (Minecraft.getInstance().getWindow().getGuiScaledWidth() / 2) ?  mouseX + 2 : mouseX - Minecraft.getInstance().font.width(getMessage().getString()), mouseY - 10, activeColor.getRGB());
     }
 }

@@ -100,7 +100,7 @@ public class GadgetExchanger extends AbstractGadget {
     }
 
     @Override
-    public int getItemEnchantability() {
+    public int getEnchantmentValue() {
         return 3;
     }
 
@@ -161,7 +161,7 @@ public class GadgetExchanger extends AbstractGadget {
     @Override
     public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
-        player.setActiveHand(hand);
+        player.startUsingItem(hand);
         if (!world.isClientSide) {
             if (player.isShiftKeyDown()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
@@ -276,7 +276,7 @@ public class GadgetExchanger extends AbstractGadget {
                 useConstructionPaste = true;
         }
 
-        if (! player.isAllowEdit() || ! world.isBlockModifiable(player, pos))
+        if (! player.mayBuild() || ! world.mayInteract(player, pos))
             return;
 
         BlockSnapshot blockSnapshot = BlockSnapshot.create(world.dimension(), world, pos);
@@ -290,13 +290,13 @@ public class GadgetExchanger extends AbstractGadget {
             MaterialList materials = te instanceof ConstructionBlockTileEntity ? InventoryHelper.PASTE_LIST : data.getRequiredItems(
                     buildContext,
                     currentBlock,
-                    world.rayTraceBlocks(new RayTraceContext(player.position(), Vector3d.atLowerCornerOf(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
+                    world.clip(new RayTraceContext(player.position(), Vector3d.atLowerCornerOf(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
                     pos);
 
             Iterator<ImmutableMultiset<IUniqueObject<?>>> it = materials.iterator();
             Multiset<IUniqueObject<?>> producedItems = LinkedHashMultiset.create();
 
-            if (buildContext.getStack().isEnchanted() && EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, buildContext.getStack()) > 0) {
+            if (buildContext.getStack().isEnchanted() && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, buildContext.getStack()) > 0) {
                 producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
             } else {
                 List<ItemStack> drops = Block.getDrops(currentBlock, (ServerWorld) buildContext.getWorld(), pos, buildContext.getWorld().getBlockEntity(pos));

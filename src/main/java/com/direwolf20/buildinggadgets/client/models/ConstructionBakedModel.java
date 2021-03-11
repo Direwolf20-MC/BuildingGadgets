@@ -32,26 +32,26 @@ public class ConstructionBakedModel implements IDynamicBakedModel {
     }
 
     @Override
-    public boolean isSideLit() {
+    public boolean usesBlockLight() {
         return false;
     }
 
     @Override
-    public boolean isBuiltInRenderer() {
+    public boolean isCustomRenderer() {
         return false;
     }
 
     @Override
-    public TextureAtlasSprite getParticleTexture() {
+    public TextureAtlasSprite getParticleIcon() {
         return null;
     }
 
     @Override
-    public boolean isAmbientOcclusion() {
+    public boolean useAmbientOcclusion() {
         if (facadeState == null) return false;
         IBakedModel model;
-        model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);
-        return model.isAmbientOcclusion();
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(facadeState);
+        return model.useAmbientOcclusion();
     }
 
     @Override
@@ -59,12 +59,12 @@ public class ConstructionBakedModel implements IDynamicBakedModel {
         IBakedModel model;
         facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
         RenderType layer = MinecraftForgeClient.getRenderLayer();
-        if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
-            facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
+        if (facadeState == null || facadeState == Blocks.AIR.defaultBlockState())
+            facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().defaultBlockState();
         if (layer != null && ! RenderTypeLookup.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
             return Collections.emptyList();
         }
-        model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);
+        model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(facadeState);
         return model.getQuads(facadeState, side, rand);
 
     }

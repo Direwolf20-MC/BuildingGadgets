@@ -21,6 +21,8 @@ import net.minecraft.util.text.StringTextComponent;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.client.gui.widget.button.Button.IPressable;
+
 public class CopyGUI extends Screen {
     private GuiIncrementer startX, startY, startZ, endX, endY, endZ;
 
@@ -76,10 +78,10 @@ public class CopyGUI extends Screen {
                 }
                 PacketHandler.sendToServer(new PacketCopyCoords(startPos, endPos));
             }));
-            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLOSE.componentTranslation(), (button) -> closeScreen()));
+            add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLOSE.componentTranslation(), (button) -> onClose()));
             add(new CenteredButton(y + 20, 50, GuiTranslation.SINGLE_CLEAR.componentTranslation(), (button) -> {
                 PacketHandler.sendToServer(new PacketCopyCoords(BlockPos.ZERO, BlockPos.ZERO));
-                closeScreen();
+                onClose();
             }));
 
             if( Config.GENERAL.allowAbsoluteCoords.get() ) {
@@ -95,7 +97,7 @@ public class CopyGUI extends Screen {
     }
 
     private void drawFieldLabel(MatrixStack matrices, String name, int x, int y) {
-        font.drawStringWithShadow(matrices, name, this.x + x, this.y + y, 0xFFFFFF);
+        font.drawShadow(matrices, name, this.x + x, this.y + y, 0xFFFFFF);
     }
 
     private void coordsModeSwitch() {
@@ -132,8 +134,8 @@ public class CopyGUI extends Screen {
         drawFieldLabel(matrices, "Y", -45, -11);
         drawFieldLabel(matrices, "Z", 55, -11);
 
-        drawCenteredString(matrices, Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), this.x, this.y - 80, 0xFFFFFF);
-        drawCenteredString(matrices, Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_SUBHEADING.getTranslationKey()), this.x, this.y - 68, 0xFFFFFF);
+        drawCenteredString(matrices, Minecraft.getInstance().font, I18n.get(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), this.x, this.y - 80, 0xFFFFFF);
+        drawCenteredString(matrices, Minecraft.getInstance().font, I18n.get(GuiTranslation.COPY_LABEL_SUBHEADING.getTranslationKey()), this.x, this.y - 68, 0xFFFFFF);
 
         super.render(matrices, mouseX, mouseY, partialTicks);
     }

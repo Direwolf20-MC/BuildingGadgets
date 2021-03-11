@@ -14,16 +14,16 @@ public class GuiTextFieldBase extends TextFieldWidget {
     public GuiTextFieldBase(FontRenderer fontRenderer, int x, int y, int width) {
         super(fontRenderer, x, y, width, 15, StringTextComponent.EMPTY);
 
-        setMaxStringLength(50);
-        setValidator(s -> {
-            valueOld = getText();
+        setMaxLength(50);
+        setFilter(s -> {
+            valueOld = getValue();
             return true;
         });
     }
 
     @Override
-    public void setText(String textIn) {
-        super.setText(textIn);
+    public void setValue(String textIn) {
+        super.setValue(textIn);
 
         //TODO validate that this is the correct place
         postModification(textIn);
@@ -38,8 +38,8 @@ public class GuiTextFieldBase extends TextFieldWidget {
     }
 
     public GuiTextFieldBase restrictToNumeric() {
-        setValidator(s -> {
-            valueOld = getText();
+        setFilter(s -> {
+            valueOld = getValue();
             if (s == null || s.isEmpty() || "-".equals(s))
                 return true;
 
@@ -56,7 +56,7 @@ public class GuiTextFieldBase extends TextFieldWidget {
 
     public int getInt() {
         try {            
-            return Integer.parseInt(getText());
+            return Integer.parseInt(getValue());
         } catch (NumberFormatException e) {
             return 0;
         }

@@ -18,12 +18,12 @@ public class RecipeConstructionPaste extends ShapedRecipe {
     }
 
     @Override
-    public ItemStack getCraftingResult(CraftingInventory craftingInventory) {
-        final ItemStack output = super.getCraftingResult(craftingInventory); // Get the default output
+    public ItemStack assemble(CraftingInventory craftingInventory) {
+        final ItemStack output = super.assemble(craftingInventory); // Get the default output
         if (!output.isEmpty()) {
             int totalPaste = 0;
-            for (int i = 0; i < craftingInventory.getSizeInventory(); i++) { // For each slot in the crafting inventory,
-                final ItemStack ingredient = craftingInventory.getStackInSlot(i); // Get the ingredient in the slot
+            for (int i = 0; i < craftingInventory.getContainerSize(); i++) { // For each slot in the crafting inventory,
+                final ItemStack ingredient = craftingInventory.getItem(i); // Get the ingredient in the slot
                 if (ingredient.getItem() instanceof ConstructionPasteContainer) // If it's a Paste Container,
                     totalPaste += ConstructionPasteContainer.getPasteAmount(ingredient);
             }
@@ -40,10 +40,10 @@ public class RecipeConstructionPaste extends ShapedRecipe {
     public static final class Serializer extends ShapedRecipe.Serializer {
         public static final Serializer INSTANCE = new Serializer();
         @Override
-        public ShapedRecipe read(ResourceLocation recipeId, JsonObject json) {
-            ShapedRecipe recipe = super.read(recipeId, json);
+        public ShapedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+            ShapedRecipe recipe = super.fromJson(recipeId, json);
             return new RecipeConstructionPaste(recipe.getId(), recipe.getGroup(), recipe.getRecipeWidth(),
-                    recipe.getRecipeHeight(), recipe.getIngredients(), recipe.getRecipeOutput());
+                    recipe.getRecipeHeight(), recipe.getIngredients(), recipe.getResultItem());
         }
     }
 }

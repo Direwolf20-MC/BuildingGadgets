@@ -48,7 +48,7 @@ public abstract class AbstractMode {
         return collect(context, player, startPos)
                 .stream()
                 .filter(e -> isExchanging ? this.exchangingValidator(e, lookingAtState, context) : this.validator(player, e, context))
-                .sorted(Comparator.comparing((BlockPos pos) -> player.getPosition().distanceSq(pos)))
+                .sorted(Comparator.comparing((BlockPos pos) -> player.blockPosition().distSqr(pos)))
                 .collect(Collectors.toList());
     }
 
@@ -59,7 +59,7 @@ public abstract class AbstractMode {
      * @return if the block is valid
      */
     public boolean validator(PlayerEntity player, BlockPos pos, UseContext context) {
-        if (!context.getWorldState(pos).isReplaceable(context.createBlockUseContext(player)))
+        if (!context.getWorldState(pos).canBeReplaced(context.createBlockUseContext(player)))
             return false;
 
         if (World.isOutsideBuildHeight(pos))
@@ -72,14 +72,14 @@ public abstract class AbstractMode {
 
     private boolean exchangingValidator(BlockPos pos, BlockState lookingAtState, UseContext context) {
         BlockState worldBlockState = context.getWorldState(pos);
-        TileEntity te = context.getWorld().getTileEntity(pos);
+        TileEntity te = context.getWorld().getBlockEntity(pos);
 
         // No air! or water
         if( worldBlockState.getMaterial() == Material.AIR || worldBlockState.getMaterial().isLiquid() )
             return false;
 
         // No effect blocks and don't try with the same block as you're trying to exchange with
-        if (worldBlockState == OurBlocks.EFFECT_BLOCK.get().getDefaultState()
+        if (worldBlockState == OurBlocks.EFFECT_BLOCK.get().defaultBlockState()
                 || worldBlockState == context.getSetState() )
             return false;
 
@@ -88,19 +88,19 @@ public abstract class AbstractMode {
             return false;
 
         // Don't exchange bedrock
-        if (worldBlockState.getBlockHardness(context.getWorld(), pos) < 0)
+        if (worldBlockState.getDestroySpeed(context.getWorld(), pos) < 0)
             return false;
 
-        if (worldBlockState.getBlock().getDefaultState() != lookingAtState.getBlock().getDefaultState() && !context.isFuzzy())
+        if (worldBlockState.getBlock().defaultBlockState() != lookingAtState.getBlock().defaultBlockState() && !context.isFuzzy())
             return false;
 
         // Finally, ensure at least a single face is exposed.
         boolean hasSingeValid = false;
         for(Direction direction : Direction.values()) {
-            BlockPos offset = pos.offset(direction);
+            BlockPos offset = pos.relative(direction);
             BlockState state = context.getWorld().getBlockState(offset);
             if( state.isAir(context.getWorld(), offset)
-                    || (state.getShape(context.getWorld(), offset) != VoxelShapes.fullCube() && !(state.getBlock() instanceof StairsBlock))) {
+                    || (state.getShape(context.getWorld(), offset) != VoxelShapes.block() && !(state.getBlock() instanceof StairsBlock))) {
                 hasSingeValid = true;
                 break;
             }
@@ -110,7 +110,7 @@ public abstract class AbstractMode {
     }
 
     public BlockPos withOffset(BlockPos pos, Direction side, boolean placeOnTop) {
-        return placeOnTop ? pos.offset(side, 1) : pos;
+        return placeOnTop ? pos.relative(side, 1) : pos;
     }
 
     public boolean isExchanging() {

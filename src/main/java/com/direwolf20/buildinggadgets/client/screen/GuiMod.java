@@ -41,7 +41,7 @@ public enum GuiMod {
             return false;
 
         Screen screen = clientScreenProvider.apply(stack).get();
-        Minecraft.getInstance().displayGuiScreen(screen);
+        Minecraft.getInstance().setScreen(screen);
         return screen == null;
     }
 

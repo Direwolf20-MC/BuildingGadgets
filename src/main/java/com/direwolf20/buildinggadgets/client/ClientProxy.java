@@ -54,7 +54,7 @@ public class ClientProxy {
         MinecraftForge.EVENT_BUS.addListener(EventTooltip::onDrawTooltip);
         MinecraftForge.EVENT_BUS.addListener(ClientProxy::onPlayerLoggedOut);
 
-        ScreenManager.registerFactory(OurContainers.TEMPLATE_MANAGER_CONTAINER.get(), TemplateManagerGUI::new);
+        ScreenManager.register(OurContainers.TEMPLATE_MANAGER_CONTAINER.get(), TemplateManagerGUI::new);
         ((ConstructionBlock) OurBlocks.CONSTRUCTION_BLOCK.get()).initColorHandler(Minecraft.getInstance().getBlockColors());
 
         RenderTypeLookup.setRenderLayer(OurBlocks.CONSTRUCTION_BLOCK.get(), (RenderType) -> true);
@@ -67,7 +67,7 @@ public class ClientProxy {
     }
 
     public static void playSound(SoundEvent sound, float pitch) {
-        Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(sound, pitch));
+        Minecraft.getInstance().getSoundManager().play(SimpleSound.forUI(sound, pitch));
     }
 
     private static void onPlayerLoggedOut(PlayerLoggedOutEvent event) {
@@ -76,7 +76,7 @@ public class ClientProxy {
 
     private static void bakeModels(ModelBakeEvent event) {
         ResourceLocation ConstrName = new ResourceLocation(Reference.MODID, "construction_block");
-        TextureAtlasSprite breakPart = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(Blocks.STONE.getDefaultState()).getParticleTexture();
+        TextureAtlasSprite breakPart = Minecraft.getInstance().getBlockRenderer().getBlockModel(Blocks.STONE.defaultBlockState()).getParticleIcon();
         ModelResourceLocation ConstrLocation1 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=false,neighbor_brightness=false");
         ModelResourceLocation ConstrLocation1a = new ModelResourceLocation(ConstrName, "ambient_occlusion=true,bright=false,neighbor_brightness=false");
         ModelResourceLocation ConstrLocation2 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=true,neighbor_brightness=false");
@@ -95,17 +95,17 @@ public class ClientProxy {
             }
 
             @Override
-            public boolean isSideLit() { //isSideLit maybe?
+            public boolean usesBlockLight() { //isSideLit maybe?
                 return false;
             }
 
             @Override
-            public boolean isBuiltInRenderer() {
+            public boolean isCustomRenderer() {
                 return false;
             }
 
             @Override
-            public boolean isAmbientOcclusion() {
+            public boolean useAmbientOcclusion() {
                 return true;
             }
 
@@ -114,18 +114,18 @@ public class ClientProxy {
                 IBakedModel model;
                 facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 RenderType layer = MinecraftForgeClient.getRenderLayer();
-                if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
-                    facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
+                if (facadeState == null || facadeState == Blocks.AIR.defaultBlockState())
+                    facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().defaultBlockState();
                 if (layer != null && ! RenderTypeLookup.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
-                model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);
+                model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(facadeState);
                 return model.getQuads(facadeState, side, rand);
 
             }
 
             @Override
-            public TextureAtlasSprite getParticleTexture() {
+            public TextureAtlasSprite getParticleIcon() {
                 //Fixes a crash until forge does something
                 return breakPart;
             }
@@ -151,17 +151,17 @@ public class ClientProxy {
             }
 
             @Override
-            public boolean isSideLit() {
+            public boolean usesBlockLight() {
                 return false;
             } // is side lit maybe?
 
             @Override
-            public boolean isBuiltInRenderer() {
+            public boolean isCustomRenderer() {
                 return false;
             }
 
             @Override
-            public boolean isAmbientOcclusion() {
+            public boolean useAmbientOcclusion() {
                 return true;
             }
 
@@ -170,18 +170,18 @@ public class ClientProxy {
                 IBakedModel model;
                 facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 RenderType layer = MinecraftForgeClient.getRenderLayer();
-                if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
-                    facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
+                if (facadeState == null || facadeState == Blocks.AIR.defaultBlockState())
+                    facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().defaultBlockState();
                 if (layer != null && ! RenderTypeLookup.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
-                model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);
+                model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(facadeState);
                 return model.getQuads(facadeState, side, rand);
 
             }
 
             @Override
-            public TextureAtlasSprite getParticleTexture() {
+            public TextureAtlasSprite getParticleIcon() {
                 //Fixes a crash until forge does something
                 return breakPart;
             }

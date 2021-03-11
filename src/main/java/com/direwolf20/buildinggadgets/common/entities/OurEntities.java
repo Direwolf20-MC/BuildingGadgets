@@ -22,7 +22,7 @@ public class OurEntities {
     @SubscribeEvent
     public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
         event.getRegistry().register(
-                EntityType.Builder.<ConstructionBlockEntity>create(ConstructionBlockEntity::new, EntityClassification.MISC)
+                EntityType.Builder.<ConstructionBlockEntity>of(ConstructionBlockEntity::new, EntityClassification.MISC)
                         .setTrackingRange(64)
                         .setUpdateInterval(1)
                         .setShouldReceiveVelocityUpdates(false)

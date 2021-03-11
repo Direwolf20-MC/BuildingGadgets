@@ -32,28 +32,28 @@ public class TemplateManager extends Block {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public TemplateManager() {
-        super(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f));
-        setDefaultState(getStateContainer().getBaseState().with(FACING, Direction.SOUTH));
+        super(Block.Properties.of(Material.STONE).strength(2f));
+        registerDefaultState(getStateDefinition().any().setValue(FACING, Direction.SOUTH));
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        super.fillStateContainer(builder);
+    protected void createBlockStateDefinition(StateContainer.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING);
     }
 
     @Override
-    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+    public void onRemove(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         if (newState.getBlock() != this) {
             GadgetUtils.dropTileEntityInventory(worldIn, pos);
-            super.onReplaced(state, worldIn, pos, newState, isMoving);
+            super.onRemove(state, worldIn, pos, newState, isMoving);
         }
     }
 
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockItemUseContext context) {
-        return getDefaultState().with(FACING, context.getPlacementHorizontalFacing().getOpposite());
+        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
@@ -68,11 +68,11 @@ public class TemplateManager extends Block {
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (worldIn.isRemote)
+    public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
+        if (worldIn.isClientSide)
             return ActionResultType.SUCCESS;
 
-        TileEntity te = worldIn.getTileEntity(pos);
+        TileEntity te = worldIn.getBlockEntity(pos);
         if (! (te instanceof TemplateManagerTileEntity))
             return ActionResultType.FAIL;
 

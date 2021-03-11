@@ -31,25 +31,25 @@ public abstract class EntityBase extends Entity {
     }
 
     protected boolean shouldSetDespawning() {
-        return ticksExisted > getMaxLife();
+        return tickCount > getMaxLife();
     }
 
     @Override
-    protected void readAdditional(CompoundNBT compound) {
+    protected void readAdditionalSaveData(CompoundNBT compound) {
         despawning = compound.getInt(NBTKeys.ENTITY_DESPAWNING);
-        ticksExisted = compound.getInt(NBTKeys.ENTITY_TICKS_EXISTED);
+        tickCount = compound.getInt(NBTKeys.ENTITY_TICKS_EXISTED);
         targetPos = NBTUtil.readBlockPos(compound.getCompound(NBTKeys.ENTITY_SET_POS));
     }
 
     @Override
-    protected void writeAdditional(CompoundNBT compound) {
+    protected void addAdditionalSaveData(CompoundNBT compound) {
         compound.putInt(NBTKeys.ENTITY_DESPAWNING, despawning);
-        compound.putInt(NBTKeys.ENTITY_TICKS_EXISTED, ticksExisted);
+        compound.putInt(NBTKeys.ENTITY_TICKS_EXISTED, tickCount);
         compound.put(NBTKeys.ENTITY_SET_POS, NBTUtil.writeBlockPos(targetPos));
     }
 
     @Override
-    public boolean isInRangeToRender3d(double x, double y, double z) {
+    public boolean shouldRender(double x, double y, double z) {
         return true;
     }
 }

@@ -22,7 +22,7 @@ public class VerticalColumnMode extends AbstractMode {
         if( XYZ.isAxisY(context.getHitSide()) ) {
             // The exchanger handles the Y completely differently :sad: means more code
             if( isExchanging() ) {
-                Direction playerFacing = player.getHorizontalFacing();
+                Direction playerFacing = player.getDirection();
                 for (int i = -halfRange; i <= halfRange; i++)
                     coordinates.add(XYZ.extendPosSingle(i, start, playerFacing, XYZ.fromFacing(playerFacing)));
             } else {

@@ -48,7 +48,7 @@ public final class PlacementChecker {
      * @implNote This code is so god damn messy. Good luck understanding it.
      */
     public CheckResult checkPositionWithResult(BuildContext context, PlacementTarget target, boolean giveBackItems) {
-        if (target.getPos().getY() > context.getWorld().getHeight() || target.getPos().getY() < 0 || ! placeCheck.test(context, target))
+        if (target.getPos().getY() > context.getWorld().getMaxBuildHeight() || target.getPos().getY() < 0 || ! placeCheck.test(context, target))
             return new CheckResult(MatchResult.failure(), ImmutableMultiset.of(), false, false);
         int energy = energyFun.applyAsInt(target);
         Multiset<IUniqueObject<?>> insertedItems = ImmutableMultiset.of();

@@ -37,7 +37,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
 
     private static final int SLOT_SIZE = 18;
     private static final int MARGIN = 2;
-    private static final int ENTRY_HEIGHT = Math.max(SLOT_SIZE + MARGIN * 2, Minecraft.getInstance().fontRenderer.FONT_HEIGHT * 2 + MARGIN * 3);
+    private static final int ENTRY_HEIGHT = Math.max(SLOT_SIZE + MARGIN * 2, Minecraft.getInstance().font.lineHeight * 2 + MARGIN * 3);
     private static final int LINE_SIDE_MARGIN = 8;
 
     private MaterialListGUI gui;
@@ -91,7 +91,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
         if (keyCode == GLFW.GLFW_KEY_E) {
             assert Minecraft.getInstance().player != null;
 
-            Minecraft.getInstance().player.closeScreen();
+            Minecraft.getInstance().player.closeContainer();
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
@@ -129,12 +129,12 @@ class ScrollingMaterialList extends EntryList<Entry> {
             this.available = MathHelper.clamp(available, 0, required);
 
             this.stack = item.createStack();
-            this.itemName = stack.getDisplayName().getString();
+            this.itemName = stack.getHoverName().getString();
 
             // Use this.available since the parameter is not clamped
             this.amount = this.available + "/" + required;
-            this.widthItemName = Minecraft.getInstance().fontRenderer.getStringWidth(itemName);
-            this.widthAmount = Minecraft.getInstance().fontRenderer.getStringWidth(amount);
+            this.widthItemName = Minecraft.getInstance().font.width(itemName);
+            this.widthAmount = Minecraft.getInstance().font.width(amount);
         }
 
         @Override
@@ -157,7 +157,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
             int itemNameX = slotX + SLOT_SIZE + MARGIN;
             // -1 because the bottom x coordinate is exclusive
             renderTextVerticalCenter(matrices, itemName, itemNameX, top, bottom, Color.WHITE.getRGB());
-            renderTextHorizontalRight(matrices, amount, right, getYForAlignedCenter(top, bottom, Minecraft.getInstance().fontRenderer.FONT_HEIGHT), getTextColor());
+            renderTextHorizontalRight(matrices, amount, right, getYForAlignedCenter(top, bottom, Minecraft.getInstance().font.lineHeight), getTextColor());
 
             drawGuidingLine(right, top, bottom, itemNameX, widthItemName, widthAmount);
         }
@@ -189,8 +189,8 @@ class ScrollingMaterialList extends EntryList<Entry> {
 
         private void drawIcon(ItemStack item, int slotX, int slotY) {
             RenderSystem.pushMatrix();
-            RenderHelper.enableStandardItemLighting();
-            Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(item, slotX, slotY);
+            RenderHelper.turnBackOn();
+            Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(item, slotX, slotY);
             RenderSystem.disableLighting();
             RenderSystem.color3f(1, 1, 1);
             RenderSystem.popMatrix();
@@ -258,7 +258,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
     }
 
     private void sort() {
-        getEventListeners().sort(sortingMode.getComparator());
+        children().sort(sortingMode.getComparator());
     }
 
     enum SortingModes {

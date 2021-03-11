@@ -19,18 +19,18 @@ public class SurfaceMode extends AbstractMode {
 
         // Grow the area. getXOffset will invert some math for us
         Region area = new Region(start).expand(
-                bound * (1 - Math.abs(context.getHitSide().getXOffset())),
-                bound * (1 - Math.abs(context.getHitSide().getYOffset())),
-                bound * (1 - Math.abs(context.getHitSide().getZOffset()))
+                bound * (1 - Math.abs(context.getHitSide().getStepX())),
+                bound * (1 - Math.abs(context.getHitSide().getStepY())),
+                bound * (1 - Math.abs(context.getHitSide().getStepZ()))
         );
 
         if (!context.isConnected()) {
-            return area.stream().map(BlockPos::toImmutable).collect(Collectors.toList());
+            return area.stream().map(BlockPos::immutable).collect(Collectors.toList());
         }
 
         List<BlockPos> coords = new ArrayList<>();
 
-        ConnectedSurface.create(area, context.getWorld(), pos -> isExchanging() ? pos : pos.offset(context.getHitSide().getOpposite()), start, context.getHitSide().getOpposite(), context.getRange(), context.isFuzzy())
+        ConnectedSurface.create(area, context.getWorld(), pos -> isExchanging() ? pos : pos.relative(context.getHitSide().getOpposite()), start, context.getHitSide().getOpposite(), context.getRange(), context.isFuzzy())
                 .spliterator()
                 .forEachRemaining(coords::add);
 
@@ -46,8 +46,8 @@ public class SurfaceMode extends AbstractMode {
 
         BlockState startState = context.getWorldState(context.getStartPos());
         if( context.isFuzzy() )
-            return topRow && !context.getWorld().isAirBlock(pos.offset(context.getHitSide().getOpposite()));
+            return topRow && !context.getWorld().isEmptyBlock(pos.relative(context.getHitSide().getOpposite()));
 
-        return topRow && context.getWorld().getBlockState(pos.offset(context.getHitSide().getOpposite())) == startState;
+        return topRow && context.getWorld().getBlockState(pos.relative(context.getHitSide().getOpposite())) == startState;
     }
 }

@@ -54,7 +54,7 @@ public class GuiSliderInt extends Slider {
     }
 
     private void playSound() {
-        ClientProxy.playSound(SoundEvents.BLOCK_DISPENSER_FAIL, 2F);
+        ClientProxy.playSound(SoundEvents.DISPENSER_FAIL, 2F);
     }
 
     @Override
@@ -72,12 +72,12 @@ public class GuiSliderInt extends Slider {
     private void renderText(MatrixStack matrices, Minecraft mc, Button component) {
         int color = ! active ? 10526880 : (isHovered ? 16777120 : - 1);
         String buttonText = component.getMessage().getString();
-        int strWidth = mc.fontRenderer.getStringWidth(buttonText);
-        int ellipsisWidth = mc.fontRenderer.getStringWidth("...");
+        int strWidth = mc.font.width(buttonText);
+        int ellipsisWidth = mc.font.width("...");
         if (strWidth > component.getWidth() - 6 && strWidth > ellipsisWidth)
-            buttonText = mc.fontRenderer.func_238412_a_(buttonText, component.getWidth() - 6 - ellipsisWidth).trim() + "...";
+            buttonText = mc.font.plainSubstrByWidth(buttonText, component.getWidth() - 6 - ellipsisWidth).trim() + "...";
 
-        drawCenteredString(matrices, mc.fontRenderer, buttonText, component.x + component.getWidth() / 2, component.y + (component.getHeightRealms() - 8) / 2, color);
+        drawCenteredString(matrices, mc.font, buttonText, component.x + component.getWidth() / 2, component.y + (component.getHeight() - 8) / 2, color);
     }
 
     @Override
