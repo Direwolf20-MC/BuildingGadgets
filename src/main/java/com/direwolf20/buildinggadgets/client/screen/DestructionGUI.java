@@ -59,7 +59,7 @@ public class DestructionGUI extends Screen {
                 this.closeScreen();
             }
             else
-                Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.DESTRCUT_TOO_LARGE.componentTranslation(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), true);
+                Minecraft.getInstance().player.displayClientMessage(MessageTranslation.DESTRCUT_TOO_LARGE.componentTranslation(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), true);
         }));
 
         this.addButton(new Button((x - 30) - 32, y + 65, 60, 20, new TranslationTextComponent(GuiMod.getLangKeySingle("cancel")), b -> closeScreen()));

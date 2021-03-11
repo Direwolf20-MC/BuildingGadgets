@@ -92,7 +92,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
             getMinecraft().keyboardListener.setClipboardString(evaluateTemplateHeader().toJson(false, hasControlDown()));
 
             if( getMinecraft().player != null )
-                getMinecraft().player.sendStatusMessage(new TranslationTextComponent(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
+                getMinecraft().player.displayClientMessage(new TranslationTextComponent(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
         });
 
         // Buttons will be placed left to right in this order

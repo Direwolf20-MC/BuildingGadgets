@@ -26,7 +26,7 @@ public class EventKeyInput {
         if (mc.player == null || event.phase == Phase.START)
             return;
 
-        if (KeyBindings.materialList.isPressed()) {
+        if (KeyBindings.materialList.isDown()) {
             GuiMod.MATERIAL_LIST.openScreen(mc.player);
             return;
         }
@@ -36,20 +36,20 @@ public class EventKeyInput {
             return;
 
         KeyBinding mode = KeyBindings.menuSettings;
-        if (!(mc.currentScreen instanceof ModeRadialMenu) && mode.isPressed() && ((mode.getKeyModifier() == KeyModifier.NONE
+        if (!(mc.screen instanceof ModeRadialMenu) && mode.isDown() && ((mode.getKeyModifier() == KeyModifier.NONE
                 && KeyModifier.getActiveModifier() == KeyModifier.NONE) || mode.getKeyModifier() != KeyModifier.NONE)) {
-                mc.displayGuiScreen(new ModeRadialMenu(tool));
-        } else if (KeyBindings.range.isPressed()) {
+                mc.setScreen(new ModeRadialMenu(tool));
+        } else if (KeyBindings.range.isDown()) {
             PacketHandler.sendToServer(new PacketChangeRange());
-        } else if (KeyBindings.rotateMirror.isPressed()) {
+        } else if (KeyBindings.rotateMirror.isDown()) {
             PacketHandler.sendToServer(new PacketRotateMirror());
-        } else if (KeyBindings.undo.isPressed()) {
+        } else if (KeyBindings.undo.isDown()) {
             PacketHandler.sendToServer(new PacketUndo());
-        } else if (KeyBindings.anchor.isPressed()) {
+        } else if (KeyBindings.anchor.isDown()) {
             PacketHandler.sendToServer(new PacketAnchor());
-        } else if (KeyBindings.fuzzy.isPressed()) {
+        } else if (KeyBindings.fuzzy.isDown()) {
             PacketHandler.sendToServer(new PacketToggleFuzzy());
-        } else if (KeyBindings.connectedArea.isPressed()) {
+        } else if (KeyBindings.connectedArea.isDown()) {
             PacketHandler.sendToServer(new PacketToggleConnectedArea());
         }
     }

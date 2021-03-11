@@ -8,7 +8,7 @@ public class UUIDPacket {
     private final UUID id;
 
     public UUIDPacket(PacketBuffer buffer) {
-        this(buffer.readUniqueId());
+        this(buffer.readUUID());
     }
 
     public UUIDPacket(UUID id) {
@@ -16,7 +16,7 @@ public class UUIDPacket {
     }
 
     public void encode(PacketBuffer buffer) {
-        buffer.writeUniqueId(id);
+        buffer.writeUUID(id);
     }
 
     public UUID getId() {

@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 public class ConnectedSurface implements Iterable<BlockPos> {
     public static ConnectedSurface create(Region searchingRegion, IBlockReader world, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
-        return create(searchingRegion, world, pos -> pos.offset(side), searchingCenter, side, range, fuzzy);
+        return create(searchingRegion, world, pos -> pos.relative(side), searchingCenter, side, range, fuzzy);
     }
 
     public static ConnectedSurface create(Region searchingRegion, IBlockReader world, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
@@ -102,7 +102,7 @@ public class ConnectedSurface implements Iterable<BlockPos> {
                             addNeighbour(neighbor);
                         } else {
                             for (int k = - 1; k <= 1; k++) {
-                                BlockPos neighbor = current.add(i, j, k);
+                                BlockPos neighbor = current.offset(i, j, k);
                                 addNeighbour(neighbor);
                             }
                         }
@@ -131,11 +131,11 @@ public class ConnectedSurface implements Iterable<BlockPos> {
     public BlockPos perpendicularSurfaceOffset(BlockPos pos, Direction.Axis intersector, int i, int j) {
         switch (intersector) {
             case X:
-                return pos.add(0, i, j);
+                return pos.offset(0, i, j);
             case Y:
-                return pos.add(i, 0, j);
+                return pos.offset(i, 0, j);
             case Z:
-                return pos.add(i, j, 0);
+                return pos.offset(i, j, 0);
         }
         throw new IllegalArgumentException("Unknown facing " + intersector);
     }

@@ -72,7 +72,7 @@ public class InventoryHelper {
     static List<IInsertProvider> indexInsertProviders(ItemStack tool, PlayerEntity player) {
         ImmutableList.Builder<IInsertProvider> builder = ImmutableList.builder();
 
-        InventoryLinker.getLinkedInventory(player.world, tool).ifPresent(e -> builder.add(new HandlerInsertProvider(e)));
+        InventoryLinker.getLinkedInventory(player.level, tool).ifPresent(e -> builder.add(new HandlerInsertProvider(e)));
         builder.add(new PlayerInventoryInsertProvider(player));
 
         return builder.build();
@@ -90,7 +90,7 @@ public class InventoryHelper {
     static List<IItemHandler> getHandlers(ItemStack stack, PlayerEntity player) {
         List<IItemHandler> handlers = new ArrayList<>();
 
-        InventoryLinker.getLinkedInventory(player.world, stack).ifPresent(handlers::add);
+        InventoryLinker.getLinkedInventory(player.level, stack).ifPresent(handlers::add);
         player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handlers::add);
 
         return handlers;
@@ -119,10 +119,10 @@ public class InventoryHelper {
         PlayerInventory inv = player.inventory;
         List<Integer> slots = findItem(itemStack.getItem(), inv);
         for (int slot : slots) {
-            ItemStack stackInSlot = inv.getStackInSlot(slot);
+            ItemStack stackInSlot = inv.getItem(slot);
             if (stackInSlot.getCount() < stackInSlot.getItem().getItemStackLimit(stackInSlot)) {
                 ItemStack giveItemStack = itemStack.copy();
-                boolean success = inv.addItemStackToInventory(giveItemStack);
+                boolean success = inv.add(giveItemStack);
                 if (success) return true;
             }
         }
@@ -162,7 +162,7 @@ public class InventoryHelper {
             }
         }
         ItemStack giveItemStack = itemStack.copy();
-        return inv.addItemStackToInventory(giveItemStack);
+        return inv.add(giveItemStack);
     }
 
     public static ItemStack addPasteToContainer(PlayerEntity player, ItemStack itemStack) {
@@ -178,7 +178,7 @@ public class InventoryHelper {
 
         Map<Integer, Integer> slotMap = new HashMap<>();
         for (int slot : slots) {
-            slotMap.put(slot, ConstructionPasteContainer.getPasteAmount(inv.getStackInSlot(slot)));
+            slotMap.put(slot, ConstructionPasteContainer.getPasteAmount(inv.getItem(slot)));
         }
 
         List<Map.Entry<Integer, Integer>> list = new ArrayList<>(slotMap.entrySet());
@@ -188,7 +188,7 @@ public class InventoryHelper {
 
 
         for (Map.Entry<Integer, Integer> entry : list) {
-            ItemStack containerStack = inv.getStackInSlot(entry.getKey());
+            ItemStack containerStack = inv.getItem(entry.getKey());
             ConstructionPasteContainer item = ((ConstructionPasteContainer) containerStack.getItem());
 
             int maxAmount = item.getMaxCapacity();
@@ -213,7 +213,7 @@ public class InventoryHelper {
         List<IItemHandler> containers = new ArrayList<>();
 
         for (int i = 0; i < 36; ++i) {
-            ItemStack stack = inv.getStackInSlot(i);
+            ItemStack stack = inv.getItem(i);
             stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                     .ifPresent(containers::add);
         }
@@ -236,7 +236,7 @@ public class InventoryHelper {
     private static List<Integer> findItem(Item item, PlayerInventory inv) {
         List<Integer> slots = new ArrayList<>();
         for (int i = 0; i < 36; ++i) {
-            ItemStack stack = inv.getStackInSlot(i);
+            ItemStack stack = inv.getItem(i);
             if (!stack.isEmpty() && stack.getItem() == item) {
                 slots.add(i);
             }
@@ -247,7 +247,7 @@ public class InventoryHelper {
     public static List<Integer> findItemClass(Class<?> c, PlayerInventory inv) {
         List<Integer> slots = new ArrayList<>();
         for (int i = 0; i < 36; ++i) {
-            ItemStack stack = inv.getStackInSlot(i);
+            ItemStack stack = inv.getItem(i);
             if (!stack.isEmpty() && c.isInstance(stack.getItem())) {
                 slots.add(i);
             }
@@ -260,29 +260,29 @@ public class InventoryHelper {
     }
 
     public static Optional<BlockData> getSafeBlockData(PlayerEntity player, BlockPos pos, Hand hand) {
-        BlockItemUseContext blockItemUseContext = new BlockItemUseContext(new ItemUseContext(player, hand, CommonUtils.fakeRayTrace(player.getPositionVec(), pos)));
+        BlockItemUseContext blockItemUseContext = new BlockItemUseContext(new ItemUseContext(player, hand, CommonUtils.fakeRayTrace(player.position(), pos)));
         return getSafeBlockData(player, pos, blockItemUseContext);
     }
 
     public static Optional<BlockData> getSafeBlockData(PlayerEntity player, BlockPos pos, BlockItemUseContext useContext) {
-        World world = player.world;
+        World world = player.level;
         Boolean isCopyPasteGadget = (AbstractGadget.getGadget(player).getItem() instanceof GadgetCopyPaste);
         BlockState state = world.getBlockState(pos);
         if (state.getBlock() instanceof FlowingFluidBlock)
             return Optional.empty();
 
         if (state.getBlock() == OurBlocks.CONSTRUCTION_BLOCK.get()) {
-            TileEntity te = world.getTileEntity(pos);
+            TileEntity te = world.getBlockEntity(pos);
             if (te instanceof ConstructionBlockTileEntity) //should already be checked
                 return Optional.of(((ConstructionBlockTileEntity) te).getConstructionBlockData());
         }
 
         // Support doors
-        if (state.getBlock() instanceof DoorBlock && state.get(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.UPPER) {
+        if (state.getBlock() instanceof DoorBlock && state.getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.UPPER) {
             return Optional.empty();
         }
 
-        BlockState placeState = state.getBlock().getDefaultState();
+        BlockState placeState = state.getBlock().defaultBlockState();
         for (Property<?> prop : placeState.getProperties()) {
             if (BASE_UNSAFE_PROPERTIES.contains(prop) || !isCopyPasteGadget && UNSAFE_PROPERTIES.contains(prop)) {
                 continue;
@@ -295,6 +295,6 @@ public class InventoryHelper {
 
     //proper generics...
     private static <T extends Comparable<T>> BlockState applyProperty(BlockState state, BlockState from, Property<T> prop) {
-        return state.with(prop, from.get(prop));
+        return state.setValue(prop, from.getValue(prop));
     }
 }

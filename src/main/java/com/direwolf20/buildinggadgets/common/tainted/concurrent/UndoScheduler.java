@@ -62,13 +62,13 @@ public final class UndoScheduler extends SteppedScheduler {
     private void undoBlock(Map.Entry<BlockPos, BlockInfo> entry) {
         //if the block that was placed is no longer there, we should not undo anything
         BlockState state = context.getWorld().getBlockState(entry.getKey());
-        TileEntity te = context.getWorld().getTileEntity(entry.getKey());
+        TileEntity te = context.getWorld().getBlockEntity(entry.getKey());
         BlockData data;
         if (state.getBlock() == OurBlocks.CONSTRUCTION_BLOCK.get() && te instanceof ConstructionBlockTileEntity) {
             data = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
         } else
             data = TileSupport.createBlockData(state, te);
-        if (data.getState().getBlock().getDefaultState() != entry.getValue().getPlacedData().getState().getBlock().getDefaultState()) {
+        if (data.getState().getBlock().defaultBlockState() != entry.getValue().getPlacedData().getState().getBlock().defaultBlockState()) {
             lastWasSuccess = false;
             return;
         }

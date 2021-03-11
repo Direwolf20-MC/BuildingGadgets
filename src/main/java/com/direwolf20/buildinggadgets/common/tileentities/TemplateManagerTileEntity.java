@@ -30,7 +30,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class TemplateManagerTileEntity extends TileEntity implements INamedContainerProvider {
-    public static final ITag.INamedTag<Item> TEMPLATE_CONVERTIBLES = ItemTags.makeWrapperTag(ItemReference.TAG_TEMPLATE_CONVERTIBLE.toString());
+    public static final ITag.INamedTag<Item> TEMPLATE_CONVERTIBLES = ItemTags.bind(ItemReference.TAG_TEMPLATE_CONVERTIBLE.toString());
 
     public static final int SIZE = 2;
 
@@ -44,7 +44,7 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
         protected void onContentsChanged(int slot) {
             // We need to tell the tile entity that something has changed so
             // that the chest contents is persisted
-            TemplateManagerTileEntity.this.markDirty();
+            TemplateManagerTileEntity.this.setChanged();
         }
 
         private boolean isTemplateStack(ItemStack stack) {
@@ -59,7 +59,7 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
         @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
             return (slot == 0 && isTemplateStack(stack)) ||
-                    (slot == 1 && (isTemplateStack(stack) || stack.getItem().isIn(TEMPLATE_CONVERTIBLES)));
+                    (slot == 1 && (isTemplateStack(stack) || stack.getItem().is(TEMPLATE_CONVERTIBLES)));
         }
     };
     private LazyOptional<IItemHandler> handlerOpt;
@@ -73,7 +73,7 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
     @Nullable
     @Override
     public Container createMenu(int windowId, @Nonnull PlayerInventory playerInventory, @Nonnull PlayerEntity playerEntity) {
-        Preconditions.checkArgument(getWorld() != null);
+        Preconditions.checkArgument(getLevel() != null);
         return new TemplateManagerContainer(windowId, playerInventory, this);
     }
 
@@ -83,9 +83,10 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
         handlerOpt = LazyOptional.of(() -> itemStackHandler);
     }
 
+
     @Override
-    public void read(BlockState state, CompoundNBT nbt) {
-        super.read(state, nbt);
+    public void load(BlockState state, CompoundNBT nbt) {
+        super.load(state, nbt);
 
         if (nbt.contains(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
             itemStackHandler.deserializeNBT(nbt.getCompound(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));
@@ -93,14 +94,14 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
 
     @Nonnull
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
+    public CompoundNBT save(CompoundNBT compound) {
         compound.put(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS, itemStackHandler.serializeNBT());
-        return super.write(compound);
+        return super.save(compound);
     }
 
     public boolean canInteractWith(PlayerEntity playerIn) {
         // If we are too far away (>4 blocks) from this tile entity you cannot use it
-        return ! isRemoved() && playerIn.getDistanceSq(Vector3d.copy(pos).add(0.5D, 0.5D, 0.5D)) <= 64D;
+        return ! isRemoved() && playerIn.distanceToSqr(Vector3d.atLowerCornerOf(this.worldPosition).add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
     @Nonnull

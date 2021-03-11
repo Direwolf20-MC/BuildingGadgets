@@ -61,7 +61,7 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
     }
 
     private void complete() {
-        if (world == null || world.isRemote || mode == null || renderedBlock == null)
+        if (level == null || level.isClientSide || mode == null || renderedBlock == null)
             return;
 
         mode.onBuilderRemoved(this);
@@ -94,13 +94,13 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
     @Override
     public SUpdateTileEntityPacket getUpdatePacket() {
         // Vanilla uses the type parameter to indicate which type of tile entity (command block, skull, or beacon?) is receiving the packet, but it seems like Forge has overridden this behavior
-        return new SUpdateTileEntityPacket(pos, 0, getUpdateTag());
+        return new SUpdateTileEntityPacket(worldPosition, 0, getUpdateTag());
     }
 
     @Nonnull
     @Override
     public CompoundNBT getUpdateTag() {
-        return write(new CompoundNBT());
+        return save(new CompoundNBT());
     }
 
     @Override
@@ -110,12 +110,12 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
 
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-        deserializeNBT(pkt.getNbtCompound());
+        deserializeNBT(pkt.getTag());
     }
 
     @Nonnull
     @Override
-    public CompoundNBT write(@Nonnull CompoundNBT compound) {
+    public CompoundNBT save(@Nonnull CompoundNBT compound) {
         if (mode != null && renderedBlock != null && sourceBlock != null) {
             compound.putInt(NBTKeys.GADGET_TICKS, ticks);
             compound.putInt(NBTKeys.GADGET_MODE, mode.ordinal());
@@ -123,12 +123,12 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
             compound.put(NBTKeys.GADGET_SOURCE_BLOCK, sourceBlock.serialize(true));
             compound.putBoolean(NBTKeys.GADGET_USE_PASTE, usePaste);
         }
-        return super.write(compound);
+        return super.save(compound);
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT nbt) {
-        super.read(state, nbt);
+    public void load(BlockState state, CompoundNBT nbt) {
+        super.load(state, nbt);
 
         if (nbt.contains(NBTKeys.GADGET_TICKS, NBT.TAG_INT) &&
                 nbt.contains(NBTKeys.GADGET_MODE, NBT.TAG_INT) &&

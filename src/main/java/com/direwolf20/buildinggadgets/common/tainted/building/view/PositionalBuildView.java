@@ -10,7 +10,6 @@ import net.minecraft.util.math.BlockPos;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Spliterator;
-import java.util.function.Function;
 
 /**
  * A simple {@link IBuildView} backed by a {@link Map Map<BlockPos, BlockData>}. {@link PlacementTarget PlacementTargets} will be created
@@ -43,7 +42,7 @@ public final class PositionalBuildView implements IBuildView {
     @Override
     public Spliterator<PlacementTarget> spliterator() {
         BlockPos translation = this.translation;
-        return new MappingSpliterator<>(map.entrySet().spliterator(), e -> new PlacementTarget(e.getKey().add(translation), e.getValue()));
+        return new MappingSpliterator<>(map.entrySet().spliterator(), e -> new PlacementTarget(e.getKey().offset(translation), e.getValue()));
     }
 
     @Override

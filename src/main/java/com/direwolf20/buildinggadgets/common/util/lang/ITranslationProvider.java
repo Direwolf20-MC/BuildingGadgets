@@ -7,7 +7,7 @@ public interface ITranslationProvider {
     /*Client side only! */
     default String format(Object... args) {
         assert areValidArguments(args);
-        return I18n.format(getTranslationKey(), args);
+        return I18n.get(getTranslationKey(), args);
     }
 
     default TranslationTextComponent componentTranslation(Object... args) {

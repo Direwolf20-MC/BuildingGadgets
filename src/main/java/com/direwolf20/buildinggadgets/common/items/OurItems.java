@@ -49,10 +49,10 @@ public final class OurItems {
             = ITEMS.register("template_manager", () -> new BlockItem(OurBlocks.TEMPLATE_MANGER_BLOCK.get(), OurItems.itemProperties()));
 
     public static Item.Properties itemProperties() {
-        return new Item.Properties().group(BuildingGadgets.creativeTab);
+        return new Item.Properties().tab(BuildingGadgets.creativeTab);
     }
 
     public static Item.Properties nonStackableItemProperties() {
-        return itemProperties().maxStackSize(1);
+        return itemProperties().stacksTo(1);
     }
 }

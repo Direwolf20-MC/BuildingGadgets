@@ -355,7 +355,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         }
         Optional<Region> regionOpt = getSelectedRegion(stack);
         if (! regionOpt.isPresent()) //notify of single copy
-            player.sendStatusMessage(MessageTranslation.FIRST_COPY.componentTranslation().setStyle(Styles.DK_GREEN), true);
+            player.displayClientMessage(MessageTranslation.FIRST_COPY.componentTranslation().setStyle(Styles.DK_GREEN), true);
         regionOpt.ifPresent(region -> tryCopy(stack, world, player, region));
     }
 
@@ -373,7 +373,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         if (! ForceUnloadedCommand.mayForceUnloadedChunks(player)) {
             ImmutableSortedSet<ChunkPos> unloaded = region.getUnloadedChunks(world);
             if (! unloaded.isEmpty()) {
-                player.sendStatusMessage(MessageTranslation.COPY_UNLOADED.componentTranslation(unloaded.size()).setStyle(Styles.RED), true);
+                player.displayClientMessage(MessageTranslation.COPY_UNLOADED.componentTranslation(unloaded.size()).setStyle(Styles.RED), true);
                 BuildingGadgets.LOG.debug("Prevented copy because {} chunks where detected as unloaded.", unloaded.size());
                 BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", CHUNK_JOINER.join(unloaded));
                 return false;
@@ -383,7 +383,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         if (region.getXSize() > 0xFFFF || region.getYSize() > 255 || region.getZSize() > 0xFFFF ||  //these are the max dimensions of a Template
                 ((region.getXSize() > maxDimension || region.getYSize() > maxDimension || region.getZSize() > maxDimension) && ! OverrideCopySizeCommand.mayPerformLargeCopy(player))) {
             BlockPos sizeVec = region.getMax().subtract(region.getMin());
-            player.sendStatusMessage(MessageTranslation.COPY_TOO_LARGE
+            player.displayClientMessage(MessageTranslation.COPY_TOO_LARGE
                     .componentTranslation(sizeVec.getX(), sizeVec.getY(), sizeVec.getZ(), Math.min(maxDimension, 0xFFFF), Math.min(maxDimension, 255), Math.min(maxDimension, 0xFFFF))
                     .setStyle(Styles.RED), true);
             return false;
@@ -434,7 +434,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         if (! ForceUnloadedCommand.mayForceUnloadedChunks(player)) {
             ImmutableSortedSet<ChunkPos> unloaded = region.getUnloadedChunks(world);
             if (! unloaded.isEmpty()) {
-                player.sendStatusMessage(MessageTranslation.BUILD_UNLOADED.componentTranslation(unloaded.size()).setStyle(Styles.RED), true);
+                player.displayClientMessage(MessageTranslation.BUILD_UNLOADED.componentTranslation(unloaded.size()).setStyle(Styles.RED), true);
                 BuildingGadgets.LOG.debug("Prevented build because {} chunks where detected as unloaded.", unloaded.size());
                 BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", CHUNK_JOINER.join(unloaded));
                 return false;
@@ -444,7 +444,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         if ((region.getXSize() > maxDimension || region.getYSize() > maxDimension || region.getZSize() > maxDimension) &&
                 ! OverrideBuildSizeCommand.mayPerformLargeBuild(player)) {
             BlockPos sizeVec = region.getMax().subtract(region.getMin());
-            player.sendStatusMessage(MessageTranslation.BUILD_TOO_LARGE
+            player.displayClientMessage(MessageTranslation.BUILD_TOO_LARGE
                     .componentTranslation(sizeVec.getX(), sizeVec.getY(), sizeVec.getZ(), maxDimension, maxDimension, maxDimension)
                     .setStyle(Styles.RED), true);
             return false;
@@ -476,6 +476,6 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void sendMessage(ItemStack stack, PlayerEntity player, ITranslationProvider messageSource, Style style) {
-        player.sendStatusMessage(messageSource.componentTranslation().setStyle(style), true);
+        player.displayClientMessage(messageSource.componentTranslation().setStyle(style), true);
     }
 }

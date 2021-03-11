@@ -17,7 +17,7 @@ public class MockBuilderWorld implements IBlockReader {
     private Set<BlockPos> positions;
     private BlockState state;
     private World realWorld;
-    private final BlockState AIR = Blocks.AIR.getDefaultState();
+    private final BlockState AIR = Blocks.AIR.defaultBlockState();
 
     public void setWorldAndState(World rWorld, BlockState setBlock, Collection<BlockPos> coordinates) {
         this.state = setBlock;
@@ -30,7 +30,7 @@ public class MockBuilderWorld implements IBlockReader {
 
     @Nullable
     @Override
-    public TileEntity getTileEntity(BlockPos pos) {
+    public TileEntity getBlockEntity(BlockPos pos) {
         return null;
     }
 

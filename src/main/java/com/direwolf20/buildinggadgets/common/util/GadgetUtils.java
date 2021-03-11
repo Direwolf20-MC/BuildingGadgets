@@ -130,7 +130,7 @@ public class GadgetUtils {
 
     public static BlockData rotateOrMirrorBlock(PlayerEntity player, PacketRotateMirror.Operation operation, BlockData data) {
         if (operation == PacketRotateMirror.Operation.MIRROR)
-            return data.mirror(player.getHorizontalFacing().getAxis() == Axis.X ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK);
+            return data.mirror(player.getDirection().getAxis() == Axis.X ? Mirror.LEFT_RIGHT : Mirror.FRONT_BACK);
 
         return data.rotate(Rotation.CLOCKWISE_90);
     }
@@ -163,46 +163,46 @@ public class GadgetUtils {
     }
 
     public static void linkToInventory(ItemStack stack, PlayerEntity player) {
-        World world = player.world;
+        World world = player.level;
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, AbstractGadget.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
-        if (world.getBlockState(VectorHelper.getLookingAt(player, stack).getPos()) == Blocks.AIR.getDefaultState())
+        if (world.getBlockState(VectorHelper.getLookingAt(player, stack).getBlockPos()) == Blocks.AIR.defaultBlockState())
             return;
 
-        InventoryLinker.Result result = InventoryLinker.linkInventory(player.world, stack, lookingAt);
-        player.sendStatusMessage(result.getI18n().componentTranslation(), true);
+        InventoryLinker.Result result = InventoryLinker.linkInventory(player.level, stack, lookingAt);
+        player.displayClientMessage(result.getI18n().componentTranslation(), true);
     }
 
     public static ActionResult<Block> selectBlock(ItemStack stack, PlayerEntity player) {
         // Used to find which block the player is looking at, and store it in NBT on the tool.
-        World world = player.world;
+        World world = player.level;
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, AbstractGadget.shouldRayTraceFluid(stack) ? RayTraceContext.FluidMode.ANY : RayTraceContext.FluidMode.NONE);
-        if (world.isAirBlock(lookingAt.getPos()))
-            return ActionResult.resultFail(Blocks.AIR);
+        if (world.isEmptyBlock(lookingAt.getBlockPos()))
+            return ActionResult.fail(Blocks.AIR);
 
-        BlockState state = world.getBlockState(lookingAt.getPos());
+        BlockState state = world.getBlockState(lookingAt.getBlockPos());
         if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock()) || state.getBlock() instanceof EffectBlock)
-            return ActionResult.resultFail(state.getBlock());
+            return ActionResult.fail(state.getBlock());
 
         if (DISALLOWED_BLOCKS.contains(state.getBlock())) {
-            return ActionResult.resultFail(state.getBlock());
+            return ActionResult.fail(state.getBlock());
         }
 
-        if (state.getBlockHardness(world, lookingAt.getPos()) < 0) {
-            return ActionResult.resultFail(state.getBlock());
+        if (state.getDestroySpeed(world, lookingAt.getBlockPos()) < 0) {
+            return ActionResult.fail(state.getBlock());
         }
 
-        Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getPos(), player.getActiveHand());
+        Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getBlockPos(), player.getUsedItemHand());
         data.ifPresent(placeState -> {
             BlockState actualState = placeState.getState(); //.getExtendedState(world, lookingAt.getPos()); 1.14 @todo: fix?
 
             setToolBlock(stack, new BlockData(actualState, placeState.getTileData()));
         });
 
-        return ActionResult.resultSuccess(state.getBlock());
+        return ActionResult.success(state.getBlock());
     }
 
     public static ActionResultType setRemoteInventory(ItemStack stack, PlayerEntity player, World world, BlockPos pos, boolean setTool) {
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         if (te == null)
             return ActionResultType.PASS;
 
@@ -221,28 +221,28 @@ public class GadgetUtils {
 
         if( anchorCoords.isPresent() ) {  //If theres already an anchor, remove it.
             setAnchor(stack);
-            player.sendStatusMessage(MessageTranslation.ANCHOR_REMOVED.componentTranslation().setStyle(Styles.AQUA), true);
+            player.displayClientMessage(MessageTranslation.ANCHOR_REMOVED.componentTranslation().setStyle(Styles.AQUA), true);
             return true;
         }
 
         //If we don't have an anchor, find the block we're supposed to anchor to
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-        BlockPos startBlock = lookingAt.getPos();
-        Direction sideHit = lookingAt.getFace();
+        BlockPos startBlock = lookingAt.getBlockPos();
+        Direction sideHit = lookingAt.getDirection();
 
         //If we aren't looking at anything, exit
-        if (player.world.isAirBlock(startBlock))
+        if (player.level.isEmptyBlock(startBlock))
             return false;
 
         BlockData blockData = getToolBlock(stack);
-        AbstractMode.UseContext context = new AbstractMode.UseContext(player.world, blockData.getState(), startBlock, stack, sideHit, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack), stack.getItem() instanceof GadgetBuilding ? GadgetBuilding.getConnectedArea(stack) : GadgetExchanger.getConnectedArea(stack));
+        AbstractMode.UseContext context = new AbstractMode.UseContext(player.level, blockData.getState(), startBlock, stack, sideHit, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack), stack.getItem() instanceof GadgetBuilding ? GadgetBuilding.getConnectedArea(stack) : GadgetExchanger.getConnectedArea(stack));
 
         List<BlockPos> coords = stack.getItem() instanceof GadgetBuilding
                 ? GadgetBuilding.getToolMode(stack).getMode().getCollection(context, player)
                 : GadgetExchanger.getToolMode(stack).getMode().getCollection(context, player);
 
         setAnchor(stack, coords); //Set the anchor NBT
-        player.sendStatusMessage(MessageTranslation.ANCHOR_SET.componentTranslation().setStyle(Styles.AQUA), true);
+        player.displayClientMessage(MessageTranslation.ANCHOR_SET.componentTranslation().setStyle(Styles.AQUA), true);
 
         return true;
     }
@@ -299,12 +299,12 @@ public class GadgetUtils {
      * Drops the IItemHandlerModifiable Inventory of the TileEntity at the specified position.
      */
     public static void dropTileEntityInventory(World world, BlockPos pos) {
-        TileEntity tileEntity = world.getTileEntity(pos);
+        TileEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity != null) {
             LazyOptional<IItemHandler> cap = tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
             cap.ifPresent(handler -> {
                 for (int i = 0; i < handler.getSlots(); i++) {
-                    net.minecraft.inventory.InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), handler.getStackInSlot(i));
+                    net.minecraft.inventory.InventoryHelper.dropItemStack(world, pos.getX(), pos.getY(), pos.getZ(), handler.getStackInSlot(i));
                 }
             });
         }

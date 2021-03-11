@@ -42,9 +42,9 @@ public final class PacketTemplateManagerTemplateCreated extends UUIDPacket {
         Context ctx = contextSupplier.get();
         ctx.enqueueWork(() -> {
             if (contextSupplier.get().getDirection().getReceptionSide() == LogicalSide.SERVER) {
-                World world = contextSupplier.get().getSender().world;
-                if (world.isBlockLoaded(pos)) {
-                    TileEntity tileEntity = world.getTileEntity(pos);
+                World world = contextSupplier.get().getSender().level;
+                if (world.isLoaded(pos)) {
+                    TileEntity tileEntity = world.getBlockEntity(pos);
                     if (tileEntity != null) {
                         tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
                             ItemStack stack = new ItemStack(OurItems.TEMPLATE_ITEM.get());

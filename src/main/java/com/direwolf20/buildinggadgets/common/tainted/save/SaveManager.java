@@ -35,7 +35,7 @@ public enum SaveManager {
 
     public void onServerStarted(FMLServerStartedEvent event) {
         BuildingGadgets.LOG.debug("Loading World Saves.");
-        ServerWorld world = event.getServer().getWorld(World.OVERWORLD);
+        ServerWorld world = event.getServer().getLevel(World.OVERWORLD);
         for (UndoSaveContainer c : undoSaves) {
             c.acquire(world);
         }
@@ -61,7 +61,7 @@ public enum SaveManager {
     }
 
     private static <T extends WorldSavedData> T get(ServerWorld world, Supplier<T> supplier, String name) {
-        return world.getSavedData().getOrCreate(supplier, name);
+        return world.getDataStorage().computeIfAbsent(supplier, name);
     }
 
     public SaveTemplateProvider getTemplateProvider() {

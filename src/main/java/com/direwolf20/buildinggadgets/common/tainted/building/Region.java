@@ -18,7 +18,7 @@ import java.util.stream.Stream;
  * Represents a region in the world with a finite and nonzero size.
  */
 public final class Region implements Serializable {
-    private static final Region ZERO = new Region(BlockPos.NULL_VECTOR);
+    private static final Region ZERO = new Region(BlockPos.ZERO);
 
     public static Region singleZero() {
         return ZERO;
@@ -364,7 +364,7 @@ public final class Region implements Serializable {
     }
 
     public Stream<BlockPos> stream() {
-        return BlockPos.getAllInBox(minX, minY, minZ, maxX, maxY, maxZ).map(BlockPos::toImmutable);
+        return BlockPos.betweenClosedStream(minX, minY, minZ, maxX, maxY, maxZ).map(BlockPos::immutable);
     }
 
 //    /**
@@ -424,18 +424,18 @@ public final class Region implements Serializable {
 
     @SuppressWarnings("deprecation")
     public ImmutableSortedSet<ChunkPos> getUnloadedChunks(IWorldReader reader) {
-        ImmutableSortedSet.Builder<ChunkPos> posBuilder = ImmutableSortedSet.orderedBy(Comparator.comparing(ChunkPos::getXStart).thenComparing(ChunkPos::getZStart));
+        ImmutableSortedSet.Builder<ChunkPos> posBuilder = ImmutableSortedSet.orderedBy(Comparator.comparing(ChunkPos::getMinBlockX).thenComparing(ChunkPos::getMinBlockZ));
         for (int i = minX; i <= maxX; i += 16) {
             for (int j = minZ; j <= maxZ; j += 16) {
-                if (! reader.chunkExists(i >> 4, j >> 4))
+                if (! reader.hasChunk(i >> 4, j >> 4))
                     posBuilder.add(new ChunkPos(i >> 4, j >> 4));
             }
         }
         for (int j = minZ; j <= maxZ; j += 16) {//check the last x row
-            if (! reader.chunkExists(maxX >> 4, j >> 4))
+            if (! reader.hasChunk(maxX >> 4, j >> 4))
                 posBuilder.add(new ChunkPos(maxX >> 4, j >> 4));
         }
-        if (! reader.chunkExists(maxX >> 4, maxZ >> 4))// might have still missed the last one
+        if (! reader.hasChunk(maxX >> 4, maxZ >> 4))// might have still missed the last one
             posBuilder.add(new ChunkPos(maxX >> 4, maxZ >> 4));
         return posBuilder.build();
     }

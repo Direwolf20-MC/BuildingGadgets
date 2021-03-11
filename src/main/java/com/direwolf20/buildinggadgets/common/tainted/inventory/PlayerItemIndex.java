@@ -116,8 +116,8 @@ public final class PlayerItemIndex implements IItemIndex {
             ItemStack copy = stack.copy();
             copy.setCount(Math.min(remainingCount, copy.getMaxStackSize()));
             remainingCount -= copy.getCount();
-            ItemEntity itemEntity = new ItemEntity(player.world, player.getPosX(), player.getPosY(), player.getPosZ(), copy);
-            player.world.addEntity(itemEntity);
+            ItemEntity itemEntity = new ItemEntity(player.level, player.getX(), player.getY(), player.getZ(), copy);
+            player.level.addFreshEntity(itemEntity);
         }
     }
 

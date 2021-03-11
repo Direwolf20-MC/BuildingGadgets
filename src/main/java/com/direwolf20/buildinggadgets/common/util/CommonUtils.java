@@ -15,8 +15,8 @@ public final class CommonUtils {
     private CommonUtils() {}
 
     public static BlockRayTraceResult fakeRayTrace(Vector3d simulatePos, BlockPos pos) {
-        Vector3d simVec = Vector3d.copy(pos).subtract(simulatePos);
-        Direction dir = Direction.getFacingFromVector(simVec.getX(), simVec.getY(), simVec.getZ());
+        Vector3d simVec = Vector3d.atLowerCornerOf(pos).subtract(simulatePos);
+        Direction dir = Direction.getNearest(simVec.x(), simVec.y(), simVec.z());
         return new BlockRayTraceResult(simVec, dir, pos, false);
     }
 

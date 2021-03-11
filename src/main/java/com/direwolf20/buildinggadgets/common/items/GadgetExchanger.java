@@ -131,8 +131,8 @@ public class GadgetExchanger extends AbstractGadget {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
-        super.addInformation(stack, world, tooltip, flag);
+    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
+        super.appendHoverText(stack, world, tooltip, flag);
         addEnergyInformation(tooltip, stack);
 
         ExchangingModes mode = getToolMode(stack);
@@ -159,21 +159,21 @@ public class GadgetExchanger extends AbstractGadget {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        ItemStack itemstack = player.getHeldItem(hand);
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+        ItemStack itemstack = player.getItemInHand(hand);
         player.setActiveHand(hand);
-        if (!world.isRemote) {
-            if (player.isSneaking()) {
+        if (!world.isClientSide) {
+            if (player.isShiftKeyDown()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
-                if( !result.getType().isSuccessOrConsume() ) {
-                    player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
-                    return super.onItemRightClick(world, player, hand);
+                if( !result.getResult().consumesAction() ) {
+                    player.displayClientMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().name()).setStyle(Styles.AQUA), true);
+                    return super.use(world, player, hand);
                 }
             } else if (player instanceof ServerPlayerEntity) {
                 exchange((ServerPlayerEntity) player, itemstack);
             }
         } else {
-            if (! player.isSneaking()) {
+            if (! player.isShiftKeyDown()) {
                 BaseRenderer.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown()) {
@@ -193,17 +193,17 @@ public class GadgetExchanger extends AbstractGadget {
     public static void rangeChange(PlayerEntity player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
         int changeAmount = (getToolMode(heldItem) == ExchangingModes.GRID || (range % 2 == 0)) ? 1 : 2;
-        if (player.isSneaking()) {
+        if (player.isShiftKeyDown()) {
             range = (range <= 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         } else {
             range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;
         }
         setToolRange(heldItem, range);
-        player.sendStatusMessage(MessageTranslation.RANGE_SET.componentTranslation(range).setStyle(Styles.AQUA), true);
+        player.displayClientMessage(MessageTranslation.RANGE_SET.componentTranslation(range).setStyle(Styles.AQUA), true);
     }
 
     private void exchange(ServerPlayerEntity player, ItemStack stack) {
-        ServerWorld world = player.getServerWorld();
+        ServerWorld world = player.getLevel();
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
             return;
@@ -212,10 +212,10 @@ public class GadgetExchanger extends AbstractGadget {
 
         // Don't attempt to do anything if we can't actually do it.
         BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-        TileEntity tileEntity = world.getTileEntity(lookingAt.getPos());
-        BlockState lookingAtState = player.world.getBlockState(lookingAt.getPos());
+        TileEntity tileEntity = world.getBlockEntity(lookingAt.getBlockPos());
+        BlockState lookingAtState = player.level.getBlockState(lookingAt.getBlockPos());
         Block lookAtBlock = lookingAtState.getBlock();
-        if (blockData.getState() == Blocks.AIR.getDefaultState()
+        if (blockData.getState() == Blocks.AIR.defaultBlockState()
                 || lookAtBlock == OurBlocks.EFFECT_BLOCK.get()
                 || blockData.getState() == lookingAtState
                 || tileEntity != null) {
@@ -225,7 +225,7 @@ public class GadgetExchanger extends AbstractGadget {
         // Get the anchor or build the collection
         Optional<List<BlockPos>> anchor = GadgetUtils.getAnchor(stack);
         List<BlockPos> coords = anchor.orElseGet(
-                () -> getToolMode(stack).getMode().getCollection(new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, lookingAt.getFace(), getConnectedArea(heldItem)), player)
+                () -> getToolMode(stack).getMode().getCollection(new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getBlockPos(), heldItem, lookingAt.getDirection(), getConnectedArea(heldItem)), player)
         );
 
         if (anchor.isPresent()) {
@@ -235,7 +235,7 @@ public class GadgetExchanger extends AbstractGadget {
         IItemIndex index = InventoryHelper.index(stack, player);
 
         //TODO replace fakeWorld
-        fakeWorld.setWorldAndState(player.world, blockData.getState(), coords); // Initialize the fake world's blocks
+        fakeWorld.setWorldAndState(player.level, blockData.getState(), coords); // Initialize the fake world's blocks
         for (BlockPos coordinate : coords) {
             //Get the extended block state in the fake world Disabled to fix Chisel
             //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
@@ -247,7 +247,7 @@ public class GadgetExchanger extends AbstractGadget {
         BlockState currentBlock = world.getBlockState(pos);
         ITileEntityData data;
 
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         if (te instanceof ConstructionBlockTileEntity) {
             data = ((ConstructionBlockTileEntity) te).getConstructionBlockData().getTileData();
             currentBlock = ((ConstructionBlockTileEntity) te).getConstructionBlockData().getState();
@@ -279,7 +279,7 @@ public class GadgetExchanger extends AbstractGadget {
         if (! player.isAllowEdit() || ! world.isBlockModifiable(player, pos))
             return;
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getDimensionKey(), world, pos);
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(world.dimension(), world, pos);
         BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP) || MinecraftForge.EVENT_BUS.post(e))
             return;
@@ -290,7 +290,7 @@ public class GadgetExchanger extends AbstractGadget {
             MaterialList materials = te instanceof ConstructionBlockTileEntity ? InventoryHelper.PASTE_LIST : data.getRequiredItems(
                     buildContext,
                     currentBlock,
-                    world.rayTraceBlocks(new RayTraceContext(player.getPositionVec(), Vector3d.copy(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
+                    world.rayTraceBlocks(new RayTraceContext(player.position(), Vector3d.atLowerCornerOf(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
                     pos);
 
             Iterator<ImmutableMultiset<IUniqueObject<?>>> it = materials.iterator();
@@ -299,7 +299,7 @@ public class GadgetExchanger extends AbstractGadget {
             if (buildContext.getStack().isEnchanted() && EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, buildContext.getStack()) > 0) {
                 producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
             } else {
-                List<ItemStack> drops = Block.getDrops(currentBlock, (ServerWorld) buildContext.getWorld(), pos, buildContext.getWorld().getTileEntity(pos));
+                List<ItemStack> drops = Block.getDrops(currentBlock, (ServerWorld) buildContext.getWorld(), pos, buildContext.getWorld().getBlockEntity(pos));
                 producedItems.addAll(drops.stream().map(UniqueItem::ofStack).collect(Collectors.toList()));
             }
 

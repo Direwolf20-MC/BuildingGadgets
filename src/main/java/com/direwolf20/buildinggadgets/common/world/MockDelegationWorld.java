@@ -2,8 +2,6 @@ package com.direwolf20.buildinggadgets.common.world;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tainted.Tainted;
-import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
-import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.google.common.base.Preconditions;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
@@ -36,7 +34,6 @@ import net.minecraft.world.storage.IWorldInfo;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.Map.Entry;
@@ -71,22 +68,23 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public void playEvent(@Nullable PlayerEntity p_217378_1_, int p_217378_2_, BlockPos p_217378_3_, int p_217378_4_) {
+    public void levelEvent(@Nullable PlayerEntity p_217378_1_, int p_217378_2_, BlockPos p_217378_3_, int p_217378_4_) {
 
     }
 
+
     @Override
-    public List<Entity> getEntitiesInAABBexcluding(@Nullable Entity entity, AxisAlignedBB axisAlignedBB, @Nullable Predicate<? super Entity> predicate) {
+    public List<Entity> getEntities(@Nullable Entity p_175674_1_, AxisAlignedBB p_175674_2_, @Nullable Predicate<? super Entity> p_175674_3_) {
         return new ArrayList<>();
     }
 
     @Override
-    public <T extends Entity> List<T> getEntitiesWithinAABB(Class<? extends T> aClass, AxisAlignedBB axisAlignedBB, @Nullable Predicate<? super T> predicate) {
+    public <T extends Entity> List<T> getEntitiesOfClass(Class<? extends T> p_175647_1_, AxisAlignedBB p_175647_2_, @Nullable Predicate<? super T> p_175647_3_) {
         return new ArrayList<>();
     }
 
     @Override
-    public List<? extends PlayerEntity> getPlayers() {
+    public List<? extends PlayerEntity> players() {
         return new ArrayList<>();
     }
 
@@ -97,14 +95,15 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public BlockPos getHeight(Type heightmapType, BlockPos pos) {
-        return getDelegate().getHeight(heightmapType, pos);
+    public BlockPos getHeightmapPos(Type heightmapType, BlockPos pos) {
+        return getDelegate().getHeightmapPos(heightmapType, pos);
     }
 
     @Override
-    public DynamicRegistries func_241828_r() {
+    public DynamicRegistries registryAccess() {
         return null;
     }
+
 
     @Override
     public boolean removeBlock(BlockPos blockPos, boolean b) {
@@ -112,8 +111,8 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public boolean hasBlockState(BlockPos p_217375_1_, Predicate<BlockState> p_217375_2_) {
-        return p_217375_2_.test(getBlockState(p_217375_1_));
+    public boolean isStateAtPosition(BlockPos state, Predicate<BlockState> p_217375_2_) {
+        return p_217375_2_.test(getBlockState(state));
     }
 
     @Override
@@ -123,13 +122,13 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public ITickList<Block> getPendingBlockTicks() {
-        return delegate.getPendingBlockTicks();
+    public ITickList<Fluid> getLiquidTicks() {
+        return delegate.getLiquidTicks();
     }
 
     @Override
-    public ITickList<Fluid> getPendingFluidTicks() {
-        return delegate.getPendingFluidTicks();
+    public ITickList<Block> getBlockTicks() {
+        return delegate.getBlockTicks();
     }
 
     /**
@@ -141,13 +140,13 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public IWorldInfo getWorldInfo() {
-        return delegate.getWorldInfo();
+    public IWorldInfo getLevelData() {
+        return delegate.getLevelData();
     }
 
     @Override
-    public DifficultyInstance getDifficultyForLocation(BlockPos pos) {
-        return delegate.getDifficultyForLocation(pos);
+    public DifficultyInstance getCurrentDifficultyAt(BlockPos pos) {
+        return delegate.getCurrentDifficultyAt(pos);
     }
 
     @Override
@@ -159,10 +158,9 @@ public class MockDelegationWorld implements IWorld {
      * gets the world's chunk provider
      */
     @Override
-    public AbstractChunkProvider getChunkProvider() {
-        return delegate.getChunkProvider();
+    public AbstractChunkProvider getChunkSource() {
+        return delegate.getChunkSource();
     }
-
 
     @Override
     public Random getRandom() {
@@ -182,7 +180,7 @@ public class MockDelegationWorld implements IWorld {
      * material is set to air, meaning it is possible for non-vanilla blocks to still pass this check.
      */
     @Override
-    public boolean isAirBlock(BlockPos pos) {
+    public boolean isEmptyBlock(BlockPos pos) {
         return getBlockState(pos).isAir(this, pos);
     }
 
@@ -192,7 +190,12 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public Biome getNoiseBiomeRaw(int x, int y, int z) {
+    public Biome getNoiseBiome(int x, int y, int z) {
+        return null;
+    }
+
+    @Override
+    public Biome getUncachedNoiseBiome(int p_225604_1_, int p_225604_2_, int p_225604_3_) {
         return null;
     }
 
@@ -202,8 +205,8 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public int getSkylightSubtracted() {
-        return delegate.getSkylightSubtracted();
+    public int getSkyDarken() {
+        return delegate.getSkyDarken();
     }
 
     @Override
@@ -224,18 +227,19 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public boolean checkNoEntityCollision(@Nullable Entity entityIn, VoxelShape shape) {
-        return delegate.checkNoEntityCollision(entityIn, shape);
+    public boolean isUnobstructed(@Nullable Entity entityIn, VoxelShape shape) {
+        return delegate.isUnobstructed(entityIn, shape);
     }
 
     @Override
-    public int getStrongPower(BlockPos pos, Direction direction) {
-        return delegate.getStrongPower(pos, direction);
+    public int getDirectSignal(BlockPos pos, Direction direction) {
+        return delegate.getDirectSignal(pos, direction);
     }
 
+
     @Override
-    public boolean isRemote() {
-        return delegate.isRemote();
+    public boolean isClientSide() {
+        return delegate.isClientSide();
     }
 
     @Override
@@ -244,27 +248,27 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public DimensionType getDimensionType() {
-        return delegate.getDimensionType();
+    public DimensionType dimensionType() {
+        return delegate.dimensionType();
     }
 
     @Override
     @Nullable
-    public TileEntity getTileEntity(BlockPos pos) {
+    public TileEntity getBlockEntity(BlockPos pos) {
         if (World.isOutsideBuildHeight(pos))
             return null;
         BlockInfo info = getOverriddenBlock(pos);
         if (info != null)
             return info.getEntity(this);
-        return delegate.getTileEntity(pos);
+        return delegate.getBlockEntity(pos);
     }
 
     @Override
     public BlockState getBlockState(BlockPos pos) {
         if (World.isOutsideBuildHeight(pos))
-            return Blocks.VOID_AIR.getDefaultState();
+            return Blocks.VOID_AIR.defaultBlockState();
         BlockState state = getOverriddenState(pos);
-        return state != null ? state : Blocks.AIR.getDefaultState();
+        return state != null ? state : Blocks.AIR.defaultBlockState();
     }
 
     @Override
@@ -278,7 +282,7 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public boolean setBlockState(BlockPos p_241211_1_, BlockState p_241211_2_, int p_241211_3_, int p_241211_4_) {
+    public boolean setBlock(BlockPos p_241211_1_, BlockState p_241211_2_, int p_241211_3_, int p_241211_4_) {
         return false;
     }
 
@@ -294,7 +298,7 @@ public class MockDelegationWorld implements IWorld {
      * Flags can be OR-ed
      */
     @Override
-    public boolean setBlockState(BlockPos pos, BlockState newState, int flags) {
+    public boolean setBlock(BlockPos pos, BlockState newState, int flags) {
         if (World.isOutsideBuildHeight(pos))
             return false;
         BlockInfo info = getOverriddenBlock(pos);
@@ -367,13 +371,13 @@ public class MockDelegationWorld implements IWorld {
     }
 
     @Override
-    public float func_230487_a_(Direction p_230487_1_, boolean p_230487_2_) {
-        return 0;
+    public float getShade(Direction p_230487_1_, boolean p_230487_2_) {
+        return delegate.getShade(p_230487_1_, p_230487_2_);
     }
 
     @Override
-    public WorldLightManager getLightManager() {
-        return delegate.getLightManager();
+    public WorldLightManager getLightEngine() {
+        return delegate.getLightEngine();
     }
 
     @Tainted(reason = "Pointless system, also, uncommented...")
@@ -416,10 +420,10 @@ public class MockDelegationWorld implements IWorld {
                 try {
                     entity = state.createTileEntity(world);
                     if (entity != null) {
-                        entity.setPos(pos);
+                        entity.setPosition(pos);
                         //if we pass our wrapped world down to this, it will cause it to determine an errornous blockstate...
                         //we'd need to reflect into the te...
-                        entity.setWorldAndPos(null, pos);
+                        entity.setLevelAndPosition(null, pos);
                         entity.onLoad();
                     }
                 } catch (Exception e) {
@@ -432,7 +436,7 @@ public class MockDelegationWorld implements IWorld {
         public void onRemove() {
             if (entity != null) {
                 try {
-                    entity.remove();
+                    entity.setRemoved();
                 } catch (Exception e) {
                     BuildingGadgets.LOG.debug("Tile Entity at {} with state {} threw exception whilst removing.", pos, state, e);
                 }

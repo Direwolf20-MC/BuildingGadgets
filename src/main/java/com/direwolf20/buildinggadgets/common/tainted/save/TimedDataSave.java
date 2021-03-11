@@ -32,7 +32,7 @@ public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData
 
     protected void writeAllIds(PacketBuffer buffer) {
         for (UUID id : idToValue.keySet()) {
-            buffer.writeUniqueId(id);
+            buffer.writeUUID(id);
         }
     }
 
@@ -41,7 +41,7 @@ public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData
     }
 
     protected T get(UUID id, Function<UUID, T> factory) {
-        markDirty();
+        setDirty();
         return idToValue.computeIfAbsent(id, factory);
     }
 
@@ -66,7 +66,7 @@ public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData
     }
 
     @Override
-    public void read(CompoundNBT nbt) {
+    public void load(CompoundNBT nbt) {
         INBT timeList = nbt.get(NBTKeys.WORD_SAVE_DATA_MAP);
         timeToId.clear();
         idToValue.clear();
@@ -79,7 +79,7 @@ public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
+    public CompoundNBT save(CompoundNBT compound) {
         ListNBT data = NBTHelper.serializeUUIDMap(idToValue, TimedValue::write);
         compound.put(NBTKeys.WORD_SAVE_DATA_MAP, data);
         return compound;

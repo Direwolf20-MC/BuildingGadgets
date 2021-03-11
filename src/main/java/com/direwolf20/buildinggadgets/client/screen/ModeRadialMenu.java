@@ -451,7 +451,7 @@ public class ModeRadialMenu extends Screen {
                 mode = GadgetCopyPaste.ToolMode.values()[slotSelected].getTranslation().format();
 
             assert getMinecraft().player != null;
-            getMinecraft().player.sendStatusMessage(MessageTranslation.MODE_SET.componentTranslation(mode).setStyle(Styles.AQUA), true);
+            getMinecraft().player.displayClientMessage(MessageTranslation.MODE_SET.componentTranslation(mode).setStyle(Styles.AQUA), true);
 
             PacketHandler.sendToServer(new PacketToggleMode(slotSelected));
             OurSounds.BEEP.playSound();

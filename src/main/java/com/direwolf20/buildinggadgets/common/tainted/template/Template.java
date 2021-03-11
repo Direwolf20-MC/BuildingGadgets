@@ -35,7 +35,7 @@ public final class Template {
             header = header.name(externalHeader.getName()).author(externalHeader.getAuthor());
         DataDecompressor<ITileDataSerializer> serializerDecompressor = persisted ? new DataDecompressor<>(
                 nbt.getList(NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING),
-                inbt -> RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), inbt.getString()),
+                inbt -> RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), inbt.getAsString()),
                 value -> SerialisationSupport.dummyDataSerializer())
                 : null;
         DataDecompressor<BlockData> dataDecompressor = new DataDecompressor<>(
@@ -47,8 +47,8 @@ public final class Template {
         ImmutableMap.Builder<BlockPos, BlockData> mapBuilder = ImmutableMap.builder();
         for (INBT inbt : posList) {
             LongNBT longNBT = (LongNBT) inbt;
-            BlockPos pos = MathUtils.posFromLong(longNBT.getLong());
-            BlockData data = dataDecompressor.apply(MathUtils.readStateId(longNBT.getLong()));
+            BlockPos pos = MathUtils.posFromLong(longNBT.getAsLong());
+            BlockData data = dataDecompressor.apply(MathUtils.readStateId(longNBT.getAsLong()));
             mapBuilder.put(pos, data);
         }
         return new Template(mapBuilder.build(), header.build());
@@ -82,7 +82,7 @@ public final class Template {
                     createViewInContext(context),
                     context,
                     context.getPlayer() != null ?
-                            context.getPlayer().getPositionVec().add(0, context.getPlayer().getEyeHeight(), 0) :
+                            context.getPlayer().position().add(0, context.getPlayer().getEyeHeight(), 0) :
                             null);
             header = TemplateHeader.builderOf(header).requiredItems(materialList).build();
         }

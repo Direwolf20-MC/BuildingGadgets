@@ -11,7 +11,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IServerWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -19,21 +18,20 @@ import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
-import java.util.Optional;
 
 public class InventoryLinker {
     /**
      * Perform the link to the inventory
      */
     public static Result linkInventory(World world, ItemStack stack, BlockRayTraceResult trace) {
-        TileEntity tileEntity = world.getTileEntity(trace.getPos());
+        TileEntity tileEntity = world.getBlockEntity(trace.getBlockPos());
         if (tileEntity == null || !tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).isPresent()) {
             return Result.fail(MessageTranslation.INVALID_BOUND_TILE);
         }
 
         // remove if the existing linked inventory is the same block we're setting now.
         boolean removed = getLinkedInventory(world, stack)
-                .map(e -> removeIfSame(stack, trace.getPos()))
+                .map(e -> removeIfSame(stack, trace.getBlockPos()))
                 .orElse(false);
 
         if (removed) {
@@ -42,8 +40,8 @@ public class InventoryLinker {
 
         // Set the relevant data
         CompoundNBT compound = stack.getOrCreateTag();
-        compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, world.getDimensionKey().getLocation().toString());
-        compound.put(NBTKeys.REMOTE_INVENTORY_POS, NBTUtil.writeBlockPos(trace.getPos()));
+        compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, world.dimension().getRegistryName().toString());
+        compound.put(NBTKeys.REMOTE_INVENTORY_POS, NBTUtil.writeBlockPos(trace.getBlockPos()));
         return Result.success();
     }
 
@@ -52,11 +50,11 @@ public class InventoryLinker {
      * a capability.
      */
     public static LazyOptional<IItemHandler> getLinkedInventory(World world, BlockPos pos, RegistryKey<World> registry, @Nullable ItemStack stack) {
-        if (!world.getDimensionKey().equals(registry)) {
+        if (!world.dimension().equals(registry)) {
             return LazyOptional.empty();
         }
 
-        TileEntity tileEntity = world.getTileEntity(pos);
+        TileEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity == null) {
             // Unlink if the tile entity no longer exists
             if (stack != null) {
@@ -117,7 +115,7 @@ public class InventoryLinker {
             return null;
         }
 
-        RegistryKey<World> dimKey = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compound.getString(NBTKeys.REMOTE_INVENTORY_DIM)));
+        RegistryKey<World> dimKey = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(compound.getString(NBTKeys.REMOTE_INVENTORY_DIM)));
         return Pair.of(
             NBTUtil.readBlockPos(compound.getCompound(NBTKeys.REMOTE_INVENTORY_POS)),
             dimKey

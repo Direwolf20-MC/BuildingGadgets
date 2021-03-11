@@ -105,7 +105,7 @@ public final class MathUtils {
     }
 
     private static int cosineForRotation(Rotation rot) {
-        return sineForRotation(rot.add(Rotation.CLOCKWISE_90));
+        return sineForRotation(rot.getRotated(Rotation.CLOCKWISE_90));
     }
 
     public static int[][] rotationMatrixFor(Axis axis, Rotation rotation) {

@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
     }
 }
 
@@ -27,9 +27,11 @@ if (env.GITHUB_RUN_NUMBER) {
 }
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+//java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-    mappings channel: 'snapshot', version: "${mcp_mappings}"
+    mappings channel: 'official', version: "${mcp_mappings}"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -61,7 +63,7 @@ minecraft {
             workingDirectory project.file('run')
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
-            args '--mod', 'buildinggadgets', '--all', '--output', file('src/generated/resources/')
+            args '--mod', 'buildinggadgets', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
             mods {
                 buildinggadgets {
                     source sourceSets.main
@@ -138,3 +140,5 @@ artifacts {
     archives deobfJar
     archives sourcesJar
 }
+
+jar.finalizedBy('reobfJar')

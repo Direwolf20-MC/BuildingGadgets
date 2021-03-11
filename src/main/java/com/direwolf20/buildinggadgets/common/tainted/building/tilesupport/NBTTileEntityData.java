@@ -18,7 +18,7 @@ import java.util.Objects;
 public class NBTTileEntityData implements ITileEntityData {
     public static NBTTileEntityData ofTile(TileEntity te) {
         CompoundNBT nbt = new CompoundNBT();
-        te.write(nbt);
+        te.save(nbt);
         return new NBTTileEntityData(nbt);
     }
     @Nonnull
@@ -50,8 +50,8 @@ public class NBTTileEntityData implements ITileEntityData {
     @Override
     public boolean placeIn(BuildContext context, BlockState state, BlockPos position) {
         BuildingGadgets.LOG.trace("Placing {} with Tile NBT at {}.", state, position);
-        context.getWorld().setBlockState(position, state, 0);
-        TileEntity te = context.getWorld().getTileEntity(position);
+        context.getWorld().setBlock(position, state, 0);
+        TileEntity te = context.getWorld().getBlockEntity(position);
         if (te != null) {
             try {
                 te.deserializeNBT(getNBTModifiable());

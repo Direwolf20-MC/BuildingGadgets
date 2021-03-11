@@ -32,7 +32,7 @@ import java.util.function.ToIntFunction;
  * Notice that this class is immutable as long as the {@link ITileEntityData} instance is immutable.
  */
 public final class BlockData {
-    public static final BlockData AIR = new BlockData(Blocks.AIR.getDefaultState(), TileSupport.dummyTileEntityData());
+    public static final BlockData AIR = new BlockData(Blocks.AIR.defaultBlockState(), TileSupport.dummyTileEntityData());
 
     /**
      * Attempts to retrieve a BlockData from the given {@link CompoundNBT}, if present.

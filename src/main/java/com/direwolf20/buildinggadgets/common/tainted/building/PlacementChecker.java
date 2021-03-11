@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.tainted.building;
 
+import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
@@ -13,10 +13,8 @@ import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresen
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.WaterFluid;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.LazyOptional;
@@ -64,7 +62,7 @@ public final class PlacementChecker {
         RayTraceResult targetRayTrace = null;
         if (context.getPlayer() != null) {
             PlayerEntity player = context.getPlayer();
-            targetRayTrace = CommonUtils.fakeRayTrace(player.getPositionVec(), target.getPos());
+            targetRayTrace = CommonUtils.fakeRayTrace(player.position(), target.getPos());
         }
         MaterialList materials = target.getRequiredMaterials(context, targetRayTrace);
         MatchResult match = index.tryMatch(materials);
@@ -76,7 +74,7 @@ public final class PlacementChecker {
             usePaste = true;
         }
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.create(context.getServerWorld().getDimensionKey(), context.getWorld(), target.getPos());
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(context.getServerWorld().dimension(), context.getWorld(), target.getPos());
         boolean isAir = blockSnapshot.getCurrentBlock().isAir(context.getWorld(), target.getPos());
         if (firePlaceEvents && ForgeEventFactory.onBlockPlace(context.getPlayer(), blockSnapshot, Direction.UP))
             return new CheckResult(match, insertedItems, false, usePaste);
@@ -89,7 +87,7 @@ public final class PlacementChecker {
                     return new CheckResult(match, insertedItems, false, usePaste);
             }
             if (giveBackItems) {
-                insertedItems = TileSupport.createTileData(context.getWorld().getTileEntity(target.getPos()))
+                insertedItems = TileSupport.createTileData(context.getWorld().getBlockEntity(target.getPos()))
                         .getRequiredItems(context, blockSnapshot.getCurrentBlock(), null, target.getPos()).iterator().next();
                 index.insert(insertedItems);
             }

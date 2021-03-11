@@ -146,7 +146,7 @@ public class GadgetDestruction extends AbstractGadget {
     public static void switchOverlay(PlayerEntity player, ItemStack stack) {
         boolean newOverlay = ! getOverlay(stack);
         setOverlay(stack, newOverlay);
-        player.sendStatusMessage(TooltipTranslation.GADGET_DESTROYSHOWOVERLAY
+        player.displayClientMessage(TooltipTranslation.GADGET_DESTROYSHOWOVERLAY
                 .componentTranslation(newOverlay).setStyle(Styles.AQUA), true);
     }
 

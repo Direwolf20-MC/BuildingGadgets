@@ -23,7 +23,7 @@ import java.util.function.Consumer;
  * <p>
  * This {@link IBuildView} is especially useful, when trying to read all {@link BlockData} instances with in a given {@link Region}.
  * If you need this Information in a pre-determined way, or intend on iterating multiple times on this {@link IBuildView} consider
- * calling {@link #evaluate()} (which is equivalent to calling {@code PositionalBuildView.ofIterable(view.getContext(), view)})
+ * calling {@link #()} (which is equivalent to calling {@code PositionalBuildView.ofIterable(view.getContext(), view)})
  * to evaluate all {@link BlockData} instances described by this {@link IBuildView view}.
  */
 public final class WorldBuildView implements IBuildView {
@@ -97,7 +97,7 @@ public final class WorldBuildView implements IBuildView {
             Optional<BlockData> dataOptional = dataFactory.apply(context, object);
             if (dataOptional.isPresent()) {
                 BlockData data = dataOptional.get();
-                action.accept(new PlacementTarget(object.add(translation), data));
+                action.accept(new PlacementTarget(object.offset(translation), data));
                 return true;
             }
             return false;

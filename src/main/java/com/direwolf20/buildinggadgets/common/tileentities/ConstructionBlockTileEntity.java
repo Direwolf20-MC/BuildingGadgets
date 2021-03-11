@@ -53,26 +53,26 @@ public class ConstructionBlockTileEntity extends TileEntity {
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT nbt) {
-        super.read(state, nbt);
+    public void load(BlockState state, CompoundNBT nbt) {
+        super.load(state, nbt);
         blockState = BlockData.tryDeserialize(nbt.getCompound(NBTKeys.TE_CONSTRUCTION_STATE), true);
         markDirtyClient();
     }
 
     @Nonnull
     @Override
-    public CompoundNBT write(@Nonnull CompoundNBT compound) {
+    public CompoundNBT save(@Nonnull CompoundNBT compound) {
         if (blockState != null) {
             compound.put(NBTKeys.TE_CONSTRUCTION_STATE, blockState.serialize(true));
         }
-        return super.write(compound);
+        return super.save(compound);
     }
 
     private void markDirtyClient() {
-        markDirty();
-        if (getWorld() != null) {
-            BlockState state = getWorld().getBlockState(getPos());
-            getWorld().notifyBlockUpdate(getPos(), state, state, 3);
+        setChanged();
+        if (getLevel() != null) {
+            BlockState state = getLevel().getBlockState(getBlockPos());
+            getLevel().sendBlockUpdated(getBlockPos(), state, state, 3);
         }
     }
 
@@ -80,15 +80,15 @@ public class ConstructionBlockTileEntity extends TileEntity {
     @Override
     public CompoundNBT getUpdateTag() {
         CompoundNBT updateTag = super.getUpdateTag();
-        write(updateTag);
+        save(updateTag);
         return updateTag;
     }
 
     @Override
     public SUpdateTileEntityPacket getUpdatePacket() {
         CompoundNBT nbtTag = new CompoundNBT();
-        write(nbtTag);
-        return new SUpdateTileEntityPacket(getPos(), 1, nbtTag);
+        save(nbtTag);
+        return new SUpdateTileEntityPacket(getBlockPos(), 1, nbtTag);
     }
 
 
@@ -96,14 +96,14 @@ public class ConstructionBlockTileEntity extends TileEntity {
     @Override
     public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
         BlockData oldMimicBlock = getConstructionBlockData();
-        CompoundNBT tagCompound = packet.getNbtCompound();
+        CompoundNBT tagCompound = packet.getTag();
         super.onDataPacket(net, packet);
         deserializeNBT(tagCompound);
 
-        if (world != null && world.isRemote) {
+        if (level != null && level.isClientSide) {
             // If needed send a render update.
             if (! getConstructionBlockData().equals(oldMimicBlock)) {
-                world.markChunkDirty(getPos(), this.getTileEntity());
+                level.blockEntityChanged(getBlockPos(), this.getTileEntity());
             }
         }
     }

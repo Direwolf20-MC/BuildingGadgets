@@ -11,9 +11,9 @@ public final class OurTileEntities {
     public static final DeferredRegister<TileEntityType<?>> TILE_ENTITIES = DeferredRegister.create(ForgeRegistries.TILE_ENTITIES, Reference.MODID);
 
     public static final RegistryObject<TileEntityType<EffectBlockTileEntity>> EFFECT_BLOCK_TILE_ENTITY =
-            TILE_ENTITIES.register("effect_block_tile", () -> TileEntityType.Builder.create(EffectBlockTileEntity::new, OurBlocks.EFFECT_BLOCK.get()).build(null));
+            TILE_ENTITIES.register("effect_block_tile", () -> TileEntityType.Builder.of(EffectBlockTileEntity::new, OurBlocks.EFFECT_BLOCK.get()).build(null));
     public static final RegistryObject<TileEntityType<ConstructionBlockTileEntity>> CONSTRUCTION_BLOCK_TILE_ENTITY =
-            TILE_ENTITIES.register("construction_tile", () -> TileEntityType.Builder.create(ConstructionBlockTileEntity::new, OurBlocks.CONSTRUCTION_BLOCK.get()).build(null));
+            TILE_ENTITIES.register("construction_tile", () -> TileEntityType.Builder.of(ConstructionBlockTileEntity::new, OurBlocks.CONSTRUCTION_BLOCK.get()).build(null));
     public static final RegistryObject<TileEntityType<TemplateManagerTileEntity>> TEMPLATE_MANAGER_TILE_ENTITY =
-            TILE_ENTITIES.register("template_manager_tile", () -> TileEntityType.Builder.create(TemplateManagerTileEntity::new, OurBlocks.TEMPLATE_MANGER_BLOCK.get()).build(null));
+            TILE_ENTITIES.register("template_manager_tile", () -> TileEntityType.Builder.of(TemplateManagerTileEntity::new, OurBlocks.TEMPLATE_MANGER_BLOCK.get()).build(null));
 }

@@ -34,6 +34,6 @@ public enum RadialTranslation implements ITranslationProvider {
     }
 
     public String getString() {
-        return I18n.format(key);
+        return I18n.get(key);
     }
 }

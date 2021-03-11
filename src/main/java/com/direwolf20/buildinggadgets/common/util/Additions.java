@@ -83,10 +83,10 @@ public final class Additions {
     public static boolean sizeInvalid(PlayerEntity player, Region region) {
         BlockPos size = region.getMax().subtract(region.getMin());
         if (size.getX() == 8 && size.getZ() == 8) { //size is 8 if it's a 9X9
-            List<ITranslationProvider> list = player.getName().getUnformattedComponentText().equals("Direwolf20") ? DireNineByNineTranslation.VALUES : NineByNineTranslation.VALUES;
+            List<ITranslationProvider> list = player.getName().getContents().equals("Direwolf20") ? DireNineByNineTranslation.VALUES : NineByNineTranslation.VALUES;
             int pos = EASTER_RAND.nextInt(list.size());
             ITranslationProvider provider = list.get(pos);
-            player.sendStatusMessage(provider.componentTranslation().setStyle(Styles.DK_GREEN), true);
+            player.displayClientMessage(provider.componentTranslation().setStyle(Styles.DK_GREEN), true);
             return true;
         }
         return false;

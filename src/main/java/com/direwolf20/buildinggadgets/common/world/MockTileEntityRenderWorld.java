@@ -44,7 +44,7 @@ public class MockTileEntityRenderWorld implements IBlockReader {
 
     @Nullable
     @Override
-    public TileEntity getTileEntity(BlockPos pos) {
+    public TileEntity getBlockEntity(BlockPos p_175625_1_) {
         return null;
     }
 

@@ -44,15 +44,15 @@ public class PacketCopyCoords {
                 BlockPos endPos = msg.end;
                 if (startPos.equals(BlockPos.ZERO) && endPos.equals(BlockPos.ZERO)) {
                     GadgetCopyPaste.setSelectedRegion(heldItem, null);
-                    playerEntity.sendStatusMessage(MessageTranslation.AREA_RESET.componentTranslation().setStyle(Styles.AQUA), true);
+                    playerEntity.displayClientMessage(MessageTranslation.AREA_RESET.componentTranslation().setStyle(Styles.AQUA), true);
                 } else {
                     GadgetCopyPaste.setSelectedRegion(heldItem, new Region(startPos, endPos));
                 }
 
                 Optional<Region> regionOpt = GadgetCopyPaste.getSelectedRegion(heldItem);
                 if (! regionOpt.isPresent()) //notify of single copy
-                    playerEntity.sendStatusMessage(MessageTranslation.FIRST_COPY.componentTranslation().setStyle(Styles.DK_GREEN), true);
-                regionOpt.ifPresent(region -> ((GadgetCopyPaste) heldItem.getItem()).tryCopy(heldItem, playerEntity.world, playerEntity, region));
+                    playerEntity.displayClientMessage(MessageTranslation.FIRST_COPY.componentTranslation().setStyle(Styles.DK_GREEN), true);
+                regionOpt.ifPresent(region -> ((GadgetCopyPaste) heldItem.getItem()).tryCopy(heldItem, playerEntity.level, playerEntity, region));
             });
 
             ctx.get().setPacketHandled(true);

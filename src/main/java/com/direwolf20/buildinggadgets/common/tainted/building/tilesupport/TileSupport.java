@@ -47,7 +47,7 @@ public final class TileSupport {
     }
 
     public static ITileEntityData createTileData(IBlockReader world, BlockPos pos) {
-        TileEntity te = world.getTileEntity(pos);
+        TileEntity te = world.getBlockEntity(pos);
         return createTileData(te);
     }
 
@@ -77,7 +77,7 @@ public final class TileSupport {
 
         @Override
         public boolean placeIn(BuildContext context, BlockState state, BlockPos position) {
-            return context.getWorld().setBlockState(position, state, 0);
+            return context.getWorld().setBlock(position, state, 0);
         }
 
         @Override

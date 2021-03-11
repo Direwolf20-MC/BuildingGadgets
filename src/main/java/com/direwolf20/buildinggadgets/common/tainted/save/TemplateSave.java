@@ -24,7 +24,7 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
 
     void removeTemplate(UUID id) {
         remove(id);
-        markDirty();
+        setDirty();
     }
 
     @Override
@@ -38,7 +38,7 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
     }
 
     private TemplateInfo markDirtyAndUpdate(TemplateInfo info) {
-        markDirty();
+        setDirty();
         return info.updateTime();
     }
 

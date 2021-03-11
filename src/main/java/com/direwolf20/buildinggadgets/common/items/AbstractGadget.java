@@ -212,7 +212,7 @@ public abstract class AbstractGadget extends Item {
 
     public final void onRotate(ItemStack stack, PlayerEntity player) {
         if (performRotate(stack, player))
-            player.sendStatusMessage(MessageTranslation.ROTATED.componentTranslation().setStyle(Styles.AQUA), true);
+            player.displayClientMessage(MessageTranslation.ROTATED.componentTranslation().setStyle(Styles.AQUA), true);
     }
 
     protected boolean performRotate(ItemStack stack, PlayerEntity player) {
@@ -221,7 +221,7 @@ public abstract class AbstractGadget extends Item {
 
     public final void onMirror(ItemStack stack, PlayerEntity player) {
         if (performMirror(stack, player))
-            player.sendStatusMessage(MessageTranslation.MIRRORED.componentTranslation().setStyle(Styles.AQUA), true);
+            player.displayClientMessage(MessageTranslation.MIRRORED.componentTranslation().setStyle(Styles.AQUA), true);
     }
 
     protected boolean performMirror(ItemStack stack, PlayerEntity player) {
@@ -234,10 +234,10 @@ public abstract class AbstractGadget extends Item {
             if ((player.world.isAirBlock(lookingAt.getPos())))
                 return;
             onAnchorSet(stack, player, lookingAt);
-            player.sendStatusMessage(MessageTranslation.ANCHOR_SET.componentTranslation().setStyle(Styles.AQUA), true);
+            player.displayClientMessage(MessageTranslation.ANCHOR_SET.componentTranslation().setStyle(Styles.AQUA), true);
         } else {
             onAnchorRemoved(stack, player);
-            player.sendStatusMessage(MessageTranslation.ANCHOR_REMOVED.componentTranslation().setStyle(Styles.AQUA), true);
+            player.displayClientMessage(MessageTranslation.ANCHOR_REMOVED.componentTranslation().setStyle(Styles.AQUA), true);
         }
     }
 
@@ -260,7 +260,7 @@ public abstract class AbstractGadget extends Item {
 
     public static void toggleFuzzy(PlayerEntity player, ItemStack stack) {
         stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_FUZZY, !getFuzzy(stack));
-        player.sendStatusMessage(MessageTranslation.FUZZY_MODE.componentTranslation(getFuzzy(stack)).setStyle(Styles.AQUA), true);
+        player.displayClientMessage(MessageTranslation.FUZZY_MODE.componentTranslation(getFuzzy(stack)).setStyle(Styles.AQUA), true);
     }
 
     public static boolean getConnectedArea(ItemStack stack) {
@@ -269,7 +269,7 @@ public abstract class AbstractGadget extends Item {
 
     public static void toggleConnectedArea(PlayerEntity player, ItemStack stack) {
         stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_UNCONNECTED_AREA, getConnectedArea(stack));
-        player.sendStatusMessage((stack.getItem() instanceof GadgetDestruction ? MessageTranslation.CONNECTED_AREA : MessageTranslation.CONNECTED_SURFACE)
+        player.displayClientMessage((stack.getItem() instanceof GadgetDestruction ? MessageTranslation.CONNECTED_AREA : MessageTranslation.CONNECTED_SURFACE)
                 .componentTranslation(getConnectedArea(stack)).setStyle(Styles.AQUA), true);
     }
 
@@ -279,7 +279,7 @@ public abstract class AbstractGadget extends Item {
 
     public static void toggleRayTraceFluid(ServerPlayerEntity player, ItemStack stack) {
         stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_RAYTRACE_FLUID, !shouldRayTraceFluid(stack));
-        player.sendStatusMessage(MessageTranslation.RAYTRACE_FLUID.componentTranslation(shouldRayTraceFluid(stack)).setStyle(Styles.AQUA), true);
+        player.displayClientMessage(MessageTranslation.RAYTRACE_FLUID.componentTranslation(shouldRayTraceFluid(stack)).setStyle(Styles.AQUA), true);
     }
 
     public static void addInformationRayTraceFluid(List<ITextComponent> tooltip, ItemStack stack) {
@@ -333,7 +333,7 @@ public abstract class AbstractGadget extends Item {
                 ImmutableSortedSet<ChunkPos> unloadedChunks = undo.getBoundingBox().getUnloadedChunks(world);
                 if (! unloadedChunks.isEmpty()) {
                     pushUndo(stack, undo);
-                    player.sendStatusMessage(MessageTranslation.UNDO_UNLOADED.componentTranslation().setStyle(Styles.RED), true);
+                    player.displayClientMessage(MessageTranslation.UNDO_UNLOADED.componentTranslation().setStyle(Styles.RED), true);
                     BuildingGadgets.LOG.error("Player attempted to undo a Region missing {} unloaded chunks. Denied undo!", unloadedChunks.size());
                     BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", unloadedChunks);
                     return;
@@ -346,6 +346,6 @@ public abstract class AbstractGadget extends Item {
 
             UndoScheduler.scheduleUndo(undo, index, buildContext, Config.GADGETS.placeSteps.get());
         } else
-            player.sendStatusMessage(MessageTranslation.NOTHING_TO_UNDO.componentTranslation().setStyle(Styles.RED), true);
+            player.displayClientMessage(MessageTranslation.NOTHING_TO_UNDO.componentTranslation().setStyle(Styles.RED), true);
     }
 }

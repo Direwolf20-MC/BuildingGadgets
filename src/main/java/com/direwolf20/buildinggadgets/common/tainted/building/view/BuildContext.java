@@ -57,7 +57,7 @@ public final class BuildContext {
     }
 
     public ServerWorld getServerWorld() {
-        return ((IServerWorld) world).getWorld();
+        return ((IServerWorld) world).getLevel();
     }
 
     /**
@@ -100,7 +100,7 @@ public final class BuildContext {
         public Builder player(@Nullable PlayerEntity buildingPlayer) {
             this.buildingPlayer = buildingPlayer;
             if (world == null && buildingPlayer != null)
-                this.world = buildingPlayer.world;
+                this.world = buildingPlayer.level;
             return this;
         }
 

@@ -103,7 +103,7 @@ public class GadgetBuilding extends AbstractGadget {
 
     public static void togglePlaceAtop(PlayerEntity player, ItemStack stack) {
         stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_PLACE_INSIDE, shouldPlaceAtop(stack));
-        player.sendStatusMessage((shouldPlaceAtop(stack) ? MessageTranslation.PLACE_ATOP : MessageTranslation.PLACE_INSIDE).componentTranslation().setStyle(Styles.AQUA), true);
+        player.displayClientMessage((shouldPlaceAtop(stack) ? MessageTranslation.PLACE_ATOP : MessageTranslation.PLACE_INSIDE).componentTranslation().setStyle(Styles.AQUA), true);
     }
 
     @Override
@@ -152,7 +152,7 @@ public class GadgetBuilding extends AbstractGadget {
             if (player.isSneaking()) {
                 ActionResult<Block> result = selectBlock(itemstack, player);
                 if( !result.getType().isSuccessOrConsume() ) {
-                    player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
+                    player.displayClientMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
                     return super.onItemRightClick(world, player, hand);
                 }
             } else if (player instanceof ServerPlayerEntity) {
@@ -186,7 +186,7 @@ public class GadgetBuilding extends AbstractGadget {
             range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;
 
         setToolRange(heldItem, range);
-        player.sendStatusMessage(MessageTranslation.RANGE_SET.componentTranslation(range).setStyle(Styles.AQUA), true);
+        player.displayClientMessage(MessageTranslation.RANGE_SET.componentTranslation(range).setStyle(Styles.AQUA), true);
     }
 
     private void build(ServerPlayerEntity player, ItemStack stack) {

@@ -53,7 +53,7 @@ public final class BuildingGadgets {
      */
     public static ItemGroup creativeTab = new ItemGroup(Reference.MODID) {
         @Override
-        public ItemStack createIcon() {
+        public ItemStack makeIcon() {
             ItemStack stack = new ItemStack(OurItems.BUILDING_GADGET_ITEM.get());
             stack.getOrCreateTag().putByte(NBTKeys.CREATIVE_MARKER, (byte) 0);
             return stack;
@@ -125,7 +125,7 @@ public final class BuildingGadgets {
     }
 
     private void serverLoad(FMLServerStartingEvent event) {
-        event.getServer().getCommandManager().getDispatcher().register(
+        event.getServer().getCommands().getDispatcher().register(
                 Commands.literal(Reference.MODID)
                         .then(OverrideBuildSizeCommand.registerToggle())
                         .then(OverrideCopySizeCommand.registerToggle())

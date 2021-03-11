@@ -42,7 +42,7 @@ public class NBTHelper {
         ListNBT list = new ListNBT();
         for (Map.Entry<UUID, V> entry : map.entrySet()) {
             CompoundNBT compound = new CompoundNBT();
-            compound.putUniqueId(NBTKeys.MAP_SERIALIZE_KEY, entry.getKey());
+            compound.putUUID(NBTKeys.MAP_SERIALIZE_KEY, entry.getKey());
             compound.put(NBTKeys.MAP_SERIALIZE_VALUE, valueSerializer.apply(entry.getValue()));
             list.add(compound);
         }
@@ -67,7 +67,7 @@ public class NBTHelper {
             if (nbt instanceof CompoundNBT) {
                 CompoundNBT compound = (CompoundNBT) nbt;
                 toAppendTo.put(
-                        compound.getUniqueId(NBTKeys.MAP_SERIALIZE_KEY),
+                        compound.getUUID(NBTKeys.MAP_SERIALIZE_KEY),
                         valueDeserializer.apply(compound.get(NBTKeys.MAP_SERIALIZE_VALUE))
                 );
             }

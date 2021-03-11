@@ -70,7 +70,7 @@ public interface IBuildView extends Iterable<PlacementTarget> {
 
     default MaterialList estimateRequiredItems() {
         PlayerEntity player = getContext().getPlayer();
-        return estimateRequiredItems(player != null ? player.getPositionVec() : null);
+        return estimateRequiredItems(player != null ? player.position() : null);
     }
 
     /**
