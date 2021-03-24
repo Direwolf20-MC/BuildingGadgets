@@ -268,7 +268,7 @@ public class MockDelegationWorld implements IWorld {
         if (World.isOutsideBuildHeight(pos))
             return Blocks.VOID_AIR.defaultBlockState();
         BlockState state = getOverriddenState(pos);
-        return state != null ? state : Blocks.AIR.defaultBlockState();
+        return state != null ? state : delegate.getBlockState(pos);
     }
 
     @Override
