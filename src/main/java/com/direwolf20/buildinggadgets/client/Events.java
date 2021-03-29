@@ -22,7 +22,7 @@ public class Events {
     }
 
     @SubscribeEvent
-    public static void KeyInput(InputEvent.KeyInputEvent event) {
+    public static void keyInput(InputEvent.KeyInputEvent event) {
         Minecraft mc = Minecraft.getInstance();
         if( mc.isGamePaused() || mc.player == null || event.isCanceled() ) {
             return;
