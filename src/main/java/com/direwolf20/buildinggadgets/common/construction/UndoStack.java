@@ -38,13 +38,13 @@ public class UndoStack {
         for (int i = 0; i < list.size(); i++) {
             CompoundNBT item = list.getCompound(i);
 
-            if (!item.hasUniqueId("key") || !item.contains("dimension")) {
+            if (!item.hasUUID("key") || !item.contains("dimension")) {
                 continue;
             }
 
             bits.add(Pair.of(
-                    item.getUniqueId("key"),
-                    RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(item.getString("dimension")))
+                    item.getUUID("key"),
+                    RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(item.getString("dimension")))
             ));
         }
 
@@ -112,8 +112,8 @@ public class UndoStack {
         ListNBT list = compound.getList("undo-list", Constants.NBT.TAG_COMPOUND);
 
         CompoundNBT data = new CompoundNBT();
-        data.putUniqueId("key", uuid);
-        data.putString("dimension", type.getLocation().toString());
+        data.putUUID("key", uuid);
+        data.putString("dimension", type.location().toString());
 
         // Pop off the last item from the dimension store if over the max undos
         if (bitsByDimension.size() > Config.CommonConfig.gadgetsMaxUndos.get()) {
@@ -135,7 +135,7 @@ public class UndoStack {
         for (int i = 0; i < undoList.size(); i++) {
             CompoundNBT item = undoList.getCompound(i);
 
-            if (!item.getUniqueId("key").equals(uuid)) {
+            if (!item.getUUID("key").equals(uuid)) {
                 continue;
             }
 

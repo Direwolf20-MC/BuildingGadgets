@@ -7,7 +7,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public final class ModItems {
-    public static final Item.Properties ITEM_GROUP = new Item.Properties().group(BuildingGadgets.itemGroup);
+    public static final Item.Properties ITEM_GROUP = new Item.Properties().tab(BuildingGadgets.itemGroup);
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, BuildingGadgets.MOD_ID);
 
     public static final RegistryObject<Item> BUILDING_GADGET = ITEMS.register("building_gadget", BuildingGadget::new);

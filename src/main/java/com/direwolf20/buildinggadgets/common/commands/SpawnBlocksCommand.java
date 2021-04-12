@@ -29,39 +29,39 @@ public class SpawnBlocksCommand {
     public static LiteralArgumentBuilder<CommandSource> register() {
         BuildingGadgets.LOGGER.debug("Spawn Block Command Registered");
         return Commands.literal("spawnblocks")
-                .requires(commandSource -> commandSource.hasPermissionLevel(2))
+                .requires(commandSource -> commandSource.hasPermission(2))
                 .executes(SpawnBlocksCommand::spawnBlocks);
     }
 
     static int spawnBlocks(CommandContext<CommandSource> context) {
         System.out.println("Working");
         try {
-            ServerPlayerEntity player = context.getSource().asPlayer();
-            System.out.println(player.getPosition());
+            ServerPlayerEntity player = context.getSource().getPlayerOrException();
+            System.out.println(player.blockPosition());
 
-            BlockPos pos = player.getPosition();
+            BlockPos pos = player.blockPosition();
             int x = pos.getX(), z = pos.getZ();
             for (Map.Entry<RegistryKey<Block>, Block> block : ForgeRegistries.BLOCKS.getEntries()) {
                 BlockPos placePos = new BlockPos(x, pos.getY(), z);
-                player.world.setBlockState(placePos.down(), Blocks.DIRT.getDefaultState());
+                player.level.setBlockAndUpdate(placePos.below(), Blocks.DIRT.defaultBlockState());
 
                 BlockState state = block.getValue().getStateForPlacement(
-                        new BlockItemUseContext(new ItemUseContext(player, player.getActiveHand(), (BlockRayTraceResult) LookingHelper.getResult(player, false)))
+                        new BlockItemUseContext(new ItemUseContext(player, player.getUsedItemHand(), (BlockRayTraceResult) LookingHelper.getResult(player, false)))
                 );
 
                 if (state == null) {
-                    player.sendStatusMessage(new StringTextComponent("Failed to place " + block.getKey().toString()), false);
+                    player.displayClientMessage(new StringTextComponent("Failed to place " + block.getKey().toString()), false);
                     continue;
                 }
 
-                player.world.setBlockState(placePos, state);
-                player.world.setBlockState(placePos.east(), Blocks.BARRIER.getDefaultState());
-                player.world.setBlockState(placePos.north(), Blocks.BARRIER.getDefaultState());
-                player.world.setBlockState(placePos.south(), Blocks.BARRIER.getDefaultState());
-                player.world.setBlockState(placePos.south().east(), Blocks.BARRIER.getDefaultState());
-                player.world.setBlockState(placePos.south().west(), Blocks.BARRIER.getDefaultState());
-                player.world.setBlockState(placePos.north().west(), Blocks.BARRIER.getDefaultState());
-                player.world.setBlockState(placePos.north().east(), Blocks.BARRIER.getDefaultState());
+                player.level.setBlockAndUpdate(placePos, state);
+                player.level.setBlockAndUpdate(placePos.east(), Blocks.BARRIER.defaultBlockState());
+                player.level.setBlockAndUpdate(placePos.north(), Blocks.BARRIER.defaultBlockState());
+                player.level.setBlockAndUpdate(placePos.south(), Blocks.BARRIER.defaultBlockState());
+                player.level.setBlockAndUpdate(placePos.south().east(), Blocks.BARRIER.defaultBlockState());
+                player.level.setBlockAndUpdate(placePos.south().west(), Blocks.BARRIER.defaultBlockState());
+                player.level.setBlockAndUpdate(placePos.north().west(), Blocks.BARRIER.defaultBlockState());
+                player.level.setBlockAndUpdate(placePos.north().east(), Blocks.BARRIER.defaultBlockState());
 
                 x += 2;
                 if (x > pos.getX() + 40) {
@@ -70,7 +70,7 @@ public class SpawnBlocksCommand {
                 }
             }
 
-            player.sendStatusMessage(new StringTextComponent("Blocks Spawned"), false);
+            player.displayClientMessage(new StringTextComponent("Blocks Spawned"), false);
         } catch (CommandSyntaxException e) {
             e.printStackTrace();
             return 0;

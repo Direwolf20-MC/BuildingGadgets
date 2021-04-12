@@ -38,7 +38,7 @@ public class DestructionGadget extends Gadget {
 
     @Override
     public ActionResult<ItemStack> sneakingAction(World worldIn, PlayerEntity playerIn, ItemStack gadget, @Nullable BlockRayTraceResult rayTrace) {
-        return ActionResult.resultSuccess(gadget);
+        return ActionResult.success(gadget);
     }
 
 

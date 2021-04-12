@@ -31,11 +31,11 @@ import java.util.UUID;
 public abstract class Gadget extends Item {
 
     public Gadget() {
-        super(ModItems.ITEM_GROUP.maxStackSize(1).maxDamage(0).setNoRepair());
+        super(ModItems.ITEM_GROUP.stacksTo(1).durability(0).setNoRepair());
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
         if (worldIn == null) {
             return;
         }
@@ -44,29 +44,29 @@ public abstract class Gadget extends Item {
 
         // Selected block
         gadget.getBlock(stack).ifPresent(block ->
-                tooltip.add(MessageHelper.translation("tooltip", "selected-block", MessageHelper.blockName(block.getBlock())).setStyle(Style.EMPTY.setItalic(true).applyFormatting(TextFormatting.GREEN))));
+                tooltip.add(MessageHelper.translation("tooltip", "selected-block", MessageHelper.blockName(block.getBlock())).setStyle(Style.EMPTY.withItalic(true).applyFormat(TextFormatting.GREEN))));
 
         // Current Mode
-        tooltip.add(MessageHelper.translation("tooltip", "mode", ForgeI18n.getPattern(MessageHelper.translationKey("mode", gadget.getMode(stack).getName()))).setStyle(Style.EMPTY.applyFormatting(TextFormatting.AQUA)));
+        tooltip.add(MessageHelper.translation("tooltip", "mode", ForgeI18n.getPattern(MessageHelper.translationKey("mode", gadget.getMode(stack).getName()))).setStyle(Style.EMPTY.applyFormat(TextFormatting.AQUA)));
 
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        if( worldIn.isRemote ) {
-            return super.onItemRightClick(worldIn, playerIn, handIn);
+    public ActionResult<ItemStack> use(World worldIn, PlayerEntity playerIn, Hand handIn) {
+        if( worldIn.isClientSide ) {
+            return super.use(worldIn, playerIn, handIn);
         }
 
-        ItemStack gadget = playerIn.getHeldItem(handIn);
+        ItemStack gadget = playerIn.getItemInHand(handIn);
         BlockRayTraceResult rayTrace = LookingHelper.getBlockResult(playerIn, false);
-        if( playerIn.isSneaking() ) {
+        if( playerIn.isShiftKeyDown() ) {
             return this.sneakingAction(worldIn, playerIn, gadget, rayTrace);
         }
 
         return this.action(worldIn, playerIn, gadget, rayTrace)
-                ? ActionResult.resultSuccess(gadget)
-                : super.onItemRightClick(worldIn, playerIn, handIn);
+                ? ActionResult.success(gadget)
+                : super.use(worldIn, playerIn, handIn);
     }
 
     public abstract boolean action(World worldIn, PlayerEntity playerIn, ItemStack gadget, @Nullable BlockRayTraceResult rayTrace);
@@ -77,12 +77,12 @@ public abstract class Gadget extends Item {
         UndoWorldStore store = UndoWorldStore.get(world);
         UndoStack undoStack = new UndoStack(gadget);
 
-        Optional<UUID> uuid = undoStack.pollBit(world.getDimensionKey());
+        Optional<UUID> uuid = undoStack.pollBit(world.dimension());
 
         if (!uuid.isPresent()) {
             // Not perfect but it's alright for now :D
-            List<UUID> bitsByDimension = undoStack.getBitsByDimension(world.getDimensionKey());
-            player.sendStatusMessage(MessageHelper.builder("message", bitsByDimension.size() == 0 ? "undo-store-empty" : "undo-fetch-failure").error().build(), true);
+            List<UUID> bitsByDimension = undoStack.getBitsByDimension(world.dimension());
+            player.displayClientMessage(MessageHelper.builder("message", bitsByDimension.size() == 0 ? "undo-store-empty" : "undo-fetch-failure").error().build(), true);
         }
 
         uuid.ifPresent(key -> undoAction(store, key, gadget, world, player));
@@ -104,12 +104,12 @@ public abstract class Gadget extends Item {
      */
     public static Optional<GadgetWithStack> findGadget(PlayerEntity entity) {
         ItemStack stack = ItemStack.EMPTY;
-        if (entity.getHeldItemMainhand().getItem() instanceof Gadget) {
-            stack = entity.getHeldItemMainhand();
+        if (entity.getMainHandItem().getItem() instanceof Gadget) {
+            stack = entity.getMainHandItem();
         }
 
-        if (entity.getHeldItemOffhand().getItem() instanceof Gadget) {
-            stack = entity.getHeldItemOffhand();
+        if (entity.getOffhandItem().getItem() instanceof Gadget) {
+            stack = entity.getOffhandItem();
         }
 
         return !stack.isEmpty() ? Optional.of(GadgetWithStack.of(stack)) : Optional.empty();
@@ -147,7 +147,7 @@ public abstract class Gadget extends Item {
     public Mode getMode(ItemStack stack) {
         if( stack.getOrCreateTag().contains("mode") ) {
             // Using requireNonNull here as the IDE does not know how the above contains check works.
-            String modeId = Objects.requireNonNull(stack.getOrCreateTag().get("mode")).getString();
+            String modeId = Objects.requireNonNull(stack.getOrCreateTag().get("mode")).getAsString();
 
             // Find the mode based on it's name or return the default one.
             return this.getModes().stream()
@@ -175,7 +175,7 @@ public abstract class Gadget extends Item {
 
         // notify the player
         Mode mode = this.getModes().get(newIndex);
-        entity.sendStatusMessage(MessageHelper.builder("message", "mode-updated", ForgeI18n.getPattern(MessageHelper.translationKey("mode", mode.getName()))).info().build(), true);
+        entity.displayClientMessage(MessageHelper.builder("message", "mode-updated", ForgeI18n.getPattern(MessageHelper.translationKey("mode", mode.getName()))).info().build(), true);
     }
 
     public int getRange(ItemStack stack) {
@@ -202,13 +202,13 @@ public abstract class Gadget extends Item {
     public void cycleRange(ItemStack gadget, PlayerEntity entity) {
         int maxRange = Config.COMMON_CONFIG.gadgetMaxRange.get();
         int currentRange = ((Gadget) gadget.getItem()).getRange(gadget);
-        int range = currentRange + (entity.isSneaking() ? -1 : 1);
+        int range = currentRange + (entity.isShiftKeyDown() ? -1 : 1);
 
         range = range > maxRange ? 1 : (range <= 0 ? maxRange : range);
         this.setRange(gadget, range);
 
         // notify the player
-        entity.sendStatusMessage(MessageHelper.builder("message", "range-updated", range).info().build(), true);
+        entity.displayClientMessage(MessageHelper.builder("message", "range-updated", range).info().build(), true);
     }
 
     /**

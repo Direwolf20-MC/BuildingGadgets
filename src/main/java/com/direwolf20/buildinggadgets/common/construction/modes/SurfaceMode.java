@@ -17,9 +17,9 @@ public class SurfaceMode extends Mode {
 
         int bound = context.getRange() / 2;
         BoundingBox region = new BoundingBox(start).expand(
-                bound * (1 - Math.abs(context.getHitSide().getXOffset())),
-                bound * (1 - Math.abs(context.getHitSide().getYOffset())),
-                bound * (1 - Math.abs(context.getHitSide().getZOffset()))
+                bound * (1 - Math.abs(context.getHitSide().getStepX())),
+                bound * (1 - Math.abs(context.getHitSide().getStepY())),
+                bound * (1 - Math.abs(context.getHitSide().getStepZ()))
         );
 
         return region.stream().collect(Collectors.toList());
@@ -34,8 +34,8 @@ public class SurfaceMode extends Mode {
 
         BlockState startState = context.getWorldState(context.getStartPos());
         if( context.isFuzzy() )
-            return topRow && !context.getWorld().isAirBlock(pos.offset(context.getHitSide().getOpposite()));
+            return topRow && !context.getWorld().isEmptyBlock(pos.relative(context.getHitSide().getOpposite()));
 
-        return topRow && context.getWorld().getBlockState(pos.offset(context.getHitSide().getOpposite())) == startState;
+        return topRow && context.getWorld().getBlockState(pos.relative(context.getHitSide().getOpposite())) == startState;
     }
 }

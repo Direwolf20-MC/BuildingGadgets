@@ -43,7 +43,7 @@ public abstract class Mode {
         return collect(context, player, startPos)
                 .stream()
                 .filter(e -> isExchanging ? this.exchangingValidator(e, lookingAtState, context) : this.validator(player, e, context))
-                .sorted(Comparator.comparing((BlockPos pos) -> player.getPosition().distanceSq(pos)))
+                .sorted(Comparator.comparing((BlockPos pos) -> player.blockPosition().distSqr(pos)))
                 .collect(Collectors.toList());
     }
 
@@ -54,7 +54,7 @@ public abstract class Mode {
      * @return if the block is valid
      */
     public boolean validator(PlayerEntity player, BlockPos pos, ModeUseContext context) {
-        if (!context.getWorldState(pos).isReplaceable(context.createBlockUseContext(player)))
+        if (!context.getWorldState(pos).canBeReplaced(context.createBlockUseContext(player)))
             return false;
 
         if (World.isOutsideBuildHeight(pos))
@@ -68,7 +68,7 @@ public abstract class Mode {
 
     private boolean exchangingValidator(BlockPos pos, BlockState lookingAtState, ModeUseContext context) {
         BlockState worldBlockState = context.getWorldState(pos);
-        TileEntity te = context.getWorld().getTileEntity(pos);
+        TileEntity te = context.getWorld().getBlockEntity(pos);
 
         if ((worldBlockState != lookingAtState && !context.isFuzzy())
                 //|| worldBlockState == OurBlocks.effectBlock.getDefaultState()
@@ -80,7 +80,7 @@ public abstract class Mode {
                 && te.getBlockState() == context.getSetState()) //)
             return false;
 
-        if (worldBlockState.getBlockHardness(context.getWorld(), pos) < 0)
+        if (worldBlockState.getDestroySpeed(context.getWorld(), pos) < 0)
             return false;
 
         if( worldBlockState.getMaterial() == Material.AIR || worldBlockState.getMaterial().isLiquid() )
@@ -89,10 +89,10 @@ public abstract class Mode {
         // Finally, ensure at least a single face is exposed.
         boolean hasSingeValid = false;
         for(Direction direction : Direction.values()) {
-            BlockPos offset = pos.offset(direction);
+            BlockPos offset = pos.relative(direction);
             BlockState state = context.getWorld().getBlockState(offset);
             if( state.isAir(context.getWorld(), offset)
-                    || (state.getShape(context.getWorld(), offset) != VoxelShapes.fullCube() && !(state.getBlock() instanceof StairsBlock))) {
+                    || (state.getShape(context.getWorld(), offset) != VoxelShapes.block() && !(state.getBlock() instanceof StairsBlock))) {
                 hasSingeValid = true;
                 break;
             }
@@ -102,7 +102,7 @@ public abstract class Mode {
     }
 
     public BlockPos withOffset(BlockPos pos, Direction side, boolean placeOnTop) {
-        return placeOnTop ? pos.offset(side, 1) : pos;
+        return placeOnTop ? pos.relative(side, 1) : pos;
     }
 
     public boolean isExchanging() {

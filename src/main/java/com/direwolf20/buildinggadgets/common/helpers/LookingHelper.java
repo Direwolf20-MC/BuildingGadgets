@@ -12,9 +12,9 @@ public class LookingHelper {
     public static RayTraceResult getResult(PlayerEntity player, boolean traceFluid) {
         double range = Config.COMMON_CONFIG.gadgetRayTraceRange.get();
 
-        return player.world.rayTraceBlocks(new RayTraceContext(
+        return player.level.clip(new RayTraceContext(
                 player.getEyePosition(1.0f),                                                    // start pos
-                player.getEyePosition(1.0f).add(player.getLookVec().mul(range, range, range)),  // end pos
+                player.getEyePosition(1.0f).add(player.getLookAngle().multiply(range, range, range)),  // end pos
                 RayTraceContext.BlockMode.OUTLINE,
                 traceFluid ? FluidMode.ANY : FluidMode.NONE,
                 player
@@ -22,11 +22,11 @@ public class LookingHelper {
     }
 
     public static Vector3d getPos(PlayerEntity player, boolean traceFluid) {
-        return getResult(player, traceFluid).getHitVec();
+        return getResult(player, traceFluid).getLocation();
     }
 
     public static BlockPos getBlockPos(PlayerEntity player, boolean traceFluid) {
-        Vector3d vec = getResult(player, traceFluid).getHitVec();
+        Vector3d vec = getResult(player, traceFluid).getLocation();
         return new BlockPos((int) vec.x, (int) vec.y, (int) vec.y);
     }
 

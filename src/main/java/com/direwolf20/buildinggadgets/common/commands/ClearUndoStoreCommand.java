@@ -29,14 +29,14 @@ public class ClearUndoStoreCommand {
 
     public static LiteralArgumentBuilder<CommandSource> register() {
         return Commands.literal("clearUndoStore")
-                .requires(commandSource -> commandSource.hasPermissionLevel(2))
+                .requires(commandSource -> commandSource.hasPermission(2))
                 .executes(ClearUndoStoreCommand::clearStore);
     }
 
     static int clearStore(CommandContext<CommandSource> context) {
-        UndoWorldStore store = UndoWorldStore.get(context.getSource().getWorld());
+        UndoWorldStore store = UndoWorldStore.get(context.getSource().getLevel());
         store.getUndoStack().clear();
-        store.markDirty();
+        store.setDirty();
         return 1;
     }
 }

@@ -18,12 +18,12 @@ public class StairMode extends Mode {
 
         Direction side = context.getHitSide();
         if (XYZ.isAxisY(side))
-            side = player.getHorizontalFacing().getOpposite();
+            side = player.getDirection().getOpposite();
 
         XYZ facingXYZ = XYZ.fromFacing(side);
         for( int i = 0; i < context.getRange(); i ++ ) {
             // Check to see if we should build up or down from the player
-            int tmp = start.getY() > player.getPosY() + 1 ? (i + 1) * -1 : i;
+            int tmp = start.getY() > player.getY() + 1 ? (i + 1) * -1 : i;
 
             if( facingXYZ == XYZ.X )
                 coordinates.add(new BlockPos(start.getX() + (tmp * (side == Direction.EAST ? -1 : 1)), start.getY() + tmp, start.getZ()));
@@ -38,6 +38,6 @@ public class StairMode extends Mode {
     @Override
     public BlockPos withOffset(BlockPos pos, Direction side, boolean placeOnTop) {
         // Is top / bottom? Do as normal. Not? then place on top or inside :D
-        return XYZ.isAxisY(side) ? super.withOffset(pos, side, placeOnTop) : (placeOnTop ? pos.offset(Direction.UP) : pos);
+        return XYZ.isAxisY(side) ? super.withOffset(pos, side, placeOnTop) : (placeOnTop ? pos.relative(Direction.UP) : pos);
     }
 }

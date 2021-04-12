@@ -51,30 +51,30 @@ public class BuildingGadget extends Gadget {
 
         // First, get the gadgets mode
         Mode mode = this.getMode(gadget);
-        List<BlockPos> blockCollection = mode.getCollection(playerIn, new ModeUseContext(worldIn, state, rayTrace.getPos(), gadget, rayTrace.getFace(), true));
+        List<BlockPos> blockCollection = mode.getCollection(playerIn, new ModeUseContext(worldIn, state, rayTrace.getBlockPos(), gadget, rayTrace.getDirection(), true));
 
         // Build and store to the undo worldStore
         UndoWorldStore store = UndoWorldStore.get(worldIn);
         List<UndoBit> bits = new ArrayList<>();
         for (BlockPos e : blockCollection) {
-            if (state.isValidPosition(worldIn, e) && worldIn.setBlockState(e, state)) {
-                bits.add(new UndoBit(e, state, worldIn.getDimensionKey()));
+            if (state.canSurvive(worldIn, e) && worldIn.setBlockAndUpdate(e, state)) {
+                bits.add(new UndoBit(e, state, worldIn.dimension()));
             }
         }
 
         // if there was no blocks places, do not store the undo
         if (bits.size() == 0) {
-            playerIn.sendStatusMessage(MessageHelper.builder("message", "no-blocks-placed").error().build(), true);
+            playerIn.displayClientMessage(MessageHelper.builder("message", "no-blocks-placed").error().build(), true);
             return;
         }
 
-        playerIn.sendStatusMessage(MessageHelper.builder("message", "build-successful", bits.size()).success().build(), true);
+        playerIn.displayClientMessage(MessageHelper.builder("message", "build-successful", bits.size()).success().build(), true);
 
         UUID uuid = UUID.randomUUID();
-        if (new UndoStack(gadget).pushUndo(gadget, uuid, worldIn.getDimensionKey())) {
+        if (new UndoStack(gadget).pushUndo(gadget, uuid, worldIn.dimension())) {
             store.push(uuid, bits);
         } else {
-            playerIn.sendStatusMessage(MessageHelper.builder("message", "undo-save-failure").error().build(), true);
+            playerIn.displayClientMessage(MessageHelper.builder("message", "undo-save-failure").error().build(), true);
         }
     }
 
@@ -88,19 +88,19 @@ public class BuildingGadget extends Gadget {
     @Override
     public ActionResult<ItemStack> sneakingAction(World worldIn, PlayerEntity playerIn, ItemStack gadget, @Nullable BlockRayTraceResult rayTrace) {
         if( rayTrace == null ) {
-            playerIn.sendStatusMessage(MessageHelper.builder("message", "no-block-selected").error().build(), true);
-            return ActionResult.resultFail(gadget);
+            playerIn.displayClientMessage(MessageHelper.builder("message", "no-block-selected").error().build(), true);
+            return ActionResult.fail(gadget);
         }
 
-        BlockState state = worldIn.getBlockState(rayTrace.getPos());
+        BlockState state = worldIn.getBlockState(rayTrace.getBlockPos());
         if (BlockAuthority.allowed(state)) {
             this.setBlock(gadget, StateAuthority.pipe(state));
-            playerIn.sendStatusMessage(MessageHelper.builder("message", "block-selected", MessageHelper.blockName(state.getBlock())).success().build(), true);
-            return ActionResult.resultSuccess(gadget);
+            playerIn.displayClientMessage(MessageHelper.builder("message", "block-selected", MessageHelper.blockName(state.getBlock())).success().build(), true);
+            return ActionResult.success(gadget);
         }
 
-        playerIn.sendStatusMessage(MessageHelper.builder("message", "block-selection-banned", MessageHelper.blockName(state.getBlock())).error().build(), true);
-        return ActionResult.resultFail(gadget);
+        playerIn.displayClientMessage(MessageHelper.builder("message", "block-selection-banned", MessageHelper.blockName(state.getBlock())).error().build(), true);
+        return ActionResult.fail(gadget);
     }
 
     /**
@@ -112,7 +112,7 @@ public class BuildingGadget extends Gadget {
 
         if (bits == null) {
             BuildingGadgets.LOGGER.debug("Failed to get undo data :( " + uuid.toString());
-            player.sendStatusMessage(MessageHelper.builder("message", "undo-fetch-failure").error().build(), true);
+            player.displayClientMessage(MessageHelper.builder("message", "undo-fetch-failure").error().build(), true);
             return;
         }
 
@@ -123,11 +123,11 @@ public class BuildingGadget extends Gadget {
                 continue;
             }
 
-            world.setBlockState(bit.getPos(), Blocks.AIR.getDefaultState());
+            world.setBlockAndUpdate(bit.getPos(), Blocks.AIR.defaultBlockState());
             count ++;
         }
 
-        player.sendStatusMessage(MessageHelper.builder("message", "blocks-undo", count).success().build(), true);
+        player.displayClientMessage(MessageHelper.builder("message", "blocks-undo", count).success().build(), true);
         store.pop(uuid);
     }
 

@@ -26,7 +26,7 @@ public class VerticalWallMode extends Mode {
         int halfRange = context.getRange() / 2;
         if( XYZ.isAxisY(context.getHitSide()) ) {
             // This allows us to figure out how to move the render
-            XYZ xyz = XYZ.fromFacing(player.getHorizontalFacing().getOpposite());
+            XYZ xyz = XYZ.fromFacing(player.getDirection().getOpposite());
             for(int i = 0; i < context.getRange(); i ++ ) {
                 for(int j = -halfRange; j <= halfRange; j ++) {
                     int value = XYZ.invertOnFace(context.getHitSide(), i);

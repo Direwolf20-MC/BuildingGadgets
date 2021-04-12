@@ -48,7 +48,7 @@ public class UndoBit {
         return new UndoBit(
                 NBTUtil.readBlockPos(compound.getCompound("pos")),
                 NBTUtil.readBlockState(compound.getCompound("state")),
-                RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compound.getString("dimension")))
+                RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(compound.getString("dimension")))
         );
     }
 
@@ -62,7 +62,7 @@ public class UndoBit {
         CompoundNBT compound = new CompoundNBT();
         compound.put("pos", NBTUtil.writeBlockPos(this.pos));
         compound.put("state", NBTUtil.writeBlockState(this.state));
-        compound.putString("dimension", dimensionName.getLocation().toString());
+        compound.putString("dimension", dimensionName.location().toString());
         return compound;
     }
 }

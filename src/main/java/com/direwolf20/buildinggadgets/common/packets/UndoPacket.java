@@ -22,7 +22,7 @@ public final class UndoPacket {
             if (player == null)
                 return;
 
-            Gadget.findGadget(player).ifPresent(e -> e.getGadget().undo(e.getStack(), player.world, player));
+            Gadget.findGadget(player).ifPresent(e -> e.getGadget().undo(e.getStack(), player.level, player));
         });
 
         ctx.get().setPacketHandled(true);

@@ -34,7 +34,7 @@ public class BuildingGadgets
      */
     public static ItemGroup itemGroup = new ItemGroup(BuildingGadgets.MOD_ID) {
         @Override
-        public ItemStack createIcon() {
+        public ItemStack makeIcon() {
             return new ItemStack(ModItems.BUILDING_GADGET.get());
         }
     };

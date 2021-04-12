@@ -27,7 +27,7 @@ public class UndoWorldStore extends WorldSavedData {
     }
 
     @Override
-    public void read(CompoundNBT nbt) {
+    public void load(CompoundNBT nbt) {
         undoStack.clear();
 
         ListNBT list = nbt.getList("undo-data", Constants.NBT.TAG_COMPOUND);
@@ -41,19 +41,19 @@ public class UndoWorldStore extends WorldSavedData {
             }
 
             undoStack.put(
-                    list.getCompound(i).getUniqueId("key"),
+                    list.getCompound(i).getUUID("key"),
                     undoBits
             );
         }
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
+    public CompoundNBT save(CompoundNBT compound) {
         ListNBT nbt = new ListNBT();
 
         for (Map.Entry<UUID, List<UndoBit>> undo : undoStack.entrySet()) {
             CompoundNBT comp = new CompoundNBT();
-            comp.putUniqueId("key", undo.getKey());
+            comp.putUUID("key", undo.getKey());
 
             ListNBT list = new ListNBT();
             for (UndoBit undoBit : undo.getValue()) {
@@ -69,12 +69,12 @@ public class UndoWorldStore extends WorldSavedData {
     }
 
     public static UndoWorldStore get(World world) {
-        UndoWorldStore storage = ((ServerWorld) world).getSavedData().get(UndoWorldStore::new, NAME);
+        UndoWorldStore storage = ((ServerWorld) world).getDataStorage().get(UndoWorldStore::new, NAME);
 
         if (storage == null) {
             storage = new UndoWorldStore();
-            storage.markDirty();
-            ((ServerWorld) world).getSavedData().set(storage);
+            storage.setDirty();
+            ((ServerWorld) world).getDataStorage().set(storage);
         }
 
         return storage;
@@ -86,11 +86,11 @@ public class UndoWorldStore extends WorldSavedData {
 
     public void push(UUID uuid, List<UndoBit> bits) {
         this.undoStack.put(uuid, bits);
-        this.markDirty();
+        this.setDirty();
     }
 
     public void pop(UUID uuid) {
         this.undoStack.remove(uuid);
-        this.markDirty();
+        this.setDirty();
     }
 }

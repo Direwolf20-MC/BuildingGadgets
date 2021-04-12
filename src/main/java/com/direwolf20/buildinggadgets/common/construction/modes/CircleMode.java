@@ -2,11 +2,9 @@ package com.direwolf20.buildinggadgets.common.construction.modes;
 
 import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
 import com.direwolf20.buildinggadgets.common.construction.XYZ;
-import com.direwolf20.buildinggadgets.common.schema.BoundingBox;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,9 +65,9 @@ public class CircleMode extends Mode {
      */
     private BlockPos getBlockPosition(BlockPos start, int directionalX, int directionalY, Direction direction) {
         if (XYZ.isAxisY(direction))
-            return start.add(directionalX, 0, directionalY);
+            return start.offset(directionalX, 0, directionalY);
         if (XYZ.isAxisZ(direction))
-            return start.add(directionalX, directionalY, 0);
-        return start.add(0, directionalX, directionalY);
+            return start.offset(directionalX, directionalY, 0);
+        return start.offset(0, directionalX, directionalY);
     }
 }

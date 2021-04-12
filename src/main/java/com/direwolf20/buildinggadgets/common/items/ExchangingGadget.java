@@ -46,8 +46,8 @@ public class ExchangingGadget extends BuildingGadget {
         // First, get the gadgets mode
         Mode mode = this.getMode(gadget);
 
-        List<BlockPos> blockCollection = mode.getCollection(playerIn, new ModeUseContext(worldIn, state, rayTrace.getPos(), gadget, rayTrace.getFace(), false));
-        blockCollection.forEach(e -> worldIn.setBlockState(e, state));
+        List<BlockPos> blockCollection = mode.getCollection(playerIn, new ModeUseContext(worldIn, state, rayTrace.getBlockPos(), gadget, rayTrace.getDirection(), false));
+        blockCollection.forEach(e -> worldIn.setBlockAndUpdate(e, state));
     }
 
     /**

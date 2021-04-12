@@ -17,10 +17,10 @@ import java.util.List;
  */
 public class StateAuthority {
     public static final List<Property<?>> BANNED_STATES = Arrays.asList(
-            AGE_0_1, AGE_0_2, AGE_0_3, AGE_0_5, AGE_0_7, AGE_0_15, AGE_0_25,
-            OPEN, POWERED, WATERLOGGED, SNOWY, TRIGGERED, BITES_0_6, DISTANCE_1_7 , EGGS_1_4 , HATCH_0_2, LAYERS_1_8,
-            LEVEL_0_3, LEVEL_0_8, LEVEL_1_8, HONEY_LEVEL, LEVEL_0_15, MOISTURE_0_7, NOTE_0_24, PICKLES_1_4, POWER_0_15,
-            STAGE_0_1, DISTANCE_0_7, CHEST_TYPE, BED_PART, NOTE_BLOCK_INSTRUMENT, STRUCTURE_BLOCK_MODE, BAMBOO_LEAVES,
+            AGE_1, AGE_2, AGE_3, AGE_5, AGE_7, AGE_15, AGE_25,
+            OPEN, POWERED, WATERLOGGED, SNOWY, TRIGGERED, BITES, DISTANCE , EGGS , HATCH, LAYERS,
+            LEVEL_CAULDRON, LEVEL_COMPOSTER, LEVEL_FLOWING, LEVEL_HONEY, LEVEL, MOISTURE, NOTE, PICKLES, POWER,
+            STAGE, STABILITY_DISTANCE, CHEST_TYPE, BED_PART, NOTEBLOCK_INSTRUMENT, STRUCTUREBLOCK_MODE, BAMBOO_LEAVES,
             EXTENDED, LOCKED
     );
 
@@ -29,7 +29,7 @@ public class StateAuthority {
      * abusive states like growth of blocks
      */
     public static BlockState pipe(BlockState state) {
-        BlockState subjectState = state.getBlock().getDefaultState();
+        BlockState subjectState = state.getBlock().defaultBlockState();
 
         // Remove properties from the state
         Collection<Property<?>> properties = state.getProperties();
@@ -44,7 +44,7 @@ public class StateAuthority {
 
         // Literally just for leaves when being placed by our mod
         if (state.getProperties().contains(PERSISTENT))
-            subjectState = subjectState.with(PERSISTENT, true);
+            subjectState = subjectState.setValue(PERSISTENT, true);
 
         return subjectState;
     }
@@ -58,6 +58,6 @@ public class StateAuthority {
             BlockState originalState,
             Property<T> property
     ) {
-        return subjectState.with(property, originalState.get(property));
+        return subjectState.setValue(property, originalState.getValue(property));
     }
 }

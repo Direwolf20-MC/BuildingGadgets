@@ -47,7 +47,7 @@ public final class KeyBindings {
      * @return     Registered Key Binding Object
      */
     private static KeyBinding createBinding(String name, int key) {
-        KeyBinding keyBinding = new KeyBinding(MessageHelper.translationKey("key", name), CONFLICT_CONTEXT, InputMappings.Type.KEYSYM.getOrMakeInput(key), MessageHelper.translationKey("key", "category"));
+        KeyBinding keyBinding = new KeyBinding(MessageHelper.translationKey("key", name), CONFLICT_CONTEXT, InputMappings.Type.KEYSYM.getOrCreate(key), MessageHelper.translationKey("key", "category"));
         ClientRegistry.registerKeyBinding(keyBinding);
         return keyBinding;
     }
@@ -58,15 +58,15 @@ public final class KeyBindings {
      * @param event key event
      */
     public static void onKeyPressed(InputEvent.KeyInputEvent event) {
-        if (range.isPressed()) {
+        if (range.consumeClick()) {
             Packets.sendToServer(new SetRangePacket());
         }
 
-        if (mode.isPressed()) {
+        if (mode.consumeClick()) {
             Packets.sendToServer(new SetModePacket());
         }
 
-        if (undo.isPressed()) {
+        if (undo.consumeClick()) {
             Packets.sendToServer(new UndoPacket());
         }
     }

@@ -20,7 +20,7 @@ archivesBaseName = "buildinggadgets-${mc_version}"
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    mappings channel: 'snapshot', version: "${mcp_mappings}"
+    mappings channel: 'official', version: "${mc_version}"
 
     runs {
         client {
