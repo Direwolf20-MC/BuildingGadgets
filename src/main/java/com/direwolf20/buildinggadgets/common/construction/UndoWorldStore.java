@@ -32,7 +32,6 @@ public class UndoWorldStore extends WorldSavedData {
 
         ListNBT list = nbt.getList("undo-data", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < list.size(); i++) {
-            System.out.println(list.getCompound(i));
             List<UndoBit> undoBits = new ArrayList<>();
             ListNBT bits = list.getCompound(i).getList("bits", Constants.NBT.TAG_COMPOUND);
 

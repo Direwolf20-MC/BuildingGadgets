@@ -34,10 +34,8 @@ public class SpawnBlocksCommand {
     }
 
     static int spawnBlocks(CommandContext<CommandSource> context) {
-        System.out.println("Working");
         try {
             ServerPlayerEntity player = context.getSource().getPlayerOrException();
-            System.out.println(player.blockPosition());
 
             BlockPos pos = player.blockPosition();
             int x = pos.getX(), z = pos.getZ();
