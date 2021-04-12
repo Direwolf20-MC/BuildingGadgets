@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.Config;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.*;
 import net.minecraft.util.math.RayTraceContext.FluidMode;
+import net.minecraft.util.math.vector.Vector3d;
 
 import javax.annotation.Nullable;
 
@@ -20,12 +21,12 @@ public class LookingHelper {
         ));
     }
 
-    public static Vec3d getPos(PlayerEntity player, boolean traceFluid) {
+    public static Vector3d getPos(PlayerEntity player, boolean traceFluid) {
         return getResult(player, traceFluid).getHitVec();
     }
 
     public static BlockPos getBlockPos(PlayerEntity player, boolean traceFluid) {
-        Vec3d vec = getResult(player, traceFluid).getHitVec();
+        Vector3d vec = getResult(player, traceFluid).getHitVec();
         return new BlockPos((int) vec.x, (int) vec.y, (int) vec.y);
     }
 

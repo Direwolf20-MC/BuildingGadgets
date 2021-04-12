@@ -1,14 +1,13 @@
 package com.direwolf20.buildinggadgets.common.construction;
 
+import static net.minecraft.state.properties.BlockStateProperties.*;
+
 import net.minecraft.block.BlockState;
-import net.minecraft.state.IProperty;
-import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.state.Property;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
-import static net.minecraft.state.properties.BlockStateProperties.*;
 
 /**
  * This class should handle anything to do with state modification and allowed states. It is
@@ -17,7 +16,7 @@ import static net.minecraft.state.properties.BlockStateProperties.*;
  * @todo: Add IMC
  */
 public class StateAuthority {
-    public static final List<IProperty<?>> BANNED_STATES = Arrays.asList(
+    public static final List<Property<?>> BANNED_STATES = Arrays.asList(
             AGE_0_1, AGE_0_2, AGE_0_3, AGE_0_5, AGE_0_7, AGE_0_15, AGE_0_25,
             OPEN, POWERED, WATERLOGGED, SNOWY, TRIGGERED, BITES_0_6, DISTANCE_1_7 , EGGS_1_4 , HATCH_0_2, LAYERS_1_8,
             LEVEL_0_3, LEVEL_0_8, LEVEL_1_8, HONEY_LEVEL, LEVEL_0_15, MOISTURE_0_7, NOTE_0_24, PICKLES_1_4, POWER_0_15,
@@ -33,8 +32,8 @@ public class StateAuthority {
         BlockState subjectState = state.getBlock().getDefaultState();
 
         // Remove properties from the state
-        Collection<IProperty<?>> properties = state.getProperties();
-        for (IProperty<?> property : properties) {
+        Collection<Property<?>> properties = state.getProperties();
+        for (Property<?> property : properties) {
             // Skip banned states
             if (BANNED_STATES.contains(property)) {
                 continue;
@@ -57,7 +56,7 @@ public class StateAuthority {
     private static <T extends Comparable<T>> BlockState applyProperty(
             BlockState subjectState,
             BlockState originalState,
-            IProperty<T> property
+            Property<T> property
     ) {
         return subjectState.with(property, originalState.get(property));
     }

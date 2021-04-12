@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.schema;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -23,11 +23,11 @@ public final class BoundingBox {
         this.maxZ = Math.max(minZ, maxZ);
     }
 
-    public BoundingBox(Vec3i pos) {
+    public BoundingBox(Vector3i pos) {
         this(pos, pos);
     }
 
-    public BoundingBox(Vec3i min, Vec3i max) {
+    public BoundingBox(Vector3i min, Vector3i max) {
         this(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
     }
 

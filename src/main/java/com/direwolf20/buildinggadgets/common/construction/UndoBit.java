@@ -4,12 +4,13 @@ import com.direwolf20.buildinggadgets.BuildingGadgets;
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 
 /**
  * An UndoBit identifies specific data about a action ("bit") which can be used to
@@ -18,9 +19,9 @@ import java.util.Objects;
 public class UndoBit {
     private BlockPos pos;
     private BlockState state;
-    private DimensionType dimension;
+    private RegistryKey<World> dimension;
 
-    public UndoBit(BlockPos pos, BlockState state, DimensionType dimension) {
+    public UndoBit(BlockPos pos, BlockState state, RegistryKey<World> dimension) {
         this.pos = pos;
         this.state = state;
         this.dimension = dimension;
@@ -34,7 +35,7 @@ public class UndoBit {
         return state;
     }
 
-    public DimensionType getDimension() {
+    public RegistryKey<World> getDimension() {
         return dimension;
     }
 
@@ -47,12 +48,12 @@ public class UndoBit {
         return new UndoBit(
                 NBTUtil.readBlockPos(compound.getCompound("pos")),
                 NBTUtil.readBlockState(compound.getCompound("state")),
-                DimensionType.byName(new ResourceLocation(compound.getString("dimension")))
+                RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compound.getString("dimension")))
         );
     }
 
     public CompoundNBT serialize() {
-        ResourceLocation dimensionName = this.dimension.getRegistryName();
+        RegistryKey<World> dimensionName = this.dimension;
         if (dimensionName == null) {
             BuildingGadgets.LOGGER.fatal("Current dimension does not have a registry name!");
             return new CompoundNBT();
@@ -61,7 +62,7 @@ public class UndoBit {
         CompoundNBT compound = new CompoundNBT();
         compound.put("pos", NBTUtil.writeBlockPos(this.pos));
         compound.put("state", NBTUtil.writeBlockState(this.state));
-        compound.putString("dimension", dimensionName.toString());
+        compound.putString("dimension", dimensionName.getLocation().toString());
         return compound;
     }
 }

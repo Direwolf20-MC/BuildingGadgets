@@ -1,36 +1,32 @@
 package com.direwolf20.buildinggadgets.common.items;
 
-import com.direwolf20.buildinggadgets.BuildingGadgets;
 import com.direwolf20.buildinggadgets.Config;
 import com.direwolf20.buildinggadgets.common.construction.UndoStack;
 import com.direwolf20.buildinggadgets.common.construction.UndoWorldStore;
-import com.direwolf20.buildinggadgets.common.helpers.MessageHelper;
 import com.direwolf20.buildinggadgets.common.construction.modes.Mode;
 import com.direwolf20.buildinggadgets.common.helpers.LookingHelper;
+import com.direwolf20.buildinggadgets.common.helpers.MessageHelper;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.fml.ForgeI18n;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 public abstract class Gadget extends Item {
 
@@ -40,14 +36,18 @@ public abstract class Gadget extends Item {
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        if (worldIn == null) {
+            return;
+        }
+
         Gadget gadget = ((Gadget) stack.getItem());
 
         // Selected block
         gadget.getBlock(stack).ifPresent(block ->
-                tooltip.add(MessageHelper.translation("tooltip", "selected-block", MessageHelper.blockName(block.getBlock())).setStyle(new Style().setItalic(true).setColor(TextFormatting.GREEN))));
+                tooltip.add(MessageHelper.translation("tooltip", "selected-block", MessageHelper.blockName(block.getBlock())).setStyle(Style.EMPTY.setItalic(true).applyFormatting(TextFormatting.GREEN))));
 
         // Current Mode
-        tooltip.add(MessageHelper.translation("tooltip", "mode", ForgeI18n.getPattern(MessageHelper.translationKey("mode", gadget.getMode(stack).getName()))).setStyle(new Style().setColor(TextFormatting.AQUA)));
+        tooltip.add(MessageHelper.translation("tooltip", "mode", ForgeI18n.getPattern(MessageHelper.translationKey("mode", gadget.getMode(stack).getName()))).setStyle(Style.EMPTY.applyFormatting(TextFormatting.AQUA)));
 
         super.addInformation(stack, worldIn, tooltip, flagIn);
     }
@@ -77,11 +77,11 @@ public abstract class Gadget extends Item {
         UndoWorldStore store = UndoWorldStore.get(world);
         UndoStack undoStack = new UndoStack(gadget);
 
-        Optional<UUID> uuid = undoStack.pollBit(world.getDimension().getType());
+        Optional<UUID> uuid = undoStack.pollBit(world.getDimensionKey());
 
         if (!uuid.isPresent()) {
             // Not perfect but it's alright for now :D
-            List<UUID> bitsByDimension = undoStack.getBitsByDimension(world.getDimension().getType());
+            List<UUID> bitsByDimension = undoStack.getBitsByDimension(world.getDimensionKey());
             player.sendStatusMessage(MessageHelper.builder("message", bitsByDimension.size() == 0 ? "undo-store-empty" : "undo-fetch-failure").error().build(), true);
         }
 

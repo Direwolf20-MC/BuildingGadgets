@@ -11,8 +11,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
@@ -60,7 +58,7 @@ public class BuildingGadget extends Gadget {
         List<UndoBit> bits = new ArrayList<>();
         for (BlockPos e : blockCollection) {
             if (state.isValidPosition(worldIn, e) && worldIn.setBlockState(e, state)) {
-                bits.add(new UndoBit(e, state, worldIn.getDimension().getType()));
+                bits.add(new UndoBit(e, state, worldIn.getDimensionKey()));
             }
         }
 
@@ -73,7 +71,7 @@ public class BuildingGadget extends Gadget {
         playerIn.sendStatusMessage(MessageHelper.builder("message", "build-successful", bits.size()).success().build(), true);
 
         UUID uuid = UUID.randomUUID();
-        if (new UndoStack(gadget).pushUndo(gadget, uuid, worldIn.getDimension().getType())) {
+        if (new UndoStack(gadget).pushUndo(gadget, uuid, worldIn.getDimensionKey())) {
             store.push(uuid, bits);
         } else {
             playerIn.sendStatusMessage(MessageHelper.builder("message", "undo-save-failure").error().build(), true);

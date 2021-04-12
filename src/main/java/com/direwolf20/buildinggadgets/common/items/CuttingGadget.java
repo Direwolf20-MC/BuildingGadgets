@@ -9,6 +9,7 @@ import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,6 +35,6 @@ public class CuttingGadget extends Gadget {
 
     @Override
     public List<Mode> getModes() {
-        return null;
+        return new ArrayList<>();
     }
 }

@@ -10,6 +10,7 @@ import net.minecraft.command.Commands;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -18,9 +19,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
-import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLPaths;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,7 +55,7 @@ public class BuildingGadgets
         eventBus.addListener(this::enqueueIMC);
         eventBus.addListener(this::processIMC);
 
-        MinecraftForge.EVENT_BUS.addListener(this::serverLoad);
+        MinecraftForge.EVENT_BUS.addListener(this::registerCommands);
         MinecraftForge.EVENT_BUS.register(Events.class);
 
         ModItems.ITEMS.register(eventBus);
@@ -70,12 +69,12 @@ public class BuildingGadgets
         KeyBindings.init();
     }
 
-    private void serverLoad(FMLServerStartingEvent event) {
+    private void registerCommands(RegisterCommandsEvent event) {
         LOGGER.debug("Registering commands");
-        event.getCommandDispatcher().register(
-                Commands.literal(MOD_ID)
-                        .then(SpawnBlocksCommand.register())
-                        .then(ClearUndoStoreCommand.register())
+        event.getDispatcher().register(
+            Commands.literal(MOD_ID)
+                .then(SpawnBlocksCommand.register())
+                .then(ClearUndoStoreCommand.register())
         );
     }
 

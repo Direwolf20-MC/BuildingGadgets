@@ -5,8 +5,10 @@ import com.direwolf20.buildinggadgets.Config;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.ListNBT;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -30,8 +32,8 @@ public class UndoStack {
     /**
      * Extract the UndoBit UUID's from the gadget as a list of pairs
      */
-    public List<Pair<UUID, DimensionType>> getBitKeys() {
-        List<Pair<UUID, DimensionType>> bits = new ArrayList<>();
+    public List<Pair<UUID, RegistryKey<World>>> getBitKeys() {
+        List<Pair<UUID, RegistryKey<World>>> bits = new ArrayList<>();
         ListNBT list = this.getUndoList();
         for (int i = 0; i < list.size(); i++) {
             CompoundNBT item = list.getCompound(i);
@@ -42,7 +44,7 @@ public class UndoStack {
 
             bits.add(Pair.of(
                     item.getUniqueId("key"),
-                    DimensionType.byName(new ResourceLocation(item.getString("dimension")))
+                    RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(item.getString("dimension")))
             ));
         }
 
@@ -59,8 +61,8 @@ public class UndoStack {
     /**
      * Only return UUID's based on a dimension
      */
-    public List<UUID> getBitsByDimension(DimensionType type) {
-        List<Pair<UUID, DimensionType>> bits = this.getBitKeys();
+    public List<UUID> getBitsByDimension(RegistryKey<World> type) {
+        List<Pair<UUID, RegistryKey<World>>> bits = this.getBitKeys();
 
         return bits.stream()
                 .filter(e -> e.getValue().equals(type))
@@ -68,7 +70,7 @@ public class UndoStack {
                 .collect(Collectors.toList());
     }
 
-    public Optional<UUID> pollBit(DimensionType type) {
+    public Optional<UUID> pollBit(RegistryKey<World> type) {
         CompoundNBT compound = stack.getOrCreateTag();
         List<UUID> bits = this.getBitsByDimension(type);
 
@@ -98,9 +100,8 @@ public class UndoStack {
      *
      * The UndoStack handles the removal :D
      */
-    public boolean pushUndo(ItemStack stack, UUID uuid, DimensionType type) {
-        ResourceLocation dimensionName = type.getRegistryName();
-        if (dimensionName == null) {
+    public boolean pushUndo(ItemStack stack, UUID uuid, RegistryKey<World> type) {
+        if (type == null) {
             BuildingGadgets.LOGGER.fatal("Current dimension does not have registry name!");
             return false;
         }
@@ -112,7 +113,7 @@ public class UndoStack {
 
         CompoundNBT data = new CompoundNBT();
         data.putUniqueId("key", uuid);
-        data.putString("dimension", dimensionName.toString());
+        data.putString("dimension", type.getLocation().toString());
 
         // Pop off the last item from the dimension store if over the max undos
         if (bitsByDimension.size() > Config.CommonConfig.gadgetsMaxUndos.get()) {

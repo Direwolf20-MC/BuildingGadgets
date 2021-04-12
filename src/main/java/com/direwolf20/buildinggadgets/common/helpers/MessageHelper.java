@@ -17,7 +17,7 @@ public final class MessageHelper {
     }
 
     public static String blockName(Block block) {
-        return block.getNameTextComponent().getFormattedText();
+        return block.getTranslatedName().getString();
     }
 
     public static Builder builder(String group, String key, Object... args) {
@@ -40,17 +40,17 @@ public final class MessageHelper {
         }
 
         public Builder error() {
-            component.setStyle(new Style().setParentStyle(component.getStyle()).setColor(TextFormatting.RED).setBold(true));
+            component.setStyle(component.getStyle().applyFormatting(TextFormatting.RED).setBold(true));
             return this;
         }
 
         public Builder success() {
-            component.setStyle(new Style().setParentStyle(component.getStyle()).setColor(TextFormatting.GREEN).setBold(true));
+            component.setStyle(component.getStyle().applyFormatting(TextFormatting.GREEN).setBold(true));
             return this;
         }
 
         public Builder info() {
-            component.setStyle(new Style().setParentStyle(component.getStyle()).setColor(TextFormatting.AQUA));
+            component.setStyle(component.getStyle().applyFormatting(TextFormatting.AQUA));
             return this;
         }
 
