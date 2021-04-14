@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.construction.modes;
 
 import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
-import com.direwolf20.buildinggadgets.common.construction.XYZ;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -18,15 +17,19 @@ public class HorizontalColumnMode extends Mode {
     List<BlockPos> collect(ModeUseContext context, PlayerEntity player, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
-        Direction side = XYZ.isAxisY(context.getHitSide()) ? player.getDirection() : context.getHitSide().getOpposite();
-        if( !isExchanging() ) {
-            for (int i = 0; i < context.getRange(); i++)
-                coordinates.add(XYZ.extendPosSingle(i, start, side, XYZ.fromFacing(side)));
+        Direction side = context.getHitSide().getAxis() == Direction.Axis.Y
+            ? player.getDirection()
+            : context.getHitSide().getOpposite();
+        if (!this.isExchanging()) {
+            for (int i = 0; i < context.getRange(); i++) {
+                coordinates.add(start.relative(side, i));
+            }
         } else {
             side = side.getClockWise();
             int halfRange = context.getRange() / 2;
-            for (int i = -halfRange; i <= halfRange; i++)
-                coordinates.add(XYZ.extendPosSingle(i, start, side, XYZ.fromFacing(side)));
+            for (int i = -halfRange; i <= halfRange; i++) {
+                coordinates.add(start.relative(side, i));
+            }
         }
 
         return coordinates;

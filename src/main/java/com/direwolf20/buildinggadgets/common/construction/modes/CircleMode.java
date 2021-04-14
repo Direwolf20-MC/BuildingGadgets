@@ -1,7 +1,6 @@
 package com.direwolf20.buildinggadgets.common.construction.modes;
 
 import com.direwolf20.buildinggadgets.common.construction.ModeUseContext;
-import com.direwolf20.buildinggadgets.common.construction.XYZ;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
@@ -64,9 +63,9 @@ public class CircleMode extends Mode {
      * Get the position to place a block based on directionality
      */
     private BlockPos getBlockPosition(BlockPos start, int directionalX, int directionalY, Direction direction) {
-        if (XYZ.isAxisY(direction))
+        if (direction.getAxis() == Direction.Axis.Y)
             return start.offset(directionalX, 0, directionalY);
-        if (XYZ.isAxisZ(direction))
+        if (direction.getAxis() == Direction.Axis.Z)
             return start.offset(directionalX, directionalY, 0);
         return start.offset(0, directionalX, directionalY);
     }
