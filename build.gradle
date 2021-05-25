@@ -5,7 +5,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
     }
 }
 
@@ -102,9 +102,9 @@ processResources {
 
     from(sourceSets.main.resources.srcDirs) {
         include 'META-INF/mods.toml'
-        expand 'version':project.version, 'forge_major':forge_major
+        expand 'version': project.version, 'forge_major': forge_major
     }
-    
+
     from(sourceSets.main.resources.srcDirs) {
         exclude 'META-INF/mods.toml'
     }
@@ -113,10 +113,10 @@ processResources {
 jar {
     group = 'artifact'
     manifest {
-        attributes(["Specification-Title": "BuildingGadgets",
-                    "Specification-Version": forge_major, // We are version 1 of the modlauncher specification
-                    "Implementation-Title": project.archivesBaseName,
-                    "Implementation-Version": project.version,
+        attributes(["Specification-Title"     : "BuildingGadgets",
+                    "Specification-Version"   : forge_major, // We are version 1 of the modlauncher specification
+                    "Implementation-Title"    : project.archivesBaseName,
+                    "Implementation-Version"  : project.version,
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
     }
 
