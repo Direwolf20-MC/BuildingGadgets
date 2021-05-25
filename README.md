@@ -21,7 +21,9 @@
 `Dire's Building Gadgets` aims to make building a little bit easier. At this time there are `four` tools, and they are described below. Alternatively, watch the following mod spotlight for instructions!
 
 ## Usage
-To see how to use Dire's `Building Gadgets` refer to our [Wiki](https://github.com/Direwolf20-MC/BuildingGadgets/wiki) and well as Direwolf's Spotlights - [Spotlight Part One](https://youtu.be/D4Ib4h7aTSk) and [Spotlight Part Two](https://youtu.be/JS1Xx_kwQQ0)
+To see how to use Dire's `Building Gadgets` refer to our [Wiki](https://github.com/Direwolf20-MC/BuildingGadgets/wiki) which has been recently updated to be inline with the mod as of `1.16.5`. Please feel free to make feature requests to add more info to our wiki. We're always trying to improve.
+
+Direwolf20's Spotlights - [Spotlight Part One](https://youtu.be/D4Ib4h7aTSk) and [Spotlight Part Two](https://youtu.be/JS1Xx_kwQQ0)
 
 ### Installing the mod
 **First**, grab [Forge](https://files.minecraftforge.net) and install it using the installer. **Second**, pick up [Building Gadgets](https://minecraft.curseforge.com/projects/building-gadgets) from CurseForge, **Third**, drop the hot stuff into your `mods` folder (*Psst*! It's (usually) in `C:\Users\<username>\AppData\Roaming\.minecraft\mods` on *Windows* and `~/Library/Application\ Support/minecraft/mods` on *Mac* and `~/.minecraft` on *most Linux distros*), **Finally**, Enjoy!
