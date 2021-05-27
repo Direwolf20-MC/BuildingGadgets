@@ -29,9 +29,9 @@ public class GuiSliderInt extends Slider {
 
         super(xPos, yPos, width, height, prefix, suf, minVal, maxVal, currentVal, showDec, drawStr, par);
 
-        colorBackground = GuiMod.getColor(color, 200).getRGB();
-        colorSliderBackground = GuiMod.getColor(color.darker(), 200).getRGB();
-        colorSlider = GuiMod.getColor(color.brighter().brighter(), 200).getRGB();
+        this.colorBackground = GuiMod.getColor(color, 200).getRGB();
+        this.colorSliderBackground = GuiMod.getColor(color.darker(), 200).getRGB();
+        this.colorSlider = GuiMod.getColor(color.brighter().brighter(), 200).getRGB();
 
         this.increment = increment;
     }
@@ -39,17 +39,17 @@ public class GuiSliderInt extends Slider {
     @Override
     public void onRelease(double mouseX, double mouseY) {
         super.onRelease(mouseX, mouseY);
-        setValue(getValueInt());
+        this.setValue(this.getValueInt());
     }
 
     @Override
     public void updateSlider() {
         super.updateSlider();
-        int valueInt = getValueInt();
-        if (value != valueInt) {
-            value = valueInt;
-            playSound();
-            PacketHandler.sendToServer(new PacketChangeRange(getValueInt()));
+        int valueInt = this.getValueInt();
+        if (this.value != valueInt) {
+            this.value = valueInt;
+            this.playSound();
+            PacketHandler.sendToServer(new PacketChangeRange(this.getValueInt()));
         }
     }
 
@@ -59,54 +59,63 @@ public class GuiSliderInt extends Slider {
 
     @Override
     public void render(MatrixStack matrices, int mouseX, int mouseY, float partial) {
-        if (!visible)
+        if (!this.visible) {
             return;
+        }
 
         Minecraft mc = Minecraft.getInstance();
-        isHovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-        fill(matrices, x, y, x + width, y + height, colorBackground);
-        renderBg(matrices, mc, mouseX, mouseY);
-        renderText(matrices, mc, this);
+        this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+        fill(matrices, this.x, this.y, this.x + this.width, this.y + this.height, this.colorBackground);
+        this.renderBg(matrices, mc, mouseX, mouseY);
+        this.renderText(matrices, mc, this);
     }
 
     private void renderText(MatrixStack matrices, Minecraft mc, Button component) {
-        int color = ! active ? 10526880 : (isHovered ? 16777120 : - 1);
+        int color = !this.active
+            ? 10526880
+            : (this.isHovered
+                ? 16777120
+                : -1);
         String buttonText = component.getMessage().getString();
         int strWidth = mc.fontRenderer.getStringWidth(buttonText);
         int ellipsisWidth = mc.fontRenderer.getStringWidth("...");
-        if (strWidth > component.getWidth() - 6 && strWidth > ellipsisWidth)
-            buttonText = mc.fontRenderer.func_238412_a_(buttonText, component.getWidth() - 6 - ellipsisWidth).trim() + "...";
+        if (strWidth > component.getWidth() - 6 && strWidth > ellipsisWidth) {
+            buttonText = mc.fontRenderer.trimStringToWidth(buttonText, component.getWidth() - 6 - ellipsisWidth).trim() + "...";
+        }
 
-        drawCenteredString(matrices, mc.fontRenderer, buttonText, component.x + component.getWidth() / 2, component.y + (component.getHeightRealms() - 8) / 2, color);
+        drawCenteredString(matrices, mc.fontRenderer, buttonText, component.x + component.getWidth() / 2, component.y + (component.getHeight() - 8) / 2, color);
     }
 
     @Override
-    public void playDownSound(SoundHandler p_playDownSound_1_) { }
+    public void playDownSound(SoundHandler p_playDownSound_1_) {
+    }
 
     @Override
     protected void renderBg(MatrixStack matrices, Minecraft mc, int mouseX, int mouseY) {
-        if (!visible)
+        if (!this.visible) {
             return;
-
-        if (dragging) {
-            sliderValue = (mouseX - (x + 4)) / (float) (width - 8);
-            updateSlider();
         }
 
-        drawBorderedRect(matrices, x + (int) (sliderValue * (width - 8)), y, 8, height);
+        if (this.dragging) {
+            this.sliderValue = (mouseX - (this.x + 4)) / (float) (this.width - 8);
+            this.updateSlider();
+        }
+
+        this.drawBorderedRect(matrices, this.x + (int) (this.sliderValue * (this.width - 8)), this.y, 8, this.height);
     }
 
     private void drawBorderedRect(MatrixStack matrices, int x, int y, int width, int height) {
-        fill(matrices, x, y, x + width, y + height, colorSliderBackground);
-        fill(matrices, ++ x, ++ y, x + width - 2, y + height - 2, colorSlider);
+        fill(matrices, x, y, x + width, y + height, this.colorSliderBackground);
+        fill(matrices, ++x, ++y, x + width - 2, y + height - 2, this.colorSlider);
     }
 
     public Collection<Button> getComponents() {
         return ImmutableSet.of(
-                this,
-                new GuiButtonIncrement(this, x - height, y, height, height, new StringTextComponent("-"), b -> increment.accept(this, - 1)),
-                new GuiButtonIncrement(this, x + width, y, height, height, new StringTextComponent("+"), b -> increment.accept(this, 1)
-        ));
+            this,
+            new GuiButtonIncrement(this, this.x - this.height, this.y, this.height, this.height, new StringTextComponent("-"), b -> this.increment.accept(this, -1)),
+            new GuiButtonIncrement(this, this.x + this.width, this.y, this.height, this.height, new StringTextComponent("+"), b -> this.increment.accept(this, 1)
+            )
+        );
     }
 
     private static class GuiButtonIncrement extends Button {
@@ -119,17 +128,19 @@ public class GuiSliderInt extends Slider {
 
         @Override
         public void render(MatrixStack matrices, int mouseX, int mouseY, float partial) {
-            if (!visible)
+            if (!this.visible) {
                 return;
+            }
 
             Minecraft mc = Minecraft.getInstance();
-            isHovered = mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height;
-            fill(matrices, x, y, x + width, y + height, parent.colorBackground);
-            parent.drawBorderedRect(matrices, x, y, width, height);
-            parent.renderText(matrices, mc, this);
+            this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+            fill(matrices, this.x, this.y, this.x + this.width, this.y + this.height, this.parent.colorBackground);
+            this.parent.drawBorderedRect(matrices, this.x, this.y, this.width, this.height);
+            this.parent.renderText(matrices, mc, this);
         }
 
         @Override
-        public void playDownSound(SoundHandler p_playDownSound_1_) { }
+        public void playDownSound(SoundHandler p_playDownSound_1_) {
+        }
     }
 }
