@@ -40,16 +40,19 @@ body:
       placeholder: Direwolf20 - 1.16 (2.4)
     validations:
       required: false
-  - type: checkboxes
+  - type: dropdown
     id: optifine
+    validations:
+        required: true
     attributes:
       label: Do you have optifine installed?
-      description: You may select more than one.
+      description: |
+        If you have a different rendering mod installed, please add to in the extra info box at the end.
+      multiple: false
       options:
-        - label: Yes!
-          required: true
-        - label: No!
-          required: true
+        - Yes
+        - No
+        - I have other rendering based mods installed
   - type: input
     id: bugdesc
     attributes:
