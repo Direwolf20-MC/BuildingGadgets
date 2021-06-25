@@ -47,7 +47,9 @@ body:
       description: You may select more than one.
       options:
         - label: Yes!
+          required: true
         - label: No!
+          required: true
   - type: input
     id: bugdesc
     attributes:
