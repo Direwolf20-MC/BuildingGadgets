@@ -46,8 +46,10 @@ body:
       label: Do you have optifine installed?
       description: You may select more than one.
       options:
-        - label: :heavy_check_mark: Yes!
-        - label: :no_entry: No!
+        - label: |
+          :heavy_check_mark: Yes!
+        - label: |
+          :no_entry: No!
   - type: input
     id: bugdesc
     attributes:
