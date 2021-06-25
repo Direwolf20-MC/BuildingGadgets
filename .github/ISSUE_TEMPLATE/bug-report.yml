@@ -1,6 +1,5 @@
 name: Bug Report
-description: Report a bug / crash
-title: ""
+description: Report a bug / cras
 labels: [bug]
 body:
   - type: markdown
