@@ -50,9 +50,9 @@ body:
         If you have a different rendering mod installed, please add to in the extra info box at the end.
       multiple: false
       options:
-        - Yes
-        - No
-        - I have other rendering based mods installed
+        - 'Yes'
+        - 'No'
+        - 'I have other rendering based mods installed'
   - type: input
     id: bugdesc
     attributes:
