@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.lang;
 
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.resources.language.I18n;
 
 public enum RadialTranslation implements ITranslationProvider {
     DESTRUCTION_OVERLAY("destruction_overlay"),
@@ -34,6 +34,6 @@ public enum RadialTranslation implements ITranslationProvider {
     }
 
     public String getString() {
-        return I18n.format(key);
+        return I18n.get(key);
     }
 }

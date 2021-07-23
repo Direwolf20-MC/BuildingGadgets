@@ -12,17 +12,17 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.client.gui.GuiUtils;
 
@@ -59,7 +59,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
 
     private int hoveringTextX;
     private int hoveringTextY;
-    private List<ITextComponent> hoveringText;
+    private List<Component> hoveringText;
     private TemplateHeader header;
 
     public MaterialListGUI(ItemStack item) {
@@ -78,21 +78,21 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
 
         this.scrollingList = new ScrollingMaterialList(this);
         // Make it receive mouse scroll events, so that the player can use his mouse wheel at the start
-        this.setListener(scrollingList);
+        this.setFocused(scrollingList);
         this.children.add(scrollingList);
 
         int buttonY = getWindowBottomY() - (ScrollingMaterialList.BOTTOM / 2 + BUTTON_HEIGHT / 2);
-        this.buttonClose = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_CLOSE.componentTranslation(), b -> getMinecraft().player.closeScreen());
+        this.buttonClose = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_CLOSE.componentTranslation(), b -> getMinecraft().player.closeContainer());
         this.buttonSortingModes = new Button(0, buttonY, 0, BUTTON_HEIGHT, scrollingList.getSortingMode().getTranslationProvider().componentTranslation(), (button) -> {
             scrollingList.setSortingMode(scrollingList.getSortingMode().next());
             buttonSortingModes.setMessage(scrollingList.getSortingMode().getTranslationProvider().componentTranslation());
         });
 
         this.buttonCopyList = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_COPY.componentTranslation(), (button) -> {
-            getMinecraft().keyboardListener.setClipboardString(evaluateTemplateHeader().toJson(false, hasControlDown()));
+            getMinecraft().keyboardHandler.setClipboard(evaluateTemplateHeader().toJson(false, hasControlDown()));
 
             if( getMinecraft().player != null )
-                getMinecraft().player.sendStatusMessage(new TranslationTextComponent(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
+                getMinecraft().player.displayClientMessage(new TranslatableComponent(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
         });
 
         // Buttons will be placed left to right in this order
@@ -110,7 +110,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         BuildContext context = BuildContext.builder()
                 .player(getMinecraft().player)
                 .stack(getTemplateItem())
-                .build(getMinecraft().world);
+                .build(getMinecraft().level);
 
         return template.getHeaderAndForceMaterials(context);
     }
@@ -120,8 +120,8 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float particleTicks) {
-        getMinecraft().getTextureManager().bindTexture(BACKGROUND_TEXTURE);
+    public void render(PoseStack matrices, int mouseX, int mouseY, float particleTicks) {
+        getMinecraft().getTextureManager().bind(BACKGROUND_TEXTURE);
         GuiUtils.drawTexturedModalRect(backgroundX, backgroundY, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, 0F);
 
         scrollingList.render(matrices, mouseX, mouseY, particleTicks);
@@ -129,10 +129,10 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         super.render(matrices, mouseX, mouseY, particleTicks);
 
         if (buttonCopyList.isMouseOver(mouseX, mouseY)) {
-            renderTooltip(matrices, Lists.transform(ImmutableList.of(MaterialListTranslation.HELP_COPY_LIST.componentTranslation()), ITextComponent::func_241878_f), mouseX, mouseY);
+            renderTooltip(matrices, Lists.transform(ImmutableList.of(MaterialListTranslation.HELP_COPY_LIST.componentTranslation()), Component::getVisualOrderText), mouseX, mouseY);
 //            GuiUtils.drawHoveringText(matrices, ImmutableList.of(MaterialListTranslation.HELP_COPY_LIST.componentTranslation()), mouseX, mouseY, width, height, Integer.MAX_VALUE, textRenderer);
         } else if (hoveringText != null) {
-            renderTooltip(matrices, Lists.transform(hoveringText, ITextComponent::func_241878_f), mouseX, mouseY);
+            renderTooltip(matrices, Lists.transform(hoveringText, Component::getVisualOrderText), mouseX, mouseY);
 
 //            GuiUtils.drawHoveringText(matrices, hoveringText, hoveringTextX, hoveringTextY, width, height, Integer.MAX_VALUE, textRenderer);
             hoveringText = null;
@@ -150,7 +150,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         // Align the box of buttons in the center, and start from the left
         int nextX = getWindowLeftX();
 
-        for (Widget widget : buttons) {
+        for (AbstractWidget widget : buttons) {
             widget.setWidth(buttonWidth);
             widget.x = nextX;
             nextX += buttonWidth + BUTTONS_PADDING;
@@ -158,10 +158,10 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
     }
 
     public Template getTemplateCapability() {
-        if( getMinecraft().world == null || getMinecraft().player == null )
+        if( getMinecraft().level == null || getMinecraft().player == null )
             return null;
 
-        LazyOptional<ITemplateProvider> providerCap = getMinecraft().world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);
+        LazyOptional<ITemplateProvider> providerCap = getMinecraft().level.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);
         if (providerCap.isPresent()) {
             LazyOptional<ITemplateKey> keyCap = item.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY);
             ITemplateProvider provider = providerCap.orElseThrow(RuntimeException::new);
@@ -171,16 +171,16 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
                 return provider.getTemplateForKey(key);
             }
             BuildingGadgets.LOG.warn("Item used for material list does not have an ITemplateKey capability!");
-            getMinecraft().player.closeScreen();
+            getMinecraft().player.closeContainer();
             return null;
         }
 
         BuildingGadgets.LOG.warn("Client world used for material list does not have an ITemplateProvider capability!");
-        getMinecraft().player.closeScreen();
+        getMinecraft().player.closeContainer();
         return null;
     }
 
-    public void setTaskHoveringText(int x, int y, List<ITextComponent> text) {
+    public void setTaskHoveringText(int x, int y, List<Component> text) {
         hoveringTextX = x;
         hoveringTextY = y;
         hoveringText = text;
@@ -208,8 +208,8 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
                 : author == null ? MaterialListTranslation.TITLE_NAME_ONLY.format(name)
                 : MaterialListTranslation.TITLE.format(name, author);
 
-        this.titleTop = getYForAlignedCenter(backgroundY, getWindowTopY() + ScrollingMaterialList.TOP, font.FONT_HEIGHT);
-        this.titleLeft = getXForAlignedCenter(backgroundX, getWindowRightX(), font.getStringWidth(title));
+        this.titleTop = getYForAlignedCenter(backgroundY, getWindowTopY() + ScrollingMaterialList.TOP, font.lineHeight);
+        this.titleLeft = getXForAlignedCenter(backgroundX, getWindowRightX(), font.width(title));
     }
 
     @Override
@@ -257,18 +257,18 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         return top + (bottom - top) / 2 - height / 2;
     }
 
-    public static void renderTextVerticalCenter(MatrixStack matrices, String text, int leftX, int top, int bottom, int color) {
-        FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-        int y = getYForAlignedCenter(top, bottom, fontRenderer.FONT_HEIGHT);
+    public static void renderTextVerticalCenter(PoseStack matrices, String text, int leftX, int top, int bottom, int color) {
+        Font fontRenderer = Minecraft.getInstance().font;
+        int y = getYForAlignedCenter(top, bottom, fontRenderer.lineHeight);
         RenderSystem.enableTexture();
-        fontRenderer.drawString(matrices, text, leftX, y, color);
+        fontRenderer.draw(matrices, text, leftX, y, color);
     }
 
-    public static void renderTextHorizontalRight(MatrixStack matrices, String text, int right, int y, int color) {
-        FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-        int x = getXForAlignedRight(right, fontRenderer.getStringWidth(text));
+    public static void renderTextHorizontalRight(PoseStack matrices, String text, int right, int y, int color) {
+        Font fontRenderer = Minecraft.getInstance().font;
+        int x = getXForAlignedRight(right, fontRenderer.width(text));
         RenderSystem.enableTexture();
-        fontRenderer.drawString(matrices, text, x, y, color);
+        fontRenderer.draw(matrices, text, x, y, color);
     }
 
     public static boolean isPointInBox(double x, double y, int bx, int by, int width, int height) {

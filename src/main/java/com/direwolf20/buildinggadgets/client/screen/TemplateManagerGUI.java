@@ -36,38 +36,38 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.gson.JsonParseException;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Rectangle2d;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import net.minecraft.client.renderer.Rect2i;
+import com.mojang.blaze3d.platform.Lighting;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import com.mojang.math.Matrix4f;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.LazyOptional;
 import org.lwjgl.opengl.GL11;
 
@@ -76,10 +76,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
-public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer> {
+public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerContainer> {
     private static final ResourceLocation background = new ResourceLocation(Reference.MODID, "textures/gui/template_manager.png");
 
-    private final Rectangle2d panel = new Rectangle2d((8 - 20), 12, 136, 80);
+    private final Rect2i panel = new Rect2i((8 - 20), 12, 136, 80);
     private boolean panelClicked;
     private int clickButton, clickX, clickY;
     private float initRotX, initRotY, initZoom, initPanX, initPanY;
@@ -87,7 +87,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     private float rotX = 0, rotY = 0, zoom = 1;
     private float panX = 0, panY = 0;
 
-    private TextFieldWidget nameField;
+    private EditBox nameField;
     private Button buttonSave, buttonLoad, buttonCopy, buttonPaste;
 
     private final TemplateManagerTileEntity te;
@@ -97,8 +97,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     // It is so stupid I can't get the key from the template.
     private Template template;
 
-    public TemplateManagerGUI(TemplateManagerContainer container, PlayerInventory playerInventory, ITextComponent title) {
-        super(container, playerInventory, new StringTextComponent(""));
+    public TemplateManagerGUI(TemplateManagerContainer container, Inventory playerInventory, Component title) {
+        super(container, playerInventory, new TextComponent(""));
 
         this.container = container;
         this.te = container.getTe();
@@ -107,25 +107,25 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     @Override
     public void init() {
         super.init();
-        this.nameField = new TextFieldWidget(this.font, (this.guiLeft - 20) + 8, guiTop - 5, xSize - 16, this.font.FONT_HEIGHT + 3, GuiTranslation.TEMPLATE_NAME_TIP.componentTranslation());
+        this.nameField = new EditBox(this.font, (this.leftPos - 20) + 8, topPos - 5, imageWidth - 16, this.font.lineHeight + 3, GuiTranslation.TEMPLATE_NAME_TIP.componentTranslation());
 
-        int x = (guiLeft - 20) + 180;
-        buttonSave = addButton(new Button(x, guiTop + 17, 60, 20, GuiTranslation.BUTTON_SAVE.componentTranslation(), b -> onSave()));
-        buttonLoad = addButton(new Button(x,guiTop + 39, 60, 20, GuiTranslation.BUTTON_LOAD.componentTranslation(), b -> onLoad()));
-        buttonCopy = addButton(new Button(x, guiTop + 66, 60, 20, GuiTranslation.BUTTON_COPY.componentTranslation(), b -> onCopy()));
-        buttonPaste = addButton(new Button(x, guiTop + 89, 60, 20, GuiTranslation.BUTTON_PASTE.componentTranslation(), b -> onPaste()));
+        int x = (leftPos - 20) + 180;
+        buttonSave = addButton(new Button(x, topPos + 17, 60, 20, GuiTranslation.BUTTON_SAVE.componentTranslation(), b -> onSave()));
+        buttonLoad = addButton(new Button(x,topPos + 39, 60, 20, GuiTranslation.BUTTON_LOAD.componentTranslation(), b -> onLoad()));
+        buttonCopy = addButton(new Button(x, topPos + 66, 60, 20, GuiTranslation.BUTTON_COPY.componentTranslation(), b -> onCopy()));
+        buttonPaste = addButton(new Button(x, topPos + 89, 60, 20, GuiTranslation.BUTTON_PASTE.componentTranslation(), b -> onPaste()));
 
-        this.nameField.setMaxStringLength(50);
+        this.nameField.setMaxLength(50);
         this.nameField.setVisible(true);
         children.add(nameField);
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
         super.render(matrices, mouseX, mouseY, partialTicks);
-        this.renderHoveredTooltip(matrices, mouseX, mouseY);
+        this.renderTooltip(matrices, mouseX, mouseY);
 
-        drawString(matrices, font, "Preview disabled for now...", guiLeft - 10, guiTop + 40, 0xFFFFFF);
+        drawString(matrices, font, "Preview disabled for now...", leftPos - 10, topPos + 40, 0xFFFFFF);
         if (this.template != null) {
             renderRequirement(matrices, mouseX, mouseY);
         }
@@ -134,18 +134,18 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrices, float partialTicks, int mouseX, int mouseY) {
+    protected void renderBg(PoseStack matrices, float partialTicks, int mouseX, int mouseY) {
         renderBackground(matrices);
 
-        getMinecraft().getTextureManager().bindTexture(background);
-        blit(matrices, guiLeft - 20, guiTop - 12, 0, 0, xSize, ySize + 25);
-        blit(matrices, (guiLeft - 20) + xSize, guiTop + 8, xSize + 3, 30, 71, ySize);
+        getMinecraft().getTextureManager().bind(background);
+        blit(matrices, leftPos - 20, topPos - 12, 0, 0, imageWidth, imageHeight + 25);
+        blit(matrices, (leftPos - 20) + imageWidth, topPos + 8, imageWidth + 3, 30, 71, imageHeight);
 
         if (! buttonCopy.isHovered() && ! buttonPaste.isHovered()) {
             if( buttonLoad.isHovered() )
-                blit(matrices, (guiLeft + xSize) - 44, guiTop + 38, xSize, 0, 17, 24);
+                blit(matrices, (leftPos + imageWidth) - 44, topPos + 38, imageWidth, 0, 17, 24);
             else
-                blit(matrices, (guiLeft + xSize) - 44, guiTop + 38, xSize + 17, 0, 16, 24);
+                blit(matrices, (leftPos + imageWidth) - 44, topPos + 38, imageWidth + 17, 0, 16, 24);
         }
 
         this.nameField.render(matrices, mouseX, mouseY, partialTicks);
@@ -158,13 +158,13 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     private void validateCache(float partialTicks) {
         // Invalidate the render
-        if( container.getSlot(0).getStack().isEmpty() && template != null ) {
+        if( container.getSlot(0).getItem().isEmpty() && template != null ) {
             template = null;
             resetViewport();
             return;
         }
 
-        container.getSlot(0).getStack().getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
+        container.getSlot(0).getItem().getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
             // Make sure we're not re-creating the same cache.
             Template template = provider.getTemplateForKey(key);
             if( this.template == template )
@@ -190,19 +190,19 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     private void renderStructure(IBuildView view, float partialTicks) {
         Random rand = new Random();
-        BlockRendererDispatcher dispatcher = getMinecraft().getBlockRendererDispatcher();
+        BlockRenderDispatcher dispatcher = getMinecraft().getBlockRenderer();
 
         BufferBuilder bufferBuilder = new BufferBuilder(2097152);
-        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormat.BLOCK);
 
         for (PlacementTarget target : view) {
             target.placeIn(view.getContext());
             BlockPos targetPos = target.getPos();
             BlockState renderBlockState = view.getContext().getWorld().getBlockState(targetPos);
-            TileEntity te = view.getContext().getWorld().getTileEntity(targetPos);
+            BlockEntity te = view.getContext().getWorld().getBlockEntity(targetPos);
 
-            if (renderBlockState.getRenderType() == BlockRenderType.MODEL) {
-                IBakedModel model = dispatcher.getModelForState(renderBlockState);
+            if (renderBlockState.getRenderShape() == RenderShape.MODEL) {
+                BakedModel model = dispatcher.getBlockModel(renderBlockState);
 //                dispatcher.getBlockModelRenderer().renderModelFlat()
 //                        .renderModelFlat(getWorld(), model, renderBlockState, target.getPos(), bufferBuilder, false,
 //                        rand, 0L, te != null ? te.getModelData() : EmptyModelData.INSTANCE);
@@ -210,7 +210,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
             if (te != null) {
                 try {
-                    TileEntityRenderer<TileEntity> renderer = TileEntityRendererDispatcher.instance.getRenderer(te);
+                    BlockEntityRenderer<BlockEntity> renderer = BlockEntityRenderDispatcher.instance.getRenderer(te);
                     if (renderer != null) {
 //                        if (te.hasFastRenderer())
 //                            renderer.renderTileEntityFast(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, - 1, bufferBuilder);
@@ -218,14 +218,14 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 //                            renderer.render(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, - 1);
                     }
                     //remember vanilla Tiles rebinding the TextureAtlas
-                    getMinecraft().getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+                    getMinecraft().getTextureManager().bind(InventoryMenu.BLOCK_ATLAS);
                 } catch (Exception e) {
                     BuildingGadgets.LOG.error("Error rendering TileEntity", e);
                 }
             }
         }
 
-        bufferBuilder.finishDrawing();
+        bufferBuilder.end();
 
 //        if (bufferBuilder.getVertexCount() > 0) {
 //            VertexFormat vertexformat = bufferBuilder.getVertexFormat();
@@ -249,19 +249,19 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 //        }
     }
 
-    private void renderRequirement(MatrixStack matrices, int mouseX, int mouseY) {
+    private void renderRequirement(PoseStack matrices, int mouseX, int mouseY) {
         MaterialList requirements = this.template.getHeaderAndForceMaterials(BuildContext.builder().build(getWorld())).getRequiredItems();
         if( requirements == null )
             return;
 
-        RenderHelper.enableStandardItemLighting();
+        Lighting.turnBackOn();
 
         RenderSystem.pushMatrix();
-        RenderSystem.translated(guiLeft - 30, guiTop - 5, 200);
+        RenderSystem.translated(leftPos - 30, topPos - 5, 200);
         RenderSystem.scalef(.8f, .8f, .8f);
 
         String title = "Requirements"; // Todo lang;
-        drawString(matrices, getMinecraft().fontRenderer, title, 5 - (font.getStringWidth(title)), 0, Color.WHITE.getRGB());
+        drawString(matrices, getMinecraft().font, title, 5 - (font.width(title)), 0, Color.WHITE.getRGB());
 
         // The things you have to do to get anything from this system is just stupid.
         MatchResult list = InventoryHelper.CREATIVE_INDEX.tryMatch(requirements);
@@ -277,14 +277,14 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             ItemStack stack = e.getElement().createStack();
             int x = (-20 - (column * 25)), y = (20 + (index * 25));
 
-            itemRenderer.renderItemAndEffectIntoGUI(this.getMinecraft().player, stack, x + 4, y + 4);
-            itemRenderer.renderItemOverlayIntoGUI(Minecraft.getInstance().fontRenderer, stack, x + 4, y + 4, GadgetUtils.withSuffix(foundItems.count(e.getElement())));
+            itemRenderer.renderAndDecorateItem(this.getMinecraft().player, stack, x + 4, y + 4);
+            itemRenderer.renderGuiItemDecorations(Minecraft.getInstance().font, stack, x + 4, y + 4, GadgetUtils.withSuffix(foundItems.count(e.getElement())));
 
             int space = (int) (25 - (.2f * 25));
-            int zoneX = ((guiLeft - 32) + (-15 - (column * space))), zoneY = (guiTop - 9) + (20 + (index * space));
+            int zoneX = ((leftPos - 32) + (-15 - (column * space))), zoneY = (topPos - 9) + (20 + (index * space));
 
             if (mouseX > zoneX && mouseX < (zoneX + space) && mouseY > zoneY && mouseY < (zoneY + space)) {
-                renderTooltip(matrices, Lists.transform(stack.getTooltip(this.getMinecraft().player, ITooltipFlag.TooltipFlags.NORMAL), ITextComponent::func_241878_f), x + 15, y + 25);
+                renderTooltip(matrices, Lists.transform(stack.getTooltipLines(this.getMinecraft().player, TooltipFlag.Default.NORMAL), Component::getVisualOrderText), x + 15, y + 25);
             }
 
             index ++;
@@ -294,28 +294,28 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             }
         }
 
-        RenderHelper.disableStandardItemLighting();
+        Lighting.turnOff();
         RenderSystem.popMatrix();
 
     }
 
-    private void pasteTemplateToStack(World world, ItemStack stack, Template newTemplate, boolean replaced) {
+    private void pasteTemplateToStack(Level world, ItemStack stack, Template newTemplate, boolean replaced) {
         world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider ->
-                pasteTemplateToStack(provider, stack, newTemplate, replaced && world.isRemote()));
+                pasteTemplateToStack(provider, stack, newTemplate, replaced && world.isClientSide()));
     }
 
     private void pasteTemplateToStack(ITemplateProvider provider, ItemStack stack, Template newTemplate, boolean replaced) {
         stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
             provider.setTemplate(key, newTemplate);
             if (replaced)
-                PacketHandler.sendToServer(new PacketTemplateManagerTemplateCreated(provider.getId(key), te.getPos()));
+                PacketHandler.sendToServer(new PacketTemplateManagerTemplateCreated(provider.getId(key), te.getBlockPos()));
             else
                 provider.requestRemoteUpdate(key);
         });
     }
 
     private boolean replaceStack() {
-        ItemStack stack = container.getSlot(1).getStack();
+        ItemStack stack = container.getSlot(1).getItem();
         if (stack.isEmpty())
             return false;
 
@@ -323,7 +323,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
             return false;
 
         else if (TemplateManagerTileEntity.TEMPLATE_CONVERTIBLES.contains(stack.getItem())) {
-            container.putStackInSlot(1, new ItemStack(OurItems.TEMPLATE_ITEM.get()));
+            container.setItem(1, new ItemStack(OurItems.TEMPLATE_ITEM.get()));
             return true;
         }
 
@@ -331,19 +331,19 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     private void rename(ItemStack stack) {
-        if (nameField.getText().isEmpty())
+        if (nameField.getValue().isEmpty())
             return;
 
         stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
             Template template = provider.getTemplateForKey(key);
-            template = template.withName(nameField.getText());
+            template = template.withName(nameField.getValue());
             provider.setTemplate(key, template);
             provider.requestRemoteUpdate(key);
         }));
     }
 
     private void renderPanel() {
-        double scale = getMinecraft().getMainWindow().getGuiScaleFactor();
+        double scale = getMinecraft().getWindow().getGuiScale();
 
         BlockPos startPos = template.getHeader().getBoundingBox().getMin();
         BlockPos endPos = template.getHeader().getBoundingBox().getMax();
@@ -376,8 +376,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
         RenderSystem.multMatrix(Matrix4f.perspective(60, (float) panel.getWidth() / panel.getHeight(), 0.01F, 4000));
         RenderSystem.matrixMode(GL11.GL_MODELVIEW);
-        RenderSystem.viewport((int) Math.round((guiLeft + panel.getX()) * scale),
-                (int) Math.round(getMinecraft().getMainWindow().getFramebufferHeight() - (guiTop + panel.getY() + panel.getHeight()) * scale),
+        RenderSystem.viewport((int) Math.round((leftPos + panel.getX()) * scale),
+                (int) Math.round(getMinecraft().getWindow().getHeight() - (topPos + panel.getY() + panel.getHeight()) * scale),
                 (int) Math.round(panel.getWidth() * scale),
                 (int) Math.round(panel.getHeight() * scale));
 
@@ -398,7 +398,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         RenderSystem.rotatef(rotY, 0, 1, 0);
         RenderSystem.translated(((startPos.getX() - endPos.getX()) / 2f), ((startPos.getY() - endPos.getY()) / 2f), ((startPos.getZ() - endPos.getZ()) / 2f));
 
-        getMinecraft().getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+        getMinecraft().getTextureManager().bind(InventoryMenu.BLOCK_ATLAS);
 
 //        RenderSystem.callList(displayList);
 
@@ -406,7 +406,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         RenderSystem.matrixMode(GL11.GL_PROJECTION);
         RenderSystem.popMatrix();
         RenderSystem.matrixMode(GL11.GL_MODELVIEW);
-        RenderSystem.viewport(0, 0, getMinecraft().getMainWindow().getFramebufferWidth(), getMinecraft().getMainWindow().getFramebufferHeight());
+        RenderSystem.viewport(0, 0, getMinecraft().getWindow().getWidth(), getMinecraft().getWindow().getHeight());
     }
 
     private void resetViewport() {
@@ -421,11 +421,11 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        if (panel.contains((int) mouseX - guiLeft, (int) mouseY - guiTop)) {
+        if (panel.contains((int) mouseX - leftPos, (int) mouseY - topPos)) {
             clickButton = mouseButton;
             panelClicked = true;
-            clickX = (int) getMinecraft().mouseHelper.getMouseX();
-            clickY = (int) getMinecraft().mouseHelper.getMouseY();
+            clickX = (int) getMinecraft().mouseHandler.xpos();
+            clickY = (int) getMinecraft().mouseHandler.ypos();
         }
 
         return super.mouseClicked(mouseX, mouseY, mouseButton);
@@ -446,7 +446,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     @Override
     public boolean keyPressed(int p_keyPressed_1_, int p_keyPressed_2_, int p_keyPressed_3_) {
         if (p_keyPressed_1_ == 256) {
-            this.closeScreen();
+            this.onClose();
             return true;
         }
 
@@ -454,18 +454,18 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrices, int mouseX, int mouseY) {
+    protected void renderLabels(PoseStack matrices, int mouseX, int mouseY) {
         if (panelClicked) {
             if (clickButton == 0) {
                 float prevRotX = rotX;
                 float prevRotY = rotY;
-                rotX = initRotX - ((int) getMinecraft().mouseHelper.getMouseY() - clickY);
-                rotY = initRotY + ((int) getMinecraft().mouseHelper.getMouseX() - clickX);
+                rotX = initRotX - ((int) getMinecraft().mouseHandler.ypos() - clickY);
+                rotY = initRotY + ((int) getMinecraft().mouseHandler.xpos() - clickX);
                 momentumX = rotX - prevRotX;
                 momentumY = rotY - prevRotY;
             } else if (clickButton == 1) {
-                panX = initPanX + ((int) getMinecraft().mouseHelper.getMouseX() - clickX) / 8f;
-                panY = initPanY + ((int) getMinecraft().mouseHelper.getMouseY() - clickY) / 8f;
+                panX = initPanX + ((int) getMinecraft().mouseHandler.xpos() - clickX) / 8f;
+                panY = initPanY + ((int) getMinecraft().mouseHandler.ypos() - clickY) / 8f;
             }
         }
 
@@ -475,17 +475,17 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         momentumX *= momentumDampening;
         momentumY *= momentumDampening;
 
-        if (! nameField.isFocused() && nameField.getText().isEmpty())
-            getMinecraft().fontRenderer.drawString(matrices, GuiTranslation.TEMPLATE_PLACEHOLDER.format(), nameField.x - guiLeft + 4, (nameField.y + 2) - guiTop, - 10197916);
+        if (! nameField.isFocused() && nameField.getValue().isEmpty())
+            getMinecraft().font.draw(matrices, GuiTranslation.TEMPLATE_PLACEHOLDER.format(), nameField.x - leftPos + 4, (nameField.y + 2) - topPos, - 10197916);
 
         if (buttonSave.isHovered() || buttonLoad.isHovered() || buttonPaste.isHovered())
             drawSlotOverlay(matrices, buttonLoad.isHovered() ? container.getSlot(0) : container.getSlot(1));
     }
 
-    private void drawSlotOverlay(MatrixStack matrices, Slot slot) {
+    private void drawSlotOverlay(PoseStack matrices, Slot slot) {
         RenderSystem.pushMatrix();
         RenderSystem.translated(0, 0, 1000);
-        fill(matrices, slot.xPos, slot.yPos, slot.xPos + 16, slot.yPos + 16, - 1660903937);
+        fill(matrices, slot.x, slot.y, slot.x + 16, slot.y + 16, - 1660903937);
         RenderSystem.translated(0, 0, - 1000);
         RenderSystem.popMatrix();
     }
@@ -512,8 +512,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         }
     }
 
-    private World getWorld() {
-        return getMinecraft().world;
+    private Level getWorld() {
+        return getMinecraft().level;
     }
 
     @Override
@@ -524,7 +524,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     // Events
     // we need to ensure that the Template we want to look at is recent, before we take any further action
     private void runAfterUpdate(int slot, Runnable runnable) {
-        container.getSlot(slot).getStack().getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
+        container.getSlot(slot).getItem().getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
             provider.registerUpdateListener(new IUpdateListener() {
                 @Override
                 public void onTemplateUpdate(ITemplateProvider provider, ITemplateKey updateKey, Template template) {
@@ -540,8 +540,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     private void onSave() {
         boolean replaced = replaceStack();
-        ItemStack left = container.getSlot(0).getStack();
-        ItemStack right = container.getSlot(1).getStack();
+        ItemStack left = container.getSlot(0).getItem();
+        ItemStack right = container.getSlot(1).getItem();
         if (left.isEmpty()) {
             rename(right);
             return;
@@ -550,7 +550,7 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         runAfterUpdate(0, () -> { //we are copying form 0 to 1 => slot 0 needs to be the recent one
             templateProvider.ifPresent(provider -> {
                 left.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
-                    Template templateToSave = provider.getTemplateForKey(key).withName(nameField.getText());
+                    Template templateToSave = provider.getTemplateForKey(key).withName(nameField.getValue());
                     pasteTemplateToStack(provider, right, templateToSave, replaced);
                 });
             });
@@ -559,8 +559,8 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     private void onLoad() {
         boolean replaced = replaceStack();
-        ItemStack left = container.getSlot(0).getStack();
-        ItemStack right = container.getSlot(1).getStack();
+        ItemStack left = container.getSlot(0).getItem();
+        ItemStack right = container.getSlot(1).getItem();
         if (left.isEmpty()) {
             rename(right);
             return;
@@ -578,10 +578,10 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
 
     private void onCopy() {
         runAfterUpdate(0, () -> { //we are copying from slot 1 => slot 1 needs to be updated
-            ItemStack stack = container.getSlot(0).getStack();
+            ItemStack stack = container.getSlot(0).getItem();
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                 templateProvider.ifPresent(provider -> {
-                    PlayerEntity player = getMinecraft().player;
+                    Player player = getMinecraft().player;
                     assert player != null;
 
                     BuildContext buildContext = BuildContext.builder()
@@ -590,17 +590,17 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
                             .build(getWorld());
                     try {
                         Template template = provider.getTemplateForKey(key);
-                        if (! nameField.getText().isEmpty())
-                            template = template.withName(nameField.getText());
+                        if (! nameField.getValue().isEmpty())
+                            template = template.withName(nameField.getValue());
                         String json = TemplateIO.writeTemplateJson(template, buildContext);
-                        getMinecraft().keyboardListener.setClipboardString(json);
-                        player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
+                        getMinecraft().keyboardHandler.setClipboard(json);
+                        player.displayClientMessage(MessageTranslation.CLIPBOARD_COPY_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
                     } catch (DataCannotBeWrittenException e) {
                         BuildingGadgets.LOG.error("Failed to write Template.", e);
-                        player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_ERROR_TEMPLATE.componentTranslation().setStyle(Styles.RED), false);
+                        player.displayClientMessage(MessageTranslation.CLIPBOARD_COPY_ERROR_TEMPLATE.componentTranslation().setStyle(Styles.RED), false);
                     } catch (Exception e) {
                         BuildingGadgets.LOG.error("Failed to copy Template to clipboard.", e);
-                        player.sendStatusMessage(MessageTranslation.CLIPBOARD_COPY_ERROR.componentTranslation().setStyle(Styles.RED), false);
+                        player.displayClientMessage(MessageTranslation.CLIPBOARD_COPY_ERROR.componentTranslation().setStyle(Styles.RED), false);
                     }
                 });
             });
@@ -610,19 +610,19 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
     private void onPaste() {
         assert getMinecraft().player != null;
 
-        String CBString = getMinecraft().keyboardListener.getClipboardString();
+        String CBString = getMinecraft().keyboardHandler.getClipboard();
         if (GadgetUtils.mightBeLink(CBString)) {
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_LINK_COPIED.componentTranslation().setStyle(Styles.RED), false);
+            getMinecraft().player.displayClientMessage(MessageTranslation.PASTE_FAILED_LINK_COPIED.componentTranslation().setStyle(Styles.RED), false);
             return;
         }
 
         // Attempt to parse into nbt first to check for old 1.12 pastes
         try {
-            CompoundNBT tagFromJson = JsonToNBT.getTagFromJson(CBString);
+            CompoundTag tagFromJson = TagParser.parseTag(CBString);
             if (!tagFromJson.contains("header")) {
                 BuildingGadgets.LOG.error("Attempted to use a 1.12 compound on a newer MC version");
-                getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
-                        .componentTranslation("(1.12.x)", Minecraft.getInstance().getMinecraftGame().getVersion().getName()).setStyle(Styles.RED), false);
+                getMinecraft().player.displayClientMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
+                        .componentTranslation("(1.12.x)", Minecraft.getInstance().getGame().getVersion().getName()).setStyle(Styles.RED), false);
                 return;
 
             }
@@ -632,37 +632,37 @@ public class TemplateManagerGUI extends ContainerScreen<TemplateManagerContainer
         try {
             Template template = TemplateIO.readTemplateFromJson(CBString);
             Template readTemplate = template.clearMaterials();
-            if (! nameField.getText().isEmpty())
-                readTemplate = readTemplate.withName(nameField.getText());
+            if (! nameField.getValue().isEmpty())
+                readTemplate = readTemplate.withName(nameField.getValue());
             boolean replaced = replaceStack();
-            ItemStack stack = container.getSlot(1).getStack();
+            ItemStack stack = container.getSlot(1).getItem();
             pasteTemplateToStack(getWorld(), stack, readTemplate, replaced);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
+            getMinecraft().player.displayClientMessage(MessageTranslation.PASTE_SUCCESS.componentTranslation().setStyle(Styles.DK_GREEN), false);
         } catch (CorruptJsonException e) {
             BuildingGadgets.LOG.error("Failed to parse json syntax.", e);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_JSON
+            getMinecraft().player.displayClientMessage(MessageTranslation.PASTE_FAILED_CORRUPT_JSON
                     .componentTranslation().setStyle(Styles.RED), false);
         } catch (IllegalMinecraftVersionException e) {
             BuildingGadgets.LOG.error("Attempted to parse Template for Minecraft version {} but expected between {} and {}.",
                     e.getMinecraftVersion(), TemplateHeader.LOWEST_MC_VERSION, TemplateHeader.HIGHEST_MC_VERSION, e);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
+            getMinecraft().player.displayClientMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
                     .componentTranslation(e.getMinecraftVersion(), TemplateHeader.LOWEST_MC_VERSION, TemplateHeader.HIGHEST_MC_VERSION).setStyle(Styles.RED), false);
         } catch (UnknownTemplateVersionException e) {
             BuildingGadgets.LOG.error("Attempted to parse Template version {} but newest is {}.",
                     e.getTemplateVersion(), TemplateHeader.VERSION, e);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_TOO_RECENT_VERSION
+            getMinecraft().player.displayClientMessage(MessageTranslation.PASTE_FAILED_TOO_RECENT_VERSION
                     .componentTranslation(e.getTemplateVersion(), TemplateHeader.VERSION).setStyle(Styles.RED), false);
         } catch (JsonParseException e) {
             BuildingGadgets.LOG.error("Failed to parse Template json.", e);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_INVALID_JSON
+            getMinecraft().player.displayClientMessage(MessageTranslation.PASTE_FAILED_INVALID_JSON
                     .componentTranslation().setStyle(Styles.RED), false);
         } catch (TemplateReadException e) {
             BuildingGadgets.LOG.error("Failed to read Template body.", e);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED_CORRUPT_BODY
+            getMinecraft().player.displayClientMessage(MessageTranslation.PASTE_FAILED_CORRUPT_BODY
                     .componentTranslation().setStyle(Styles.RED), false);
         } catch (Exception e) {
             BuildingGadgets.LOG.error("Failed to paste Template.", e);
-            getMinecraft().player.sendStatusMessage(MessageTranslation.PASTE_FAILED
+            getMinecraft().player.displayClientMessage(MessageTranslation.PASTE_FAILED
                     .componentTranslation().setStyle(Styles.RED), false);
         }
     }

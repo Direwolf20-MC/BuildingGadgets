@@ -4,9 +4,9 @@ import com.direwolf20.buildinggadgets.common.items.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -14,10 +14,10 @@ import java.util.function.Supplier;
 public class PacketToggleMode {
     private final int mode;
 
-    public static void encode(PacketToggleMode msg, PacketBuffer buffer) {
+    public static void encode(PacketToggleMode msg, FriendlyByteBuf buffer) {
         buffer.writeInt(msg.mode);
     }
-    public static PacketToggleMode decode(PacketBuffer buffer) {
+    public static PacketToggleMode decode(FriendlyByteBuf buffer) {
         return new PacketToggleMode(buffer.readInt());
     }
 
@@ -28,7 +28,7 @@ public class PacketToggleMode {
     public static class Handler {
         public static void handle(PacketToggleMode msg, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
-                ServerPlayerEntity playerEntity = ctx.get().getSender();
+                ServerPlayer playerEntity = ctx.get().getSender();
                 if( playerEntity == null ) return;
 
                 ItemStack heldItem = AbstractGadget.getGadget(playerEntity);

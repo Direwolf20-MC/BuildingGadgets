@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.modes;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +10,7 @@ public class HorizontalWallMode extends AbstractMode {
     public HorizontalWallMode() { super(false); }
 
     @Override
-    List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
+    List<BlockPos> collect(UseContext context, Player player, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
         // Handle top and bottom first.

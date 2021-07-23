@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.exceptions;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public class TemplateWriteException extends Exception {
     public TemplateWriteException() {
@@ -23,14 +23,14 @@ public class TemplateWriteException extends Exception {
     }
 
     public static final class DataCannotBeWrittenException extends TemplateWriteException {
-        private final CompoundNBT nbt;
+        private final CompoundTag nbt;
 
-        public DataCannotBeWrittenException(Throwable cause, CompoundNBT nbt) {
+        public DataCannotBeWrittenException(Throwable cause, CompoundTag nbt) {
             super("Unable to write TemplateItem data to bytes!", cause);
             this.nbt = nbt;
         }
 
-        public CompoundNBT getNbt() {
+        public CompoundTag getNbt() {
             return nbt;
         }
     }

@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.common.tainted.template.Template;
 import com.direwolf20.buildinggadgets.common.tainted.template.TemplateIO;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadException;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateWriteException;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 public final class SplitPacketUpdateTemplate extends UUIDPacket {
     private final Template template;
 
-    public SplitPacketUpdateTemplate(PacketBuffer buffer) {
+    public SplitPacketUpdateTemplate(FriendlyByteBuf buffer) {
         super(buffer);
         byte[] bytes = new byte[buffer.readableBytes()];
         buffer.readBytes(bytes);
@@ -35,7 +35,7 @@ public final class SplitPacketUpdateTemplate extends UUIDPacket {
         this.template = template;
     }
 
-    public void encode(PacketBuffer buffer) {
+    public void encode(FriendlyByteBuf buffer) {
         super.encode(buffer);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         try {

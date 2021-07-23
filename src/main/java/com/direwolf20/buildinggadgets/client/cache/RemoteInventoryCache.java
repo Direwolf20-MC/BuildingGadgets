@@ -6,11 +6,11 @@ import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryLinker;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Multiset;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.RegistryKey;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RemoteInventoryCache {
     private boolean isCopyPaste, forceUpdate;
-    private Pair<BlockPos, RegistryKey<World>> locCached;
+    private Pair<BlockPos, ResourceKey<Level>> locCached;
     private Multiset<UniqueItem> cache;
     private Stopwatch timer;
 
@@ -36,7 +36,7 @@ public class RemoteInventoryCache {
     }
 
     public boolean maintainCache(ItemStack tool) {
-        Pair<BlockPos, RegistryKey<World>> loc = InventoryLinker.getDataFromStack(tool);
+        Pair<BlockPos, ResourceKey<Level>> loc = InventoryLinker.getDataFromStack(tool);
         if (isCacheOld(loc))
             updateCache(loc);
 
@@ -47,7 +47,7 @@ public class RemoteInventoryCache {
         return cache;
     }
 
-    private void updateCache(Pair<BlockPos, RegistryKey<World>> loc) {
+    private void updateCache(Pair<BlockPos, ResourceKey<Level>> loc) {
         locCached = loc;
         if (loc == null)
             cache = null;
@@ -56,7 +56,7 @@ public class RemoteInventoryCache {
         }
     }
 
-    private boolean isCacheOld(@Nullable Pair<BlockPos, RegistryKey<World>> loc) {
+    private boolean isCacheOld(@Nullable Pair<BlockPos, ResourceKey<Level>> loc) {
         if (!Objects.equals(locCached, loc)) {
             timer = loc == null ? null : Stopwatch.createStarted();
             return true;

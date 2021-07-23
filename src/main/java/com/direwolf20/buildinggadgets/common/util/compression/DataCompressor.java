@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.common.util.compression;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -56,8 +56,8 @@ public final class DataCompressor<T> implements ToIntFunction<T> {
         return reverseMap;
     }
 
-    public ListNBT write(Function<T, ? extends INBT> serializer) {
-        ListNBT resList = new ListNBT();
+    public ListTag write(Function<T, ? extends Tag> serializer) {
+        ListTag resList = new ListTag();
         for (T entry : reverseMap) {
             resList.add(serializer.apply(entry));
         }

@@ -5,12 +5,12 @@ import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.MoreObjects;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.HitResult;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -32,8 +32,8 @@ public final class PlacementTarget {
      * @throws NullPointerException if the serializer for the {@link ITileEntityData} could not be found
      * @see BlockData#deserialize(CompoundNBT, boolean)
      */
-    public static PlacementTarget deserialize(CompoundNBT nbt, boolean persisted) {
-        BlockPos pos = NBTUtil.readBlockPos(nbt.getCompound(NBTKeys.KEY_POS));
+    public static PlacementTarget deserialize(CompoundTag nbt, boolean persisted) {
+        BlockPos pos = NbtUtils.readBlockPos(nbt.getCompound(NBTKeys.KEY_POS));
         BlockData data = BlockData.deserialize(nbt.getCompound(NBTKeys.KEY_DATA), persisted);
         return new PlacementTarget(pos, data);
     }
@@ -86,7 +86,7 @@ public final class PlacementTarget {
         return new PlacementTarget(getPos(), getData().rotate(rotation));
     }
 
-    public MaterialList getRequiredMaterials(BuildContext context, @Nullable RayTraceResult target) {
+    public MaterialList getRequiredMaterials(BuildContext context, @Nullable HitResult target) {
         return getData().getRequiredItems(context, target, getPos());
     }
 
@@ -97,10 +97,10 @@ public final class PlacementTarget {
      * @return The serialized form of this {@code PlacementTarget} as an {@link CompoundNBT}.
      * @see BlockData#serialize(boolean)
      */
-    public CompoundNBT serialize(boolean persisted) {
-        CompoundNBT compound = new CompoundNBT();
+    public CompoundTag serialize(boolean persisted) {
+        CompoundTag compound = new CompoundTag();
         compound.put(NBTKeys.KEY_DATA, data.serialize(persisted));
-        compound.put(NBTKeys.KEY_POS, NBTUtil.writeBlockPos(pos));
+        compound.put(NBTKeys.KEY_POS, NbtUtils.writeBlockPos(pos));
         return compound;
     }
 

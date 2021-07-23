@@ -4,10 +4,10 @@ import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.Optional;
@@ -22,18 +22,18 @@ public class PacketCopyCoords {
         this.end = end;
     }
 
-    public static void encode(PacketCopyCoords msg, PacketBuffer buffer) {
+    public static void encode(PacketCopyCoords msg, FriendlyByteBuf buffer) {
         buffer.writeBlockPos(msg.start);
         buffer.writeBlockPos(msg.end);
     }
 
-    public static PacketCopyCoords decode(PacketBuffer buffer) {
+    public static PacketCopyCoords decode(FriendlyByteBuf buffer) {
         return new PacketCopyCoords(buffer.readBlockPos(), buffer.readBlockPos());
     }
 
     public static class Handler {
         public static void handle(final PacketCopyCoords msg, Supplier<NetworkEvent.Context> ctx) {
-            ServerPlayerEntity playerEntity = ctx.get().getSender();
+            ServerPlayer playerEntity = ctx.get().getSender();
             if( playerEntity == null ) return;
 
             ctx.get().enqueueWork(() -> {
@@ -44,15 +44,15 @@ public class PacketCopyCoords {
                 BlockPos endPos = msg.end;
                 if (startPos.equals(BlockPos.ZERO) && endPos.equals(BlockPos.ZERO)) {
                     GadgetCopyPaste.setSelectedRegion(heldItem, null);
-                    playerEntity.sendStatusMessage(MessageTranslation.AREA_RESET.componentTranslation().setStyle(Styles.AQUA), true);
+                    playerEntity.displayClientMessage(MessageTranslation.AREA_RESET.componentTranslation().setStyle(Styles.AQUA), true);
                 } else {
                     GadgetCopyPaste.setSelectedRegion(heldItem, new Region(startPos, endPos));
                 }
 
                 Optional<Region> regionOpt = GadgetCopyPaste.getSelectedRegion(heldItem);
                 if (! regionOpt.isPresent()) //notify of single copy
-                    playerEntity.sendStatusMessage(MessageTranslation.FIRST_COPY.componentTranslation().setStyle(Styles.DK_GREEN), true);
-                regionOpt.ifPresent(region -> ((GadgetCopyPaste) heldItem.getItem()).tryCopy(heldItem, playerEntity.world, playerEntity, region));
+                    playerEntity.displayClientMessage(MessageTranslation.FIRST_COPY.componentTranslation().setStyle(Styles.DK_GREEN), true);
+                regionOpt.ifPresent(region -> ((GadgetCopyPaste) heldItem.getItem()).tryCopy(heldItem, playerEntity.level, playerEntity, region));
             });
 
             ctx.get().setPacketHandled(true);

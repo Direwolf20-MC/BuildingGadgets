@@ -1,22 +1,22 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public class PacketToggleRayTraceFluid {
 
-    public static void encode(PacketToggleRayTraceFluid msg, PacketBuffer buffer) {}
-    public static PacketToggleRayTraceFluid decode(PacketBuffer buffer) { return new PacketToggleRayTraceFluid(); }
+    public static void encode(PacketToggleRayTraceFluid msg, FriendlyByteBuf buffer) {}
+    public static PacketToggleRayTraceFluid decode(FriendlyByteBuf buffer) { return new PacketToggleRayTraceFluid(); }
 
     public static class Handler {
         public static void handle(final PacketToggleRayTraceFluid msg, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
-                ServerPlayerEntity player = ctx.get().getSender();
+                ServerPlayer player = ctx.get().getSender();
                 if (player == null)
                     return;
 

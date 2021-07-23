@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.common.tainted.building.view;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.IServerWorld;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,13 +25,13 @@ public final class BuildContext {
     }
 
     @Nonnull
-    private final IWorld world;
+    private final LevelAccessor world;
     @Nullable
-    private final PlayerEntity player;
+    private final Player player;
 
     private final ItemStack stack;
 
-    public BuildContext(@Nonnull IWorld world, @Nullable PlayerEntity player, @Nonnull ItemStack stack) {
+    public BuildContext(@Nonnull LevelAccessor world, @Nullable Player player, @Nonnull ItemStack stack) {
         this.world = world;
         this.player = player;
         this.stack = stack;
@@ -40,7 +40,7 @@ public final class BuildContext {
     /**
      * @return The {@link IWorld} of this {@code SimpleBuildContext}. Will not be null.
      */
-    public IWorld getWorld() {
+    public LevelAccessor getWorld() {
         return world;
     }
 
@@ -48,7 +48,7 @@ public final class BuildContext {
      * @return The {@link PlayerEntity} performing the build. May be null if unknown.
      */
     @Nullable
-    public PlayerEntity getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 
@@ -56,8 +56,8 @@ public final class BuildContext {
         return stack;
     }
 
-    public ServerWorld getServerWorld() {
-        return ((IServerWorld) world).getWorld();
+    public ServerLevel getServerWorld() {
+        return ((ServerLevelAccessor) world).getLevel();
     }
 
     /**
@@ -65,9 +65,9 @@ public final class BuildContext {
      */
     public static final class Builder {
         @Nullable
-        private IWorld world;
+        private LevelAccessor world;
         @Nullable
-        private PlayerEntity buildingPlayer;
+        private Player buildingPlayer;
         @Nonnull
         private ItemStack stack;
 
@@ -83,7 +83,7 @@ public final class BuildContext {
          * @return The {@code Builder} itself
          * @see BuildContext#getWorld()
          */
-        public Builder world(@Nonnull IWorld world) {
+        public Builder world(@Nonnull LevelAccessor world) {
             this.world = world;
             return this;
         }
@@ -97,10 +97,10 @@ public final class BuildContext {
          * @return The {@code Builder} itself
          * @see BuildContext#getPlayer()
          */
-        public Builder player(@Nullable PlayerEntity buildingPlayer) {
+        public Builder player(@Nullable Player buildingPlayer) {
             this.buildingPlayer = buildingPlayer;
             if (world == null && buildingPlayer != null)
-                this.world = buildingPlayer.world;
+                this.world = buildingPlayer.level;
             return this;
         }
 
@@ -133,7 +133,7 @@ public final class BuildContext {
          * @return A new {@link BuildContext} with the values specified in this {@code SimpleBuilder}.
          * @throws NullPointerException if both the {@link World} passed in and the {@link World} of this {@code Builder} are null.
          */
-        public BuildContext build(@Nullable IWorld world) {
+        public BuildContext build(@Nullable LevelAccessor world) {
             return new BuildContext(world != null ? world : Objects.requireNonNull(this.world), buildingPlayer, stack);
         }
     }

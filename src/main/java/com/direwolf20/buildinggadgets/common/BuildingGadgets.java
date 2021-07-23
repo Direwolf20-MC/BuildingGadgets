@@ -19,11 +19,11 @@ import com.direwolf20.buildinggadgets.common.tainted.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.tileentities.OurTileEntities;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.command.Commands;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.commands.Commands;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -51,9 +51,9 @@ public final class BuildingGadgets {
      * building gadget to remove the damage / energy indicator from the creative
      * tabs icon.
      */
-    public static ItemGroup creativeTab = new ItemGroup(Reference.MODID) {
+    public static CreativeModeTab creativeTab = new CreativeModeTab(Reference.MODID) {
         @Override
-        public ItemStack createIcon() {
+        public ItemStack makeIcon() {
             ItemStack stack = new ItemStack(OurItems.BUILDING_GADGET_ITEM.get());
             stack.getOrCreateTag().putByte(NBTKeys.CREATIVE_MARKER, (byte) 0);
             return stack;
@@ -88,7 +88,7 @@ public final class BuildingGadgets {
         eventBus.addListener(this::loadComplete);
         eventBus.addListener(this::handleIMC);
 
-        eventBus.addGenericListener(IRecipeSerializer.class, this::onRecipeRegister);
+        eventBus.addGenericListener(RecipeSerializer.class, this::onRecipeRegister);
         eventBus.addListener(this::onEnqueueIMC);
     }
 
@@ -125,7 +125,7 @@ public final class BuildingGadgets {
     }
 
     private void serverLoad(FMLServerStartingEvent event) {
-        event.getServer().getCommandManager().getDispatcher().register(
+        event.getServer().getCommands().getDispatcher().register(
                 Commands.literal(Reference.MODID)
                         .then(OverrideBuildSizeCommand.registerToggle())
                         .then(OverrideCopySizeCommand.registerToggle())
@@ -144,7 +144,7 @@ public final class BuildingGadgets {
         SaveManager.INSTANCE.onServerStopped(event);
     }
 
-    private void onRecipeRegister(final RegistryEvent.Register<IRecipeSerializer<?>> e) {
+    private void onRecipeRegister(final RegistryEvent.Register<RecipeSerializer<?>> e) {
         e.getRegistry().register(
                 Serializer.INSTANCE.setRegistryName(
                     new ResourceLocation(Reference.MODID, "construction_paste")

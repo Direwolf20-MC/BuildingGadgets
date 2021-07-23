@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.ref;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 import static com.direwolf20.buildinggadgets.common.util.ref.Reference.MODID;
 

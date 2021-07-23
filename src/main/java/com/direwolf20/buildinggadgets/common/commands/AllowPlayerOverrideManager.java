@@ -7,10 +7,10 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.command.CommandSource;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.Map;
 import java.util.UUID;
@@ -39,8 +39,8 @@ final class AllowPlayerOverrideManager {
         this.logMessage = logMessage;
     }
 
-    void toggleAllowOverride(PlayerEntity player) {
-        toggleAllowOverride(player.getUniqueID());
+    void toggleAllowOverride(Player player) {
+        toggleAllowOverride(player.getUUID());
     }
 
     void toggleAllowOverride(UUID uuid) {
@@ -56,26 +56,26 @@ final class AllowPlayerOverrideManager {
         return res != null ? res : false;
     }
 
-    boolean mayOverride(PlayerEntity player) {
-        return mayOverride(player.getUniqueID());
+    boolean mayOverride(Player player) {
+        return mayOverride(player.getUUID());
     }
 
-    int executeToggle(CommandContext<CommandSource> context, PlayerEntity player) {
+    int executeToggle(CommandContext<CommandSourceStack> context, Player player) {
         if (player == null) {
-            context.getSource().sendErrorMessage(noPlayerTranslation.componentTranslation().setStyle(Styles.RED));
+            context.getSource().sendFailure(noPlayerTranslation.componentTranslation().setStyle(Styles.RED));
             return 0;
         }
         toggleAllowOverride(player);
-        context.getSource().sendFeedback(toggledTranslation.componentTranslation(player.getDisplayName(), mayOverride(player))
+        context.getSource().sendSuccess(toggledTranslation.componentTranslation(player.getDisplayName(), mayOverride(player))
                 .setStyle(Styles.AQUA), true);
         return 1;
     }
 
-    int executeList(CommandContext<CommandSource> context) {
+    int executeList(CommandContext<CommandSourceStack> context) {
         for (Map.Entry<UUID, Boolean> entry : allowPlayerOverrideCache.asMap().entrySet()) {
-            TranslationTextComponent component = listTranslation.componentTranslation(entry.getKey(), entry.getValue());
-            component = (TranslationTextComponent) (entry.getValue() ? component.setStyle(Styles.BLUE) : component.setStyle(Styles.DK_GREEN));
-            context.getSource().sendFeedback(component, true);
+            TranslatableComponent component = listTranslation.componentTranslation(entry.getKey(), entry.getValue());
+            component = (TranslatableComponent) (entry.getValue() ? component.setStyle(Styles.BLUE) : component.setStyle(Styles.DK_GREEN));
+            context.getSource().sendSuccess(component, true);
         }
         return 1;
     }

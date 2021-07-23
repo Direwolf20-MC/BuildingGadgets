@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.common.tainted.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.tainted.template.TemplateKey;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
@@ -15,7 +15,7 @@ public final class PacketRequestTemplate extends UUIDPacket {
         super(id);
     }
 
-    public PacketRequestTemplate(PacketBuffer buffer) {
+    public PacketRequestTemplate(FriendlyByteBuf buffer) {
         super(buffer);
     }
 

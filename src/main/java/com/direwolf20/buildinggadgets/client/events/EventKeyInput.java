@@ -8,8 +8,8 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
@@ -26,7 +26,7 @@ public class EventKeyInput {
         if (mc.player == null || event.phase == Phase.START)
             return;
 
-        if (KeyBindings.materialList.isPressed()) {
+        if (KeyBindings.materialList.consumeClick()) {
             GuiMod.MATERIAL_LIST.openScreen(mc.player);
             return;
         }
@@ -35,21 +35,21 @@ public class EventKeyInput {
         if (tool.isEmpty())
             return;
 
-        KeyBinding mode = KeyBindings.menuSettings;
-        if (!(mc.currentScreen instanceof ModeRadialMenu) && mode.isPressed() && ((mode.getKeyModifier() == KeyModifier.NONE
+        KeyMapping mode = KeyBindings.menuSettings;
+        if (!(mc.screen instanceof ModeRadialMenu) && mode.consumeClick() && ((mode.getKeyModifier() == KeyModifier.NONE
                 && KeyModifier.getActiveModifier() == KeyModifier.NONE) || mode.getKeyModifier() != KeyModifier.NONE)) {
-                mc.displayGuiScreen(new ModeRadialMenu(tool));
-        } else if (KeyBindings.range.isPressed()) {
+                mc.setScreen(new ModeRadialMenu(tool));
+        } else if (KeyBindings.range.consumeClick()) {
             PacketHandler.sendToServer(new PacketChangeRange());
-        } else if (KeyBindings.rotateMirror.isPressed()) {
+        } else if (KeyBindings.rotateMirror.consumeClick()) {
             PacketHandler.sendToServer(new PacketRotateMirror());
-        } else if (KeyBindings.undo.isPressed()) {
+        } else if (KeyBindings.undo.consumeClick()) {
             PacketHandler.sendToServer(new PacketUndo());
-        } else if (KeyBindings.anchor.isPressed()) {
+        } else if (KeyBindings.anchor.consumeClick()) {
             PacketHandler.sendToServer(new PacketAnchor());
-        } else if (KeyBindings.fuzzy.isPressed()) {
+        } else if (KeyBindings.fuzzy.consumeClick()) {
             PacketHandler.sendToServer(new PacketToggleFuzzy());
-        } else if (KeyBindings.connectedArea.isPressed()) {
+        } else if (KeyBindings.connectedArea.consumeClick()) {
             PacketHandler.sendToServer(new PacketToggleConnectedArea());
         }
     }

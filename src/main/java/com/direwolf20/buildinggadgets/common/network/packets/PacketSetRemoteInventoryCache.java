@@ -9,14 +9,14 @@ import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.network.NetworkEvent;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -29,50 +29,50 @@ public class PacketSetRemoteInventoryCache {
 
     private final boolean isCopyPaste;
     private Multiset<UniqueItem> cache;
-    private Pair<BlockPos, RegistryKey<World>> loc;
+    private Pair<BlockPos, ResourceKey<Level>> loc;
 
     public PacketSetRemoteInventoryCache(Multiset<UniqueItem> cache, boolean isCopyPaste) {
         this.cache = cache;
         this.isCopyPaste = isCopyPaste;
     }
 
-    public PacketSetRemoteInventoryCache(Pair<BlockPos, RegistryKey<World>> loc, boolean isCopyPaste) {
+    public PacketSetRemoteInventoryCache(Pair<BlockPos, ResourceKey<Level>> loc, boolean isCopyPaste) {
         this.loc = loc;
         this.isCopyPaste = isCopyPaste;
     }
 
-    public static PacketSetRemoteInventoryCache decode(PacketBuffer buf) {
+    public static PacketSetRemoteInventoryCache decode(FriendlyByteBuf buf) {
         boolean isCopyPaste = buf.readBoolean();
         if (buf.readBoolean()) {
-            Pair<BlockPos, RegistryKey<World>> loc = new ImmutablePair<>(
+            Pair<BlockPos, ResourceKey<Level>> loc = new ImmutablePair<>(
                     buf.readBlockPos(),
-                    RegistryKey.getOrCreateKey(Registry.WORLD_KEY, buf.readResourceLocation())
+                    ResourceKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation())
             );
             return new PacketSetRemoteInventoryCache(loc, isCopyPaste);
         }
         int len = buf.readInt();
         ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
         for (int i = 0; i < len; i++)
-            builder.addCopies(new UniqueItem(Item.getItemById(buf.readInt())), buf.readInt());
+            builder.addCopies(new UniqueItem(Item.byId(buf.readInt())), buf.readInt());
 
         Multiset<UniqueItem> cache = builder.build();
         return new PacketSetRemoteInventoryCache(cache, isCopyPaste);
     }
 
-    public static void encode(PacketSetRemoteInventoryCache msg, PacketBuffer buf) {
+    public static void encode(PacketSetRemoteInventoryCache msg, FriendlyByteBuf buf) {
         buf.writeBoolean(msg.isCopyPaste());
         boolean isRequest = msg.getCache() == null;
         buf.writeBoolean(isRequest);
         if (isRequest) {
-            buf.writeLong(msg.getLoc().getLeft().toLong());
-            buf.writeResourceLocation(msg.getLoc().getRight().getLocation());
+            buf.writeLong(msg.getLoc().getLeft().asLong());
+            buf.writeResourceLocation(msg.getLoc().getRight().location());
             return;
         }
         Set<Entry<UniqueItem>> items = msg.getCache().entrySet();
         buf.writeInt(items.size());
         for (Entry<UniqueItem> entry : items) {
             UniqueItem uniqueItem = entry.getElement();
-            buf.writeInt(Item.getIdFromItem(uniqueItem.createStack().getItem()));
+            buf.writeInt(Item.getId(uniqueItem.createStack().getItem()));
             buf.writeInt(entry.getCount());
         }
     }
@@ -85,18 +85,18 @@ public class PacketSetRemoteInventoryCache {
         return cache;
     }
 
-    public Pair<BlockPos, RegistryKey<World>> getLoc() {
+    public Pair<BlockPos, ResourceKey<Level>> getLoc() {
         return loc;
     }
 
     public static class Handler {
         public static void handle(final PacketSetRemoteInventoryCache msg, Supplier<NetworkEvent.Context> ctx) {
             ctx.get().enqueueWork(() -> {
-                ServerPlayerEntity player = ctx.get().getSender();
+                ServerPlayer player = ctx.get().getSender();
                 if (player != null) {
                     Set<UniqueItem> itemTypes = new HashSet<>();
                     ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
-                    InventoryLinker.getLinkedInventory(player.world, msg.loc.getKey(), msg.loc.getValue(), null).ifPresent(inventory -> {
+                    InventoryLinker.getLinkedInventory(player.level, msg.loc.getKey(), msg.loc.getValue(), null).ifPresent(inventory -> {
                         for (int i = 0; i < inventory.getSlots(); i++) {
                             ItemStack stack = inventory.getStackInSlot(i);
                             if (!stack.isEmpty()) {

@@ -4,8 +4,8 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 
@@ -28,7 +28,7 @@ public final class PacketSplitManager {
         this.idToHandlerMap = new Int2ObjectOpenHashMap<>();
     }
 
-    public <MSG> void registerSplitPacket(Class<MSG> msgClass, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<Context>> handler) {
+    public <MSG> void registerSplitPacket(Class<MSG> msgClass, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<Context>> handler) {
         PacketEncoder<MSG> splitEncoder = new PacketEncoder<>(encoder, id);
         PacketDecoder<MSG> splitDecoder = new PacketDecoder<>(decoder);
         PacketSplitHandler<MSG> splitHandler = new PacketSplitHandler<>(splitEncoder, splitDecoder, handler);
@@ -36,7 +36,7 @@ public final class PacketSplitManager {
         idToHandlerMap.put(id++, splitHandler);
     }
 
-    public void sendTo(Object message, ServerPlayerEntity player) {
+    public void sendTo(Object message, ServerPlayer player) {
         send(message, packet -> PacketHandler.sendTo(packet, player));
     }
 
@@ -55,11 +55,11 @@ public final class PacketSplitManager {
         handler.splitPackets(message, packetConsumer);
     }
 
-    public void encode(SplitPacket msg, PacketBuffer buf) {
+    public void encode(SplitPacket msg, FriendlyByteBuf buf) {
         msg.writeTo(buf);
     }
 
-    public SplitPacket decode(PacketBuffer buf) {
+    public SplitPacket decode(FriendlyByteBuf buf) {
         return SplitPacket.readFrom(buf);
     }
 

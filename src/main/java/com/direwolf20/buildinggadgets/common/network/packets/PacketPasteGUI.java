@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.fml.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -18,13 +18,13 @@ public class PacketPasteGUI {
         Z = z;
     }
 
-    public static void encode(PacketPasteGUI msg, PacketBuffer buffer) {
+    public static void encode(PacketPasteGUI msg, FriendlyByteBuf buffer) {
         buffer.writeInt(msg.X);
         buffer.writeInt(msg.Y);
         buffer.writeInt(msg.Z);
     }
 
-    public static PacketPasteGUI decode(PacketBuffer buffer) {
+    public static PacketPasteGUI decode(FriendlyByteBuf buffer) {
         return new PacketPasteGUI(buffer.readInt(), buffer.readInt(), buffer.readInt());
     }
 

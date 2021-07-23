@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.common.capability;
 
 import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.util.Mth;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
@@ -89,7 +89,7 @@ public final class PasteContainerItemHandler implements IItemHandlerModifiable {
     }
 
     private int setCount(int count, boolean simulate) {
-        int res = MathHelper.clamp(count, 0, getContainerItem().getMaxCapacity());
+        int res = Mth.clamp(count, 0, getContainerItem().getMaxCapacity());
         if (! simulate)
             getContainerItem().setPasteCount(container, res);
         return res;

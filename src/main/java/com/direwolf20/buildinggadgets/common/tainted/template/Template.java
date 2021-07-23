@@ -16,10 +16,10 @@ import com.direwolf20.buildinggadgets.common.util.tools.MathUtils;
 import com.direwolf20.buildinggadgets.common.util.tools.RegistryUtils;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.nbt.*;
-import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nullable;
@@ -28,27 +28,27 @@ import java.util.Optional;
 import java.util.function.Function;
 
 public final class Template {
-    public static Template deserialize(CompoundNBT nbt, @Nullable TemplateHeader externalHeader, boolean persisted) {
-        ListNBT posList = nbt.getList(NBTKeys.KEY_POS, NBT.TAG_LONG);
+    public static Template deserialize(CompoundTag nbt, @Nullable TemplateHeader externalHeader, boolean persisted) {
+        ListTag posList = nbt.getList(NBTKeys.KEY_POS, NBT.TAG_LONG);
         TemplateHeader.Builder header = TemplateHeader.builderFromNBT(nbt.getCompound(NBTKeys.KEY_HEADER));
         if (externalHeader != null)
             header = header.name(externalHeader.getName()).author(externalHeader.getAuthor());
         DataDecompressor<ITileDataSerializer> serializerDecompressor = persisted ? new DataDecompressor<>(
                 nbt.getList(NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING),
-                inbt -> RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), inbt.getString()),
+                inbt -> RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), inbt.getAsString()),
                 value -> SerialisationSupport.dummyDataSerializer())
                 : null;
         DataDecompressor<BlockData> dataDecompressor = new DataDecompressor<>(
                 nbt.getList(NBTKeys.KEY_DATA, NBT.TAG_COMPOUND),
                 inbt -> persisted ?
-                        BlockData.tryDeserialize((CompoundNBT) inbt, serializerDecompressor, true) :
-                        BlockData.tryDeserialize((CompoundNBT) inbt, false),
+                        BlockData.tryDeserialize((CompoundTag) inbt, serializerDecompressor, true) :
+                        BlockData.tryDeserialize((CompoundTag) inbt, false),
                 value -> BlockData.AIR);
         ImmutableMap.Builder<BlockPos, BlockData> mapBuilder = ImmutableMap.builder();
-        for (INBT inbt : posList) {
-            LongNBT longNBT = (LongNBT) inbt;
-            BlockPos pos = MathUtils.posFromLong(longNBT.getLong());
-            BlockData data = dataDecompressor.apply(MathUtils.readStateId(longNBT.getLong()));
+        for (Tag inbt : posList) {
+            LongTag longNBT = (LongTag) inbt;
+            BlockPos pos = MathUtils.posFromLong(longNBT.getAsLong());
+            BlockData data = dataDecompressor.apply(MathUtils.readStateId(longNBT.getAsLong()));
             mapBuilder.put(pos, data);
         }
         return new Template(mapBuilder.build(), header.build());
@@ -78,7 +78,7 @@ public final class Template {
                     createViewInContext(context),
                     context,
                     context.getPlayer() != null ?
-                            context.getPlayer().getPositionVec().add(0, context.getPlayer().getEyeHeight(), 0) :
+                            context.getPlayer().position().add(0, context.getPlayer().getEyeHeight(), 0) :
                             null);
             header = TemplateHeader.builderOf(header).requiredItems(materialList).build();
         }
@@ -93,21 +93,21 @@ public final class Template {
         return PositionalBuildView.createUnsafe(context, map, header.getBoundingBox());
     }
 
-    public CompoundNBT serialize(boolean persisted) {
+    public CompoundTag serialize(boolean persisted) {
         if (! isNormalized)
             return normalize().serialize(persisted);
-        CompoundNBT res = new CompoundNBT();
-        ListNBT posList = new ListNBT();
+        CompoundTag res = new CompoundTag();
+        ListTag posList = new ListTag();
         DataCompressor<BlockData> blockDataCompressor = new DataCompressor<>();
         DataCompressor<ITileDataSerializer> dataSerializerCompressor = new DataCompressor<>();
         for (Map.Entry<BlockPos, BlockData> entry : map.entrySet()) {
             long posEntry = MathUtils.includeStateId(MathUtils.posToLong(entry.getKey()), blockDataCompressor.applyAsInt(entry.getValue()));
-            posList.add(LongNBT.valueOf(posEntry));
+            posList.add(LongTag.valueOf(posEntry));
         }
-        ListNBT dataList = blockDataCompressor.write(d -> persisted ?
+        ListTag dataList = blockDataCompressor.write(d -> persisted ?
                 d.serialize(dataSerializerCompressor, true)
                 : d.serialize(false));
-        ListNBT serializerList = persisted ? dataSerializerCompressor.write(s -> StringNBT.valueOf(s.getRegistryName().toString())) : null;
+        ListTag serializerList = persisted ? dataSerializerCompressor.write(s -> StringTag.valueOf(s.getRegistryName().toString())) : null;
         res.put(NBTKeys.KEY_DATA, dataList);
         res.put(NBTKeys.KEY_POS, posList);
         res.put(NBTKeys.KEY_HEADER, header.toNBT(persisted));

@@ -5,21 +5,21 @@ import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.ItemReference;
 import com.google.common.base.Preconditions;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tags.ITag;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.Tag;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -29,8 +29,8 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TemplateManagerTileEntity extends TileEntity implements INamedContainerProvider {
-    public static final ITag.INamedTag<Item> TEMPLATE_CONVERTIBLES = ItemTags.makeWrapperTag(ItemReference.TAG_TEMPLATE_CONVERTIBLE.toString());
+public class TemplateManagerTileEntity extends BlockEntity implements MenuProvider {
+    public static final Tag.Named<Item> TEMPLATE_CONVERTIBLES = ItemTags.bind(ItemReference.TAG_TEMPLATE_CONVERTIBLE.toString());
 
     public static final int SIZE = 2;
 
@@ -44,7 +44,7 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
         protected void onContentsChanged(int slot) {
             // We need to tell the tile entity that something has changed so
             // that the chest contents is persisted
-            TemplateManagerTileEntity.this.markDirty();
+            TemplateManagerTileEntity.this.setChanged();
         }
 
         private boolean isTemplateStack(ItemStack stack) {
@@ -59,21 +59,21 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
         @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
             return (slot == 0 && isTemplateStack(stack)) ||
-                    (slot == 1 && (isTemplateStack(stack) || stack.getItem().isIn(TEMPLATE_CONVERTIBLES)));
+                    (slot == 1 && (isTemplateStack(stack) || stack.getItem().is(TEMPLATE_CONVERTIBLES)));
         }
     };
     private LazyOptional<IItemHandler> handlerOpt;
 
     @Override
     @Nonnull
-    public ITextComponent getDisplayName() {
-        return new StringTextComponent("Template Manager GUI");
+    public Component getDisplayName() {
+        return new TextComponent("Template Manager GUI");
     }
 
     @Nullable
     @Override
-    public Container createMenu(int windowId, @Nonnull PlayerInventory playerInventory, @Nonnull PlayerEntity playerEntity) {
-        Preconditions.checkArgument(getWorld() != null);
+    public AbstractContainerMenu createMenu(int windowId, @Nonnull Inventory playerInventory, @Nonnull Player playerEntity) {
+        Preconditions.checkArgument(getLevel() != null);
         return new TemplateManagerContainer(windowId, playerInventory, this);
     }
 
@@ -84,8 +84,8 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT nbt) {
-        super.read(state, nbt);
+    public void load(BlockState state, CompoundTag nbt) {
+        super.load(state, nbt);
 
         if (nbt.contains(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
             itemStackHandler.deserializeNBT(nbt.getCompound(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));
@@ -93,14 +93,14 @@ public class TemplateManagerTileEntity extends TileEntity implements INamedConta
 
     @Nonnull
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
+    public CompoundTag save(CompoundTag compound) {
         compound.put(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS, itemStackHandler.serializeNBT());
-        return super.write(compound);
+        return super.save(compound);
     }
 
-    public boolean canInteractWith(PlayerEntity playerIn) {
+    public boolean canInteractWith(Player playerIn) {
         // If we are too far away (>4 blocks) from this tile entity you cannot use it
-        return ! isRemoved() && playerIn.getDistanceSq(Vector3d.copy(pos).add(0.5D, 0.5D, 0.5D)) <= 64D;
+        return ! isRemoved() && playerIn.distanceToSqr(Vec3.atLowerCornerOf(worldPosition).add(0.5D, 0.5D, 0.5D)) <= 64D;
     }
 
     @Nonnull

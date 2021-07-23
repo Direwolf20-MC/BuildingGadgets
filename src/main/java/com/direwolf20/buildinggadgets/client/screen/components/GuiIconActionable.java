@@ -2,15 +2,15 @@ package com.direwolf20.buildinggadgets.client.screen.components;
 
 import com.direwolf20.buildinggadgets.client.OurSounds;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
 
 import java.awt.*;
 import java.util.function.Predicate;
@@ -32,7 +32,7 @@ public class GuiIconActionable extends Button {
     private ResourceLocation selectedTexture;
     private ResourceLocation deselectedTexture;
 
-    public GuiIconActionable(int x, int y, String texture, ITextComponent message, boolean isSelectable, Predicate<Boolean> action) {
+    public GuiIconActionable(int x, int y, String texture, Component message, boolean isSelectable, Predicate<Boolean> action) {
         super(x, y, 25, 25, message, (b) -> {});
         this.activeColor = deselectedColor;
         this.isSelectable = isSelectable;
@@ -51,7 +51,7 @@ public class GuiIconActionable extends Button {
      * If yo do not need to be able to select / toggle something then use this constructor as
      * you'll hit missing texture issues if you don't have an active (_selected) texture.
      */
-    public GuiIconActionable(int x, int y, String texture, ITextComponent message, Predicate<Boolean> action) {
+    public GuiIconActionable(int x, int y, String texture, Component message, Predicate<Boolean> action) {
         this(x, y, texture, message, false, action);
     }
 
@@ -68,8 +68,8 @@ public class GuiIconActionable extends Button {
     }
 
     @Override
-    public void playDownSound(SoundHandler soundHandler) {
-        soundHandler.play(SimpleSound.master(OurSounds.BEEP.getSound(), selected ? .6F: 1F));
+    public void playDownSound(SoundManager soundHandler) {
+        soundHandler.play(SimpleSoundInstance.forUI(OurSounds.BEEP.getSound(), selected ? .6F: 1F));
     }
 
     @Override
@@ -84,7 +84,7 @@ public class GuiIconActionable extends Button {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTick) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float partialTick) {
         if( !visible )
             return;
 
@@ -98,10 +98,10 @@ public class GuiIconActionable extends Button {
         RenderSystem.enableTexture();
 
         RenderSystem.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, alpha);
-        Minecraft.getInstance().getTextureManager().bindTexture(selected ? selectedTexture : deselectedTexture);
+        Minecraft.getInstance().getTextureManager().bind(selected ? selectedTexture : deselectedTexture);
         blit(matrices, this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
 
         if( mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height )
-            drawString(matrices, Minecraft.getInstance().fontRenderer, this.getMessage().getString(), mouseX > (Minecraft.getInstance().getMainWindow().getScaledWidth() / 2) ?  mouseX + 2 : mouseX - Minecraft.getInstance().fontRenderer.getStringWidth(getMessage().getString()), mouseY - 10, activeColor.getRGB());
+            drawString(matrices, Minecraft.getInstance().font, this.getMessage().getString(), mouseX > (Minecraft.getInstance().getWindow().getGuiScaledWidth() / 2) ?  mouseX + 2 : mouseX - Minecraft.getInstance().font.width(getMessage().getString()), mouseY - 10, activeColor.getRGB());
     }
 }

@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tainted.building.tilesupport;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 /**
@@ -22,7 +22,7 @@ public interface ITileDataSerializer extends IForgeRegistryEntry<ITileDataSerial
      * @throws IllegalArgumentException If the {@link ITileEntityData} implementation is not supported by this serializer or
      *         if a persisted save is attempted to be retrieved non-persistently or vice-versa.
      */
-    CompoundNBT serialize(ITileEntityData data, boolean persisted);
+    CompoundTag serialize(ITileEntityData data, boolean persisted);
 
     /**
      * Deserializes an {@link ITileEntityData} from the given {@link CompoundNBT}.
@@ -32,5 +32,5 @@ public interface ITileDataSerializer extends IForgeRegistryEntry<ITileDataSerial
      * @return The {@link ITileEntityData} representing the serialized data in the {@link CompoundNBT}.
      * @throws IllegalArgumentException If the data does not match the format of this serializer or if a persisted save is attempted to be retrieved non-persistently or vice-versa.
      */
-    ITileEntityData deserialize(CompoundNBT tagCompound, boolean persisted);
+    ITileEntityData deserialize(CompoundTag tagCompound, boolean persisted);
 }

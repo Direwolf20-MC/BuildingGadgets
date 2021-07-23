@@ -17,16 +17,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.ItemRenderer;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.item.ItemStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.util.text.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderTooltipEvent;
@@ -36,6 +36,10 @@ import org.lwjgl.opengl.GL11;
 
 import java.util.Comparator;
 import java.util.List;
+
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.TextComponent;
 
 /**
  * This class was adapted from code written by Vazkii
@@ -56,13 +60,13 @@ public class EventTooltip {
         EventTooltip.cache.setCache(cache);
     }
 
-    public static void addTemplatePadding(ItemStack stack, List<ITextComponent> tooltip) {
+    public static void addTemplatePadding(ItemStack stack, List<Component> tooltip) {
         //This method extends the tooltip box size to fit the item's we will render in onDrawTooltip
         Minecraft mc = Minecraft.getInstance();
-        if (mc.world == null || mc.player == null) //populateSearchTreeManager...
+        if (mc.level == null || mc.player == null) //populateSearchTreeManager...
             return;
 
-        mc.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+        mc.level.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(templateKey -> {
                 Template template = provider.getTemplateForKey(templateKey);
                 IItemIndex index = InventoryHelper.index(stack, mc.player);
@@ -70,7 +74,7 @@ public class EventTooltip {
                 BuildContext buildContext = BuildContext.builder()
                         .stack(stack)
                         .player(mc.player)
-                        .build(mc.world);
+                        .build(mc.level);
 
                 TemplateHeader header = template.getHeaderAndForceMaterials(buildContext);
                 MaterialList list = header.getRequiredItems();
@@ -83,11 +87,11 @@ public class EventTooltip {
                     int lines = (((count - 1) / STACKS_PER_LINE) + 1) * 2;
                     int width = Math.min(STACKS_PER_LINE, count) * 18;
                     String spaces = PLACE_HOLDER;
-                    while (mc.fontRenderer.getStringWidth(spaces) < width)
+                    while (mc.font.width(spaces) < width)
                         spaces += " ";
 
                     for (int j = 0; j < lines; j++)
-                        tooltip.add(new StringTextComponent(spaces));
+                        tooltip.add(new TextComponent(spaces));
                 }
             });
         });
@@ -101,19 +105,19 @@ public class EventTooltip {
         //This method will draw items on the tooltip
         ItemStack stack = event.getStack();
         Minecraft mc = Minecraft.getInstance();
-        MatrixStack matrices = event.getMatrixStack();
+        PoseStack matrices = event.getMatrixStack();
 
-        if( mc.world == null || mc.player == null )
+        if( mc.level == null || mc.player == null )
             return;
 
-        mc.world.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
+        mc.level.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
             stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(templateKey -> {
                 Template template = provider.getTemplateForKey(templateKey);
                 IItemIndex index = InventoryHelper.index(stack, mc.player);
                 BuildContext buildContext = BuildContext.builder()
                         .stack(stack)
                         .player(mc.player)
-                        .build(mc.world);
+                        .build(mc.level);
                 TemplateHeader header = template.getHeaderAndForceMaterials(buildContext);
                 MaterialList list = header.getRequiredItems();
                 if (list == null)
@@ -127,12 +131,12 @@ public class EventTooltip {
                 int by = event.getY();
                 int j = 0;
                 int totalMissing = 0;
-                List<? extends ITextProperties> tooltip = event.getLines();
-                FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-                for (ITextProperties s : tooltip) {
+                List<? extends FormattedText> tooltip = event.getLines();
+                Font fontRenderer = Minecraft.getInstance().font;
+                for (FormattedText s : tooltip) {
                     if (s.getString().trim().equals(PLACE_HOLDER))
                         break;
-                    by += fontRenderer.FONT_HEIGHT;
+                    by += fontRenderer.lineHeight;
                 }
                 //add missing offset because the Stack is 16 by 16 as a render, not 9 by 9
                 //needs to be 8 instead of 7, so that there is a one pixel padding to the text, just as there is between stacks
@@ -165,45 +169,45 @@ public class EventTooltip {
         });
     }
 
-    private static int renderRequiredBlocks(MatrixStack matrices, ItemStack itemStack, int x, int y, int count, int req) {
+    private static int renderRequiredBlocks(PoseStack matrices, ItemStack itemStack, int x, int y, int count, int req) {
         Minecraft mc = Minecraft.getInstance();
         ItemRenderer render = mc.getItemRenderer();
 
         String s1 = req == Integer.MAX_VALUE ? "\u221E" : Integer.toString(req);
-        int w1 = mc.fontRenderer.getStringWidth(s1);
+        int w1 = mc.font.width(s1);
 
         boolean hasReq = req > 0;
 
-        render.zLevel += 500f;
-        render.renderItemAndEffectIntoGUI(mc.player, itemStack, x, y);
-        render.renderItemOverlays(mc.fontRenderer, itemStack, x, y);
-        render.zLevel -= 500f;
+        render.blitOffset += 500f;
+        render.renderAndDecorateItem(mc.player, itemStack, x, y);
+        render.renderGuiItemDecorations(mc.font, itemStack, x, y);
+        render.blitOffset -= 500f;
 
-        matrices.push();
-        matrices.translate(x + 8 - w1 / 4f, y + (hasReq ? 12 : 14), render.zLevel + 800.0F);
+        matrices.pushPose();
+        matrices.translate(x + 8 - w1 / 4f, y + (hasReq ? 12 : 14), render.blitOffset + 800.0F);
         matrices.scale(.5f, .5f, 0);
-        IRenderTypeBuffer.Impl irendertypebuffer$impl = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
-        mc.fontRenderer.renderString(s1, 0, 0, 0xFFFFFF, true, matrices.getLast().getMatrix(), irendertypebuffer$impl, false, 0, 15728880);
-        matrices.pop();
+        MultiBufferSource.BufferSource irendertypebuffer$impl = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+        mc.font.drawInBatch(s1, 0, 0, 0xFFFFFF, true, matrices.last().pose(), irendertypebuffer$impl, false, 0, 15728880);
+        matrices.popPose();
 
         int missingCount = 0;
         if (hasReq) {
             if (count < req) {
                 String fs = Integer.toString(req - count);
                 String s2 = "(" + fs + ")";
-                int w2 = mc.fontRenderer.getStringWidth(s2);
+                int w2 = mc.font.width(s2);
 
-                matrices.push();
-                matrices.translate(x + 8 - w2 / 4f, y + 17, render.zLevel + 800.0F);
+                matrices.pushPose();
+                matrices.translate(x + 8 - w2 / 4f, y + 17, render.blitOffset + 800.0F);
                 matrices.scale(.5f, .5f, 0);
-                mc.fontRenderer.renderString(s2, 0, 0, 0xFF0000, true, matrices.getLast().getMatrix(), irendertypebuffer$impl, false, 0, 15728880);
-                matrices.pop();
+                mc.font.drawInBatch(s2, 0, 0, 0xFF0000, true, matrices.last().pose(), irendertypebuffer$impl, false, 0, 15728880);
+                matrices.popPose();
 
                 missingCount = (req - count);
             }
         }
 
-        irendertypebuffer$impl.finish();
+        irendertypebuffer$impl.endBatch();
         return missingCount;
     }
 }

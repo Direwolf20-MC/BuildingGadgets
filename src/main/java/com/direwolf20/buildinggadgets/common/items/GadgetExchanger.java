@@ -34,33 +34,33 @@ import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.LinkedHashMultiset;
 import com.google.common.collect.Multiset;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceContext.BlockMode;
-import net.minecraft.util.math.RayTraceContext.FluidMode;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.ClipContext.Block;
+import net.minecraft.world.level.ClipContext.Fluid;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -100,7 +100,7 @@ public class GadgetExchanger extends AbstractGadget {
     }
 
     @Override
-    public int getItemEnchantability() {
+    public int getEnchantmentValue() {
         return 3;
     }
 
@@ -121,25 +121,25 @@ public class GadgetExchanger extends AbstractGadget {
 
     private static void setToolMode(ItemStack tool, ExchangingModes mode) {
         //Store the tool's mode in NBT as a string
-        CompoundNBT tagCompound = tool.getOrCreateTag();
+        CompoundTag tagCompound = tool.getOrCreateTag();
         tagCompound.putString("mode", mode.toString());
     }
 
     public static ExchangingModes getToolMode(ItemStack tool) {
-        CompoundNBT tagCompound = tool.getOrCreateTag();
+        CompoundTag tagCompound = tool.getOrCreateTag();
         return ExchangingModes.getFromName(tagCompound.getString("mode"));
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
-        super.addInformation(stack, world, tooltip, flag);
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, world, tooltip, flag);
         addEnergyInformation(tooltip, stack);
 
         ExchangingModes mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
                 .componentTranslation((mode == ExchangingModes.SURFACE && getConnectedArea(stack)
-                        ? TooltipTranslation.GADGET_CONNECTED.format(new TranslationTextComponent(mode.getTranslationKey()).getString())
-                        : new TranslationTextComponent(mode.getTranslationKey())))
+                        ? TooltipTranslation.GADGET_CONNECTED.format(new TranslatableComponent(mode.getTranslationKey()).getString())
+                        : new TranslatableComponent(mode.getTranslationKey())))
                 .setStyle(Styles.AQUA));
 
         tooltip.add(TooltipTranslation.GADGET_BLOCK
@@ -159,21 +159,21 @@ public class GadgetExchanger extends AbstractGadget {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        ItemStack itemstack = player.getHeldItem(hand);
-        player.setActiveHand(hand);
-        if (!world.isRemote) {
-            if (player.isSneaking()) {
-                ActionResult<Block> result = selectBlock(itemstack, player);
-                if( !result.getType().isSuccessOrConsume() ) {
-                    player.sendStatusMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getResult().getRegistryName()).setStyle(Styles.AQUA), true);
-                    return super.onItemRightClick(world, player, hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        ItemStack itemstack = player.getItemInHand(hand);
+        player.startUsingItem(hand);
+        if (!world.isClientSide) {
+            if (player.isShiftKeyDown()) {
+                InteractionResultHolder<Block> result = selectBlock(itemstack, player);
+                if( !result.getResult().consumesAction() ) {
+                    player.displayClientMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getObject().getRegistryName()).setStyle(Styles.AQUA), true);
+                    return super.use(world, player, hand);
                 }
-            } else if (player instanceof ServerPlayerEntity) {
-                exchange((ServerPlayerEntity) player, itemstack);
+            } else if (player instanceof ServerPlayer) {
+                exchange((ServerPlayer) player, itemstack);
             }
         } else {
-            if (! player.isSneaking()) {
+            if (! player.isShiftKeyDown()) {
                 BaseRenderer.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown()) {
@@ -181,7 +181,7 @@ public class GadgetExchanger extends AbstractGadget {
                 }
             }
         }
-        return new ActionResult<>(ActionResultType.SUCCESS, itemstack);
+        return new InteractionResultHolder<>(InteractionResult.SUCCESS, itemstack);
     }
 
     public void setMode(ItemStack heldItem, int modeInt) {
@@ -190,20 +190,20 @@ public class GadgetExchanger extends AbstractGadget {
         setToolMode(heldItem, mode);
     }
 
-    public static void rangeChange(PlayerEntity player, ItemStack heldItem) {
+    public static void rangeChange(Player player, ItemStack heldItem) {
         int range = getToolRange(heldItem);
         int changeAmount = (getToolMode(heldItem) == ExchangingModes.GRID || (range % 2 == 0)) ? 1 : 2;
-        if (player.isSneaking()) {
+        if (player.isShiftKeyDown()) {
             range = (range <= 1) ? Config.GADGETS.maxRange.get() : range - changeAmount;
         } else {
             range = (range >= Config.GADGETS.maxRange.get()) ? 1 : range + changeAmount;
         }
         setToolRange(heldItem, range);
-        player.sendStatusMessage(MessageTranslation.RANGE_SET.componentTranslation(range).setStyle(Styles.AQUA), true);
+        player.displayClientMessage(MessageTranslation.RANGE_SET.componentTranslation(range).setStyle(Styles.AQUA), true);
     }
 
-    private void exchange(ServerPlayerEntity player, ItemStack stack) {
-        ServerWorld world = player.getServerWorld();
+    private void exchange(ServerPlayer player, ItemStack stack) {
+        ServerLevel world = player.getLevel();
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
             return;
@@ -211,11 +211,11 @@ public class GadgetExchanger extends AbstractGadget {
         BlockData blockData = getToolBlock(heldItem);
 
         // Don't attempt to do anything if we can't actually do it.
-        BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-        TileEntity tileEntity = world.getTileEntity(lookingAt.getPos());
-        BlockState lookingAtState = player.world.getBlockState(lookingAt.getPos());
+        BlockHitResult lookingAt = VectorHelper.getLookingAt(player, stack);
+        BlockEntity tileEntity = world.getBlockEntity(lookingAt.getBlockPos());
+        BlockState lookingAtState = player.level.getBlockState(lookingAt.getBlockPos());
         Block lookAtBlock = lookingAtState.getBlock();
-        if (blockData.getState() == Blocks.AIR.getDefaultState()
+        if (blockData.getState() == Blocks.AIR.defaultBlockState()
                 || lookAtBlock == OurBlocks.EFFECT_BLOCK.get()
                 || blockData.getState() == lookingAtState
                 || tileEntity != null) {
@@ -225,7 +225,7 @@ public class GadgetExchanger extends AbstractGadget {
         // Get the anchor or build the collection
         Optional<List<BlockPos>> anchor = GadgetUtils.getAnchor(stack);
         List<BlockPos> coords = anchor.orElseGet(
-                () -> getToolMode(stack).getMode().getCollection(new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getPos(), heldItem, lookingAt.getFace(), getConnectedArea(heldItem)), player)
+                () -> getToolMode(stack).getMode().getCollection(new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getBlockPos(), heldItem, lookingAt.getDirection(), getConnectedArea(heldItem)), player)
         );
 
         if (anchor.isPresent()) {
@@ -235,7 +235,7 @@ public class GadgetExchanger extends AbstractGadget {
         IItemIndex index = InventoryHelper.index(stack, player);
 
         //TODO replace fakeWorld
-        fakeWorld.setWorldAndState(player.world, blockData.getState(), coords); // Initialize the fake world's blocks
+        fakeWorld.setWorldAndState(player.level, blockData.getState(), coords); // Initialize the fake world's blocks
         for (BlockPos coordinate : coords) {
             //Get the extended block state in the fake world Disabled to fix Chisel
             //state = state.getBlock().getExtendedState(state, fakeWorld, coordinate);
@@ -243,11 +243,11 @@ public class GadgetExchanger extends AbstractGadget {
         }
     }
 
-    private void exchangeBlock(ServerWorld world, ServerPlayerEntity player, IItemIndex index, BlockPos pos, BlockData setBlock) {
+    private void exchangeBlock(ServerLevel world, ServerPlayer player, IItemIndex index, BlockPos pos, BlockData setBlock) {
         BlockState currentBlock = world.getBlockState(pos);
         ITileEntityData data;
 
-        TileEntity te = world.getTileEntity(pos);
+        BlockEntity te = world.getBlockEntity(pos);
         if (te instanceof ConstructionBlockTileEntity) {
             data = ((ConstructionBlockTileEntity) te).getConstructionBlockData().getTileData();
             currentBlock = ((ConstructionBlockTileEntity) te).getConstructionBlockData().getState();
@@ -276,10 +276,10 @@ public class GadgetExchanger extends AbstractGadget {
                 useConstructionPaste = true;
         }
 
-        if (! player.isAllowEdit() || ! world.isBlockModifiable(player, pos))
+        if (! player.mayBuild() || ! world.mayInteract(player, pos))
             return;
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getDimensionKey(), world, pos);
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(world.dimension(), world, pos);
         BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, pos, currentBlock, player);
         if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP) || MinecraftForge.EVENT_BUS.post(e))
             return;
@@ -290,16 +290,16 @@ public class GadgetExchanger extends AbstractGadget {
             MaterialList materials = te instanceof ConstructionBlockTileEntity ? InventoryHelper.PASTE_LIST : data.getRequiredItems(
                     buildContext,
                     currentBlock,
-                    world.rayTraceBlocks(new RayTraceContext(player.getPositionVec(), Vector3d.copy(pos), BlockMode.COLLIDER, FluidMode.NONE, player)),
+                    world.clip(new ClipContext(player.position(), Vec3.atLowerCornerOf(pos), Block.COLLIDER, Fluid.NONE, player)),
                     pos);
 
             Iterator<ImmutableMultiset<IUniqueObject<?>>> it = materials.iterator();
             Multiset<IUniqueObject<?>> producedItems = LinkedHashMultiset.create();
 
-            if (buildContext.getStack().isEnchanted() && EnchantmentHelper.getEnchantmentLevel(Enchantments.SILK_TOUCH, buildContext.getStack()) > 0) {
+            if (buildContext.getStack().isEnchanted() && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, buildContext.getStack()) > 0) {
                 producedItems = it.hasNext() ? it.next() : ImmutableMultiset.of();
             } else {
-                List<ItemStack> drops = Block.getDrops(currentBlock, (ServerWorld) buildContext.getWorld(), pos, buildContext.getWorld().getTileEntity(pos));
+                List<ItemStack> drops = Block.getDrops(currentBlock, (ServerLevel) buildContext.getWorld(), pos, buildContext.getWorld().getBlockEntity(pos));
                 producedItems.addAll(drops.stream().map(UniqueItem::ofStack).collect(Collectors.toList()));
             }
 
@@ -309,7 +309,7 @@ public class GadgetExchanger extends AbstractGadget {
         }
     }
 
-    public static ItemStack getGadget(PlayerEntity player) {
+    public static ItemStack getGadget(Player player) {
         ItemStack stack = AbstractGadget.getGadget(player);
         if (!(stack.getItem() instanceof GadgetExchanger))
             return ItemStack.EMPTY;
@@ -323,13 +323,13 @@ public class GadgetExchanger extends AbstractGadget {
     }
 
     @Override
-    public boolean performRotate(ItemStack stack, PlayerEntity player) {
+    public boolean performRotate(ItemStack stack, Player player) {
         GadgetUtils.rotateOrMirrorToolBlock(stack, player, PacketRotateMirror.Operation.ROTATE);
         return true;
     }
 
     @Override
-    public boolean performMirror(ItemStack stack, PlayerEntity player) {
+    public boolean performMirror(ItemStack stack, Player player) {
         GadgetUtils.rotateOrMirrorToolBlock(stack, player, PacketRotateMirror.Operation.MIRROR);
         return true;
     }

@@ -1,18 +1,18 @@
 package com.direwolf20.buildinggadgets.common.entities;
 
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public abstract class EntityBase extends Entity {
     private int despawning = -1;
     protected BlockPos targetPos;
 
-    public EntityBase(EntityType<?> entityType, World world) {
+    public EntityBase(EntityType<?> entityType, Level world) {
         super(entityType, world);
     }
 
@@ -31,25 +31,25 @@ public abstract class EntityBase extends Entity {
     }
 
     protected boolean shouldSetDespawning() {
-        return ticksExisted > getMaxLife();
+        return tickCount > getMaxLife();
     }
 
     @Override
-    protected void readAdditional(CompoundNBT compound) {
+    protected void readAdditionalSaveData(CompoundTag compound) {
         despawning = compound.getInt(NBTKeys.ENTITY_DESPAWNING);
-        ticksExisted = compound.getInt(NBTKeys.ENTITY_TICKS_EXISTED);
-        targetPos = NBTUtil.readBlockPos(compound.getCompound(NBTKeys.ENTITY_SET_POS));
+        tickCount = compound.getInt(NBTKeys.ENTITY_TICKS_EXISTED);
+        targetPos = NbtUtils.readBlockPos(compound.getCompound(NBTKeys.ENTITY_SET_POS));
     }
 
     @Override
-    protected void writeAdditional(CompoundNBT compound) {
+    protected void addAdditionalSaveData(CompoundTag compound) {
         compound.putInt(NBTKeys.ENTITY_DESPAWNING, despawning);
-        compound.putInt(NBTKeys.ENTITY_TICKS_EXISTED, ticksExisted);
-        compound.put(NBTKeys.ENTITY_SET_POS, NBTUtil.writeBlockPos(targetPos));
+        compound.putInt(NBTKeys.ENTITY_TICKS_EXISTED, tickCount);
+        compound.put(NBTKeys.ENTITY_SET_POS, NbtUtils.writeBlockPos(targetPos));
     }
 
     @Override
-    public boolean isInRangeToRender3d(double x, double y, double z) {
+    public boolean shouldRender(double x, double y, double z) {
         return true;
     }
 }

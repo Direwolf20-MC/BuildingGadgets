@@ -2,13 +2,13 @@ package com.direwolf20.buildinggadgets.common.config;
 
 import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
 import com.google.gson.JsonObject;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipeSerializer;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapedRecipe;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 
 public class RecipeConstructionPaste extends ShapedRecipe {
 
@@ -18,12 +18,12 @@ public class RecipeConstructionPaste extends ShapedRecipe {
     }
 
     @Override
-    public ItemStack getCraftingResult(CraftingInventory craftingInventory) {
-        final ItemStack output = super.getCraftingResult(craftingInventory); // Get the default output
+    public ItemStack assemble(CraftingContainer craftingInventory) {
+        final ItemStack output = super.assemble(craftingInventory); // Get the default output
         if (!output.isEmpty()) {
             int totalPaste = 0;
-            for (int i = 0; i < craftingInventory.getSizeInventory(); i++) { // For each slot in the crafting inventory,
-                final ItemStack ingredient = craftingInventory.getStackInSlot(i); // Get the ingredient in the slot
+            for (int i = 0; i < craftingInventory.getContainerSize(); i++) { // For each slot in the crafting inventory,
+                final ItemStack ingredient = craftingInventory.getItem(i); // Get the ingredient in the slot
                 if (ingredient.getItem() instanceof ConstructionPasteContainer) // If it's a Paste Container,
                     totalPaste += ConstructionPasteContainer.getPasteAmount(ingredient);
             }
@@ -33,17 +33,17 @@ public class RecipeConstructionPaste extends ShapedRecipe {
     }
 
     @Override
-    public IRecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<?> getSerializer() {
         return Serializer.INSTANCE;
     }
 
     public static final class Serializer extends ShapedRecipe.Serializer {
         public static final Serializer INSTANCE = new Serializer();
         @Override
-        public ShapedRecipe read(ResourceLocation recipeId, JsonObject json) {
-            ShapedRecipe recipe = super.read(recipeId, json);
+        public ShapedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
+            ShapedRecipe recipe = super.fromJson(recipeId, json);
             return new RecipeConstructionPaste(recipe.getId(), recipe.getGroup(), recipe.getRecipeWidth(),
-                    recipe.getRecipeHeight(), recipe.getIngredients(), recipe.getRecipeOutput());
+                    recipe.getRecipeHeight(), recipe.getIngredients(), recipe.getResultItem());
         }
     }
 }

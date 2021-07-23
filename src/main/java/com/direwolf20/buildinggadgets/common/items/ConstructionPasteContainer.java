@@ -6,19 +6,19 @@ import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
 import javax.annotation.Nullable;
@@ -50,7 +50,7 @@ public class ConstructionPasteContainer extends Item {
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundNBT nbt) {
+    public ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
         return new PasteContainerCapabilityProvider(stack);
     }
 
@@ -71,24 +71,24 @@ public class ConstructionPasteContainer extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        ItemStack heldItem = player.getHeldItem(hand);
-        player.setActiveHand(hand);
-        PlayerInventory inv = player.inventory;
-        if (!world.isRemote) {
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        ItemStack heldItem = player.getItemInHand(hand);
+        player.startUsingItem(hand);
+        Inventory inv = player.inventory;
+        if (!world.isClientSide) {
             for (int i = 0; i < 36; ++i) { // todo: this is awful. hardcoded int
-                ItemStack itemStack = inv.getStackInSlot(i);
+                ItemStack itemStack = inv.getItem(i);
                 if (itemStack.getItem() instanceof ConstructionPaste) {
                     InventoryHelper.addPasteToContainer(player, itemStack);
                 }
             }
         }
-        return new ActionResult<>(ActionResultType.SUCCESS, heldItem);
+        return new InteractionResultHolder<>(InteractionResult.SUCCESS, heldItem);
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flag) {
-        TranslationTextComponent key = isCreative
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> list, TooltipFlag flag) {
+        TranslatableComponent key = isCreative
                 ? TooltipTranslation.PASTECONTAINER_CREATIVE_AMOUNT.componentTranslation()
                 : TooltipTranslation.PASTECONTAINER_AMOUNT.componentTranslation(getPasteCount(stack), getMaxCapacity());
 

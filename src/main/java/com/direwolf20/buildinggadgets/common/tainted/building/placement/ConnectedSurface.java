@@ -2,10 +2,10 @@ package com.direwolf20.buildinggadgets.common.tainted.building.placement;
 
 import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.google.common.collect.AbstractIterator;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -14,23 +14,23 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 
 public class ConnectedSurface implements Iterable<BlockPos> {
-    public static ConnectedSurface create(Region searchingRegion, IBlockReader world, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
-        return create(searchingRegion, world, pos -> pos.offset(side), searchingCenter, side, range, fuzzy);
+    public static ConnectedSurface create(Region searchingRegion, BlockGetter world, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
+        return create(searchingRegion, world, pos -> pos.relative(side), searchingCenter, side, range, fuzzy);
     }
 
-    public static ConnectedSurface create(Region searchingRegion, IBlockReader world, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
+    public static ConnectedSurface create(Region searchingRegion, BlockGetter world, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, Direction side, int range, boolean fuzzy) {
         return create(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
     }
 
-    public static ConnectedSurface create(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, boolean fuzzy) {
+    public static ConnectedSurface create(BlockGetter world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, boolean fuzzy) {
         return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, fuzzy);
     }
 
-    public static ConnectedSurface create(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, BiPredicate<BlockState, BlockPos> predicate) {
+    public static ConnectedSurface create(BlockGetter world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, BiPredicate<BlockState, BlockPos> predicate) {
         return new ConnectedSurface(world, searchingRegion, searching2referenceMapper, searchingCenter, side, predicate);
     }
 
-    private final IBlockReader world;
+    private final BlockGetter world;
     private final Region searchingRegion;
     private final Function<BlockPos, BlockPos> searching2referenceMapper;
     private final BlockPos searchingCenter;
@@ -39,7 +39,7 @@ public class ConnectedSurface implements Iterable<BlockPos> {
     private final Direction side;
     private final BiPredicate<BlockState, BlockPos> predicate;
 
-    ConnectedSurface(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, boolean fuzzy) {
+    ConnectedSurface(BlockGetter world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, boolean fuzzy) {
         this(world, searchingRegion, searching2referenceMapper, searchingCenter, side,
                 (filter, pos) -> {
                     BlockState reference = world.getBlockState(searching2referenceMapper.apply(pos));
@@ -49,7 +49,7 @@ public class ConnectedSurface implements Iterable<BlockPos> {
                 });
     }
 
-    ConnectedSurface(IBlockReader world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, BiPredicate<BlockState, BlockPos> predicate) {
+    ConnectedSurface(BlockGetter world, Region searchingRegion, Function<BlockPos, BlockPos> searching2referenceMapper, BlockPos searchingCenter, @Nullable Direction side, BiPredicate<BlockState, BlockPos> predicate) {
         this.world = world;
         this.searchingRegion = searchingRegion;
         this.searching2referenceMapper = searching2referenceMapper;
@@ -102,7 +102,7 @@ public class ConnectedSurface implements Iterable<BlockPos> {
                             addNeighbour(neighbor);
                         } else {
                             for (int k = - 1; k <= 1; k++) {
-                                BlockPos neighbor = current.add(i, j, k);
+                                BlockPos neighbor = current.offset(i, j, k);
                                 addNeighbour(neighbor);
                             }
                         }
@@ -131,11 +131,11 @@ public class ConnectedSurface implements Iterable<BlockPos> {
     public BlockPos perpendicularSurfaceOffset(BlockPos pos, Direction.Axis intersector, int i, int j) {
         switch (intersector) {
             case X:
-                return pos.add(0, i, j);
+                return pos.offset(0, i, j);
             case Y:
-                return pos.add(i, 0, j);
+                return pos.offset(i, 0, j);
             case Z:
-                return pos.add(i, j, 0);
+                return pos.offset(i, j, 0);
         }
         throw new IllegalArgumentException("Unknown facing " + intersector);
     }

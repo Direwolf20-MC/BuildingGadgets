@@ -7,7 +7,7 @@ import com.direwolf20.buildinggadgets.common.network.packets.SplitPacketUpdateTe
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider;
 import com.direwolf20.buildinggadgets.common.tainted.template.Template;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -18,6 +18,8 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider.IUpdateListener;
 
 public final class SaveTemplateProvider implements ITemplateProvider {
     private final Supplier<TemplateSave> save;
@@ -73,7 +75,7 @@ public final class SaveTemplateProvider implements ITemplateProvider {
         return key.getTemplateId(this::getFreeId);
     }
 
-    public boolean requestRemoteUpdate(ITemplateKey key, ServerPlayerEntity playerEntity) {
+    public boolean requestRemoteUpdate(ITemplateKey key, ServerPlayer playerEntity) {
         return requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> playerEntity));
     }
 

@@ -2,18 +2,18 @@ package com.direwolf20.buildinggadgets.common.tileentities;
 
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 import net.minecraftforge.client.model.data.ModelProperty;
 
 import javax.annotation.Nonnull;
 
-public class ConstructionBlockTileEntity extends TileEntity {
+public class ConstructionBlockTileEntity extends BlockEntity {
 
     private BlockData blockState;
     public static final ModelProperty<BlockState> FACADE_STATE = new ModelProperty<>();
@@ -53,57 +53,57 @@ public class ConstructionBlockTileEntity extends TileEntity {
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT nbt) {
-        super.read(state, nbt);
+    public void load(BlockState state, CompoundTag nbt) {
+        super.load(state, nbt);
         blockState = BlockData.tryDeserialize(nbt.getCompound(NBTKeys.TE_CONSTRUCTION_STATE), true);
         markDirtyClient();
     }
 
     @Nonnull
     @Override
-    public CompoundNBT write(@Nonnull CompoundNBT compound) {
+    public CompoundTag save(@Nonnull CompoundTag compound) {
         if (blockState != null) {
             compound.put(NBTKeys.TE_CONSTRUCTION_STATE, blockState.serialize(true));
         }
-        return super.write(compound);
+        return super.save(compound);
     }
 
     private void markDirtyClient() {
-        markDirty();
-        if (getWorld() != null) {
-            BlockState state = getWorld().getBlockState(getPos());
-            getWorld().notifyBlockUpdate(getPos(), state, state, 3);
+        setChanged();
+        if (getLevel() != null) {
+            BlockState state = getLevel().getBlockState(getBlockPos());
+            getLevel().sendBlockUpdated(getBlockPos(), state, state, 3);
         }
     }
 
     @Nonnull
     @Override
-    public CompoundNBT getUpdateTag() {
-        CompoundNBT updateTag = super.getUpdateTag();
-        write(updateTag);
+    public CompoundTag getUpdateTag() {
+        CompoundTag updateTag = super.getUpdateTag();
+        save(updateTag);
         return updateTag;
     }
 
     @Override
-    public SUpdateTileEntityPacket getUpdatePacket() {
-        CompoundNBT nbtTag = new CompoundNBT();
-        write(nbtTag);
-        return new SUpdateTileEntityPacket(getPos(), 1, nbtTag);
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        CompoundTag nbtTag = new CompoundTag();
+        save(nbtTag);
+        return new ClientboundBlockEntityDataPacket(getBlockPos(), 1, nbtTag);
     }
 
 
 
     @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket packet) {
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
         BlockData oldMimicBlock = getConstructionBlockData();
-        CompoundNBT tagCompound = packet.getNbtCompound();
+        CompoundTag tagCompound = packet.getTag();
         super.onDataPacket(net, packet);
         deserializeNBT(tagCompound);
 
-        if (world != null && world.isRemote) {
+        if (level != null && level.isClientSide) {
             // If needed send a render update.
             if (! getConstructionBlockData().equals(oldMimicBlock)) {
-                world.markChunkDirty(getPos(), this.getTileEntity());
+                level.blockEntityChanged(getBlockPos(), this.getTileEntity());
             }
         }
     }

@@ -2,17 +2,17 @@ package com.direwolf20.buildinggadgets.common.tainted.inventory;
 
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.Registry;
 import net.minecraft.world.IServerWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -25,15 +25,15 @@ public class InventoryLinker {
     /**
      * Perform the link to the inventory
      */
-    public static Result linkInventory(World world, ItemStack stack, BlockRayTraceResult trace) {
-        TileEntity tileEntity = world.getTileEntity(trace.getPos());
+    public static Result linkInventory(Level world, ItemStack stack, BlockHitResult trace) {
+        BlockEntity tileEntity = world.getBlockEntity(trace.getBlockPos());
         if (tileEntity == null || !tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).isPresent()) {
             return Result.fail(MessageTranslation.INVALID_BOUND_TILE);
         }
 
         // remove if the existing linked inventory is the same block we're setting now.
         boolean removed = getLinkedInventory(world, stack)
-                .map(e -> removeIfSame(stack, trace.getPos()))
+                .map(e -> removeIfSame(stack, trace.getBlockPos()))
                 .orElse(false);
 
         if (removed) {
@@ -41,9 +41,9 @@ public class InventoryLinker {
         }
 
         // Set the relevant data
-        CompoundNBT compound = stack.getOrCreateTag();
-        compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, world.getDimensionKey().getLocation().toString());
-        compound.put(NBTKeys.REMOTE_INVENTORY_POS, NBTUtil.writeBlockPos(trace.getPos()));
+        CompoundTag compound = stack.getOrCreateTag();
+        compound.putString(NBTKeys.REMOTE_INVENTORY_DIM, world.dimension().location().toString());
+        compound.put(NBTKeys.REMOTE_INVENTORY_POS, NbtUtils.writeBlockPos(trace.getBlockPos()));
         return Result.success();
     }
 
@@ -51,12 +51,12 @@ public class InventoryLinker {
      * Directly fetch the linked inventory if the tile exists (removes if not) and if the tile holds
      * a capability.
      */
-    public static LazyOptional<IItemHandler> getLinkedInventory(World world, BlockPos pos, RegistryKey<World> registry, @Nullable ItemStack stack) {
-        if (!world.getDimensionKey().equals(registry)) {
+    public static LazyOptional<IItemHandler> getLinkedInventory(Level world, BlockPos pos, ResourceKey<Level> registry, @Nullable ItemStack stack) {
+        if (!world.dimension().equals(registry)) {
             return LazyOptional.empty();
         }
 
-        TileEntity tileEntity = world.getTileEntity(pos);
+        BlockEntity tileEntity = world.getBlockEntity(pos);
         if (tileEntity == null) {
             // Unlink if the tile entity no longer exists
             if (stack != null) {
@@ -69,8 +69,8 @@ public class InventoryLinker {
         return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
     }
 
-    public static LazyOptional<IItemHandler> getLinkedInventory(World world, ItemStack stack) {
-        Pair<BlockPos, RegistryKey<World>> dataFromStack = getDataFromStack(stack);
+    public static LazyOptional<IItemHandler> getLinkedInventory(Level world, ItemStack stack) {
+        Pair<BlockPos, ResourceKey<Level>> dataFromStack = getDataFromStack(stack);
         if (dataFromStack == null) {
             return LazyOptional.empty();
         }
@@ -85,7 +85,7 @@ public class InventoryLinker {
      */
     private static boolean removeIfSame(ItemStack stack, BlockPos pos) {
         // This isn't ideal that we have to do this twice
-        Pair<BlockPos, RegistryKey<World>> dataFromStack = getDataFromStack(stack);
+        Pair<BlockPos, ResourceKey<Level>> dataFromStack = getDataFromStack(stack);
         if (dataFromStack == null) {
             return false;
         }
@@ -102,7 +102,7 @@ public class InventoryLinker {
      * Removes the keys from the stack to allow for lazy contains
      */
     public static void removeDataFromStack(ItemStack stack) {
-        CompoundNBT compound = stack.getOrCreateTag();
+        CompoundTag compound = stack.getOrCreateTag();
         compound.remove(NBTKeys.REMOTE_INVENTORY_POS);
         compound.remove(NBTKeys.REMOTE_INVENTORY_DIM);
     }
@@ -111,15 +111,15 @@ public class InventoryLinker {
      * Retrieves the link data from the ItemStack
      */
     @Nullable
-    public static Pair<BlockPos, RegistryKey<World>> getDataFromStack(ItemStack stack) {
-        CompoundNBT compound = stack.getOrCreateTag();
+    public static Pair<BlockPos, ResourceKey<Level>> getDataFromStack(ItemStack stack) {
+        CompoundTag compound = stack.getOrCreateTag();
         if (!compound.contains(NBTKeys.REMOTE_INVENTORY_POS) || !compound.contains(NBTKeys.REMOTE_INVENTORY_DIM)) {
             return null;
         }
 
-        RegistryKey<World> dimKey = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(compound.getString(NBTKeys.REMOTE_INVENTORY_DIM)));
+        ResourceKey<Level> dimKey = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(compound.getString(NBTKeys.REMOTE_INVENTORY_DIM)));
         return Pair.of(
-            NBTUtil.readBlockPos(compound.getCompound(NBTKeys.REMOTE_INVENTORY_POS)),
+            NbtUtils.readBlockPos(compound.getCompound(NBTKeys.REMOTE_INVENTORY_POS)),
             dimKey
         );
     }

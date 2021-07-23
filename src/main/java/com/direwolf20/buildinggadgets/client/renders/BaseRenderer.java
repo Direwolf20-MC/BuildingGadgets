@@ -7,22 +7,22 @@ import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects
 import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.direwolf20.buildinggadgets.common.world.MockTileEntityRenderWorld;
 import com.google.common.collect.Multiset;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import com.mojang.math.Matrix4f;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -33,15 +33,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 public abstract class BaseRenderer {
-    public static final BlockState AIR = Blocks.AIR.getDefaultState();
+    public static final BlockState AIR = Blocks.AIR.defaultBlockState();
 
     private static final MockTileEntityRenderWorld tileEntityWorld = new MockTileEntityRenderWorld();
     private static final MockBuilderWorld builderWorld = new MockBuilderWorld();
-    private static final Set<TileEntity> invalidTileEntities = new HashSet<>();
+    private static final Set<BlockEntity> invalidTileEntities = new HashSet<>();
 
     private static final RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
 
-    public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
+    public void render(RenderWorldLastEvent evt, Player player, ItemStack heldItem) {
         // This is necessary to prevent issues with not rendering the overlay's at all (when Botania being present) - See #329 for more information
         bindBlocks();
 
@@ -50,40 +50,40 @@ public abstract class BaseRenderer {
     }
 
     private void bindBlocks() {
-        getMc().getTextureManager().bindTexture(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+        getMc().getTextureManager().bind(InventoryMenu.BLOCK_ATLAS);
     }
 
-    private static void renderLinkedInventoryOutline(RenderWorldLastEvent evt, ItemStack item, PlayerEntity player) {
-        Pair<BlockPos, RegistryKey<World>> dataFromStack = InventoryLinker.getDataFromStack(item);
+    private static void renderLinkedInventoryOutline(RenderWorldLastEvent evt, ItemStack item, Player player) {
+        Pair<BlockPos, ResourceKey<Level>> dataFromStack = InventoryLinker.getDataFromStack(item);
         if (dataFromStack == null) {
             return;
         }
 
-        if (!player.world.getDimensionKey().equals(dataFromStack.getValue())) {
+        if (!player.level.dimension().equals(dataFromStack.getValue())) {
             return;
         }
 
         BlockPos pos = dataFromStack.getKey();
-        Vector3d renderPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView()
+        Vec3 renderPos = getMc().gameRenderer.getMainCamera().getPosition()
                 .subtract(pos.getX(), pos.getY(), pos.getZ())
                 .add(.005f, .005f, .005f);
 
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
 
-        MatrixStack stack = evt.getMatrixStack();
-        stack.push();
-        stack.translate(-renderPos.getX(), -renderPos.getY(), -renderPos.getZ());
+        PoseStack stack = evt.getMatrixStack();
+        stack.pushPose();
+        stack.translate(-renderPos.x(), -renderPos.y(), -renderPos.z());
         stack.scale(1.01f, 1.01f, 1.01f);
 
-        renderBoxSolid(stack.getLast().getMatrix(), buffer.getBuffer(OurRenderTypes.BlockOverlay), BlockPos.ZERO, 0, 1, 0, .35f);
+        renderBoxSolid(stack.last().pose(), buffer.getBuffer(OurRenderTypes.BlockOverlay), BlockPos.ZERO, 0, 1, 0, .35f);
 
-        stack.pop();
+        stack.popPose();
         RenderSystem.disableDepthTest();
-        buffer.finish(); // @mcp: finish (mcp) = draw (yarn)
+        buffer.endBatch(); // @mcp: finish (mcp) = draw (yarn)
     }
 
 
-    int getEnergy(PlayerEntity player, ItemStack heldItem) {
+    int getEnergy(Player player, ItemStack heldItem) {
         LazyOptional<IEnergyStorage> energy = heldItem.getCapability(CapabilityEnergy.ENERGY);
         if (player.isCreative() || !energy.isPresent())
             return Integer.MAX_VALUE;
@@ -91,11 +91,11 @@ public abstract class BaseRenderer {
         return energy.map(IEnergyStorage::getEnergyStored).orElse(0);
     }
 
-    protected static void renderMissingBlock(Matrix4f matrix, IVertexBuilder builder, BlockPos pos) {
+    protected static void renderMissingBlock(Matrix4f matrix, VertexConsumer builder, BlockPos pos) {
         renderBoxSolid(matrix, builder, pos, 1f, 0f, 0f, 0.35f);
     }
 
-    protected static void renderBoxSolid(Matrix4f matrix, IVertexBuilder builder, BlockPos pos, float r, float g, float b, float alpha) {
+    protected static void renderBoxSolid(Matrix4f matrix, VertexConsumer builder, BlockPos pos, float r, float g, float b, float alpha) {
         double x = pos.getX() - 0.001;
         double y = pos.getY() - 0.001;
         double z = pos.getZ() - 0.001;
@@ -106,7 +106,7 @@ public abstract class BaseRenderer {
         renderBoxSolid(matrix, builder, x, y, z, xEnd, yEnd, zEnd, r, g, b, alpha);
     }
 
-    protected static void renderBoxSolid(Matrix4f matrix, IVertexBuilder builder, double x, double y, double z, double xEnd, double yEnd, double zEnd, float red, float green, float blue, float alpha) {
+    protected static void renderBoxSolid(Matrix4f matrix, VertexConsumer builder, double x, double y, double z, double xEnd, double yEnd, double zEnd, float red, float green, float blue, float alpha) {
         //careful: mc want's it's vertices to be defined CCW - if you do it the other way around weird cullling issues will arise
         //CCW herby counts as if you were looking at it from the outside
         float startX = (float) x;
@@ -119,40 +119,40 @@ public abstract class BaseRenderer {
 //        float startX = 0, startY = 0, startZ = -1, endX = 1, endY = 1, endZ = 0;
 
         //down
-        builder.pos(matrix, startX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, endX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, endX, startY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, startX, startY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, startX, startY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, endX, startY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, endX, startY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, startX, startY, endZ).color(red, green, blue, alpha).endVertex();
 
         //up
-        builder.pos(matrix, startX, endY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, startX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, endX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, endX, endY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, startX, endY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, startX, endY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, endX, endY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, endX, endY, startZ).color(red, green, blue, alpha).endVertex();
 
         //east
-        builder.pos(matrix, startX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, startX, endY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, endX, endY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, endX, startY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, startX, startY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, startX, endY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, endX, endY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, endX, startY, startZ).color(red, green, blue, alpha).endVertex();
 
         //west
-        builder.pos(matrix, startX, startY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, endX, startY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, endX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, startX, endY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, startX, startY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, endX, startY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, endX, endY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, startX, endY, endZ).color(red, green, blue, alpha).endVertex();
 
         //south
-        builder.pos(matrix, endX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, endX, endY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, endX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, endX, startY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, endX, startY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, endX, endY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, endX, endY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, endX, startY, endZ).color(red, green, blue, alpha).endVertex();
 
         //north
-        builder.pos(matrix, startX, startY, startZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, startX, startY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, startX, endY, endZ).color(red, green, blue, alpha).endVertex();
-        builder.pos(matrix, startX, endY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, startX, startY, startZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, startX, startY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, startX, endY, endZ).color(red, green, blue, alpha).endVertex();
+        builder.vertex(matrix, startX, endY, startZ).color(red, green, blue, alpha).endVertex();
     }
 
     /**

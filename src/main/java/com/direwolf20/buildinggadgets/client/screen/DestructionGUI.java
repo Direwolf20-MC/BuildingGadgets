@@ -7,15 +7,15 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketDestructionGUI;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.util.Mth;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fml.ForgeI18n;
 
 import javax.annotation.Nonnull;
@@ -38,7 +38,7 @@ public class DestructionGUI extends Screen {
     private final ItemStack destructionTool;
 
     public DestructionGUI(ItemStack tool) {
-        super(new StringTextComponent("Destruction Gui?!?"));
+        super(new TextComponent("Destruction Gui?!?"));
         this.destructionTool = tool;
     }
 
@@ -49,20 +49,20 @@ public class DestructionGUI extends Screen {
         int x = width / 2;
         int y = height / 2;
 
-        this.addButton(confirm = new Button((x - 30) + 32, y + 65, 60, 20, new TranslationTextComponent(GuiMod.getLangKeySingle("confirm")), b -> {
+        this.addButton(confirm = new Button((x - 30) + 32, y + 65, 60, 20, new TranslatableComponent(GuiMod.getLangKeySingle("confirm")), b -> {
             if (Minecraft.getInstance().player == null) {
                 return;
             }
 
             if (isWithinBounds()) {
                 PacketHandler.sendToServer(new PacketDestructionGUI(left.getValueInt(), right.getValueInt(), up.getValueInt(), down.getValueInt(), depth.getValueInt()));
-                this.closeScreen();
+                this.onClose();
             }
             else
-                Minecraft.getInstance().player.sendStatusMessage(MessageTranslation.DESTRCUT_TOO_LARGE.componentTranslation(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), true);
+                Minecraft.getInstance().player.displayClientMessage(MessageTranslation.DESTRCUT_TOO_LARGE.componentTranslation(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), true);
         }));
 
-        this.addButton(new Button((x - 30) - 32, y + 65, 60, 20, new TranslationTextComponent(GuiMod.getLangKeySingle("cancel")), b -> closeScreen()));
+        this.addButton(new Button((x - 30) - 32, y + 65, 60, 20, new TranslatableComponent(GuiMod.getLangKeySingle("cancel")), b -> onClose()));
 
         sliders.clear();
         sliders.add(depth   = new GuiDestructionSlider(x - (GuiDestructionSlider.width / 2), y - (GuiDestructionSlider.height / 2), GuiTranslation.SINGLE_DEPTH.format() + ":", GadgetDestruction.getToolValue(destructionTool, "depth")));
@@ -113,7 +113,7 @@ public class DestructionGUI extends Screen {
     }
 
     @Override
-    public void render(@Nonnull MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
+    public void render(@Nonnull PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
         super.render(matrices, mouseX, mouseY, partialTicks);
 
         drawCenteredString(matrices, font, this.sizeString, width / 2, (height / 2) + 40, this.isValidSize ? 0x00FF00 : 0xFF2000);
@@ -146,9 +146,9 @@ public class DestructionGUI extends Screen {
 
         GuiDestructionSlider(int x, int y, String prefix, int current) {
             super(
-                    x, y, width, height, new StringTextComponent(String.format("%s ", prefix)), new StringTextComponent(""), min, max, current, false, true, Color.DARK_GRAY, null,
+                    x, y, width, height, new TextComponent(String.format("%s ", prefix)), new TextComponent(""), min, max, current, false, true, Color.DARK_GRAY, null,
                     (slider, amount) -> {
-                        slider.setValue(MathHelper.clamp(slider.getValueInt() + amount, min, max));
+                        slider.setValue(Mth.clamp(slider.getValueInt() + amount, min, max));
                         slider.updateSlider();
                     }
             );

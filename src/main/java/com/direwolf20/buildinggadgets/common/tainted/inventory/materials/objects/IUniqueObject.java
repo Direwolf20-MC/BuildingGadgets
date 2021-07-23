@@ -2,9 +2,9 @@ package com.direwolf20.buildinggadgets.common.tainted.inventory.materials.object
 
 import com.direwolf20.buildinggadgets.common.tainted.inventory.handle.IObjectHandle;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.util.List;

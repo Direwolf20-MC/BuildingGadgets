@@ -1,19 +1,22 @@
 package com.direwolf20.buildinggadgets.client.renderer;
 
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.Atlases;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.inventory.container.PlayerContainer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix3f;
-import net.minecraft.util.math.vector.Matrix4f;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.resources.ResourceLocation;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import java.util.OptionalDouble;
+
+import net.minecraft.client.renderer.RenderStateShard.LineStateShard;
+import net.minecraft.client.renderer.RenderType.CompositeRenderType;
 
 public class OurRenderTypes extends RenderType {
     // Dummy
@@ -21,70 +24,70 @@ public class OurRenderTypes extends RenderType {
         super(name, format, p_i225992_3_, p_i225992_4_, p_i225992_5_, p_i225992_6_, runnablePre, runnablePost);
     }
 
-    private static final LineState THICK_LINES = new LineState(OptionalDouble.of(3.0D));
+    private static final LineStateShard THICK_LINES = new LineStateShard(OptionalDouble.of(3.0D));
 
-    public static final RenderType RenderBlock = makeType("GadgetRenderBlock",
-            DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 256,
-            RenderType.State.getBuilder()
-                    .shadeModel(SHADE_ENABLED)
-                    .lightmap(LIGHTMAP_ENABLED)
-                    .texture(BLOCK_SHEET_MIPPED) //BLOCK_SHEET_MIPPED (mcp) = BLOCK_SHEET_MIPPED (yarn)
-                    .layer(field_239235_M_) // view_offset_z_layering
-                    .transparency(TRANSLUCENT_TRANSPARENCY)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_DISABLED)
-                    .writeMask(COLOR_DEPTH_WRITE)
-                    .build(false));
+    public static final RenderType RenderBlock = create("GadgetRenderBlock",
+            DefaultVertexFormat.BLOCK, GL11.GL_QUADS, 256,
+            RenderType.CompositeState.builder()
+                    .setShadeModelState(SMOOTH_SHADE)
+                    .setLightmapState(LIGHTMAP)
+                    .setTextureState(BLOCK_SHEET_MIPPED) //BLOCK_SHEET_MIPPED (mcp) = BLOCK_SHEET_MIPPED (yarn)
+                    .setLayeringState(VIEW_OFFSET_Z_LAYERING) // view_offset_z_layering
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setDepthTestState(LEQUAL_DEPTH_TEST)
+                    .setCullState(NO_CULL)
+                    .setWriteMaskState(COLOR_DEPTH_WRITE)
+                    .createCompositeState(false));
 
-    public static final RenderType MissingBlockOverlay = makeType("GadgetMissingBlockOverlay",
-            DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 256,
-            RenderType.State.getBuilder()
-                    .layer(field_239235_M_) // view_offset_z_layering
-                    .transparency(TRANSLUCENT_TRANSPARENCY)
-                    .texture(NO_TEXTURE)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_DISABLED)
-                    .lightmap(LIGHTMAP_DISABLED)
-                    .writeMask(COLOR_WRITE)
-                    .build(false));
+    public static final RenderType MissingBlockOverlay = create("GadgetMissingBlockOverlay",
+            DefaultVertexFormat.POSITION_COLOR, GL11.GL_QUADS, 256,
+            RenderType.CompositeState.builder()
+                    .setLayeringState(VIEW_OFFSET_Z_LAYERING) // view_offset_z_layering
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setTextureState(NO_TEXTURE)
+                    .setDepthTestState(LEQUAL_DEPTH_TEST)
+                    .setCullState(NO_CULL)
+                    .setLightmapState(NO_LIGHTMAP)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(false));
 
-    public static final RenderType CopyGadgetLines = makeType("GadgetCopyLines",
-            DefaultVertexFormats.POSITION_COLOR, GL11.GL_LINE_STRIP, 256,
-            RenderType.State.getBuilder()
-                    .line(new LineState(OptionalDouble.of(2.0D)))
-                    .layer(field_239235_M_) // view_offset_z_layering
-                    .transparency(TRANSLUCENT_TRANSPARENCY)
-                    .texture(NO_TEXTURE)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_DISABLED)
-                    .lightmap(LIGHTMAP_DISABLED)
-                    .writeMask(COLOR_WRITE)
-                    .build(false));
+    public static final RenderType CopyGadgetLines = create("GadgetCopyLines",
+            DefaultVertexFormat.POSITION_COLOR, GL11.GL_LINE_STRIP, 256,
+            RenderType.CompositeState.builder()
+                    .setLineState(new LineStateShard(OptionalDouble.of(2.0D)))
+                    .setLayeringState(VIEW_OFFSET_Z_LAYERING) // view_offset_z_layering
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setTextureState(NO_TEXTURE)
+                    .setDepthTestState(LEQUAL_DEPTH_TEST)
+                    .setCullState(NO_CULL)
+                    .setLightmapState(NO_LIGHTMAP)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(false));
 
-    public static final RenderType CopyPasteRenderBlock = makeType("CopyPasteRenderBlock",
-            DefaultVertexFormats.BLOCK, GL11.GL_QUADS, 256,
-            RenderType.State.getBuilder()
-                    .shadeModel(SHADE_ENABLED)
-                    .lightmap(LIGHTMAP_ENABLED)
-                    .texture(BLOCK_SHEET_MIPPED) //BLOCK_SHEET_MIPPED (mcp) = BLOCK_SHEET_MIPPED (yarn)
-                    .layer(field_239235_M_) // view_offset_z_layering
-                    .transparency(TRANSLUCENT_TRANSPARENCY)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_DISABLED)
-                    .writeMask(COLOR_WRITE)
-                    .build(false));
+    public static final RenderType CopyPasteRenderBlock = create("CopyPasteRenderBlock",
+            DefaultVertexFormat.BLOCK, GL11.GL_QUADS, 256,
+            RenderType.CompositeState.builder()
+                    .setShadeModelState(SMOOTH_SHADE)
+                    .setLightmapState(LIGHTMAP)
+                    .setTextureState(BLOCK_SHEET_MIPPED) //BLOCK_SHEET_MIPPED (mcp) = BLOCK_SHEET_MIPPED (yarn)
+                    .setLayeringState(VIEW_OFFSET_Z_LAYERING) // view_offset_z_layering
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setDepthTestState(LEQUAL_DEPTH_TEST)
+                    .setCullState(NO_CULL)
+                    .setWriteMaskState(COLOR_WRITE)
+                    .createCompositeState(false));
 
-    public static final RenderType BlockOverlay = makeType("BGBlockOverlay",
-            DefaultVertexFormats.POSITION_COLOR, GL11.GL_QUADS, 256,
-            RenderType.State.getBuilder()
-                    .layer(field_239235_M_) // view_offset_z_layering
-                    .transparency(TRANSLUCENT_TRANSPARENCY)
-                    .texture(NO_TEXTURE)
-                    .depthTest(DEPTH_LEQUAL)
-                    .cull(CULL_ENABLED)
-                    .lightmap(LIGHTMAP_DISABLED)
-                    .writeMask(COLOR_DEPTH_WRITE)
-                    .build(false));
+    public static final RenderType BlockOverlay = create("BGBlockOverlay",
+            DefaultVertexFormat.POSITION_COLOR, GL11.GL_QUADS, 256,
+            RenderType.CompositeState.builder()
+                    .setLayeringState(VIEW_OFFSET_Z_LAYERING) // view_offset_z_layering
+                    .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                    .setTextureState(NO_TEXTURE)
+                    .setDepthTestState(LEQUAL_DEPTH_TEST)
+                    .setCullState(CULL)
+                    .setLightmapState(NO_LIGHTMAP)
+                    .setWriteMaskState(COLOR_DEPTH_WRITE)
+                    .createCompositeState(false));
 
     /**
      * This is used for rendering blocks with an alpha value as the alpha currently isn't
@@ -92,30 +95,30 @@ public class OurRenderTypes extends RenderType {
      *
      * Literally just raps the buffer so we can render a different RenderType
      */
-    public static class MultiplyAlphaRenderTypeBuffer implements IRenderTypeBuffer
+    public static class MultiplyAlphaRenderTypeBuffer implements MultiBufferSource
     {
-        private final IRenderTypeBuffer inner;
+        private final MultiBufferSource inner;
         private final float constantAlpha;
 
-        public MultiplyAlphaRenderTypeBuffer(IRenderTypeBuffer inner, float constantAlpha)
+        public MultiplyAlphaRenderTypeBuffer(MultiBufferSource inner, float constantAlpha)
         {
             this.inner = inner;
             this.constantAlpha = constantAlpha;
         }
 
         @Override
-        public IVertexBuilder getBuffer(RenderType type)
+        public VertexConsumer getBuffer(RenderType type)
         {
             RenderType localType = type;
-            if (localType instanceof Type) {
+            if (localType instanceof CompositeRenderType) {
                 // all of this requires a lot of AT's so be aware of that on ports
-                ResourceLocation texture = ((Type) localType).renderState.texture.texture
-                        .orElse(PlayerContainer.LOCATION_BLOCKS_TEXTURE);
+                ResourceLocation texture = ((CompositeRenderType) localType).state.textureState.texture
+                        .orElse(InventoryMenu.BLOCK_ATLAS);
 
-                localType = getEntityTranslucentCull(texture);
+                localType = entityTranslucentCull(texture);
             }
-            else if (localType.toString().equals(Atlases.getTranslucentCullBlockType().toString())) {
-                localType = Atlases.getTranslucentCullBlockType();
+            else if (localType.toString().equals(Sheets.translucentCullBlockSheet().toString())) {
+                localType = Sheets.translucentCullBlockSheet();
             }
 
             return new MultiplyAlphaVertexBuilder(inner.getBuffer(localType), this.constantAlpha);
@@ -124,61 +127,61 @@ public class OurRenderTypes extends RenderType {
         /**
          * Required for modifying the alpha value.
          */
-        public static class MultiplyAlphaVertexBuilder implements IVertexBuilder
+        public static class MultiplyAlphaVertexBuilder implements VertexConsumer
         {
-            private final IVertexBuilder inner;
+            private final VertexConsumer inner;
             private final float constantAlpha;
 
-            public MultiplyAlphaVertexBuilder(IVertexBuilder inner, float constantAlpha)
+            public MultiplyAlphaVertexBuilder(VertexConsumer inner, float constantAlpha)
             {
                 this.inner = inner;
                 this.constantAlpha = constantAlpha;
             }
 
             @Override
-            public IVertexBuilder pos(double x, double y, double z)
+            public VertexConsumer vertex(double x, double y, double z)
             {
-                return inner.pos(x,y,z);
+                return inner.vertex(x,y,z);
             }
 
             @Override
-            public IVertexBuilder pos(Matrix4f matrixIn, float x, float y, float z)
+            public VertexConsumer vertex(Matrix4f matrixIn, float x, float y, float z)
             {
-                return inner.pos(matrixIn, x, y, z);
+                return inner.vertex(matrixIn, x, y, z);
             }
 
             @Override
-            public IVertexBuilder color(int red, int green, int blue, int alpha)
+            public VertexConsumer color(int red, int green, int blue, int alpha)
             {
                 return inner.color(red,green,blue, (int) (alpha * constantAlpha));
             }
 
             @Override
-            public IVertexBuilder tex(float u, float v) {
-                return inner.tex(u, v);
+            public VertexConsumer uv(float u, float v) {
+                return inner.uv(u, v);
             }
 
             @Override
-            public IVertexBuilder overlay(int u, int v)
+            public VertexConsumer overlayCoords(int u, int v)
             {
-                return inner.overlay(u, v);
+                return inner.overlayCoords(u, v);
             }
 
 
             @Override
-            public IVertexBuilder lightmap(int u, int v)
+            public VertexConsumer uv2(int u, int v)
             {
-                return inner.lightmap(u, v);
+                return inner.uv2(u, v);
             }
 
             @Override
-            public IVertexBuilder normal(float x, float y, float z)
+            public VertexConsumer normal(float x, float y, float z)
             {
                 return inner.normal(x,y,z);
             }
 
             @Override
-            public IVertexBuilder normal(Matrix3f matrixIn, float x, float y, float z)
+            public VertexConsumer normal(Matrix3f matrixIn, float x, float y, float z)
             {
                 return inner.normal(matrixIn, x, y, z);
             }

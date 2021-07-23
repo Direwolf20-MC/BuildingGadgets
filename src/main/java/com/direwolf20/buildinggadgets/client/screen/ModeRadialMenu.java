@@ -23,21 +23,21 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import com.mojang.blaze3d.platform.Lighting;
+import net.minecraft.client.KeyMapping;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraftforge.fml.ForgeI18n;
 import org.lwjgl.opengl.GL11;
 
@@ -64,7 +64,7 @@ public class ModeRadialMenu extends Screen {
     private final List<Button> conditionalButtons = new ArrayList<>();
 
     public ModeRadialMenu(ItemStack stack) {
-        super(new StringTextComponent(""));
+        super(new TextComponent(""));
 
         if (stack.getItem() instanceof AbstractGadget)
             setSocketable(stack);
@@ -138,13 +138,13 @@ public class ModeRadialMenu extends Screen {
             }
             if (!isDestruction) {
                 int widthSlider = 82;
-                GuiSliderInt sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, GuiTranslation.SINGLE_RANGE.componentTranslation().append(new StringTextComponent(": ")), new StringTextComponent(""), 1, Config.GADGETS.maxRange.get(),
+                GuiSliderInt sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, GuiTranslation.SINGLE_RANGE.componentTranslation().append(new TextComponent(": ")), new TextComponent(""), 1, Config.GADGETS.maxRange.get(),
                         GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
                     GuiSliderInt sliderI = (GuiSliderInt) slider;
                     sendRangeUpdate(sliderI.getValueInt());
                 }, (slider, amount) -> {
                     int value = slider.getValueInt();
-                    int valueNew = MathHelper.clamp(value + amount, 1, Config.GADGETS.maxRange.get());
+                    int valueNew = Mth.clamp(value + amount, 1, Config.GADGETS.maxRange.get());
                     sendRangeUpdate(valueNew);
                     slider.setValue(valueNew);
                     slider.updateSlider();
@@ -160,11 +160,11 @@ public class ModeRadialMenu extends Screen {
 
                 assert getMinecraft().player != null;
 
-                getMinecraft().player.closeScreen();
+                getMinecraft().player.closeContainer();
                 if (GadgetCopyPaste.getToolMode(tool) == GadgetCopyPaste.ToolMode.COPY)
-                    getMinecraft().displayGuiScreen(new CopyGUI(tool));
+                    getMinecraft().setScreen(new CopyGUI(tool));
                 else
-                    getMinecraft().displayGuiScreen(new PasteGUI(tool));
+                    getMinecraft().setScreen(new PasteGUI(tool));
                 return true;
             }));
             addButton(new PositionedIconActionable(RadialTranslation.OPEN_MATERIAL_LIST, "copypaste_materiallist", right, send -> {
@@ -173,8 +173,8 @@ public class ModeRadialMenu extends Screen {
 
                 assert getMinecraft().player != null;
 
-                getMinecraft().player.closeScreen();
-                getMinecraft().displayGuiScreen(new MaterialListGUI(tool));
+                getMinecraft().player.closeContainer();
+                getMinecraft().setScreen(new MaterialListGUI(tool));
                 return true;
             }));
         }
@@ -222,7 +222,7 @@ public class ModeRadialMenu extends Screen {
         int padding = 10;
         boolean isDestruction = tool.getItem() instanceof GadgetDestruction;
         ScreenPosition right = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.RIGHT;
-        for (Widget widget : buttons) {
+        for (AbstractWidget widget : buttons) {
             if (!(widget instanceof PositionedIconActionable))
                 continue;
 
@@ -241,13 +241,13 @@ public class ModeRadialMenu extends Screen {
             button.setWidth(dim);
             button.setHeight(dim);
             if (isDestruction)
-                button.y = height / 2 + (isRight ? 10 : -button.getHeightRealms() - 10);
+                button.y = height / 2 + (isRight ? 10 : -button.getHeight() - 10);
             else
                 button.x = width / 2 + offset;
         }
         posRight = resetPos(tool, padding, posRight);
         posLeft = resetPos(tool, padding, posLeft);
-        for (Widget widget : buttons) {
+        for (AbstractWidget widget : buttons) {
             if (!(widget instanceof PositionedIconActionable))
                 continue;
 
@@ -277,7 +277,7 @@ public class ModeRadialMenu extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mx, int my, float partialTicks) {
+    public void render(PoseStack matrices, int mx, int my, float partialTicks) {
         float stime = 5F;
         float fract = Math.min(stime, timeIn + partialTicks) / stime;
         int x = width / 2;
@@ -285,11 +285,11 @@ public class ModeRadialMenu extends Screen {
 
         int radiusMin = 26;
         int radiusMax = 60;
-        double dist = new Vector3d(x, y, 0).distanceTo(new Vector3d(mx, my, 0));
+        double dist = new Vec3(x, y, 0).distanceTo(new Vec3(mx, my, 0));
         boolean inRange = false;
         if (segments != 0) {
             inRange = dist > radiusMin && dist < radiusMax;
-            for (Widget button : buttons) {
+            for (AbstractWidget button : buttons) {
                 if (button instanceof PositionedIconActionable)
                     ((PositionedIconActionable) button).setFaded(inRange);
             }
@@ -394,7 +394,7 @@ public class ModeRadialMenu extends Screen {
 
             int xsp = xp - 4;
             int ysp = yp;
-            int width = font.getStringWidth(name);
+            int width = font.width(name);
 
             if (xsp < x)
                 xsp -= width - 8;
@@ -403,29 +403,29 @@ public class ModeRadialMenu extends Screen {
 
             Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
             if (data.isSelected())
-                font.drawStringWithShadow(matrices, name, xsp + (data.isCentralized() ? width / 2f - 4 : 0), ysp, color.getRGB());
+                font.drawShadow(matrices, name, xsp + (data.isCentralized() ? width / 2f - 4 : 0), ysp, color.getRGB());
 
             double mod = 0.7;
             int xdp = (int) ((xp - x) * mod + x);
             int ydp = (int) ((yp - y) * mod + y);
 
-            getMinecraft().getTextureManager().bindTexture(signs.get(i));
+            getMinecraft().getTextureManager().bind(signs.get(i));
             RenderSystem.color4f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
-            getMinecraft().getTextureManager().bindTexture(signs.get(i));
+            getMinecraft().getTextureManager().bind(signs.get(i));
             blit(matrices, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
         }
 
         RenderSystem.enableRescaleNormal();
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-        RenderHelper.enableStandardItemLighting();
+        Lighting.turnBackOn();
 
         float s = 2.25F * fract;
         RenderSystem.scalef(s, s, s);
         RenderSystem.translatef(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
-        itemRenderer.renderItemAndEffectIntoGUI(tool, 0, 0);
+        itemRenderer.renderAndDecorateItem(tool, 0, 0);
 
-        RenderHelper.disableStandardItemLighting();
+        Lighting.turnOff();
         RenderSystem.disableBlend();
         RenderSystem.disableRescaleNormal();
 
@@ -451,7 +451,7 @@ public class ModeRadialMenu extends Screen {
                 mode = GadgetCopyPaste.ToolMode.values()[slotSelected].getTranslation().format();
 
             assert getMinecraft().player != null;
-            getMinecraft().player.sendStatusMessage(MessageTranslation.MODE_SET.componentTranslation(mode).setStyle(Styles.AQUA), true);
+            getMinecraft().player.displayClientMessage(MessageTranslation.MODE_SET.componentTranslation(mode).setStyle(Styles.AQUA), true);
 
             PacketHandler.sendToServer(new PacketToggleMode(slotSelected));
             OurSounds.BEEP.playSound();
@@ -466,14 +466,14 @@ public class ModeRadialMenu extends Screen {
 
     @Override
     public void tick() {
-        if (!InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), KeyBindings.menuSettings.getKey().getKeyCode())) {
-            closeScreen();
+        if (!InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), KeyBindings.menuSettings.getKey().getValue())) {
+            onClose();
             changeMode();
         }
 
-        ImmutableSet<KeyBinding> set = ImmutableSet.of(getMinecraft().gameSettings.keyBindForward, getMinecraft().gameSettings.keyBindLeft, getMinecraft().gameSettings.keyBindBack, getMinecraft().gameSettings.keyBindRight, getMinecraft().gameSettings.keyBindSneak, getMinecraft().gameSettings.keyBindSprint, getMinecraft().gameSettings.keyBindJump);
-        for (KeyBinding k : set)
-            KeyBinding.setKeyBindState(k.getKey(), k.isKeyDown());
+        ImmutableSet<KeyMapping> set = ImmutableSet.of(getMinecraft().options.keyUp, getMinecraft().options.keyLeft, getMinecraft().options.keyDown, getMinecraft().options.keyRight, getMinecraft().options.keyShift, getMinecraft().options.keySprint, getMinecraft().options.keyJump);
+        for (KeyMapping k : set)
+            KeyMapping.set(k.getKey(), k.isDown());
 
         timeIn++;
         ItemStack tool = getGadget();

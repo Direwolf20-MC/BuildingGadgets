@@ -4,7 +4,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import io.netty.buffer.Unpooled;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -15,9 +15,9 @@ import java.util.function.Function;
 
 final class PacketDecoder<MSG> {
     private final Cache<Short, PendingPacket> pendingPackets;
-    private final Function<PacketBuffer, MSG> decoder;
+    private final Function<FriendlyByteBuf, MSG> decoder;
 
-    PacketDecoder(Function<PacketBuffer, MSG> decoder) {
+    PacketDecoder(Function<FriendlyByteBuf, MSG> decoder) {
         pendingPackets = CacheBuilder.newBuilder()
                 .expireAfterAccess(1, TimeUnit.MINUTES)
                 .build();
@@ -72,9 +72,9 @@ final class PacketDecoder<MSG> {
         }
 
         private Optional<MSG> assemble() {
-            PacketBuffer payloadBuffer = new PacketBuffer(Unpooled.buffer(Short.MAX_VALUE, Integer.MAX_VALUE));
+            FriendlyByteBuf payloadBuffer = new FriendlyByteBuf(Unpooled.buffer(Short.MAX_VALUE, Integer.MAX_VALUE));
             for (SplitPacket packet : partialPackets) {
-                PacketBuffer payload = packet.getPayload();
+                FriendlyByteBuf payload = packet.getPayload();
                 payloadBuffer.writeBytes(payload);
             }
             return Optional.of(decoder.apply(payloadBuffer));

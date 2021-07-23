@@ -1,25 +1,25 @@
 package com.direwolf20.buildinggadgets.common.world;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MockBuilderWorld implements IBlockReader {
+public class MockBuilderWorld implements BlockGetter {
     private Set<BlockPos> positions;
     private BlockState state;
-    private World realWorld;
-    private final BlockState AIR = Blocks.AIR.getDefaultState();
+    private Level realWorld;
+    private final BlockState AIR = Blocks.AIR.defaultBlockState();
 
-    public void setWorldAndState(World rWorld, BlockState setBlock, Collection<BlockPos> coordinates) {
+    public void setWorldAndState(Level rWorld, BlockState setBlock, Collection<BlockPos> coordinates) {
         this.state = setBlock;
         this.realWorld = rWorld;
         if (coordinates instanceof Set)
@@ -30,7 +30,7 @@ public class MockBuilderWorld implements IBlockReader {
 
     @Nullable
     @Override
-    public TileEntity getTileEntity(BlockPos pos) {
+    public BlockEntity getBlockEntity(BlockPos pos) {
         return null;
     }
 

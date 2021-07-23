@@ -3,15 +3,15 @@ package com.direwolf20.buildinggadgets.client.renderer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Floats;
-import com.mojang.blaze3d.vertex.DefaultColorVertexBuilder;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import com.mojang.blaze3d.vertex.IVertexConsumer;
+import com.mojang.blaze3d.vertex.DefaultedVertexConsumer;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.BufferVertexConsumer;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.ints.IntArrays;
-import net.minecraft.client.renderer.GLAllocation;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import com.mojang.blaze3d.platform.MemoryTracker;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormatElement;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.logging.log4j.LogManager;
@@ -23,7 +23,7 @@ import java.nio.FloatBuffer;
 import java.util.BitSet;
 import java.util.List;
 
-public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVertexConsumer {
+public class DireBufferBuilder extends DefaultedVertexConsumer implements BufferVertexConsumer {
     private static final Logger LOGGER = LogManager.getLogger();
     private ByteBuffer byteBuffer;
     private final List<DireBufferBuilder.DrawState> drawStates = Lists.newArrayList();
@@ -42,11 +42,11 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
     private boolean isDrawing;
 
     public DireBufferBuilder(int bufferSizeIn) {
-        this.byteBuffer = GLAllocation.createDirectByteBuffer(bufferSizeIn * 4);
+        this.byteBuffer = MemoryTracker.createByteBuffer(bufferSizeIn * 4);
     }
 
     protected void growBuffer() {
-        this.growBuffer(this.vertexFormat.getSize());
+        this.growBuffer(this.vertexFormat.getVertexSize());
     }
 
     private void growBuffer(int increaseAmount) {
@@ -54,7 +54,7 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
             int i = this.byteBuffer.capacity();
             int j = i + roundUpPositive(increaseAmount);
             LOGGER.debug("Needed to grow BufferBuilder buffer: Old size {} bytes, new size {} bytes.", i, j);
-            ByteBuffer bytebuffer = GLAllocation.createDirectByteBuffer(j);
+            ByteBuffer bytebuffer = MemoryTracker.createByteBuffer(j);
             this.byteBuffer.position(0);
             bytebuffer.put(this.byteBuffer);
             bytebuffer.rewind();
@@ -83,7 +83,7 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
         float[] afloat = new float[i];
 
         for (int j = 0; j < i; ++j) {
-            afloat[j] = getDistanceSq(floatbuffer, cameraX, cameraY, cameraZ, this.vertexFormat.getIntegerSize(), this.renderedBytes / 4 + j * this.vertexFormat.getSize());
+            afloat[j] = getDistanceSq(floatbuffer, cameraX, cameraY, cameraZ, this.vertexFormat.getIntegerSize(), this.renderedBytes / 4 + j * this.vertexFormat.getVertexSize());
         }
 
         int[] aint = new int[i];
@@ -96,7 +96,7 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
             return Floats.compare(afloat[p_227830_1_], afloat[p_227830_2_]);
         });
         BitSet bitset = new BitSet();
-        FloatBuffer floatbuffer1 = GLAllocation.createDirectFloatBuffer(this.vertexFormat.getIntegerSize() * 4);
+        FloatBuffer floatbuffer1 = MemoryTracker.createFloatBuffer(this.vertexFormat.getIntegerSize() * 4);
 
         for (int l = bitset.nextClearBit(0); l < aint.length; l = bitset.nextClearBit(l + 1)) {
             int i1 = aint[l];
@@ -133,7 +133,7 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
     public DireBufferBuilder.State getVertexState() {
         this.byteBuffer.limit(this.nextElementBytes);
         this.byteBuffer.position(this.renderedBytes);
-        ByteBuffer bytebuffer = ByteBuffer.allocate(this.vertexCount * this.vertexFormat.getSize());
+        ByteBuffer bytebuffer = ByteBuffer.allocate(this.vertexCount * this.vertexFormat.getVertexSize());
         bytebuffer.put(this.byteBuffer);
         this.byteBuffer.clear();
         return new DireBufferBuilder.State(bytebuffer, this.vertexFormat);
@@ -168,8 +168,8 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
         this.byteBuffer.clear();
         VertexFormat vertexformat = state.stateVertexFormat;
         this.setVertexFormat(vertexformat);
-        this.vertexCount = i / vertexformat.getSize();
-        this.nextElementBytes = this.renderedBytes + this.vertexCount * vertexformat.getSize();
+        this.vertexCount = i / vertexformat.getVertexSize();
+        this.nextElementBytes = this.renderedBytes + this.vertexCount * vertexformat.getVertexSize();
     }
 
     public void begin(int glMode, VertexFormat format) {
@@ -188,8 +188,8 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
     private void setVertexFormat(VertexFormat vertexFormatIn) {
         if (this.vertexFormat != vertexFormatIn) {
             this.vertexFormat = vertexFormatIn;
-            boolean flag = vertexFormatIn == DefaultVertexFormats.POSITION_COLOR_TEX_LIGHTMAP; //POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL;
-            boolean flag1 = vertexFormatIn == DefaultVertexFormats.BLOCK;
+            boolean flag = vertexFormatIn == DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP; //POSITION_COLOR_TEXTURE_OVERLAY_LIGHT_NORMAL;
+            boolean flag1 = vertexFormatIn == DefaultVertexFormat.BLOCK;
             this.fastFormat = flag || flag1;
             this.fullFormat = flag;
         }
@@ -201,7 +201,7 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
         } else {
             this.isDrawing = false;
             this.drawStates.add(new DireBufferBuilder.DrawState(this.vertexFormat, this.vertexCount, this.drawMode));
-            this.renderedBytes += this.vertexCount * this.vertexFormat.getSize();
+            this.renderedBytes += this.vertexCount * this.vertexFormat.getVertexSize();
             this.vertexCount = 0;
             this.vertexFormatElement = null;
             this.vertexFormatIndex = 0;
@@ -229,32 +229,32 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
         }
     }
 
-    public void nextVertexFormatIndex() {
+    public void nextElement() {
         ImmutableList<VertexFormatElement> immutablelist = this.vertexFormat.getElements();
         this.vertexFormatIndex = (this.vertexFormatIndex + 1) % immutablelist.size();
-        this.nextElementBytes += this.vertexFormatElement.getSize();
+        this.nextElementBytes += this.vertexFormatElement.getByteSize();
         VertexFormatElement vertexformatelement = immutablelist.get(this.vertexFormatIndex);
         this.vertexFormatElement = vertexformatelement;
         if (vertexformatelement.getUsage() == VertexFormatElement.Usage.PADDING) {
-            this.nextVertexFormatIndex();
+            this.nextElement();
         }
 
-        if (this.defaultColor && this.vertexFormatElement.getUsage() == VertexFormatElement.Usage.COLOR) {
-            IVertexConsumer.super.color(this.defaultRed, this.defaultGreen, this.defaultBlue, this.defaultAlpha);
+        if (this.defaultColorSet && this.vertexFormatElement.getUsage() == VertexFormatElement.Usage.COLOR) {
+            BufferVertexConsumer.super.color(this.defaultR, this.defaultG, this.defaultB, this.defaultA);
         }
 
     }
 
-    public IVertexBuilder color(int red, int green, int blue, int alpha) {
-        if (this.defaultColor) {
+    public VertexConsumer color(int red, int green, int blue, int alpha) {
+        if (this.defaultColorSet) {
             throw new IllegalStateException();
         } else {
-            return IVertexConsumer.super.color(red, green, blue, alpha);
+            return BufferVertexConsumer.super.color(red, green, blue, alpha);
         }
     }
 
-    public void addVertex(float x, float y, float z, float red, float green, float blue, float alpha, float texU, float texV, int overlayUV, int lightmapUV, float normalX, float normalY, float normalZ) {
-        if (this.defaultColor) {
+    public void vertex(float x, float y, float z, float red, float green, float blue, float alpha, float texU, float texV, int overlayUV, int lightmapUV, float normalX, float normalY, float normalZ) {
+        if (this.defaultColorSet) {
             throw new IllegalStateException();
         } else if (this.fastFormat) {
             this.putFloat(0, x);
@@ -277,20 +277,20 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
 
             this.putShort(i + 0, (short) (lightmapUV & '\uffff'));
             this.putShort(i + 2, (short) (lightmapUV >> 16 & '\uffff'));
-            this.putByte(i + 4, IVertexConsumer.normalInt(normalX)); // @mcp: func_227846_a_ = normalInt
-            this.putByte(i + 5, IVertexConsumer.normalInt(normalY));
-            this.putByte(i + 6, IVertexConsumer.normalInt(normalZ));
+            this.putByte(i + 4, BufferVertexConsumer.normalIntValue(normalX)); // @mcp: normalIntValue = normalInt
+            this.putByte(i + 5, BufferVertexConsumer.normalIntValue(normalY));
+            this.putByte(i + 6, BufferVertexConsumer.normalIntValue(normalZ));
             this.nextElementBytes += i + 8;
             this.endVertex();
         } else {
-            super.addVertex(x, y, z, red, green, blue, alpha, texU, texV, overlayUV, lightmapUV, normalX, normalY, normalZ);
+            super.vertex(x, y, z, red, green, blue, alpha, texU, texV, overlayUV, lightmapUV, normalX, normalY, normalZ);
         }
     }
 
     public Pair<DireBufferBuilder.DrawState, ByteBuffer> getNextBuffer() {
         DireBufferBuilder.DrawState bufferbuilder$drawstate = this.drawStates.get(this.drawStateIndex++);
         this.byteBuffer.position(this.uploadedBytes);
-        this.uploadedBytes += bufferbuilder$drawstate.getVertexCount() * bufferbuilder$drawstate.getFormat().getSize();
+        this.uploadedBytes += bufferbuilder$drawstate.getVertexCount() * bufferbuilder$drawstate.getFormat().getVertexSize();
         this.byteBuffer.limit(this.uploadedBytes);
         if (this.drawStateIndex == this.drawStates.size() && this.vertexCount == 0) {
             this.reset();
@@ -317,7 +317,7 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
         this.drawStateIndex = 0;
     }
 
-    public VertexFormatElement getCurrentElement() {
+    public VertexFormatElement currentElement() {
         if (this.vertexFormatElement == null) {
             throw new IllegalStateException("BufferBuilder not started");
         } else {
@@ -366,10 +366,10 @@ public class DireBufferBuilder extends DefaultColorVertexBuilder implements IVer
     }
 
     public void putBulkData(ByteBuffer buffer) {
-        growBuffer(buffer.limit() + this.vertexFormat.getSize());
-        this.byteBuffer.position(this.vertexCount * this.vertexFormat.getSize());
+        growBuffer(buffer.limit() + this.vertexFormat.getVertexSize());
+        this.byteBuffer.position(this.vertexCount * this.vertexFormat.getVertexSize());
         this.byteBuffer.put(buffer);
-        this.vertexCount += buffer.limit() / this.vertexFormat.getSize();
+        this.vertexCount += buffer.limit() / this.vertexFormat.getVertexSize();
     }
 
     // Forge start

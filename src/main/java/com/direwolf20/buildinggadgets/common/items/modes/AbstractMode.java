@@ -6,19 +6,19 @@ import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.StairsBlock;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.level.Level;
 
 import java.util.Comparator;
 import java.util.List;
@@ -31,13 +31,13 @@ public abstract class AbstractMode {
         this.isExchanging = isExchanging;
     }
 
-    abstract List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start);
+    abstract List<BlockPos> collect(UseContext context, Player player, BlockPos start);
 
     /**
      * Gets the collection with filters applied stopping us having to handle the filters in the actual collection
      * method from having to handle the world etc.
      */
-    public List<BlockPos> getCollection(UseContext context, PlayerEntity player) {
+    public List<BlockPos> getCollection(UseContext context, Player player) {
         BlockPos startPos = this.withOffset(context.getStartPos(), context.getHitSide(), context.isPlaceOnTop());
 
         // We don't need this unless we're using the exchanger but I also don't want to
@@ -48,7 +48,7 @@ public abstract class AbstractMode {
         return collect(context, player, startPos)
                 .stream()
                 .filter(e -> isExchanging ? this.exchangingValidator(e, lookingAtState, context) : this.validator(player, e, context))
-                .sorted(Comparator.comparing((BlockPos pos) -> player.getPosition().distanceSq(pos)))
+                .sorted(Comparator.comparing((BlockPos pos) -> player.blockPosition().distSqr(pos)))
                 .collect(Collectors.toList());
     }
 
@@ -58,11 +58,11 @@ public abstract class AbstractMode {
      * @param context the use context instance
      * @return if the block is valid
      */
-    public boolean validator(PlayerEntity player, BlockPos pos, UseContext context) {
-        if (!context.getWorldState(pos).isReplaceable(context.createBlockUseContext(player)))
+    public boolean validator(Player player, BlockPos pos, UseContext context) {
+        if (!context.getWorldState(pos).canBeReplaced(context.createBlockUseContext(player)))
             return false;
 
-        if (World.isOutsideBuildHeight(pos))
+        if (Level.isOutsideBuildHeight(pos))
             return false;
 
         return Config.GENERAL.allowOverwriteBlocks.get()
@@ -72,14 +72,14 @@ public abstract class AbstractMode {
 
     private boolean exchangingValidator(BlockPos pos, BlockState lookingAtState, UseContext context) {
         BlockState worldBlockState = context.getWorldState(pos);
-        TileEntity te = context.getWorld().getTileEntity(pos);
+        BlockEntity te = context.getWorld().getBlockEntity(pos);
 
         // No air! or water
         if( worldBlockState.getMaterial() == Material.AIR || worldBlockState.getMaterial().isLiquid() )
             return false;
 
         // No effect blocks and don't try with the same block as you're trying to exchange with
-        if (worldBlockState == OurBlocks.EFFECT_BLOCK.get().getDefaultState()
+        if (worldBlockState == OurBlocks.EFFECT_BLOCK.get().defaultBlockState()
                 || worldBlockState == context.getSetState() )
             return false;
 
@@ -88,19 +88,19 @@ public abstract class AbstractMode {
             return false;
 
         // Don't exchange bedrock
-        if (worldBlockState.getBlockHardness(context.getWorld(), pos) < 0)
+        if (worldBlockState.getDestroySpeed(context.getWorld(), pos) < 0)
             return false;
 
-        if (worldBlockState.getBlock().getDefaultState() != lookingAtState.getBlock().getDefaultState() && !context.isFuzzy())
+        if (worldBlockState.getBlock().defaultBlockState() != lookingAtState.getBlock().defaultBlockState() && !context.isFuzzy())
             return false;
 
         // Finally, ensure at least a single face is exposed.
         boolean hasSingeValid = false;
         for(Direction direction : Direction.values()) {
-            BlockPos offset = pos.offset(direction);
+            BlockPos offset = pos.relative(direction);
             BlockState state = context.getWorld().getBlockState(offset);
             if( state.isAir(context.getWorld(), offset)
-                    || (state.getShape(context.getWorld(), offset) != VoxelShapes.fullCube() && !(state.getBlock() instanceof StairsBlock))) {
+                    || (state.getShape(context.getWorld(), offset) != Shapes.block() && !(state.getBlock() instanceof StairBlock))) {
                 hasSingeValid = true;
                 break;
             }
@@ -110,7 +110,7 @@ public abstract class AbstractMode {
     }
 
     public BlockPos withOffset(BlockPos pos, Direction side, boolean placeOnTop) {
-        return placeOnTop ? pos.offset(side, 1) : pos;
+        return placeOnTop ? pos.relative(side, 1) : pos;
     }
 
     public boolean isExchanging() {
@@ -118,7 +118,7 @@ public abstract class AbstractMode {
     }
 
     public static class UseContext {
-        private final World world;
+        private final Level world;
         private final BlockState setState;
         private final BlockPos startPos;
         private final Direction hitSide;
@@ -129,7 +129,7 @@ public abstract class AbstractMode {
         private final boolean rayTraceFluid;
         private final boolean isConnected;
 
-        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean placeOnTop, boolean isConnected) {
+        public UseContext(Level world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean placeOnTop, boolean isConnected) {
             this.world = world;
             this.setState = setState;
             this.startPos = startPos;
@@ -143,15 +143,15 @@ public abstract class AbstractMode {
             this.placeOnTop = placeOnTop;
         }
 
-        public UseContext(World world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean isConnected) {
+        public UseContext(Level world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean isConnected) {
             this(world, setState, startPos, gadget, hitSide, false, isConnected);
         }
 
-        public BlockItemUseContext createBlockUseContext(PlayerEntity player) {
-            return new BlockItemUseContext(
-                    new ItemUseContext(
+        public BlockPlaceContext createBlockUseContext(Player player) {
+            return new BlockPlaceContext(
+                    new UseOnContext(
                             player,
-                            Hand.MAIN_HAND,
+                            InteractionHand.MAIN_HAND,
                             VectorHelper.getLookingAt(player, this.rayTraceFluid)
                     )
             );
@@ -165,7 +165,7 @@ public abstract class AbstractMode {
             return world.getBlockState(pos);
         }
 
-        public World getWorld() {
+        public Level getWorld() {
             return world;
         }
 

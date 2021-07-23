@@ -5,19 +5,21 @@ import com.direwolf20.buildinggadgets.common.tainted.Tainted;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.entity.TickingBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.entity.TickableBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @Tainted(reason = "Used blockData and a stupid non-centralised callback system")
-public class EffectBlockTileEntity extends TileEntity implements ITickableTileEntity {
+public class EffectBlockTileEntity extends BlockEntity implements TickingBlockEntity {
     /**
      * Even though this is called "rendered", is will be used for replacement under normal conditions.
      */
@@ -36,7 +38,7 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
         super(OurTileEntities.EFFECT_BLOCK_TILE_ENTITY.get());
     }
 
-    public void initializeData(BlockState curState, @Nullable TileEntity te, BlockData replacementBlock, Mode mode, boolean usePaste) {
+    public void initializeData(BlockState curState, @Nullable BlockEntity te, BlockData replacementBlock, Mode mode, boolean usePaste) {
         // Minecraft will reuse a tile entity object at a location where the block got removed, but the modification is still buffered, and the block got restored again
         // If we don't reset this here, the 2nd phase of REPLACE will simply finish immediately because the tile entity object is reused
         this.ticks = 0;
@@ -60,8 +62,13 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
         }
     }
 
+    @Override
+    public BlockPos getPos() {
+        return this.getBlockPos();
+    }
+
     private void complete() {
-        if (world == null || world.isRemote || mode == null || renderedBlock == null)
+        if (level == null || level.isClientSide || mode == null || renderedBlock == null)
             return;
 
         mode.onBuilderRemoved(this);
@@ -92,30 +99,30 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
     }
 
     @Override
-    public SUpdateTileEntityPacket getUpdatePacket() {
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
         // Vanilla uses the type parameter to indicate which type of tile entity (command block, skull, or beacon?) is receiving the packet, but it seems like Forge has overridden this behavior
-        return new SUpdateTileEntityPacket(pos, 0, getUpdateTag());
+        return new ClientboundBlockEntityDataPacket(worldPosition, 0, getUpdateTag());
     }
 
     @Nonnull
     @Override
-    public CompoundNBT getUpdateTag() {
-        return write(new CompoundNBT());
+    public CompoundTag getUpdateTag() {
+        return save(new CompoundTag());
     }
 
     @Override
-    public void handleUpdateTag(BlockState state, CompoundNBT tag) {
+    public void handleUpdateTag(BlockState state, CompoundTag tag) {
         deserializeNBT(tag);
     }
 
     @Override
-    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
-        deserializeNBT(pkt.getNbtCompound());
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
+        deserializeNBT(pkt.getTag());
     }
 
     @Nonnull
     @Override
-    public CompoundNBT write(@Nonnull CompoundNBT compound) {
+    public CompoundTag save(@Nonnull CompoundTag compound) {
         if (mode != null && renderedBlock != null && sourceBlock != null) {
             compound.putInt(NBTKeys.GADGET_TICKS, ticks);
             compound.putInt(NBTKeys.GADGET_MODE, mode.ordinal());
@@ -123,12 +130,12 @@ public class EffectBlockTileEntity extends TileEntity implements ITickableTileEn
             compound.put(NBTKeys.GADGET_SOURCE_BLOCK, sourceBlock.serialize(true));
             compound.putBoolean(NBTKeys.GADGET_USE_PASTE, usePaste);
         }
-        return super.write(compound);
+        return super.save(compound);
     }
 
     @Override
-    public void read(BlockState state, CompoundNBT nbt) {
-        super.read(state, nbt);
+    public void load(BlockState state, CompoundTag nbt) {
+        super.load(state, nbt);
 
         if (nbt.contains(NBTKeys.GADGET_TICKS, NBT.TAG_INT) &&
                 nbt.contains(NBTKeys.GADGET_MODE, NBT.TAG_INT) &&

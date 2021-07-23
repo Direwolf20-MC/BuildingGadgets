@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
 import com.direwolf20.buildinggadgets.common.tainted.Tainted;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;

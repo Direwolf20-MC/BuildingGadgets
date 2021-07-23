@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.tainted.template;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.NonNullSupplier;
-import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 
 import java.util.UUID;
 
@@ -43,7 +43,7 @@ public interface ITemplateProvider {
      * @param target The target to which to request the update
      * @see #requestUpdate(ITemplateKey)
      */
-    boolean requestUpdate(ITemplateKey key, PacketTarget target);
+    boolean requestUpdate(ITemplateKey key, PacketDistributor.PacketTarget target);
 
     /**
      * Requests an update <b>for<b/> the other side - aka sends an update packet to it. On the client this will send the data to the server,
@@ -59,7 +59,7 @@ public interface ITemplateProvider {
      * @param target The target for which to request an update
      * @see #requestRemoteUpdate(ITemplateKey)
      */
-    boolean requestRemoteUpdate(ITemplateKey key, PacketTarget target);
+    boolean requestRemoteUpdate(ITemplateKey key, PacketDistributor.PacketTarget target);
 
 
     /**

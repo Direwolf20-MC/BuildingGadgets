@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.util.spliterator.DelegatingSpliterator;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.IWorld;
 
 import javax.annotation.Nullable;
@@ -97,7 +97,7 @@ public final class WorldBuildView implements IBuildView {
             Optional<BlockData> dataOptional = dataFactory.apply(context, object);
             if (dataOptional.isPresent()) {
                 BlockData data = dataOptional.get();
-                action.accept(new PlacementTarget(object.add(translation), data));
+                action.accept(new PlacementTarget(object.offset(translation), data));
                 return true;
             }
             return false;

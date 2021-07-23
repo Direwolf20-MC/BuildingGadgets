@@ -9,7 +9,7 @@ import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 import java.util.Objects;
 import java.util.Spliterator;

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tainted.save;
 
 import com.direwolf20.buildinggadgets.common.tainted.save.UndoWorldSave.UndoValue;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -45,14 +45,14 @@ public class UndoWorldSave extends TimedDataSave<UndoValue> {
     }
 
     @Override
-    protected UndoValue readValue(CompoundNBT nbt) {
+    protected UndoValue readValue(CompoundTag nbt) {
         return new UndoValue(nbt, undoMaxLength);
     }
 
     static final class UndoValue extends TimedDataSave.TimedValue { //for reasons I don't understand it doesn't compile if you leave the TimedDataSave out!
         private final UndoHistory history;
 
-        private UndoValue(CompoundNBT nbt, IntSupplier supplier) {
+        private UndoValue(CompoundTag nbt, IntSupplier supplier) {
             super(nbt);
             this.history = new UndoHistory(supplier);
             history.read(nbt);
@@ -68,8 +68,8 @@ public class UndoWorldSave extends TimedDataSave<UndoValue> {
         }
 
         @Override
-        public CompoundNBT write() {
-            CompoundNBT nbt = super.write();
+        public CompoundTag write() {
+            CompoundTag nbt = super.write();
             history.write(nbt);
             return nbt;
         }

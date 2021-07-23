@@ -12,14 +12,14 @@ import com.google.gson.JsonSerializer;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.TagParser;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
@@ -36,26 +36,26 @@ public final class UniqueItem implements IUniqueObject<Item> {
     public enum ComparisonMode {
         EXACT_MATCH(0) {
             @Override
-            public boolean match(CompoundNBT nbt, @Nullable CompoundNBT other) {
+            public boolean match(CompoundTag nbt, @Nullable CompoundTag other) {
                 return nbt.equals(other);
             }
         },
         SUB_TAG_MATCH(1) {
             @Override
-            public boolean match(CompoundNBT nbt, @Nullable CompoundNBT other) {
+            public boolean match(CompoundTag nbt, @Nullable CompoundTag other) {
                 if (other == null)
                     return false;
-                for (String key : nbt.keySet()) {
-                    INBT val = nbt.get(key);
+                for (String key : nbt.getAllKeys()) {
+                    Tag val = nbt.get(key);
                     if (val == null) {
                         if (other.get(key) != null) return false;
                         else continue;
                     }
                     if (! other.contains(key, val.getId()) || other.get(key) == null)
                         return false;
-                    if (val.getId() == NBT.TAG_COMPOUND && ! match((CompoundNBT) val, other.getCompound(key)))
+                    if (val.getId() == NBT.TAG_COMPOUND && ! match((CompoundTag) val, other.getCompound(key)))
                         return false;
-                    else if (val.getId() != NBT.TAG_COMPOUND && ! val.getString().equals(other.get(key).getString()))
+                    else if (val.getId() != NBT.TAG_COMPOUND && ! val.getAsString().equals(other.get(key).getAsString()))
                         return false;
                 }
                 return true;
@@ -72,7 +72,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
             return id;
         }
 
-        public abstract boolean match(CompoundNBT nbt, @Nullable CompoundNBT other);
+        public abstract boolean match(CompoundTag nbt, @Nullable CompoundTag other);
 
         public static ComparisonMode byId(byte id) {
             ComparisonMode mode = BY_ID.get(id);
@@ -85,16 +85,16 @@ public final class UniqueItem implements IUniqueObject<Item> {
     }
 
     public static UniqueItem ofStack(ItemStack stack) {
-        CompoundNBT nbt = new CompoundNBT();
-        stack.write(nbt);
+        CompoundTag nbt = new CompoundTag();
+        stack.save(nbt);
         return new UniqueItem(stack.getItem(), stack.getTag(), ComparisonMode.EXACT_MATCH, nbt.getCompound("ForgeCaps"), ComparisonMode.EXACT_MATCH);
     }
 
     private final Item item;
     @Nullable
-    private final CompoundNBT tagCompound;
+    private final CompoundTag tagCompound;
     @Nullable
-    private final CompoundNBT forgeCaps;
+    private final CompoundTag forgeCaps;
     private final int hash;
     private final ComparisonMode tagMatch;
     private final ComparisonMode capMatch;
@@ -103,11 +103,11 @@ public final class UniqueItem implements IUniqueObject<Item> {
         this(item, null, ComparisonMode.EXACT_MATCH);
     }
 
-    public UniqueItem(Item item, @Nullable CompoundNBT tagCompound, ComparisonMode comparisonMode) {
+    public UniqueItem(Item item, @Nullable CompoundTag tagCompound, ComparisonMode comparisonMode) {
         this(item, tagCompound, comparisonMode, null, ComparisonMode.EXACT_MATCH);
     }
 
-    public UniqueItem(Item item, @Nullable CompoundNBT tagCompound, ComparisonMode tagMatch, @Nullable CompoundNBT forgeCaps, ComparisonMode capMatch) {
+    public UniqueItem(Item item, @Nullable CompoundTag tagCompound, ComparisonMode tagMatch, @Nullable CompoundTag forgeCaps, ComparisonMode capMatch) {
         this.item = Objects.requireNonNull(item, "Cannot construct a UniqueItem for a null Item!");
         this.tagCompound = tagCompound;
         this.forgeCaps = forgeCaps;
@@ -130,12 +130,12 @@ public final class UniqueItem implements IUniqueObject<Item> {
     }
 
     @Nullable
-    public CompoundNBT getTag() {
+    public CompoundTag getTag() {
         return tagCompound != null ? tagCompound.copy() : null;
     }
 
     @Nullable
-    public CompoundNBT getForgeCaps() {
+    public CompoundTag getForgeCaps() {
         return forgeCaps != null ? forgeCaps.copy() : null;
     }
 
@@ -154,9 +154,9 @@ public final class UniqueItem implements IUniqueObject<Item> {
             return false;
         if (forgeCaps != null) {
             //There's no getter for this, so we need to hack or way into it...
-            CompoundNBT container = new CompoundNBT();
-            stack.write(container);
-            CompoundNBT otherCapNBT = container.getCompound("ForgeCaps");
+            CompoundTag container = new CompoundTag();
+            stack.save(container);
+            CompoundTag otherCapNBT = container.getCompound("ForgeCaps");
             return capMatch.match(forgeCaps, otherCapNBT);
         }
         return true;
@@ -208,9 +208,9 @@ public final class UniqueItem implements IUniqueObject<Item> {
 
     public static final class Serializer extends ForgeRegistryEntry<IUniqueObjectSerializer> implements IUniqueObjectSerializer {
         @Override
-        public CompoundNBT serialize(IUniqueObject<?> obj, boolean persisted) {
+        public CompoundTag serialize(IUniqueObject<?> obj, boolean persisted) {
             UniqueItem item = (UniqueItem) obj;
-            CompoundNBT res = new CompoundNBT();
+            CompoundTag res = new CompoundTag();
             if (item.tagCompound != null)
                 res.put(NBTKeys.KEY_DATA, item.tagCompound);
             if (item.forgeCaps != null)
@@ -225,11 +225,11 @@ public final class UniqueItem implements IUniqueObject<Item> {
         }
 
         @Override
-        public IUniqueObject<Item> deserialize(CompoundNBT res) {
+        public IUniqueObject<Item> deserialize(CompoundTag res) {
             Preconditions.checkArgument(res.contains(NBTKeys.KEY_ID), "Cannot construct a UniqueItem without an Item!");
-            CompoundNBT nbt = res.getCompound(NBTKeys.KEY_DATA);
+            CompoundTag nbt = res.getCompound(NBTKeys.KEY_DATA);
             ComparisonMode mode = ComparisonMode.byId(res.getByte(NBTKeys.KEY_DATA_COMPARISON));
-            CompoundNBT capNbt = res.getCompound(NBTKeys.KEY_CAP_NBT);
+            CompoundTag capNbt = res.getCompound(NBTKeys.KEY_CAP_NBT);
             ComparisonMode capMode = ComparisonMode.byId(res.getByte(NBTKeys.KEY_CAP_COMPARISON));
             Item item;
             if (res.contains(NBTKeys.KEY_ID, NBT.TAG_INT))
@@ -246,7 +246,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
                 UniqueItem element = (UniqueItem) uobj;
                 Item item = element.getIndexObject();
                 if (printName)
-                    obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NAME, I18n.format(item.getTranslationKey(element.createStack())));
+                    obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NAME, I18n.get(item.getDescriptionId(element.createStack())));
                 obj.add(JsonKeys.MATERIAL_LIST_ITEM_ID, context.serialize(element.getIndexObject().getRegistryName()));
                 if (extended) {
                     if (element.tagCompound != null && ! element.tagCompound.isEmpty()) {
@@ -270,21 +270,21 @@ public final class UniqueItem implements IUniqueObject<Item> {
                 Item item = ForgeRegistries.ITEMS.getValue(registryName);
                 if (item == null)
                     return new UniqueItem(Items.AIR);
-                CompoundNBT tagCompound = null;
+                CompoundTag tagCompound = null;
                 ComparisonMode tagMatch = ComparisonMode.EXACT_MATCH;
                 if (object.has(JsonKeys.MATERIAL_LIST_ITEM_NBT)) {
                     try {
-                        tagCompound = JsonToNBT.getTagFromJson(object.getAsJsonPrimitive(JsonKeys.MATERIAL_LIST_ITEM_NBT).getAsString());
+                        tagCompound = TagParser.parseTag(object.getAsJsonPrimitive(JsonKeys.MATERIAL_LIST_ITEM_NBT).getAsString());
                         tagMatch = context.deserialize(object.get(JsonKeys.MATERIAL_LIST_ITEM_NBT_MATCH), ComparisonMode.class);
                     } catch (CommandSyntaxException e) {
                         e.printStackTrace();
                     }
                 }
-                CompoundNBT forgeCaps = null;
+                CompoundTag forgeCaps = null;
                 ComparisonMode capMatch = ComparisonMode.EXACT_MATCH;
                 if (object.has(JsonKeys.MATERIAL_LIST_CAP_NBT)) {
                     try {
-                        forgeCaps = JsonToNBT.getTagFromJson(object.getAsJsonPrimitive(JsonKeys.MATERIAL_LIST_CAP_NBT).getAsString());
+                        forgeCaps = TagParser.parseTag(object.getAsJsonPrimitive(JsonKeys.MATERIAL_LIST_CAP_NBT).getAsString());
                         capMatch = context.deserialize(object.get(JsonKeys.MATERIAL_LIST_CAP_NBT_MATCH), ComparisonMode.class);
                     } catch (CommandSyntaxException e) {
                         e.printStackTrace();
