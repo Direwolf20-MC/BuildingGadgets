@@ -4,7 +4,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.World;
 import net.minecraft.server.level.ServerLevel;
 
 import javax.annotation.Nonnull;

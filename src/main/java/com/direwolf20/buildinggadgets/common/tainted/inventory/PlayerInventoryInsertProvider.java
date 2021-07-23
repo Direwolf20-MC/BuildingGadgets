@@ -24,7 +24,7 @@ public final class PlayerInventoryInsertProvider implements IInsertProvider {
         int eventResponse = ForgeEventFactory.onItemPickup(new ItemEntity(player.level, player.getX(), player.getY(), player.getZ(), copy), player);
         // 0  = picking up was not handled by anyone else, we'll add to inventory what we can.
         if( eventResponse == 0 ) {
-            player.inventory.add(copy);
+            player.getInventory().add(copy);
             if (copy.isEmpty()) {
                 return count;
             } else {

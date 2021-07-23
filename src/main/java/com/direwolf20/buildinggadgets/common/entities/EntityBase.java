@@ -27,7 +27,7 @@ public abstract class EntityBase extends Entity {
             despawning = 0;
             onSetDespawning();
         } else if (despawning != -1 && ++despawning > 1)
-            remove();
+            remove(false);
     }
 
     protected boolean shouldSetDespawning() {

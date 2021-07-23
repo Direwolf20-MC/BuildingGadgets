@@ -9,7 +9,6 @@ import com.google.common.cache.RemovalListener;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.Map;

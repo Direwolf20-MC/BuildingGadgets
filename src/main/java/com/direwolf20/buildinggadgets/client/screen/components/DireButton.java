@@ -1,14 +1,12 @@
 package com.direwolf20.buildinggadgets.client.screen.components;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-
-import net.minecraft.client.gui.components.Button.OnPress;
 
 public class DireButton extends Button {
 
@@ -20,8 +18,8 @@ public class DireButton extends Button {
     public void render(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
         if (this.visible) {
             Font fontrenderer = Minecraft.getInstance().font;
-            Minecraft.getInstance().getTextureManager().bind(WIDGETS_LOCATION);
-            RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+            Minecraft.getInstance().getTextureManager().bindForSetup(WIDGETS_LOCATION);
+            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             this.isHovered = isMouseOver(mouseX, mouseY);
             RenderSystem.enableBlend();
             RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);

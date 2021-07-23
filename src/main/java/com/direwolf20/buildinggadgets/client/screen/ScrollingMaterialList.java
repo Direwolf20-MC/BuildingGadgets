@@ -16,6 +16,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import com.mojang.blaze3d.platform.Lighting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.util.Mth;
@@ -148,7 +149,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
             int slotX = leftX + MARGIN;
             int slotY = topY + MARGIN;
 
-            drawIcon(stack, slotX, slotY);
+            drawIcon(matrices, stack, slotX, slotY);
             drawTextOverlay(matrices, right, topY, bottom, slotX);
             drawHoveringText(stack, slotX, slotY, mouseX, mouseY);
         }
@@ -170,7 +171,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
                 RenderSystem.enableBlend();
                 RenderSystem.disableTexture();
                 RenderSystem.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                RenderSystem.color4f(255, 255, 255, 34);
+                RenderSystem.setShaderColor(255, 255, 255, 34);
 
                 glLineWidth(1);
                 glBegin(GL_LINES);
@@ -187,13 +188,11 @@ class ScrollingMaterialList extends EntryList<Entry> {
                 parent.gui.setTaskHoveringText(mouseX, mouseY, parent.gui.getTooltipFromItem(item));
         }
 
-        private void drawIcon(ItemStack item, int slotX, int slotY) {
-            RenderSystem.pushMatrix();
-            Lighting.turnBackOn();
+        private void drawIcon(PoseStack matrices, ItemStack item, int slotX, int slotY) {
+            Lighting.setupForFlatItems();
             Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(item, slotX, slotY);
-            RenderSystem.disableLighting();
-            RenderSystem.color3f(1, 1, 1);
-            RenderSystem.popMatrix();
+//            RenderSystem.color3f(1, 1, 1);
+            Lighting.setupFor3DItems();
         }
 
         private boolean hasEnoughItems() {
@@ -245,6 +244,11 @@ class ScrollingMaterialList extends EntryList<Entry> {
 
         public boolean isSelected() {
             return parent.getSelected() == this;
+        }
+
+        @Override
+        public Component getNarration() {
+            return null;
         }
     }
 

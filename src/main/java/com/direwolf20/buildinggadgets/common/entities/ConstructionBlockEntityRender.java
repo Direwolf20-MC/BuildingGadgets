@@ -4,17 +4,17 @@ import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.util.Random;
@@ -23,7 +23,7 @@ import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.ren
 
 public class ConstructionBlockEntityRender extends EntityRenderer<ConstructionBlockEntity> {
 
-    public ConstructionBlockEntityRender(EntityRenderDispatcher renderManager) {
+    public ConstructionBlockEntityRender(EntityRendererProvider.Context renderManager) {
         super(renderManager);
         this.shadowRadius = 0F;
     }

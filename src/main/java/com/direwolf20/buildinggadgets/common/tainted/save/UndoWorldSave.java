@@ -11,9 +11,22 @@ import java.util.function.IntSupplier;
 public class UndoWorldSave extends TimedDataSave<UndoValue> {
     private final IntSupplier undoMaxLength;
 
-    public UndoWorldSave(String name, IntSupplier undoMaxLength) {
-        super(name);
+    public UndoWorldSave(IntSupplier undoMaxLength) {
+        super();
         this.undoMaxLength = Objects.requireNonNull(undoMaxLength);
+    }
+
+    public static UndoWorldSave loads(CompoundTag tag) {
+        UndoWorldSave undoWorldSave = new UndoWorldSave(() -> tag.getInt("maxUndo"));
+        undoWorldSave.load(tag);
+        return undoWorldSave;
+    }
+
+    @Override
+    public CompoundTag save(CompoundTag compound) {
+        CompoundTag save = super.save(compound);
+        save.putInt("maxUndo", this.undoMaxLength.getAsInt());
+        return save;
     }
 
     public void insertUndo(UUID uuid, Undo undo) {

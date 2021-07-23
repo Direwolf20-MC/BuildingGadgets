@@ -6,7 +6,6 @@ import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.util.spliterator.DelegatingSpliterator;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.IWorld;
 
 import javax.annotation.Nullable;
 import java.util.Comparator;

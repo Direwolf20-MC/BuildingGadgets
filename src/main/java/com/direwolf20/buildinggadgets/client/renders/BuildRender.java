@@ -108,7 +108,7 @@ public class BuildRender extends BaseRenderer {
 
             OurRenderTypes.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new OurRenderTypes.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().renderBuffers().bufferSource(), .55f);
             try {
-                dispatcher.renderBlock(
+                dispatcher.renderSingleBlock(
                         state, matrix, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE
                 );
             } catch (Exception ignored) {} // I'm sure if this is an issue someone will report it

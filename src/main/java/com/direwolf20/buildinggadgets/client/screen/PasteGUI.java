@@ -64,8 +64,8 @@ public class PasteGUI extends Screen {
 
         CopyGUI.CenteredButton.centerButtonList(buttons, x);
 
-        buttons.forEach(this::addButton);
-        fields.forEach(this::addButton);
+        buttons.forEach(this::addWidget);
+        fields.forEach(this::addWidget);
     }
 
     private void sendPacket() {

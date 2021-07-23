@@ -8,7 +8,6 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.Multiset;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.Pair;

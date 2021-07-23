@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider;
 import com.direwolf20.buildinggadgets.common.tainted.template.Template;
@@ -12,19 +12,18 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.client.gui.GuiUtils;
 
 import java.awt.*;
 import java.util.List;
@@ -79,7 +78,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         this.scrollingList = new ScrollingMaterialList(this);
         // Make it receive mouse scroll events, so that the player can use his mouse wheel at the start
         this.setFocused(scrollingList);
-        this.children.add(scrollingList);
+        this.addWidget(scrollingList);
 
         int buttonY = getWindowBottomY() - (ScrollingMaterialList.BOTTOM / 2 + BUTTON_HEIGHT / 2);
         this.buttonClose = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_CLOSE.componentTranslation(), b -> getMinecraft().player.closeContainer());
@@ -96,11 +95,10 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         });
 
         // Buttons will be placed left to right in this order
-        this.addButton(buttonSortingModes);
-        this.addButton(buttonCopyList);
-        this.addButton(buttonClose);
+        this.addWidget(buttonSortingModes);
+        this.addWidget(buttonCopyList);
+        this.addWidget(buttonClose);
 
-        this.children.add(scrollingList);
         this.calculateButtonsWidthAndX();
     }
 
@@ -121,8 +119,8 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
 
     @Override
     public void render(PoseStack matrices, int mouseX, int mouseY, float particleTicks) {
-        getMinecraft().getTextureManager().bind(BACKGROUND_TEXTURE);
-        GuiUtils.drawTexturedModalRect(backgroundX, backgroundY, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT, 0F);
+        getMinecraft().getTextureManager().bindForSetup(BACKGROUND_TEXTURE);
+        blit(matrices, backgroundX, backgroundY, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT); // TODO: Might be wrong
 
         scrollingList.render(matrices, mouseX, mouseY, particleTicks);
         drawString(matrices, font, title, titleLeft, titleTop, Color.WHITE.getRGB());
@@ -141,7 +139,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
 
     private void calculateButtonsWidthAndX() {
         // This part would can create narrower buttons when there are too few of them, due to the vanilla button texture is 200 pixels wide
-        int amountButtons = buttons.size();
+        int amountButtons = (int) children().stream().filter(e -> e instanceof Button).count();
         int amountMargins = amountButtons - 1;
         int totalMarginWidth = amountMargins * BUTTONS_PADDING;
         int usableWidth = getWindowWidth();
@@ -150,10 +148,12 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         // Align the box of buttons in the center, and start from the left
         int nextX = getWindowLeftX();
 
-        for (AbstractWidget widget : buttons) {
-            widget.setWidth(buttonWidth);
-            widget.x = nextX;
-            nextX += buttonWidth + BUTTONS_PADDING;
+        for (GuiEventListener widget : children()) {
+            if (widget instanceof Button btn) {
+                btn.setWidth(buttonWidth);
+                btn.x = nextX;
+                nextX += buttonWidth + BUTTONS_PADDING;
+            }
         }
     }
 

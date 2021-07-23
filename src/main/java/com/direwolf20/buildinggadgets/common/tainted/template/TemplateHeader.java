@@ -12,7 +12,6 @@ import com.google.common.collect.Multiset;
 import com.google.gson.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 
@@ -32,7 +31,7 @@ public final class TemplateHeader {
     /**
      * Must be updated for each new MC version :cry:
      */
-    public static final String HIGHEST_MC_VERSION = "1.16.5";
+    public static final String HIGHEST_MC_VERSION = "1.17.1";
 
     /**
      * The lowest possible minecraft version we support. This could be lower but seeing as the mod only uses

@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tainted.template;
 
-import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,12 +35,12 @@ public class InMemoryTemplateProvider implements ITemplateProvider {
     }
 
     @Override
-    public boolean requestUpdate(ITemplateKey key, PacketTarget target) {
+    public boolean requestUpdate(ITemplateKey key, PacketDistributor.PacketTarget target) {
         return false;
     }
 
     @Override
-    public boolean requestRemoteUpdate(ITemplateKey key, PacketTarget target) {
+    public boolean requestRemoteUpdate(ITemplateKey key, PacketDistributor.PacketTarget target) {
         return false;
     }
 

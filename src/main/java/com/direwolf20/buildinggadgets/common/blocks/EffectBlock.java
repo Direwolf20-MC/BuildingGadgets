@@ -7,22 +7,24 @@ import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSu
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.tileentities.EffectBlockTileEntity;
-import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.block.*;
+import com.direwolf20.buildinggadgets.common.tileentities.OurTileEntities;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.material.PushReaction;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
@@ -32,15 +34,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.state.BlockState;
-
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class EffectBlock extends Block {
+public class EffectBlock extends Block implements EntityBlock {
 
     public enum Mode {
         // Serialization and networking based on `ordinal()`, please DO NOT CHANGE THE ORDER of the enums
@@ -105,9 +101,9 @@ public class EffectBlock extends Block {
         BlockEntity curTe = context.getWorld().getBlockEntity(target.getPos());
         //can't use .isAir, because it's not build yet
         if (target.getData().getState() != Blocks.AIR.defaultBlockState()) {
-            Mode mode = state.isAir(context.getWorld(), target.getPos()) ? Mode.PLACE : Mode.REPLACE;
+            Mode mode = state.isAir() ? Mode.PLACE : Mode.REPLACE;
             spawnEffectBlock(curTe, state, context.getWorld(), target.getPos(), target.getData(), mode, false);
-        } else if (! state.isAir(context.getWorld(), target.getPos())) {
+        } else if (! state.isAir()) {
             spawnEffectBlock(curTe, state, context.getWorld(), target.getPos(), TileSupport.createBlockData(state, curTe), Mode.REMOVE, false);
         }
     }
@@ -145,15 +141,10 @@ public class EffectBlock extends Block {
                 .noDrops());
     }
 
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
-    }
-
     @Nullable
     @Override
-    public BlockEntity createTileEntity(BlockState state, BlockGetter world) {
-        return new EffectBlockTileEntity();
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return OurTileEntities.EFFECT_BLOCK_TILE_ENTITY.get().create(pos, state);
     }
 
     @Override
@@ -172,6 +163,7 @@ public class EffectBlock extends Block {
      * @deprecated call via {@link BlockState#getRenderType()} whenever possible. Implementing/overriding is fine.
      */
     @Override
+    @Deprecated
     @SuppressWarnings("deprecation")
     public RenderShape getRenderShape(BlockState state) {
         // We still make effect blocks invisible because all effects (scaling block, transparent box) are dynamic so they has to be in the TER
@@ -197,6 +189,7 @@ public class EffectBlock extends Block {
      * @deprecated call via {@link BlockState#getPushReaction()} whenever possible. Implementing/overriding is fine.
      */
     @Override
+    @Deprecated
     public PushReaction getPistonPushReaction(BlockState state) {
         return PushReaction.BLOCK;
     }

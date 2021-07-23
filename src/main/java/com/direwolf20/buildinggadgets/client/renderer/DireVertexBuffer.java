@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.client.renderer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Matrix4f;
 
 import java.nio.ByteBuffer;
@@ -61,11 +61,12 @@ public class DireVertexBuffer implements AutoCloseable {
     }
 
     public void draw(Matrix4f matrixIn, int modeIn) {
-        RenderSystem.pushMatrix();
-        RenderSystem.loadIdentity();
-        RenderSystem.multMatrix(matrixIn);
-        RenderSystem.drawArrays(modeIn, 0, this.count);
-        RenderSystem.popMatrix();
+//        Render
+//        RenderSystem.pushMatrix();
+//        RenderSystem.loadIdentity();
+//        RenderSystem.multMatrix(matrixIn);
+//        RenderSystem.drawArrays(modeIn, 0, this.count);
+//        RenderSystem.popMatrix();
     }
 
     public static void unbindBuffer() {

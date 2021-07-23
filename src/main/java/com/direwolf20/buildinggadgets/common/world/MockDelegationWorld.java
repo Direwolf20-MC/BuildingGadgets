@@ -2,50 +2,50 @@ package com.direwolf20.buildinggadgets.common.world;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tainted.Tainted;
-import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
-import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.google.common.base.Preconditions;
-import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.*;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.TickList;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.border.WorldBorder;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkSource;
 import net.minecraft.world.level.chunk.ChunkStatus;
-import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.dimension.DimensionType;
+import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.Heightmap.Types;
 import net.minecraft.world.level.lighting.LevelLightEngine;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
-
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.TickList;
-import net.minecraft.world.level.dimension.DimensionType;
 
 @MethodsReturnNonnullByDefault
 public class MockDelegationWorld implements LevelAccessor {
@@ -81,13 +81,23 @@ public class MockDelegationWorld implements LevelAccessor {
     }
 
     @Override
+    public void gameEvent(@Nullable Entity p_151549_, GameEvent p_151550_, BlockPos p_151551_) {
+
+    }
+
+    @Override
     public List<Entity> getEntities(@Nullable Entity entity, AABB axisAlignedBB, @Nullable Predicate<? super Entity> predicate) {
         return new ArrayList<>();
     }
 
     @Override
-    public <T extends Entity> List<T> getEntitiesOfClass(Class<? extends T> aClass, AABB axisAlignedBB, @Nullable Predicate<? super T> predicate) {
-        return new ArrayList<>();
+    public <T extends Entity> List<T> getEntities(EntityTypeTest<Entity, T> p_151464_, AABB p_151465_, Predicate<? super T> p_151466_) {
+        return null;
+    }
+
+    @Override
+    public <T extends Entity> List<T> getEntitiesOfClass(Class<T> p_45979_, AABB p_45980_, Predicate<? super T> p_45981_) {
+        return List.of();
     }
 
     @Override
@@ -119,6 +129,11 @@ public class MockDelegationWorld implements LevelAccessor {
     @Override
     public boolean isStateAtPosition(BlockPos p_217375_1_, Predicate<BlockState> p_217375_2_) {
         return p_217375_2_.test(getBlockState(p_217375_1_));
+    }
+
+    @Override
+    public boolean isFluidAtPosition(BlockPos p_151584_, Predicate<FluidState> p_151585_) {
+        return false;
     }
 
     @Override
@@ -155,6 +170,12 @@ public class MockDelegationWorld implements LevelAccessor {
         return delegate.getCurrentDifficultyAt(pos);
     }
 
+    @Nullable
+    @Override
+    public MinecraftServer getServer() {
+        return this.delegate.getServer();
+    }
+
     @Override
     public Difficulty getDifficulty() {
         return delegate.getDifficulty();
@@ -188,7 +209,7 @@ public class MockDelegationWorld implements LevelAccessor {
      */
     @Override
     public boolean isEmptyBlock(BlockPos pos) {
-        return getBlockState(pos).isAir(this, pos);
+        return getBlockState(pos).isAir();
     }
 
     @Override
@@ -256,7 +277,7 @@ public class MockDelegationWorld implements LevelAccessor {
     @Override
     @Nullable
     public BlockEntity getBlockEntity(BlockPos pos) {
-        if (Level.isOutsideBuildHeight(pos))
+        if (this.delegate.isOutsideBuildHeight(pos))
             return null;
         BlockInfo info = getOverriddenBlock(pos);
         if (info != null)
@@ -266,7 +287,7 @@ public class MockDelegationWorld implements LevelAccessor {
 
     @Override
     public BlockState getBlockState(BlockPos pos) {
-        if (Level.isOutsideBuildHeight(pos))
+        if (this.delegate.isOutsideBuildHeight(pos))
             return Blocks.VOID_AIR.defaultBlockState();
         BlockState state = getOverriddenState(pos);
         return state != null ? state : Blocks.AIR.defaultBlockState();
@@ -300,7 +321,7 @@ public class MockDelegationWorld implements LevelAccessor {
      */
     @Override
     public boolean setBlock(BlockPos pos, BlockState newState, int flags) {
-        if (Level.isOutsideBuildHeight(pos))
+        if (this.delegate.isOutsideBuildHeight(pos))
             return false;
         BlockInfo info = getOverriddenBlock(pos);
         if (info != null) {
@@ -316,7 +337,7 @@ public class MockDelegationWorld implements LevelAccessor {
     @Override
     public boolean destroyBlock(BlockPos pos, boolean dropBlock) {
         // adapted from World
-        return ! this.getBlockState(pos).isAir(this, pos) && removeBlock(pos, true);
+        return ! this.getBlockState(pos).isAir() && removeBlock(pos, true);
     }
 
     @Override
@@ -408,7 +429,7 @@ public class MockDelegationWorld implements LevelAccessor {
 
         public BlockInfo setState(BlockState state) {
             Preconditions.checkNotNull(state);
-            if (this.state.getBlock() != state.getBlock() || ! state.hasTileEntity()) {
+            if (this.state.getBlock() != state.getBlock() || ! state.hasBlockEntity()) {
                 onRemove();
             }
             this.state = state;
@@ -417,14 +438,14 @@ public class MockDelegationWorld implements LevelAccessor {
 
         @Nullable
         public BlockEntity getEntity(LevelAccessor world) {
-            if (entity == null && state.hasTileEntity()) {
+            if (entity == null && state.hasBlockEntity()) {
                 try {
-                    entity = state.createTileEntity(world);
+                    entity = ((EntityBlock) state.getBlock()).newBlockEntity(pos, state);
                     if (entity != null) {
-                        entity.setPosition(pos);
+
                         //if we pass our wrapped world down to this, it will cause it to determine an errornous blockstate...
                         //we'd need to reflect into the te...
-                        entity.setLevelAndPosition(null, pos);
+
                         entity.onLoad();
                     }
                 } catch (Exception e) {

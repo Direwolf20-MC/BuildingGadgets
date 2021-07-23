@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import java.util.List;
 
 public class MyRenderMethods {
+    // TODO: Replace with native method
     public static void renderModelBrightnessColorQuads(PoseStack.Pose matrixEntry, VertexConsumer builder, float red, float green, float blue, float alpha, List<BakedQuad> listQuads, int combinedLightsIn, int combinedOverlayIn) {
         for(BakedQuad bakedquad : listQuads) {
             float f;
@@ -23,7 +24,7 @@ public class MyRenderMethods {
                 f2 = 1f;
             }
 
-            builder.addVertexData(matrixEntry, bakedquad, f, f1, f2, alpha, combinedLightsIn, combinedOverlayIn);
+//            builder.addVertexData(matrixEntry, bakedquad, f, f1, f2, alpha, combinedLightsIn, combinedOverlayIn);
         }
     }
 }

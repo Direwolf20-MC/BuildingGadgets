@@ -6,12 +6,10 @@ import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.TickingBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.block.entity.TickableBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.Constants.NBT;
 
@@ -19,7 +17,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @Tainted(reason = "Used blockData and a stupid non-centralised callback system")
-public class EffectBlockTileEntity extends BlockEntity implements TickingBlockEntity {
+public class EffectBlockTileEntity extends BlockEntity {
     /**
      * Even though this is called "rendered", is will be used for replacement under normal conditions.
      */
@@ -34,8 +32,8 @@ public class EffectBlockTileEntity extends BlockEntity implements TickingBlockEn
 
     private int ticks;
 
-    public EffectBlockTileEntity() {
-        super(OurTileEntities.EFFECT_BLOCK_TILE_ENTITY.get());
+    public EffectBlockTileEntity(BlockPos pos, BlockState state) {
+        super(OurTileEntities.EFFECT_BLOCK_TILE_ENTITY.get(), pos, state);
     }
 
     public void initializeData(BlockState curState, @Nullable BlockEntity te, BlockData replacementBlock, Mode mode, boolean usePaste) {
@@ -54,18 +52,15 @@ public class EffectBlockTileEntity extends BlockEntity implements TickingBlockEn
             this.renderedBlock = te instanceof ConstructionBlockTileEntity ? ((ConstructionBlockTileEntity) te).getConstructionBlockData() : replacementBlock;
     }
 
-    @Override
-    public void tick() {
-        ticks++;
-        if (ticks >= getLifespan()) {
-            complete();
-        }
-    }
+    // TODO: ADD TICKS BACK
+//    @Override
+//    public void tick() {
+//        ticks++;
+//        if (ticks >= getLifespan()) {
+//            complete();
+//        }
+//    }
 
-    @Override
-    public BlockPos getPos() {
-        return this.getBlockPos();
-    }
 
     private void complete() {
         if (level == null || level.isClientSide || mode == null || renderedBlock == null)
@@ -111,7 +106,7 @@ public class EffectBlockTileEntity extends BlockEntity implements TickingBlockEn
     }
 
     @Override
-    public void handleUpdateTag(BlockState state, CompoundTag tag) {
+    public void handleUpdateTag(CompoundTag tag) {
         deserializeNBT(tag);
     }
 
@@ -134,8 +129,8 @@ public class EffectBlockTileEntity extends BlockEntity implements TickingBlockEn
     }
 
     @Override
-    public void load(BlockState state, CompoundTag nbt) {
-        super.load(state, nbt);
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
 
         if (nbt.contains(NBTKeys.GADGET_TICKS, NBT.TAG_INT) &&
                 nbt.contains(NBTKeys.GADGET_MODE, NBT.TAG_INT) &&

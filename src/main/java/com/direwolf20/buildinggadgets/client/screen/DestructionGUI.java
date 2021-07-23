@@ -9,14 +9,12 @@ import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.util.Mth;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraftforge.fml.ForgeI18n;
+import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -49,7 +47,7 @@ public class DestructionGUI extends Screen {
         int x = width / 2;
         int y = height / 2;
 
-        this.addButton(confirm = new Button((x - 30) + 32, y + 65, 60, 20, new TranslatableComponent(GuiMod.getLangKeySingle("confirm")), b -> {
+        this.addWidget(confirm = new Button((x - 30) + 32, y + 65, 60, 20, new TranslatableComponent(GuiMod.getLangKeySingle("confirm")), b -> {
             if (Minecraft.getInstance().player == null) {
                 return;
             }
@@ -62,7 +60,7 @@ public class DestructionGUI extends Screen {
                 Minecraft.getInstance().player.displayClientMessage(MessageTranslation.DESTRCUT_TOO_LARGE.componentTranslation(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), true);
         }));
 
-        this.addButton(new Button((x - 30) - 32, y + 65, 60, 20, new TranslatableComponent(GuiMod.getLangKeySingle("cancel")), b -> onClose()));
+        this.addWidget(new Button((x - 30) - 32, y + 65, 60, 20, new TranslatableComponent(GuiMod.getLangKeySingle("cancel")), b -> onClose()));
 
         sliders.clear();
         sliders.add(depth   = new GuiDestructionSlider(x - (GuiDestructionSlider.width / 2), y - (GuiDestructionSlider.height / 2), GuiTranslation.SINGLE_DEPTH.format() + ":", GadgetDestruction.getToolValue(destructionTool, "depth")));
@@ -75,7 +73,7 @@ public class DestructionGUI extends Screen {
         updateIsValid();
 
         // Adds their buttons to the gui
-        sliders.forEach(gui -> gui.getComponents().forEach(this::addButton));
+        sliders.forEach(gui -> gui.getComponents().forEach(this::addWidget));
     }
 
     private boolean isWithinBounds() {

@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.tileentities;
 
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
@@ -18,8 +19,8 @@ public class ConstructionBlockTileEntity extends BlockEntity {
     private BlockData blockState;
     public static final ModelProperty<BlockState> FACADE_STATE = new ModelProperty<>();
 
-    public ConstructionBlockTileEntity() {
-        super(OurTileEntities.CONSTRUCTION_BLOCK_TILE_ENTITY.get());
+    public ConstructionBlockTileEntity(BlockPos pos, BlockState state) {
+        super(OurTileEntities.CONSTRUCTION_BLOCK_TILE_ENTITY.get(), pos, state);
     }
 
     public void setBlockState(BlockData state) {
@@ -53,8 +54,8 @@ public class ConstructionBlockTileEntity extends BlockEntity {
     }
 
     @Override
-    public void load(BlockState state, CompoundTag nbt) {
-        super.load(state, nbt);
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
         blockState = BlockData.tryDeserialize(nbt.getCompound(NBTKeys.TE_CONSTRUCTION_STATE), true);
         markDirtyClient();
     }
@@ -91,8 +92,6 @@ public class ConstructionBlockTileEntity extends BlockEntity {
         return new ClientboundBlockEntityDataPacket(getBlockPos(), 1, nbtTag);
     }
 
-
-
     @Override
     public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket packet) {
         BlockData oldMimicBlock = getConstructionBlockData();
@@ -103,7 +102,7 @@ public class ConstructionBlockTileEntity extends BlockEntity {
         if (level != null && level.isClientSide) {
             // If needed send a render update.
             if (! getConstructionBlockData().equals(oldMimicBlock)) {
-                level.blockEntityChanged(getBlockPos(), this.getTileEntity());
+                level.blockEntityChanged(getBlockPos());
             }
         }
     }

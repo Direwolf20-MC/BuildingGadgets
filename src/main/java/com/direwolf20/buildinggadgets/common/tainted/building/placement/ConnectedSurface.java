@@ -43,7 +43,7 @@ public class ConnectedSurface implements Iterable<BlockPos> {
         this(world, searchingRegion, searching2referenceMapper, searchingCenter, side,
                 (filter, pos) -> {
                     BlockState reference = world.getBlockState(searching2referenceMapper.apply(pos));
-                    boolean isAir = reference.isAir(world, pos);
+                    boolean isAir = reference.isAir();
                     // If fuzzy=true, we ignore the block for reference
                     return ! isAir && (fuzzy || filter == reference);
                 });

@@ -93,12 +93,12 @@ public class GuiIconActionable extends Button {
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 
         RenderSystem.disableTexture();
-        RenderSystem.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, .15f);
+        RenderSystem.setShaderColor(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, .15f);
         blit(matrices, this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
         RenderSystem.enableTexture();
 
-        RenderSystem.color4f(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, alpha);
-        Minecraft.getInstance().getTextureManager().bind(selected ? selectedTexture : deselectedTexture);
+        RenderSystem.setShaderColor(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, alpha);
+        Minecraft.getInstance().getTextureManager().bindForSetup(selected ? selectedTexture : deselectedTexture);
         blit(matrices, this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
 
         if( mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height )

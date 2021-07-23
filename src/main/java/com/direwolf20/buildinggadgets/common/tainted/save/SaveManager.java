@@ -2,11 +2,10 @@ package com.direwolf20.buildinggadgets.common.tainted.save;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.SaveReference;
-import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.fmlserverevents.FMLServerStartedEvent;
+import net.minecraftforge.fmlserverevents.FMLServerStoppedEvent;
 
 import javax.annotation.Nullable;
 import java.util.LinkedList;
@@ -53,16 +52,16 @@ public enum SaveManager {
     }
 
     public static UndoWorldSave getUndoSave(ServerLevel world, IntSupplier maxLengthSupplier, String name) {
-        return get(world, () -> new UndoWorldSave(name, maxLengthSupplier), name);
+        return world.getDataStorage().computeIfAbsent(UndoWorldSave::loads, () -> new UndoWorldSave(maxLengthSupplier), name);
     }
 
     private static TemplateSave getTemplateSave(ServerLevel world, String name) {
-        return get(world, () -> new TemplateSave(name), name);
+        return world.getDataStorage().computeIfAbsent(TemplateSave::loads, TemplateSave::new, name);
     }
 
-    private static <T extends SavedData> T get(ServerLevel world, Supplier<T> supplier, String name) {
-        return world.getDataStorage().computeIfAbsent(supplier, name);
-    }
+//    private static <T extends SavedData> T get(ServerLevel world, Function<CompoundTag, T> loader, Supplier<T> supplier, String name) {
+//        return world.getDataStorage().computeIfAbsent(loader, supplier, name);
+//    }
 
     public SaveTemplateProvider getTemplateProvider() {
         return templateProvider;

@@ -19,8 +19,8 @@ public abstract class TimedDataSave<T extends TimedValue> extends SavedData {
     private Map<UUID, T> idToValue;
     private Long2ObjectSortedMap<Set<UUID>> timeToId;
 
-    public TimedDataSave(String name) {
-        super(name);
+    public TimedDataSave() {
+        super();
         this.idToValue = new HashMap<>();
         this.timeToId = new Long2ObjectRBTreeMap<>();
     }
@@ -65,7 +65,6 @@ public abstract class TimedDataSave<T extends TimedValue> extends SavedData {
         return get(id).getUpdateTime();
     }
 
-    @Override
     public void load(CompoundTag nbt) {
         Tag timeList = nbt.get(NBTKeys.WORD_SAVE_DATA_MAP);
         timeToId.clear();

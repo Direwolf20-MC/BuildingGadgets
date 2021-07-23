@@ -62,7 +62,7 @@ public abstract class AbstractMode {
         if (!context.getWorldState(pos).canBeReplaced(context.createBlockUseContext(player)))
             return false;
 
-        if (Level.isOutsideBuildHeight(pos))
+        if (context.world.isOutsideBuildHeight(pos))
             return false;
 
         return Config.GENERAL.allowOverwriteBlocks.get()
@@ -99,7 +99,7 @@ public abstract class AbstractMode {
         for(Direction direction : Direction.values()) {
             BlockPos offset = pos.relative(direction);
             BlockState state = context.getWorld().getBlockState(offset);
-            if( state.isAir(context.getWorld(), offset)
+            if( state.isAir()
                     || (state.getShape(context.getWorld(), offset) != Shapes.block() && !(state.getBlock() instanceof StairBlock))) {
                 hasSingeValid = true;
                 break;

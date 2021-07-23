@@ -85,6 +85,7 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    implementation('cpw.mods:securejarhandler') { version { strictly '0.9.46' } }
     //JEI
 //    compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
 //    runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
@@ -95,19 +96,19 @@ dependencies {
 }
 
 // Processes main only resources
-processResources {
-    inputs.property('version', project.version)
-    inputs.property('forge_major', forge_major)
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
-        expand 'version':project.version, 'forge_major':forge_major
-    }
-    
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'META-INF/mods.toml'
-    }
-}
+//processResources {
+//    inputs.property('version', project.version)
+//    inputs.property('forge_major', forge_major)
+//
+//    from(sourceSets.main.resources.srcDirs) {
+//        include 'META-INF/mods.toml'
+//        expand 'version':project.version, 'forge_major':forge_major
+//    }
+//
+//    from(sourceSets.main.resources.srcDirs) {
+//        exclude 'META-INF/mods.toml'
+//    }
+//}
 
 jar {
     group = 'artifact'

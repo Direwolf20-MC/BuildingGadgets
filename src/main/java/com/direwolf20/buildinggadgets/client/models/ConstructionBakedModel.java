@@ -69,10 +69,10 @@ public class ConstructionBakedModel implements IDynamicBakedModel {
 
     }
 
-    @Override
-    public TextureAtlasSprite getParticleTexture(@Nonnull IModelData data) {
-        return this.getBakedModel().getParticleTexture(data);
-    }
+//    @Override
+//    public TextureAtlasSprite getParticleTexture(@Nonnull IModelData data) {
+//        return this.getBakedModel().getParticleTexture(data);
+//    }
 
     @Override
     public ItemOverrides getOverrides() {

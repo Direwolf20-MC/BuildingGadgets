@@ -1,7 +1,5 @@
 package com.direwolf20.buildinggadgets.client.renders;
 
-import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
-
 import com.direwolf20.buildinggadgets.client.renderer.DireBufferBuilder;
 import com.direwolf20.buildinggadgets.client.renderer.DireVertexBuffer;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
@@ -21,30 +19,32 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Matrix4f;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.resources.model.BakedModel;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.Direction;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import com.mojang.math.Matrix4f;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 import java.io.Closeable;
 import java.util.*;
 import java.util.function.Consumer;
+
+import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 
 public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
     private MultiVBORenderer renderBuffer;
@@ -210,7 +210,8 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
                 try {
                     if (state.getRenderShape() == RenderShape.MODEL) {
                         for (Direction direction : Direction.values()) {
-                            if (Block.shouldRenderFace(state, context.getWorld(), targetPos, direction) && !(context.getWorld().getBlockState(targetPos.relative(direction)).getBlock().equals(state.getBlock()))) {
+                            // TODO: likely broken this
+                            if (Block.shouldRenderFace(state, context.getWorld(), targetPos, direction, target.getPos()) && !(context.getWorld().getBlockState(targetPos.relative(direction)).getBlock().equals(state.getBlock()))) {
                                 if (state.getMaterial().isSolidBlocking()) {
                                     renderModelBrightnessColorQuads(stack.last(), builder, f, f1, f2, 0.7f, ibakedmodel.getQuads(state, direction, new Random(Mth.getSeed(targetPos)), EmptyModelData.INSTANCE), 15728640, 655360);
                                 } else {
@@ -258,7 +259,7 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
 
             vertexProducer.accept(rt -> builders.computeIfAbsent(rt, (_rt) -> {
                 DireBufferBuilder builder = new DireBufferBuilder(BUFFER_SIZE);
-                builder.begin(_rt.mode(), _rt.format());
+                builder.begin(_rt.mode().asGLMode, _rt.format());
 
                 return builder;
             }));
@@ -293,7 +294,7 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
                 RenderType rt = kv.getKey();
                 DireBufferBuilder.State state = kv.getValue();
                 DireBufferBuilder builder = new DireBufferBuilder(BUFFER_SIZE);
-                builder.begin(rt.mode(), rt.format());
+                builder.begin(rt.mode().asGLMode, rt.format());
                 builder.setVertexState(state);
                 builder.sortVertexData(x, y, z);
                 builder.finishDrawing();
@@ -309,8 +310,8 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
 
                 rt.setupRenderState();
                 vbo.bindBuffer();
-                fmt.setupBufferState(0L);
-                vbo.draw(matrix, rt.mode());
+                fmt.setupBufferState();
+                vbo.draw(matrix, rt.mode().asGLMode);
                 DireVertexBuffer.unbindBuffer();
                 fmt.clearBufferState();
                 rt.clearRenderState();

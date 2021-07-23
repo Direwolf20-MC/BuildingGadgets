@@ -2,6 +2,6 @@
 @MethodsReturnNonnullByDefault
 package com.direwolf20.buildinggadgets.common.util;
 
-import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;

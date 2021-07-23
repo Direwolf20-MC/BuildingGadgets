@@ -2,14 +2,14 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.client.ClientProxy;
 import com.direwolf20.buildinggadgets.common.tainted.save.SaveManager;
-import com.direwolf20.buildinggadgets.common.tainted.template.TemplateKey;
 import com.direwolf20.buildinggadgets.common.tainted.template.Template;
 import com.direwolf20.buildinggadgets.common.tainted.template.TemplateIO;
+import com.direwolf20.buildinggadgets.common.tainted.template.TemplateKey;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadException;
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateWriteException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.network.NetworkEvent.Context;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -46,7 +46,7 @@ public final class SplitPacketUpdateTemplate extends UUIDPacket {
         }
     }
 
-    public void handle(Supplier<Context> contextSupplier) {
+    public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
         contextSupplier.get().enqueueWork(() -> {
             if (contextSupplier.get().getDirection().getReceptionSide() == LogicalSide.CLIENT)
                 ClientProxy.CACHE_TEMPLATE_PROVIDER.setTemplate(new TemplateKey(getId()), template);

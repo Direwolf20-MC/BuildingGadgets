@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.tainted.building;
 
+import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
@@ -12,11 +12,9 @@ import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.fluid.WaterFluid;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.IServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.LazyOptional;
@@ -77,7 +75,7 @@ public final class PlacementChecker {
         }
 
         BlockSnapshot blockSnapshot = BlockSnapshot.create(context.getServerWorld().dimension(), context.getWorld(), target.getPos());
-        boolean isAir = blockSnapshot.getCurrentBlock().isAir(context.getWorld(), target.getPos());
+        boolean isAir = blockSnapshot.getCurrentBlock().isAir();
         if (firePlaceEvents && ForgeEventFactory.onBlockPlace(context.getPlayer(), blockSnapshot, Direction.UP))
             return new CheckResult(match, insertedItems, false, usePaste);
         if (! isAir) {

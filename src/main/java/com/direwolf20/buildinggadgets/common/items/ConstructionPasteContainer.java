@@ -74,7 +74,7 @@ public class ConstructionPasteContainer extends Item {
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         ItemStack heldItem = player.getItemInHand(hand);
         player.startUsingItem(hand);
-        Inventory inv = player.inventory;
+        Inventory inv = player.getInventory();
         if (!world.isClientSide) {
             for (int i = 0; i < 36; ++i) { // todo: this is awful. hardcoded int
                 ItemStack itemStack = inv.getItem(i);

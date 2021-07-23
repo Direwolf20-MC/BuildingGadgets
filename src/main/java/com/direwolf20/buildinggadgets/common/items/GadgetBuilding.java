@@ -248,7 +248,7 @@ public class GadgetBuilding extends AbstractGadget {
         // #majorcode
         MatchResult match = index.tryMatch(requiredItems);
         if (! match.isSuccess()) {
-            if (setBlock.getState().hasTileEntity())
+            if (setBlock.getState().hasBlockEntity())
                 return;
             match = index.tryMatch(InventoryHelper.PASTE_LIST);
             if (! match.isSuccess())

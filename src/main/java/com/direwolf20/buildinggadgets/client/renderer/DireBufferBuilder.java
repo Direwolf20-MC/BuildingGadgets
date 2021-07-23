@@ -42,7 +42,7 @@ public class DireBufferBuilder extends DefaultedVertexConsumer implements Buffer
     private boolean isDrawing;
 
     public DireBufferBuilder(int bufferSizeIn) {
-        this.byteBuffer = MemoryTracker.createByteBuffer(bufferSizeIn * 4);
+        this.byteBuffer = MemoryTracker.create(bufferSizeIn * 4); // TODO: might need to remove or change to 6
     }
 
     protected void growBuffer() {
@@ -54,7 +54,7 @@ public class DireBufferBuilder extends DefaultedVertexConsumer implements Buffer
             int i = this.byteBuffer.capacity();
             int j = i + roundUpPositive(increaseAmount);
             LOGGER.debug("Needed to grow BufferBuilder buffer: Old size {} bytes, new size {} bytes.", i, j);
-            ByteBuffer bytebuffer = MemoryTracker.createByteBuffer(j);
+            ByteBuffer bytebuffer = MemoryTracker.create(j);
             this.byteBuffer.position(0);
             bytebuffer.put(this.byteBuffer);
             bytebuffer.rewind();
@@ -96,7 +96,7 @@ public class DireBufferBuilder extends DefaultedVertexConsumer implements Buffer
             return Floats.compare(afloat[p_227830_1_], afloat[p_227830_2_]);
         });
         BitSet bitset = new BitSet();
-        FloatBuffer floatbuffer1 = MemoryTracker.createFloatBuffer(this.vertexFormat.getIntegerSize() * 4);
+        FloatBuffer floatbuffer1 = MemoryTracker.create(this.vertexFormat.getIntegerSize() * 4).asFloatBuffer();
 
         for (int l = bitset.nextClearBit(0); l < aint.length; l = bitset.nextClearBit(l + 1)) {
             int i1 = aint[l];

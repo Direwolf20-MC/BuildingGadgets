@@ -4,10 +4,10 @@ import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.google.common.base.Preconditions;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.fml.network.NetworkEvent.Context;
-import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ public final class PacketSplitManager {
         this.idToHandlerMap = new Int2ObjectOpenHashMap<>();
     }
 
-    public <MSG> void registerSplitPacket(Class<MSG> msgClass, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<Context>> handler) {
+    public <MSG> void registerSplitPacket(Class<MSG> msgClass, BiConsumer<MSG, FriendlyByteBuf> encoder, Function<FriendlyByteBuf, MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> handler) {
         PacketEncoder<MSG> splitEncoder = new PacketEncoder<>(encoder, id);
         PacketDecoder<MSG> splitDecoder = new PacketDecoder<>(decoder);
         PacketSplitHandler<MSG> splitHandler = new PacketSplitHandler<>(splitEncoder, splitDecoder, handler);
@@ -44,7 +44,7 @@ public final class PacketSplitManager {
         send(message, PacketHandler::sendToServer);
     }
 
-    public void send(Object message, PacketTarget target) {
+    public void send(Object message, PacketDistributor.PacketTarget target) {
         send(message, packet -> PacketHandler.HANDLER.send(target, packet));
     }
 
@@ -63,7 +63,7 @@ public final class PacketSplitManager {
         return SplitPacket.readFrom(buf);
     }
 
-    public void handle(SplitPacket msg, Supplier<Context> ctx) {
+    public void handle(SplitPacket msg, Supplier<NetworkEvent.Context> ctx) {
         PacketSplitHandler<?> handler = idToHandlerMap.get(msg.getId());
         Preconditions.checkArgument(handler != null, "Cannot handler packet with unknown id " + msg.getId() + "!");
         handler.handleSplit(msg, ctx);
@@ -72,15 +72,15 @@ public final class PacketSplitManager {
     private static final class PacketSplitHandler<MSG> {
         private final PacketEncoder<MSG> encoder;
         private final PacketDecoder<MSG> decoder;
-        private final BiConsumer<MSG, Supplier<Context>> handler;
+        private final BiConsumer<MSG, Supplier<NetworkEvent.Context>> handler;
 
-        private PacketSplitHandler(PacketEncoder<MSG> encoder, PacketDecoder<MSG> decoder, BiConsumer<MSG, Supplier<Context>> handler) {
+        private PacketSplitHandler(PacketEncoder<MSG> encoder, PacketDecoder<MSG> decoder, BiConsumer<MSG, Supplier<NetworkEvent.Context>> handler) {
             this.encoder = encoder;
             this.decoder = decoder;
             this.handler = handler;
         }
 
-        private void handleSplit(SplitPacket msg, Supplier<Context> ctx) {
+        private void handleSplit(SplitPacket msg, Supplier<NetworkEvent.Context> ctx) {
             Optional<MSG> msgOpt = decoder.decode(msg);
             msgOpt.ifPresent(packet -> {
                 handler.accept(packet, ctx);

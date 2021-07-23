@@ -1,27 +1,25 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.client.screen.components.GuiIncrementer;
-import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketCopyCoords;
+import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import net.minecraft.client.gui.components.Button.OnPress;
 
 public class CopyGUI extends Screen {
     private GuiIncrementer startX, startY, startZ, endX, endY, endZ;
@@ -63,7 +61,7 @@ public class CopyGUI extends Screen {
         fields.add(endX = new GuiIncrementer(x - incrementerWidth - 35, y - 15));
         fields.add(endY = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y - 15));
         fields.add(endZ = new GuiIncrementer(x + (GuiIncrementer.WIDTH / 2) + 35, y - 15));
-        fields.forEach(this::addButton);
+        fields.forEach(this::addWidget);
 
         updateTextFields();
 
@@ -93,7 +91,7 @@ public class CopyGUI extends Screen {
         }};
 
         CenteredButton.centerButtonList(buttons, x);
-        buttons.forEach(this::addButton);
+        buttons.forEach(this::addWidget);
     }
 
     private void drawFieldLabel(PoseStack matrices, String name, int x, int y) {

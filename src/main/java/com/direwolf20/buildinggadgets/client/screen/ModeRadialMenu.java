@@ -6,6 +6,7 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
+import com.direwolf20.buildinggadgets.client.OurSounds;
 import com.direwolf20.buildinggadgets.client.screen.components.GuiIconActionable;
 import com.direwolf20.buildinggadgets.client.screen.components.GuiSliderInt;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -14,7 +15,6 @@ import com.direwolf20.buildinggadgets.common.items.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.items.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
-import com.direwolf20.buildinggadgets.client.OurSounds;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
@@ -23,22 +23,22 @@ import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
-import com.mojang.blaze3d.platform.Lighting;
-import net.minecraft.client.KeyMapping;
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraftforge.fml.ForgeI18n;
+import net.minecraftforge.fmllegacy.ForgeI18n;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -88,27 +88,27 @@ public class ModeRadialMenu extends Screen {
         ScreenPosition left = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.LEFT;
 
         if (isDestruction) {
-            addButton(new PositionedIconActionable(RadialTranslation.DESTRUCTION_OVERLAY, "destroy_overlay", right, send -> {
+            addWidget(new PositionedIconActionable(RadialTranslation.DESTRUCTION_OVERLAY, "destroy_overlay", right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketChangeRange());
 
                 return GadgetDestruction.getOverlay(getGadget());
             }));
 
-            addButton(new PositionedIconActionable(RadialTranslation.FLUID_ONLY, "fluid_only", right, send -> {
+            addWidget(new PositionedIconActionable(RadialTranslation.FLUID_ONLY, "fluid_only", right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleFluidOnly());
 
                 return GadgetDestruction.getIsFluidOnly(getGadget());
             }));
         } else {
-            addButton(new PositionedIconActionable(RadialTranslation.ROTATE, "rotate", left, false, send -> {
+            addWidget(new PositionedIconActionable(RadialTranslation.ROTATE, "rotate", left, false, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.ROTATE));
 
                 return false;
             }));
-            addButton(new PositionedIconActionable(RadialTranslation.MIRROR, "mirror", left, false, send -> {
+            addWidget(new PositionedIconActionable(RadialTranslation.MIRROR, "mirror", left, false, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.MIRROR));
 
@@ -123,7 +123,7 @@ public class ModeRadialMenu extends Screen {
 
                     return AbstractGadget.getFuzzy(getGadget());
                 });
-                addButton(button);
+                addWidget(button);
                 conditionalButtons.add(button);
             }
             if( !isDestruction ) {
@@ -133,7 +133,7 @@ public class ModeRadialMenu extends Screen {
 
                     return AbstractGadget.getConnectedArea(getGadget());
                 });
-                addButton(button);
+                addWidget(button);
                 conditionalButtons.add(button);
             }
             if (!isDestruction) {
@@ -150,11 +150,11 @@ public class ModeRadialMenu extends Screen {
                     slider.updateSlider();
                 });
                 sliderRange.precision = 1;
-                sliderRange.getComponents().forEach(this::addButton);
+                sliderRange.getComponents().forEach(this::addWidget);
             }
         } else {
             // Copy Paste specific
-            addButton(new PositionedIconActionable(RadialTranslation.OPEN_GUI, "copypaste_opengui", right, send -> {
+            addWidget(new PositionedIconActionable(RadialTranslation.OPEN_GUI, "copypaste_opengui", right, send -> {
                 if (!send)
                     return false;
 
@@ -167,7 +167,7 @@ public class ModeRadialMenu extends Screen {
                     getMinecraft().setScreen(new PasteGUI(tool));
                 return true;
             }));
-            addButton(new PositionedIconActionable(RadialTranslation.OPEN_MATERIAL_LIST, "copypaste_materiallist", right, send -> {
+            addWidget(new PositionedIconActionable(RadialTranslation.OPEN_MATERIAL_LIST, "copypaste_materiallist", right, send -> {
                 if (!send)
                     return false;
 
@@ -178,21 +178,21 @@ public class ModeRadialMenu extends Screen {
                 return true;
             }));
         }
-        addButton(new PositionedIconActionable(RadialTranslation.RAYTRACE_FLUID, "raytrace_fluid", right, send -> {
+        addWidget(new PositionedIconActionable(RadialTranslation.RAYTRACE_FLUID, "raytrace_fluid", right, send -> {
             if (send)
                 PacketHandler.sendToServer(new PacketToggleRayTraceFluid());
 
             return AbstractGadget.shouldRayTraceFluid(getGadget());
         }));
         if (tool.getItem() instanceof GadgetBuilding) {
-            addButton(new PositionedIconActionable(RadialTranslation.PLACE_ON_TOP, "building_place_atop", right, send -> {
+            addWidget(new PositionedIconActionable(RadialTranslation.PLACE_ON_TOP, "building_place_atop", right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleBlockPlacement());
 
                 return GadgetBuilding.shouldPlaceAtop(getGadget());
             }));
         }
-        addButton(new PositionedIconActionable(RadialTranslation.ANCHOR, "anchor", left, send -> {
+        addWidget(new PositionedIconActionable(RadialTranslation.ANCHOR, "anchor", left, send -> {
             if (send)
                 PacketHandler.sendToServer(new PacketAnchor());
 
@@ -204,7 +204,7 @@ public class ModeRadialMenu extends Screen {
         }));
 
         if (!(tool.getItem() instanceof GadgetExchanger)) {
-            addButton(new PositionedIconActionable(RadialTranslation.UNDO, "undo", left, false, send -> {
+            addWidget(new PositionedIconActionable(RadialTranslation.UNDO, "undo", left, false, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketUndo());
 
@@ -222,7 +222,7 @@ public class ModeRadialMenu extends Screen {
         int padding = 10;
         boolean isDestruction = tool.getItem() instanceof GadgetDestruction;
         ScreenPosition right = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.RIGHT;
-        for (AbstractWidget widget : buttons) {
+        for (GuiEventListener widget : children()) {
             if (!(widget instanceof PositionedIconActionable))
                 continue;
 
@@ -247,7 +247,7 @@ public class ModeRadialMenu extends Screen {
         }
         posRight = resetPos(tool, padding, posRight);
         posLeft = resetPos(tool, padding, posLeft);
-        for (AbstractWidget widget : buttons) {
+        for (GuiEventListener widget : children()) {
             if (!(widget instanceof PositionedIconActionable))
                 continue;
 
@@ -289,28 +289,27 @@ public class ModeRadialMenu extends Screen {
         boolean inRange = false;
         if (segments != 0) {
             inRange = dist > radiusMin && dist < radiusMax;
-            for (AbstractWidget button : buttons) {
+            for (GuiEventListener button : children()) {
                 if (button instanceof PositionedIconActionable)
                     ((PositionedIconActionable) button).setFaded(inRange);
             }
         }
 
-        RenderSystem.pushMatrix();
-        RenderSystem.translatef((1 - fract) * x, (1 - fract) * y, 0);
-        RenderSystem.scalef(fract, fract, fract);
+        matrices.pushPose();
+        matrices.translate((1 - fract) * x, (1 - fract) * y, 0);
+        matrices.scale(fract, fract, fract);
         super.render(matrices, mx, my, partialTicks);
-        RenderSystem.popMatrix();
+        matrices.popPose();
 
         if (segments == 0)
             return;
 
-        RenderSystem.pushMatrix();
         RenderSystem.disableTexture();
 
         float angle = mouseAngle(x, y, mx, my);
 
         RenderSystem.enableBlend();
-        RenderSystem.shadeModel(GL11.GL_SMOOTH);
+//        RenderSystem.shadeModel(GL11.GL_SMOOTH);
         float totalDeg = 0;
         float degPer = 360F / segments;
 
@@ -357,7 +356,7 @@ public class ModeRadialMenu extends Screen {
                 r = g = b = 1F;
             }
 
-            RenderSystem.color4f(r, g, b, a);
+            RenderSystem.setShaderColor(r, g, b, a);
 
             for (float i = degPer; i >= 0; i--) {
                 float rad = (float) ((i + totalDeg) / 180F * Math.PI);
@@ -373,10 +372,10 @@ public class ModeRadialMenu extends Screen {
             totalDeg += degPer;
 
             GL11.glEnd();
-            RenderSystem.color4f(1, 1, 1, 1);
+            RenderSystem.setShaderColor(1, 1, 1, 1);
         }
 
-        RenderSystem.shadeModel(GL11.GL_FLAT);
+//        RenderSystem.shadeModel(GL11.GL_FLAT);
         RenderSystem.enableTexture();
 
         for (int i = 0; i < nameData.size(); i++) {
@@ -409,27 +408,27 @@ public class ModeRadialMenu extends Screen {
             int xdp = (int) ((xp - x) * mod + x);
             int ydp = (int) ((yp - y) * mod + y);
 
-            getMinecraft().getTextureManager().bind(signs.get(i));
-            RenderSystem.color4f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
-            getMinecraft().getTextureManager().bind(signs.get(i));
+            getMinecraft().getTextureManager().bindForSetup(signs.get(i));
+            RenderSystem.setShaderColor(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
+            getMinecraft().getTextureManager().bindForSetup(signs.get(i));
             blit(matrices, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
         }
 
-        RenderSystem.enableRescaleNormal();
+//        RenderSystem.enableRescaleNormal();
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-        Lighting.turnBackOn();
+        Lighting.setupForFlatItems();
 
         float s = 2.25F * fract;
-        RenderSystem.scalef(s, s, s);
-        RenderSystem.translatef(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
+        matrices.popPose();
+        matrices.scale(s, s, s);
+        matrices.translate(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
         itemRenderer.renderAndDecorateItem(tool, 0, 0);
 
-        Lighting.turnOff();
         RenderSystem.disableBlend();
-        RenderSystem.disableRescaleNormal();
-
-        RenderSystem.popMatrix();
+//        RenderSystem.disableRescaleNormal();
+        Lighting.setupForFlatItems();
+        matrices.popPose();
     }
 
     private boolean isCursorInSlice(float angle, float totalDeg, float degPer, boolean inRange) {

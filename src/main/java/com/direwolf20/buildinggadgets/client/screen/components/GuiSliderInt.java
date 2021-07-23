@@ -7,18 +7,16 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketChangeRange;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import net.minecraftforge.fml.client.gui.widget.Slider;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraftforge.fmlclient.gui.widget.Slider;
 
 import java.awt.*;
 import java.util.Collection;
 import java.util.function.BiConsumer;
-
-import net.minecraft.client.gui.components.Button.OnPress;
 
 public class GuiSliderInt extends Slider {
     private int colorBackground, colorSliderBackground, colorSlider;

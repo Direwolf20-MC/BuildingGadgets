@@ -30,9 +30,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
 

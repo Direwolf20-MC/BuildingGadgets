@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.client.screen.components;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.util.Mth;
@@ -123,6 +124,11 @@ public class GuiIncrementer extends AbstractWidget {
 
     public int getY() {
         return y;
+    }
+
+    @Override
+    public void updateNarration(NarrationElementOutput p_169152_) {
+
     }
 
     public interface IIncrementerChanged {

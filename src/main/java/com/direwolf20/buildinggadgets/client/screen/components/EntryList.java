@@ -1,15 +1,11 @@
 package com.direwolf20.buildinggadgets.client.screen.components;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.ObjectSelectionList.Entry;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.util.Mth;
-import net.minecraftforge.client.gui.ScrollPanel;
 import org.lwjgl.opengl.GL11;
 
 import static org.lwjgl.opengl.GL11.*;
@@ -42,8 +38,8 @@ public class EntryList<E extends Entry<E>> extends ObjectSelectionList<E> {
     // Copied and modified from AbstractLists#render(int, int, float)
     private void renderParts(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
         renderBackground(matrices);
-        RenderSystem.disableLighting();
-        RenderSystem.disableFog();
+//        RenderSystem.disableLighting();
+//        RenderSystem.disableFog();
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuilder();
 
@@ -68,7 +64,7 @@ public class EntryList<E extends Entry<E>> extends ObjectSelectionList<E> {
             int x2 = x1 + 6;
 
             RenderSystem.disableTexture();
-            bufferbuilder.begin(GL_QUADS, DefaultVertexFormat.POSITION_COLOR);
+            bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             bufferbuilder.vertex(x1, getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
             bufferbuilder.vertex(x2, getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
             bufferbuilder.vertex(x2, getTop(), 0.0D).color(0, 0, 0, 255).endVertex();

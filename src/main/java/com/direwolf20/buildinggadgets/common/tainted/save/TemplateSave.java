@@ -9,8 +9,14 @@ import java.util.UUID;
 
 public final class TemplateSave extends TimedDataSave<TemplateInfo> {
 
-    public TemplateSave(String name) {
-        super(name);
+    public TemplateSave() {
+        super();
+    }
+
+    public static TemplateSave loads(CompoundTag tag) {
+        TemplateSave templateSave = new TemplateSave();
+        templateSave.load(tag);
+        return templateSave;
     }
 
     public Template getTemplate(UUID id) {

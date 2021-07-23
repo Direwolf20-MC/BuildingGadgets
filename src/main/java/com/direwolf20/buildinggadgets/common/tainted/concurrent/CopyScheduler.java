@@ -43,7 +43,7 @@ public final class CopyScheduler extends SteppedScheduler {
     @Override
     protected StepResult advance() {
         return StepResult.ofBoolean(targets.tryAdvance(t -> {
-            if (! t.getData().getState().isAir(context.getWorld(), t.getPos()) && ((GadgetCopyPaste) OurItems.COPY_PASTE_GADGET_ITEM.get()).isAllowedBlock(t.getData().getState().getBlock())) {
+            if (! t.getData().getState().isAir() && ((GadgetCopyPaste) OurItems.COPY_PASTE_GADGET_ITEM.get()).isAllowedBlock(t.getData().getState().getBlock())) {
                 builder.put(t.getPos(), t.getData());
                 if (regionBuilder == null)
                     regionBuilder = Region.enclosingBuilder();

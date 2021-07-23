@@ -5,21 +5,22 @@ import com.direwolf20.buildinggadgets.common.containers.TemplateManagerContainer
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.ItemReference;
 import com.google.common.base.Preconditions;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.tags.Tag;
-import net.minecraft.tags.ItemTags;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -34,8 +35,8 @@ public class TemplateManagerTileEntity extends BlockEntity implements MenuProvid
 
     public static final int SIZE = 2;
 
-    public TemplateManagerTileEntity() {
-        super(OurTileEntities.TEMPLATE_MANAGER_TILE_ENTITY.get());
+    public TemplateManagerTileEntity(BlockPos pos, BlockState state) {
+        super(OurTileEntities.TEMPLATE_MANAGER_TILE_ENTITY.get(), pos, state);
     }
 
     // This item handler will hold our inventory slots
@@ -59,7 +60,7 @@ public class TemplateManagerTileEntity extends BlockEntity implements MenuProvid
         @Override
         public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
             return (slot == 0 && isTemplateStack(stack)) ||
-                    (slot == 1 && (isTemplateStack(stack) || stack.getItem().is(TEMPLATE_CONVERTIBLES)));
+                    (slot == 1 && (isTemplateStack(stack) || TEMPLATE_CONVERTIBLES.contains(stack.getItem())));
         }
     };
     private LazyOptional<IItemHandler> handlerOpt;
@@ -84,8 +85,8 @@ public class TemplateManagerTileEntity extends BlockEntity implements MenuProvid
     }
 
     @Override
-    public void load(BlockState state, CompoundTag nbt) {
-        super.load(state, nbt);
+    public void load(CompoundTag nbt) {
+        super.load(nbt);
 
         if (nbt.contains(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS))
             itemStackHandler.deserializeNBT(nbt.getCompound(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS));

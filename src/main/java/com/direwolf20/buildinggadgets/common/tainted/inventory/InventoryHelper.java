@@ -15,20 +15,24 @@ import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.block.*;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.DoublePlantBlock;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -36,12 +40,6 @@ import net.minecraftforge.items.wrapper.EmptyHandler;
 
 import java.util.*;
 import java.util.function.Supplier;
-
-import net.minecraft.world.level.block.CropBlock;
-import net.minecraft.world.level.block.DoorBlock;
-import net.minecraft.world.level.block.DoublePlantBlock;
-import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraft.world.level.block.state.BlockState;
 
 /*
  * @MichaelHillcox
@@ -122,7 +120,7 @@ public class InventoryHelper {
         }
 
         //Fill any unfilled stacks in the player's inventory first
-        Inventory inv = player.inventory;
+        Inventory inv = player.getInventory();
         List<Integer> slots = findItem(itemStack.getItem(), inv);
         for (int slot : slots) {
             ItemStack stackInSlot = inv.getItem(slot);
@@ -176,7 +174,7 @@ public class InventoryHelper {
             return itemStack;
         }
 
-        Inventory inv = player.inventory;
+        Inventory inv = player.getInventory();
         List<Integer> slots = findItemClass(ConstructionPasteContainer.class, inv);
         if (slots.size() == 0) {
             return itemStack;
