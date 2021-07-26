@@ -173,11 +173,11 @@ class ScrollingMaterialList extends EntryList<Entry> {
                 RenderSystem.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 RenderSystem.setShaderColor(255, 255, 255, 34);
 
-                glLineWidth(1);
-                glBegin(GL_LINES);
-                glVertex3f(lineXStart, lineY, 0);
-                glVertex3f(lineXEnd, lineY, 0);
-                glEnd();
+//                glLineWidth(1);
+//                glBegin(GL_LINES);
+//                glVertex3f(lineXStart, lineY, 0);
+//                glVertex3f(lineXEnd, lineY, 0);
+//                glEnd();
 
                 RenderSystem.enableTexture();
             }

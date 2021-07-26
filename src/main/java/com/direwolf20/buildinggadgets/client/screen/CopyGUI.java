@@ -61,7 +61,7 @@ public class CopyGUI extends Screen {
         fields.add(endX = new GuiIncrementer(x - incrementerWidth - 35, y - 15));
         fields.add(endY = new GuiIncrementer(x - GuiIncrementer.WIDTH / 2, y - 15));
         fields.add(endZ = new GuiIncrementer(x + (GuiIncrementer.WIDTH / 2) + 35, y - 15));
-        fields.forEach(this::addWidget);
+        fields.forEach(this::addRenderableWidget);
 
         updateTextFields();
 
@@ -91,7 +91,7 @@ public class CopyGUI extends Screen {
         }};
 
         CenteredButton.centerButtonList(buttons, x);
-        buttons.forEach(this::addWidget);
+        buttons.forEach(this::addRenderableWidget);
     }
 
     private void drawFieldLabel(PoseStack matrices, String name, int x, int y) {

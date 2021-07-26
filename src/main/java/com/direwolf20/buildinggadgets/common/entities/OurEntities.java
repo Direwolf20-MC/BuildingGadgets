@@ -4,12 +4,11 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.EntityReference;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fmlclient.registry.RenderingRegistry;
 
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public class OurEntities {
@@ -33,7 +32,7 @@ public class OurEntities {
     }
 
     @SubscribeEvent
-    public static void registerModels(ModelRegistryEvent evt) {
-        RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.TYPE, ConstructionBlockEntityRender::new);
+    public static void registerModels(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(ConstructionBlockEntity.TYPE, ConstructionBlockEntityRender::new);
     }
 }

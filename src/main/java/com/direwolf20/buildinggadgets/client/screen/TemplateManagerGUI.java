@@ -107,14 +107,14 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
         this.nameField = new EditBox(this.font, (this.leftPos - 20) + 8, topPos - 5, imageWidth - 16, this.font.lineHeight + 3, GuiTranslation.TEMPLATE_NAME_TIP.componentTranslation());
 
         int x = (leftPos - 20) + 180;
-        buttonSave = addWidget(new Button(x, topPos + 17, 60, 20, GuiTranslation.BUTTON_SAVE.componentTranslation(), b -> onSave()));
-        buttonLoad = addWidget(new Button(x,topPos + 39, 60, 20, GuiTranslation.BUTTON_LOAD.componentTranslation(), b -> onLoad()));
-        buttonCopy = addWidget(new Button(x, topPos + 66, 60, 20, GuiTranslation.BUTTON_COPY.componentTranslation(), b -> onCopy()));
-        buttonPaste = addWidget(new Button(x, topPos + 89, 60, 20, GuiTranslation.BUTTON_PASTE.componentTranslation(), b -> onPaste()));
+        buttonSave = addRenderableWidget(new Button(x, topPos + 17, 60, 20, GuiTranslation.BUTTON_SAVE.componentTranslation(), b -> onSave()));
+        buttonLoad = addRenderableWidget(new Button(x,topPos + 39, 60, 20, GuiTranslation.BUTTON_LOAD.componentTranslation(), b -> onLoad()));
+        buttonCopy = addRenderableWidget(new Button(x, topPos + 66, 60, 20, GuiTranslation.BUTTON_COPY.componentTranslation(), b -> onCopy()));
+        buttonPaste = addRenderableWidget(new Button(x, topPos + 89, 60, 20, GuiTranslation.BUTTON_PASTE.componentTranslation(), b -> onPaste()));
 
         this.nameField.setMaxLength(50);
         this.nameField.setVisible(true);
-        addWidget(nameField);
+        addRenderableWidget(nameField);
     }
 
     @Override

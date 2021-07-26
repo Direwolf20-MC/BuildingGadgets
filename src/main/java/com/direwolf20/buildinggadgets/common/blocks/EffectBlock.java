@@ -16,7 +16,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
@@ -36,7 +36,7 @@ import java.util.List;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class EffectBlock extends Block implements EntityBlock {
+public class EffectBlock extends BaseEntityBlock {
 
     public enum Mode {
         // Serialization and networking based on `ordinal()`, please DO NOT CHANGE THE ORDER of the enums
@@ -87,6 +87,12 @@ public class EffectBlock extends Block implements EntityBlock {
         public static final Mode[] VALUES = values();
 
         public abstract void onBuilderRemoved(EffectBlockTileEntity builder);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return createTickerHelper(type, OurTileEntities.EFFECT_BLOCK_TILE_ENTITY.get(), EffectBlockTileEntity::tick);
     }
 
     /**

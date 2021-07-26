@@ -6,11 +6,12 @@ import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nonnull;
@@ -52,15 +53,12 @@ public class EffectBlockTileEntity extends BlockEntity {
             this.renderedBlock = te instanceof ConstructionBlockTileEntity ? ((ConstructionBlockTileEntity) te).getConstructionBlockData() : replacementBlock;
     }
 
-    // TODO: ADD TICKS BACK
-//    @Override
-//    public void tick() {
-//        ticks++;
-//        if (ticks >= getLifespan()) {
-//            complete();
-//        }
-//    }
-
+    public static void tick(Level level, BlockPos blockPos, BlockState state, EffectBlockTileEntity blockEntity) {
+        blockEntity.ticks++;
+        if (blockEntity.ticks >= blockEntity.getLifespan()) {
+            blockEntity.complete();
+        }
+    }
 
     private void complete() {
         if (level == null || level.isClientSide || mode == null || renderedBlock == null)
@@ -145,5 +143,4 @@ public class EffectBlockTileEntity extends BlockEntity {
             usePaste = nbt.getBoolean(NBTKeys.GADGET_USE_PASTE);
         }
     }
-
 }

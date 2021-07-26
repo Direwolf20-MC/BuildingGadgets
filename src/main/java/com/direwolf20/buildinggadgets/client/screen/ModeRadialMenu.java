@@ -24,14 +24,14 @@ import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -39,7 +39,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fmllegacy.ForgeI18n;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -88,27 +87,27 @@ public class ModeRadialMenu extends Screen {
         ScreenPosition left = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.LEFT;
 
         if (isDestruction) {
-            addWidget(new PositionedIconActionable(RadialTranslation.DESTRUCTION_OVERLAY, "destroy_overlay", right, send -> {
+            addRenderableWidget(new PositionedIconActionable(RadialTranslation.DESTRUCTION_OVERLAY, "destroy_overlay", right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketChangeRange());
 
                 return GadgetDestruction.getOverlay(getGadget());
             }));
 
-            addWidget(new PositionedIconActionable(RadialTranslation.FLUID_ONLY, "fluid_only", right, send -> {
+            addRenderableWidget(new PositionedIconActionable(RadialTranslation.FLUID_ONLY, "fluid_only", right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleFluidOnly());
 
                 return GadgetDestruction.getIsFluidOnly(getGadget());
             }));
         } else {
-            addWidget(new PositionedIconActionable(RadialTranslation.ROTATE, "rotate", left, false, send -> {
+            addRenderableWidget(new PositionedIconActionable(RadialTranslation.ROTATE, "rotate", left, false, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.ROTATE));
 
                 return false;
             }));
-            addWidget(new PositionedIconActionable(RadialTranslation.MIRROR, "mirror", left, false, send -> {
+            addRenderableWidget(new PositionedIconActionable(RadialTranslation.MIRROR, "mirror", left, false, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.MIRROR));
 
@@ -123,7 +122,7 @@ public class ModeRadialMenu extends Screen {
 
                     return AbstractGadget.getFuzzy(getGadget());
                 });
-                addWidget(button);
+                addRenderableWidget(button);
                 conditionalButtons.add(button);
             }
             if( !isDestruction ) {
@@ -133,7 +132,7 @@ public class ModeRadialMenu extends Screen {
 
                     return AbstractGadget.getConnectedArea(getGadget());
                 });
-                addWidget(button);
+                addRenderableWidget(button);
                 conditionalButtons.add(button);
             }
             if (!isDestruction) {
@@ -150,11 +149,11 @@ public class ModeRadialMenu extends Screen {
                     slider.updateSlider();
                 });
                 sliderRange.precision = 1;
-                sliderRange.getComponents().forEach(this::addWidget);
+                sliderRange.getComponents().forEach(this::addRenderableWidget);
             }
         } else {
             // Copy Paste specific
-            addWidget(new PositionedIconActionable(RadialTranslation.OPEN_GUI, "copypaste_opengui", right, send -> {
+            addRenderableWidget(new PositionedIconActionable(RadialTranslation.OPEN_GUI, "copypaste_opengui", right, send -> {
                 if (!send)
                     return false;
 
@@ -167,7 +166,7 @@ public class ModeRadialMenu extends Screen {
                     getMinecraft().setScreen(new PasteGUI(tool));
                 return true;
             }));
-            addWidget(new PositionedIconActionable(RadialTranslation.OPEN_MATERIAL_LIST, "copypaste_materiallist", right, send -> {
+            addRenderableWidget(new PositionedIconActionable(RadialTranslation.OPEN_MATERIAL_LIST, "copypaste_materiallist", right, send -> {
                 if (!send)
                     return false;
 
@@ -178,21 +177,21 @@ public class ModeRadialMenu extends Screen {
                 return true;
             }));
         }
-        addWidget(new PositionedIconActionable(RadialTranslation.RAYTRACE_FLUID, "raytrace_fluid", right, send -> {
+        addRenderableWidget(new PositionedIconActionable(RadialTranslation.RAYTRACE_FLUID, "raytrace_fluid", right, send -> {
             if (send)
                 PacketHandler.sendToServer(new PacketToggleRayTraceFluid());
 
             return AbstractGadget.shouldRayTraceFluid(getGadget());
         }));
         if (tool.getItem() instanceof GadgetBuilding) {
-            addWidget(new PositionedIconActionable(RadialTranslation.PLACE_ON_TOP, "building_place_atop", right, send -> {
+            addRenderableWidget(new PositionedIconActionable(RadialTranslation.PLACE_ON_TOP, "building_place_atop", right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleBlockPlacement());
 
                 return GadgetBuilding.shouldPlaceAtop(getGadget());
             }));
         }
-        addWidget(new PositionedIconActionable(RadialTranslation.ANCHOR, "anchor", left, send -> {
+        addRenderableWidget(new PositionedIconActionable(RadialTranslation.ANCHOR, "anchor", left, send -> {
             if (send)
                 PacketHandler.sendToServer(new PacketAnchor());
 
@@ -204,7 +203,7 @@ public class ModeRadialMenu extends Screen {
         }));
 
         if (!(tool.getItem() instanceof GadgetExchanger)) {
-            addWidget(new PositionedIconActionable(RadialTranslation.UNDO, "undo", left, false, send -> {
+            addRenderableWidget(new PositionedIconActionable(RadialTranslation.UNDO, "undo", left, false, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketUndo());
 
@@ -334,6 +333,16 @@ public class ModeRadialMenu extends Screen {
             signs = signsCopyPaste;
         }
 
+        Tesselator tessellator = Tesselator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuilder();
+
+        RenderSystem.enableBlend();
+        RenderSystem.disableTexture();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+
         boolean shouldCenter = (segments + 2) % 4 == 0;
         int indexBottom = segments / 4;
         int indexTop = indexBottom + segments / 2;
@@ -341,7 +350,6 @@ public class ModeRadialMenu extends Screen {
             boolean mouseInSector = isCursorInSlice(angle, totalDeg, degPer, inRange);
             float radius = Math.max(0F, Math.min((timeIn + partialTicks - seg * 6F / segments) * 40F, radiusMax));
 
-            GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
 
             float gs = 0.25F;
             if (seg % 2 == 0)
@@ -356,7 +364,8 @@ public class ModeRadialMenu extends Screen {
                 r = g = b = 1F;
             }
 
-            RenderSystem.setShaderColor(r, g, b, a);
+//            RenderSystem.setShaderColor(r, g, b, a);
+
 
             for (float i = degPer; i >= 0; i--) {
                 float rad = (float) ((i + totalDeg) / 180F * Math.PI);
@@ -365,20 +374,41 @@ public class ModeRadialMenu extends Screen {
                 if ((int) i == (int) (degPer / 2))
                     nameData.add(new NameDisplayData((int) xp, (int) yp, mouseInSector, shouldCenter && (seg == indexBottom || seg == indexTop)));
 
-                GL11.glVertex2d(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F);
-                GL11.glVertex2d(xp, yp);
+                float angle1 = startAngle + (i / (float) segments) * angle;
+                float angle2 = startAngle + ((i + 1) / (float) segments) * angle;
+
+                float z = 1;
+                float pos1InX = x + radiusMin * (float) Math.cos(angle1);
+                float pos1InY = y + radiusMin * (float) Math.sin(angle1);
+                float pos1OutX = x + radiusMax * (float) Math.cos(angle1);
+                float pos1OutY = y + radiusMax * (float) Math.sin(angle1);
+                float pos2OutX = x + radiusMax * (float) Math.cos(angle2);
+                float pos2OutY = y + radiusMax * (float) Math.sin(angle2);
+                float pos2InX = x + radiusMin * (float) Math.cos(angle2);
+                float pos2InY = y + radiusMin * (float) Math.sin(angle2);
+
+                bufferBuilder.vertex(pos1OutX, pos1OutY, z).color(r, g, b, a).endVertex();
+                bufferBuilder.vertex(pos1InX, pos1InY, z).color(r, g, b, a).endVertex();
+                bufferBuilder.vertex(pos2InX, pos2InY, z).color(r, g, b, a).endVertex();
+                bufferBuilder.vertex(pos2OutX, pos2OutY, z).color(r, g, b, a).endVertex();
+
+                bufferBuilder.vertex(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F, 0).color(r, g, b, a).endVertex();
+                bufferBuilder.vertex(xp, yp, 0).color(r, g, b, a).endVertex();
+
+//                GL11.glVertex2d(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F);
+//                GL11.glVertex2d(xp, yp);
             }
 
             totalDeg += degPer;
-
-            GL11.glEnd();
-            RenderSystem.setShaderColor(1, 1, 1, 1);
+//            RenderSystem.setShaderColor(1, 1, 1, 1);
         }
 
-//        RenderSystem.shadeModel(GL11.GL_FLAT);
+        tessellator.end();
         RenderSystem.enableTexture();
+        RenderSystem.disableBlend();
 
         for (int i = 0; i < nameData.size(); i++) {
+            matrices.pushPose();
             NameDisplayData data = nameData.get(i);
             int xp = data.getX();
             int yp = data.getY();
@@ -408,26 +438,28 @@ public class ModeRadialMenu extends Screen {
             int xdp = (int) ((xp - x) * mod + x);
             int ydp = (int) ((yp - y) * mod + y);
 
-            getMinecraft().getTextureManager().bindForSetup(signs.get(i));
+            RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
-            getMinecraft().getTextureManager().bindForSetup(signs.get(i));
+            RenderSystem.setShaderTexture(0, signs.get(i));
             blit(matrices, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
+
+            matrices.popPose();
         }
 
 //        RenderSystem.enableRescaleNormal();
-        RenderSystem.enableBlend();
-        RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-        Lighting.setupForFlatItems();
+//        RenderSystem.enableBlend();
+//        RenderSystem.blendFuncSeparate(770, 771, 1, 0);
+//        Lighting.setupForFlatItems();
 
         float s = 2.25F * fract;
-        matrices.popPose();
+        matrices.pushPose();
         matrices.scale(s, s, s);
         matrices.translate(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
-        itemRenderer.renderAndDecorateItem(tool, 0, 0);
+        itemRenderer.renderGuiItem(tool, 0, 0);
 
-        RenderSystem.disableBlend();
+//        RenderSystem.disableBlend();
 //        RenderSystem.disableRescaleNormal();
-        Lighting.setupForFlatItems();
+//        Lighting.setupForFlatItems();
         matrices.popPose();
     }
 

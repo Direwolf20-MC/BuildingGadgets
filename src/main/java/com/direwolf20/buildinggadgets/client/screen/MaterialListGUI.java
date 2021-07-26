@@ -78,7 +78,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         this.scrollingList = new ScrollingMaterialList(this);
         // Make it receive mouse scroll events, so that the player can use his mouse wheel at the start
         this.setFocused(scrollingList);
-        this.addWidget(scrollingList);
+        this.addRenderableWidget(scrollingList);
 
         int buttonY = getWindowBottomY() - (ScrollingMaterialList.BOTTOM / 2 + BUTTON_HEIGHT / 2);
         this.buttonClose = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_CLOSE.componentTranslation(), b -> getMinecraft().player.closeContainer());
@@ -95,9 +95,9 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         });
 
         // Buttons will be placed left to right in this order
-        this.addWidget(buttonSortingModes);
-        this.addWidget(buttonCopyList);
-        this.addWidget(buttonClose);
+        this.addRenderableWidget(buttonSortingModes);
+        this.addRenderableWidget(buttonCopyList);
+        this.addRenderableWidget(buttonClose);
 
         this.calculateButtonsWidthAndX();
     }
