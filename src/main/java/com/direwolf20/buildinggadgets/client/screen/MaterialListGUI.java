@@ -119,7 +119,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
 
     @Override
     public void render(PoseStack matrices, int mouseX, int mouseY, float particleTicks) {
-        getMinecraft().getTextureManager().bindForSetup(BACKGROUND_TEXTURE);
+        RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
         blit(matrices, backgroundX, backgroundY, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT); // TODO: Might be wrong
 
         scrollingList.render(matrices, mouseX, mouseY, particleTicks);

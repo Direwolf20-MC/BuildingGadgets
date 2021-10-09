@@ -18,7 +18,7 @@ public class DireButton extends Button {
     public void render(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
         if (this.visible) {
             Font fontrenderer = Minecraft.getInstance().font;
-            Minecraft.getInstance().getTextureManager().bindForSetup(WIDGETS_LOCATION);
+            RenderSystem.setShaderTexture(0, WIDGETS_LOCATION);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             this.isHovered = isMouseOver(mouseX, mouseY);
             RenderSystem.enableBlend();

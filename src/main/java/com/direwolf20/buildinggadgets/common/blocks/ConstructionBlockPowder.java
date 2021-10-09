@@ -16,14 +16,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.ToolType;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class ConstructionBlockPowder extends FallingBlock {
     public ConstructionBlockPowder() {
-        super(Block.Properties.of(Material.SAND).strength(0.5F).harvestTool(ToolType.SHOVEL));
+        super(Block.Properties.of(Material.SAND).strength(0.5F));
     }
 
     @Override

@@ -86,9 +86,10 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 //    implementation('cpw.mods:securejarhandler') { version { strictly '0.9.45' } }
+
     //JEI
-//    compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
-//    runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
 //    runtimeOnly fg.deobf("curse.maven:create-328085:3158185")
     // deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
     // deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"

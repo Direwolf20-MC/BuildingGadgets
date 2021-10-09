@@ -50,7 +50,7 @@ public abstract class BaseRenderer {
     }
 
     private void bindBlocks() {
-        getMc().getTextureManager().bindForSetup(InventoryMenu.BLOCK_ATLAS);
+        RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
     }
 
     private static void renderLinkedInventoryOutline(RenderWorldLastEvent evt, ItemStack item, Player player) {

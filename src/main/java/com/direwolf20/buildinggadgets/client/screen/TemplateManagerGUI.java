@@ -37,6 +37,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.google.gson.JsonParseException;
 import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -134,7 +135,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
     protected void renderBg(PoseStack matrices, float partialTicks, int mouseX, int mouseY) {
         renderBackground(matrices);
 
-        getMinecraft().getTextureManager().bindForSetup(background);
+        RenderSystem.setShaderTexture(0, background);
         blit(matrices, leftPos - 20, topPos - 12, 0, 0, imageWidth, imageHeight + 25);
         blit(matrices, (leftPos - 20) + imageWidth, topPos + 8, imageWidth + 3, 30, 71, imageHeight);
 
@@ -215,7 +216,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
 //                            renderer.render(te, targetPos.getX(), targetPos.getY(), targetPos.getZ(), partialTicks, - 1);
                     }
                     //remember vanilla Tiles rebinding the TextureAtlas
-                    getMinecraft().getTextureManager().bindForSetup(InventoryMenu.BLOCK_ATLAS);
+                    RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
                 } catch (Exception e) {
                     BuildingGadgets.LOG.error("Error rendering TileEntity", e);
                 }

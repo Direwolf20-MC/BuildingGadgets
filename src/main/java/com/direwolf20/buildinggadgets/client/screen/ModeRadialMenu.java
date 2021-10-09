@@ -7,6 +7,7 @@ package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.OurSounds;
+import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
 import com.direwolf20.buildinggadgets.client.screen.components.GuiIconActionable;
 import com.direwolf20.buildinggadgets.client.screen.components.GuiSliderInt;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -25,13 +26,16 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix4f;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -294,6 +298,7 @@ public class ModeRadialMenu extends Screen {
             }
         }
 
+        // This triggers the animation on creation
         matrices.pushPose();
         matrices.translate((1 - fract) * x, (1 - fract) * y, 0);
         matrices.scale(fract, fract, fract);
@@ -303,12 +308,8 @@ public class ModeRadialMenu extends Screen {
         if (segments == 0)
             return;
 
-        RenderSystem.disableTexture();
-
         float angle = mouseAngle(x, y, mx, my);
 
-        RenderSystem.enableBlend();
-//        RenderSystem.shadeModel(GL11.GL_SMOOTH);
         float totalDeg = 0;
         float degPer = 360F / segments;
 
@@ -333,23 +334,12 @@ public class ModeRadialMenu extends Screen {
             signs = signsCopyPaste;
         }
 
-        Tesselator tessellator = Tesselator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.getBuilder();
-
-        RenderSystem.enableBlend();
-        RenderSystem.disableTexture();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-
         boolean shouldCenter = (segments + 2) % 4 == 0;
         int indexBottom = segments / 4;
         int indexTop = indexBottom + segments / 2;
         for (int seg = 0; seg < segments; seg++) {
             boolean mouseInSector = isCursorInSlice(angle, totalDeg, degPer, inRange);
             float radius = Math.max(0F, Math.min((timeIn + partialTicks - seg * 6F / segments) * 40F, radiusMax));
-
 
             float gs = 0.25F;
             if (seg % 2 == 0)
@@ -364,49 +354,26 @@ public class ModeRadialMenu extends Screen {
                 r = g = b = 1F;
             }
 
-//            RenderSystem.setShaderColor(r, g, b, a);
-
+            MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+            VertexConsumer buffer = bufferSource.getBuffer(OurRenderTypes.TRIANGLE_STRIP);
 
             for (float i = degPer; i >= 0; i--) {
                 float rad = (float) ((i + totalDeg) / 180F * Math.PI);
-                double xp = x + Math.cos(rad) * radius;
-                double yp = y + Math.sin(rad) * radius;
+                float xp = (float) (x + Math.cos(rad) * radius);
+                float yp = (float) (y + Math.sin(rad) * radius);
                 if ((int) i == (int) (degPer / 2))
                     nameData.add(new NameDisplayData((int) xp, (int) yp, mouseInSector, shouldCenter && (seg == indexBottom || seg == indexTop)));
 
-                float angle1 = startAngle + (i / (float) segments) * angle;
-                float angle2 = startAngle + ((i + 1) / (float) segments) * angle;
-
-                float z = 1;
-                float pos1InX = x + radiusMin * (float) Math.cos(angle1);
-                float pos1InY = y + radiusMin * (float) Math.sin(angle1);
-                float pos1OutX = x + radiusMax * (float) Math.cos(angle1);
-                float pos1OutY = y + radiusMax * (float) Math.sin(angle1);
-                float pos2OutX = x + radiusMax * (float) Math.cos(angle2);
-                float pos2OutY = y + radiusMax * (float) Math.sin(angle2);
-                float pos2InX = x + radiusMin * (float) Math.cos(angle2);
-                float pos2InY = y + radiusMin * (float) Math.sin(angle2);
-
-                bufferBuilder.vertex(pos1OutX, pos1OutY, z).color(r, g, b, a).endVertex();
-                bufferBuilder.vertex(pos1InX, pos1InY, z).color(r, g, b, a).endVertex();
-                bufferBuilder.vertex(pos2InX, pos2InY, z).color(r, g, b, a).endVertex();
-                bufferBuilder.vertex(pos2OutX, pos2OutY, z).color(r, g, b, a).endVertex();
-
-                bufferBuilder.vertex(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F, 0).color(r, g, b, a).endVertex();
-                bufferBuilder.vertex(xp, yp, 0).color(r, g, b, a).endVertex();
-
-//                GL11.glVertex2d(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F);
-//                GL11.glVertex2d(xp, yp);
+                Matrix4f pose = matrices.last().pose();
+                buffer.vertex(pose, (float) (x + Math.cos(rad) * radius / 2.3F), (float) (y + Math.sin(rad) * radius / 2.3F), 0).color(r, g, b, a).endVertex();
+                buffer.vertex(xp, yp, 0).color(r, g, b, a).endVertex();
             }
 
+            bufferSource.endBatch(OurRenderTypes.TRIANGLE_STRIP);
             totalDeg += degPer;
-//            RenderSystem.setShaderColor(1, 1, 1, 1);
         }
 
-        tessellator.end();
-        RenderSystem.enableTexture();
-        RenderSystem.disableBlend();
-
+        // This is the naming logic for the text that pops up
         for (int i = 0; i < nameData.size(); i++) {
             matrices.pushPose();
             NameDisplayData data = nameData.get(i);
@@ -451,16 +418,22 @@ public class ModeRadialMenu extends Screen {
 //        RenderSystem.blendFuncSeparate(770, 771, 1, 0);
 //        Lighting.setupForFlatItems();
 
-        float s = 2.25F * fract;
-        matrices.pushPose();
-        matrices.scale(s, s, s);
-        matrices.translate(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
-        itemRenderer.renderGuiItem(tool, 0, 0);
-
-//        RenderSystem.disableBlend();
-//        RenderSystem.disableRescaleNormal();
-//        Lighting.setupForFlatItems();
-        matrices.popPose();
+//        float s = 2.25F * fract;
+//        matrices.pushPose();
+//        matrices.scale(s, s, s);
+////        matrices.translate(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
+//
+//        matrices.translate(0, 0, 0);
+//        RenderSystem.applyModelViewMatrix();
+////        this.itemRenderer.renderGuiItem(tool, 0, 0);
+//        MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+//        this.itemRenderer.renderStatic(tool, ItemTransforms.TransformType.GROUND,  OverlayTexture.NO_OVERLAY, 15728880, matrices, bufferSource, 0);
+////        bufferBuilder.end();
+////        RenderSystem.disableBlend();
+////        Lighting.setupFor3DItems();
+//        matrices.popPose();
+//        RenderSystem.applyModelViewMatrix();
+////        RenderSystem.applyModelViewMatrix();
     }
 
     private boolean isCursorInSlice(float angle, float totalDeg, float degPer, boolean inRange) {
