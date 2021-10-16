@@ -60,16 +60,14 @@ public class OurRenderTypes extends RenderType {
 //            .createCompositeState(false));
 
     public static final RenderType CopyGadgetLines = create("GadgetCopyLines",
-            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.LINE_STRIP, 256, false, false,
+            DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.LINES, 256, false, false,
             RenderType.CompositeState.builder()
-                    .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_NO_OUTLINE_SHADER)
+                    .setShaderState(RENDERTYPE_LINES_SHADER)
                     .setLineState(new LineStateShard(OptionalDouble.of(2.0D)))
                     .setLayeringState(VIEW_OFFSET_Z_LAYERING)
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                    .setTextureState(NO_TEXTURE)
-                    .setDepthTestState(LEQUAL_DEPTH_TEST)
+                    .setOutputState(ITEM_ENTITY_TARGET)
                     .setCullState(NO_CULL)
-                    .setLightmapState(RenderStateShard.NO_LIGHTMAP)
                     .setWriteMaskState(COLOR_DEPTH_WRITE)
                     .createCompositeState(false));
 
