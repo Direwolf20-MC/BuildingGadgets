@@ -1,17 +1,17 @@
 package com.direwolf20.buildinggadgets.client.renderer;
 
 
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.resources.ResourceLocation;
 import com.mojang.math.Matrix3f;
 import com.mojang.math.Matrix4f;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.InventoryMenu;
 
 import java.util.OptionalDouble;
 
@@ -38,7 +38,7 @@ public class OurRenderTypes extends RenderType {
     public static final RenderType MissingBlockOverlay = create("GadgetMissingBlockOverlay",
             DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS, 256, false, false,
             RenderType.CompositeState.builder()
-                    .setShaderState(RenderStateShard.BLOCK_SHADER)
+                    .setShaderState(RenderStateShard.POSITION_COLOR_SHADER)
                     .setLayeringState(VIEW_OFFSET_Z_LAYERING) // view_offset_z_layering
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setTextureState(NO_TEXTURE)
@@ -48,19 +48,31 @@ public class OurRenderTypes extends RenderType {
                     .setWriteMaskState(COLOR_WRITE)
                     .createCompositeState(false));
 
+//    public static final RenderType.CompositeRenderType LINES =
+//            create("lines", DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES, 256, RenderType.CompositeState.builder()
+//            .setShaderState(RENDERTYPE_LINES_SHADER)
+//            .setLineState(new RenderStateShard.LineStateShard(OptionalDouble.empty()))
+//            .setLayeringState(VIEW_OFFSET_Z_LAYERING)
+//            .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+//            .setOutputState(ITEM_ENTITY_TARGET)
+//            .setWriteMaskState(COLOR_DEPTH_WRITE)
+//            .setCullState(NO_CULL)
+//            .createCompositeState(false));
+
     public static final RenderType CopyGadgetLines = create("GadgetCopyLines",
             DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.LINE_STRIP, 256, false, false,
             RenderType.CompositeState.builder()
-                    .setShaderState(RenderStateShard.RENDERTYPE_LINES_SHADER)
+                    .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_NO_OUTLINE_SHADER)
                     .setLineState(new LineStateShard(OptionalDouble.of(2.0D)))
-                    .setLayeringState(VIEW_OFFSET_Z_LAYERING) // view_offset_z_layering
+                    .setLayeringState(VIEW_OFFSET_Z_LAYERING)
                     .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
                     .setTextureState(NO_TEXTURE)
                     .setDepthTestState(LEQUAL_DEPTH_TEST)
                     .setCullState(NO_CULL)
-                    .setLightmapState(NO_LIGHTMAP)
-                    .setWriteMaskState(COLOR_WRITE)
+                    .setLightmapState(RenderStateShard.NO_LIGHTMAP)
+                    .setWriteMaskState(COLOR_DEPTH_WRITE)
                     .createCompositeState(false));
+
 
     public static final RenderType CopyPasteRenderBlock = create("CopyPasteRenderBlock",
             DefaultVertexFormat.BLOCK, VertexFormat.Mode.QUADS, 256, false, false,

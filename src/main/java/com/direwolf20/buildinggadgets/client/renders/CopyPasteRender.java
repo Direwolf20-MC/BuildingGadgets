@@ -23,6 +23,7 @@ import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Matrix4f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -106,6 +107,8 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
         VertexConsumer builder = buffer.getBuffer(OurRenderTypes.CopyGadgetLines);
 
         Matrix4f matrix4f = matrix.last().pose();
+
+        LevelRenderer.renderLineBox(matrix, builder, x, y, z, dx, dy, dz, 1.0F, 1.0F, 1.0F, 1.0F, .5F, .5F, 0F);
         builder.vertex(matrix4f, x, y, z).color(G, G, G, 0.0F).endVertex();
         builder.vertex(matrix4f, x, y, z).color(G, G, G, R).endVertex();
         builder.vertex(matrix4f, dx, y, z).color(G, B, B, R).endVertex();

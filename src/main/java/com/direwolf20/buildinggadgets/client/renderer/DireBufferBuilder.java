@@ -96,7 +96,7 @@ public class DireBufferBuilder extends DefaultedVertexConsumer implements Buffer
             return Floats.compare(afloat[p_227830_1_], afloat[p_227830_2_]);
         });
         BitSet bitset = new BitSet();
-        FloatBuffer floatbuffer1 = MemoryTracker.create(this.vertexFormat.getIntegerSize() * 4).asFloatBuffer();
+        FloatBuffer floatbuffer1 = FloatBuffer.allocate(this.vertexFormat.getIntegerSize() * 6);
 
         for (int l = bitset.nextClearBit(0); l < aint.length; l = bitset.nextClearBit(l + 1)) {
             int i1 = aint[l];

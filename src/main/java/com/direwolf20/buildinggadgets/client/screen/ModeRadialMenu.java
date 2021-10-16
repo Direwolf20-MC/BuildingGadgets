@@ -413,27 +413,14 @@ public class ModeRadialMenu extends Screen {
             matrices.popPose();
         }
 
-//        RenderSystem.enableRescaleNormal();
-//        RenderSystem.enableBlend();
-//        RenderSystem.blendFuncSeparate(770, 771, 1, 0);
-//        Lighting.setupForFlatItems();
-
-//        float s = 2.25F * fract;
-//        matrices.pushPose();
-//        matrices.scale(s, s, s);
-////        matrices.translate(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
-//
-//        matrices.translate(0, 0, 0);
-//        RenderSystem.applyModelViewMatrix();
-////        this.itemRenderer.renderGuiItem(tool, 0, 0);
-//        MultiBufferSource.BufferSource bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
-//        this.itemRenderer.renderStatic(tool, ItemTransforms.TransformType.GROUND,  OverlayTexture.NO_OVERLAY, 15728880, matrices, bufferSource, 0);
-////        bufferBuilder.end();
-////        RenderSystem.disableBlend();
-////        Lighting.setupFor3DItems();
-//        matrices.popPose();
-//        RenderSystem.applyModelViewMatrix();
-////        RenderSystem.applyModelViewMatrix();
+        float s = 1.8F * fract;
+        PoseStack stack = RenderSystem.getModelViewStack();
+        stack.pushPose();
+        stack.scale(s, s, s);
+        matrices.popPose();
+        stack.translate(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8 : 8.5), y / s - 8, 0);
+        this.itemRenderer.renderAndDecorateItem(tool, 0, 0);
+        stack.popPose();
     }
 
     private boolean isCursorInSlice(float angle, float totalDeg, float degPer, boolean inRange) {
