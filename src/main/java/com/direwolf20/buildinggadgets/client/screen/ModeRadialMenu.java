@@ -6,6 +6,7 @@
 package com.direwolf20.buildinggadgets.client.screen;
 
 import com.direwolf20.buildinggadgets.client.KeyBindings;
+import com.direwolf20.buildinggadgets.client.OurSounds;
 import com.direwolf20.buildinggadgets.client.screen.components.GuiIconActionable;
 import com.direwolf20.buildinggadgets.client.screen.components.GuiSliderInt;
 import com.direwolf20.buildinggadgets.common.config.Config;
@@ -14,7 +15,6 @@ import com.direwolf20.buildinggadgets.common.items.modes.BuildingModes;
 import com.direwolf20.buildinggadgets.common.items.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
-import com.direwolf20.buildinggadgets.client.OurSounds;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
@@ -49,68 +49,83 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ModeRadialMenu extends Screen {
-    public enum ScreenPosition {
-        RIGHT, LEFT, BOTTOM, TOP
-    }
-
     private static final ImmutableList<ResourceLocation> signsCopyPaste = ImmutableList.of(
-            new ResourceLocation(Reference.MODID, "textures/gui/mode/copy.png"),
-            new ResourceLocation(Reference.MODID, "textures/gui/mode/paste.png")
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/copy.png"),
+        new ResourceLocation(Reference.MODID, "textures/gui/mode/paste.png")
     );
-
+    private final List<Button> conditionalButtons = new ArrayList<>();
     private int timeIn = 0;
     private int slotSelected = -1;
     private int segments;
-    private final List<Button> conditionalButtons = new ArrayList<>();
 
     public ModeRadialMenu(ItemStack stack) {
         super(new StringTextComponent(""));
 
-        if (stack.getItem() instanceof AbstractGadget)
-            setSocketable(stack);
+        if (stack.getItem() instanceof AbstractGadget) {
+            this.setSocketable(stack);
+        }
+    }
+
+    private static float mouseAngle(int x, int y, int mx, int my) {
+        Vector2f baseVec = new Vector2f(1F, 0F);
+        Vector2f mouseVec = new Vector2f(mx - x, my - y);
+
+        float ang = (float) (Math.acos(baseVec.dot(mouseVec) / (baseVec.length() * mouseVec.length())) * (180F / Math.PI));
+        return my < y
+            ? 360F - ang
+            : ang;
     }
 
     public void setSocketable(ItemStack stack) {
-        if (stack.getItem() instanceof GadgetBuilding)
-            segments = BuildingModes.values().length;
-        else if (stack.getItem() instanceof GadgetExchanger)
-            segments = ExchangingModes.values().length;
-        else if (stack.getItem() instanceof GadgetCopyPaste)
-            segments = GadgetCopyPaste.ToolMode.values().length;
+        if (stack.getItem() instanceof GadgetBuilding) {
+            this.segments = BuildingModes.values().length;
+        } else if (stack.getItem() instanceof GadgetExchanger) {
+            this.segments = ExchangingModes.values().length;
+        } else if (stack.getItem() instanceof GadgetCopyPaste) {
+            this.segments = GadgetCopyPaste.ToolMode.values().length;
+        }
     }
 
     @Override
     public void init() {
-        conditionalButtons.clear();
-        ItemStack tool = getGadget();
+        this.conditionalButtons.clear();
+        ItemStack tool = this.getGadget();
         boolean isDestruction = tool.getItem() instanceof GadgetDestruction;
-        ScreenPosition right = isDestruction ? ScreenPosition.TOP : ScreenPosition.RIGHT;
-        ScreenPosition left = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.LEFT;
+        ScreenPosition right = isDestruction
+            ? ScreenPosition.TOP
+            : ScreenPosition.RIGHT;
+        ScreenPosition left = isDestruction
+            ? ScreenPosition.BOTTOM
+            : ScreenPosition.LEFT;
 
         if (isDestruction) {
-            addButton(new PositionedIconActionable(RadialTranslation.DESTRUCTION_OVERLAY, "destroy_overlay", right, send -> {
-                if (send)
+            this.addButton(new PositionedIconActionable(RadialTranslation.DESTRUCTION_OVERLAY, "destroy_overlay", right, send -> {
+                if (send) {
                     PacketHandler.sendToServer(new PacketChangeRange());
+                }
 
-                return GadgetDestruction.getOverlay(getGadget());
+                return GadgetDestruction.getOverlay(this.getGadget());
             }));
 
-            addButton(new PositionedIconActionable(RadialTranslation.FLUID_ONLY, "fluid_only", right, send -> {
-                if (send)
+            this.addButton(new PositionedIconActionable(RadialTranslation.FLUID_ONLY, "fluid_only", right, send -> {
+                if (send) {
                     PacketHandler.sendToServer(new PacketToggleFluidOnly());
+                }
 
-                return GadgetDestruction.getIsFluidOnly(getGadget());
+                return GadgetDestruction.getIsFluidOnly(this.getGadget());
             }));
         } else {
-            addButton(new PositionedIconActionable(RadialTranslation.ROTATE, "rotate", left, false, send -> {
-                if (send)
+            this.addButton(new PositionedIconActionable(RadialTranslation.ROTATE, "rotate", left, false, send -> {
+                if (send) {
                     PacketHandler.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.ROTATE));
+                }
 
                 return false;
             }));
-            addButton(new PositionedIconActionable(RadialTranslation.MIRROR, "mirror", left, false, send -> {
-                if (send)
+            this.addButton(new PositionedIconActionable(RadialTranslation.MIRROR, "mirror", left, false, send -> {
+                if (send) {
                     PacketHandler.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.MIRROR));
+                }
 
                 return false;
             }));
@@ -118,101 +133,113 @@ public class ModeRadialMenu extends Screen {
         if (!(tool.getItem() instanceof GadgetCopyPaste)) {
             if (!isDestruction || Config.GADGETS.GADGET_DESTRUCTION.nonFuzzyEnabled.get()) {
                 Button button = new PositionedIconActionable(RadialTranslation.FUZZY, "fuzzy", right, send -> {
-                    if (send)
+                    if (send) {
                         PacketHandler.sendToServer(new PacketToggleFuzzy());
+                    }
 
-                    return AbstractGadget.getFuzzy(getGadget());
+                    return AbstractGadget.getFuzzy(this.getGadget());
                 });
-                addButton(button);
-                conditionalButtons.add(button);
+                this.addButton(button);
+                this.conditionalButtons.add(button);
             }
-            if( !isDestruction ) {
+            if (!isDestruction) {
                 Button button = new PositionedIconActionable(RadialTranslation.CONNECTED_SURFACE, "connected_area", right, send -> {
-                    if (send)
+                    if (send) {
                         PacketHandler.sendToServer(new PacketToggleConnectedArea());
+                    }
 
-                    return AbstractGadget.getConnectedArea(getGadget());
+                    return AbstractGadget.getConnectedArea(this.getGadget());
                 });
-                addButton(button);
-                conditionalButtons.add(button);
+                this.addButton(button);
+                this.conditionalButtons.add(button);
             }
             if (!isDestruction) {
                 int widthSlider = 82;
-                GuiSliderInt sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, GuiTranslation.SINGLE_RANGE.componentTranslation().append(new StringTextComponent(": ")), new StringTextComponent(""), 1, Config.GADGETS.maxRange.get(),
-                        GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
+                GuiSliderInt sliderRange = new GuiSliderInt(
+                    this.width / 2 - widthSlider / 2, this.height / 2 + 72, widthSlider, 14, GuiTranslation.SINGLE_RANGE.componentTranslation().appendSibling(new StringTextComponent(": ")), new StringTextComponent(""), 1, Config.GADGETS.maxRange.get(),
+                    GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
                     GuiSliderInt sliderI = (GuiSliderInt) slider;
-                    sendRangeUpdate(sliderI.getValueInt());
+                    this.sendRangeUpdate(sliderI.getValueInt());
                 }, (slider, amount) -> {
                     int value = slider.getValueInt();
                     int valueNew = MathHelper.clamp(value + amount, 1, Config.GADGETS.maxRange.get());
-                    sendRangeUpdate(valueNew);
+                    this.sendRangeUpdate(valueNew);
                     slider.setValue(valueNew);
                     slider.updateSlider();
-                });
+                }
+                );
                 sliderRange.precision = 1;
                 sliderRange.getComponents().forEach(this::addButton);
             }
         } else {
             // Copy Paste specific
-            addButton(new PositionedIconActionable(RadialTranslation.OPEN_GUI, "copypaste_opengui", right, send -> {
-                if (!send)
+            this.addButton(new PositionedIconActionable(RadialTranslation.OPEN_GUI, "copypaste_opengui", right, send -> {
+                if (!send) {
                     return false;
+                }
 
-                assert getMinecraft().player != null;
+                assert this.getMinecraft().player != null;
 
-                getMinecraft().player.closeScreen();
-                if (GadgetCopyPaste.getToolMode(tool) == GadgetCopyPaste.ToolMode.COPY)
-                    getMinecraft().displayGuiScreen(new CopyGUI(tool));
-                else
-                    getMinecraft().displayGuiScreen(new PasteGUI(tool));
+                this.getMinecraft().player.closeScreen();
+                if (GadgetCopyPaste.getToolMode(tool) == GadgetCopyPaste.ToolMode.COPY) {
+                    this.getMinecraft().displayGuiScreen(new CopyGUI(tool));
+                } else {
+                    this.getMinecraft().displayGuiScreen(new PasteGUI(tool));
+                }
                 return true;
             }));
-            addButton(new PositionedIconActionable(RadialTranslation.OPEN_MATERIAL_LIST, "copypaste_materiallist", right, send -> {
-                if (!send)
+            this.addButton(new PositionedIconActionable(RadialTranslation.OPEN_MATERIAL_LIST, "copypaste_materiallist", right, send -> {
+                if (!send) {
                     return false;
+                }
 
-                assert getMinecraft().player != null;
+                assert this.getMinecraft().player != null;
 
-                getMinecraft().player.closeScreen();
-                getMinecraft().displayGuiScreen(new MaterialListGUI(tool));
+                this.getMinecraft().player.closeScreen();
+                this.getMinecraft().displayGuiScreen(new MaterialListGUI(tool));
                 return true;
             }));
         }
-        addButton(new PositionedIconActionable(RadialTranslation.RAYTRACE_FLUID, "raytrace_fluid", right, send -> {
-            if (send)
+        this.addButton(new PositionedIconActionable(RadialTranslation.RAYTRACE_FLUID, "raytrace_fluid", right, send -> {
+            if (send) {
                 PacketHandler.sendToServer(new PacketToggleRayTraceFluid());
+            }
 
-            return AbstractGadget.shouldRayTraceFluid(getGadget());
+            return AbstractGadget.shouldRayTraceFluid(this.getGadget());
         }));
         if (tool.getItem() instanceof GadgetBuilding) {
-            addButton(new PositionedIconActionable(RadialTranslation.PLACE_ON_TOP, "building_place_atop", right, send -> {
-                if (send)
+            this.addButton(new PositionedIconActionable(RadialTranslation.PLACE_ON_TOP, "building_place_atop", right, send -> {
+                if (send) {
                     PacketHandler.sendToServer(new PacketToggleBlockPlacement());
+                }
 
-                return GadgetBuilding.shouldPlaceAtop(getGadget());
+                return GadgetBuilding.shouldPlaceAtop(this.getGadget());
             }));
         }
-        addButton(new PositionedIconActionable(RadialTranslation.ANCHOR, "anchor", left, send -> {
-            if (send)
+        this.addButton(new PositionedIconActionable(RadialTranslation.ANCHOR, "anchor", left, send -> {
+            if (send) {
                 PacketHandler.sendToServer(new PacketAnchor());
+            }
 
-            ItemStack stack = getGadget();
-            if (stack.getItem() instanceof GadgetCopyPaste || stack.getItem() instanceof GadgetDestruction)
+            ItemStack stack = this.getGadget();
+            if (stack.getItem() instanceof GadgetCopyPaste || stack.getItem() instanceof GadgetDestruction) {
                 return ((AbstractGadget) stack.getItem()).getAnchor(stack) != null;
+            }
 
             return GadgetUtils.getAnchor(stack).isPresent();
         }));
 
         if (!(tool.getItem() instanceof GadgetExchanger)) {
-            addButton(new PositionedIconActionable(RadialTranslation.UNDO, "undo", left, false, send -> {
-                if (send)
+            this.addButton(new PositionedIconActionable(RadialTranslation.UNDO, "undo", left, false, send -> {
+                if (send) {
                     PacketHandler.sendToServer(new PacketUndo());
+                }
 
                 return false;
             }));
         }
 
-        updateButtons(tool);
+        this.updateButtons(tool);
     }
 
     private void updateButtons(ItemStack tool) {
@@ -221,14 +248,19 @@ public class ModeRadialMenu extends Screen {
         int dim = 24;
         int padding = 10;
         boolean isDestruction = tool.getItem() instanceof GadgetDestruction;
-        ScreenPosition right = isDestruction ? ScreenPosition.BOTTOM : ScreenPosition.RIGHT;
-        for (Widget widget : buttons) {
-            if (!(widget instanceof PositionedIconActionable))
+        ScreenPosition right = isDestruction
+            ? ScreenPosition.BOTTOM
+            : ScreenPosition.RIGHT;
+        for (Widget widget : this.buttons) {
+            if (!(widget instanceof PositionedIconActionable)) {
                 continue;
+            }
 
             PositionedIconActionable button = (PositionedIconActionable) widget;
 
-            if (!button.visible) continue;
+            if (!button.visible) {
+                continue;
+            }
             int offset;
             boolean isRight = button.position == right;
             if (isRight) {
@@ -240,58 +272,71 @@ public class ModeRadialMenu extends Screen {
             }
             button.setWidth(dim);
             button.setHeight(dim);
-            if (isDestruction)
-                button.y = height / 2 + (isRight ? 10 : -button.getHeightRealms() - 10);
-            else
-                button.x = width / 2 + offset;
+            if (isDestruction) {
+                button.y = this.height / 2 + (isRight
+                    ? 10
+                    : -button.getHeight() - 10);
+            } else {
+                button.x = this.width / 2 + offset;
+            }
         }
-        posRight = resetPos(tool, padding, posRight);
-        posLeft = resetPos(tool, padding, posLeft);
-        for (Widget widget : buttons) {
-            if (!(widget instanceof PositionedIconActionable))
+        posRight = this.resetPos(tool, padding, posRight);
+        posLeft = this.resetPos(tool, padding, posLeft);
+        for (Widget widget : this.buttons) {
+            if (!(widget instanceof PositionedIconActionable)) {
                 continue;
+            }
 
             PositionedIconActionable button = (PositionedIconActionable) widget;
-            if (!button.visible) continue;
+            if (!button.visible) {
+                continue;
+            }
             boolean isRight = button.position == right;
-            int pos = isRight ? posRight : posLeft;
-            if (isDestruction)
+            int pos = isRight
+                ? posRight
+                : posLeft;
+            if (isDestruction) {
                 button.x = pos;
-            else
+            } else {
                 button.y = pos;
+            }
 
-            if (isRight)
+            if (isRight) {
                 posRight += dim + padding;
-            else
+            } else {
                 posLeft += dim + padding;
+            }
         }
     }
 
     private int resetPos(ItemStack tool, int padding, int pos) {
-        return tool.getItem() instanceof GadgetDestruction ? width / 2 - (pos - padding) / 2 : height / 2 - (pos - padding) / 2;
+        return tool.getItem() instanceof GadgetDestruction
+            ? this.width / 2 - (pos - padding) / 2
+            : this.height / 2 - (pos - padding) / 2;
     }
 
     private ItemStack getGadget() {
-        assert getMinecraft().player != null;
-        return AbstractGadget.getGadget(getMinecraft().player);
+        assert this.getMinecraft().player != null;
+        return AbstractGadget.getGadget(this.getMinecraft().player);
     }
 
     @Override
     public void render(MatrixStack matrices, int mx, int my, float partialTicks) {
         float stime = 5F;
-        float fract = Math.min(stime, timeIn + partialTicks) / stime;
-        int x = width / 2;
-        int y = height / 2;
+        float fract = Math.min(stime, this.timeIn + partialTicks) / stime;
+        int x = this.width / 2;
+        int y = this.height / 2;
 
         int radiusMin = 26;
         int radiusMax = 60;
         double dist = new Vector3d(x, y, 0).distanceTo(new Vector3d(mx, my, 0));
         boolean inRange = false;
-        if (segments != 0) {
+        if (this.segments != 0) {
             inRange = dist > radiusMin && dist < radiusMax;
-            for (Widget button : buttons) {
-                if (button instanceof PositionedIconActionable)
+            for (Widget button : this.buttons) {
+                if (button instanceof PositionedIconActionable) {
                     ((PositionedIconActionable) button).setFaded(inRange);
+                }
             }
         }
 
@@ -301,8 +346,9 @@ public class ModeRadialMenu extends Screen {
         super.render(matrices, mx, my, partialTicks);
         RenderSystem.popMatrix();
 
-        if (segments == 0)
+        if (this.segments == 0) {
             return;
+        }
 
         RenderSystem.pushMatrix();
         RenderSystem.disableTexture();
@@ -312,15 +358,16 @@ public class ModeRadialMenu extends Screen {
         RenderSystem.enableBlend();
         RenderSystem.shadeModel(GL11.GL_SMOOTH);
         float totalDeg = 0;
-        float degPer = 360F / segments;
+        float degPer = 360F / this.segments;
 
         List<NameDisplayData> nameData = new ArrayList<>();
 
-        ItemStack tool = getGadget();
-        if (tool.isEmpty())
+        ItemStack tool = this.getGadget();
+        if (tool.isEmpty()) {
             return;
+        }
 
-        slotSelected = -1;
+        this.slotSelected = -1;
 
         List<ResourceLocation> signs;
         int modeIndex;
@@ -335,25 +382,28 @@ public class ModeRadialMenu extends Screen {
             signs = signsCopyPaste;
         }
 
-        boolean shouldCenter = (segments + 2) % 4 == 0;
-        int indexBottom = segments / 4;
-        int indexTop = indexBottom + segments / 2;
-        for (int seg = 0; seg < segments; seg++) {
-            boolean mouseInSector = isCursorInSlice(angle, totalDeg, degPer, inRange);
-            float radius = Math.max(0F, Math.min((timeIn + partialTicks - seg * 6F / segments) * 40F, radiusMax));
+        boolean shouldCenter = (this.segments + 2) % 4 == 0;
+        int indexBottom = this.segments / 4;
+        int indexTop = indexBottom + this.segments / 2;
+        for (int seg = 0; seg < this.segments; seg++) {
+            boolean mouseInSector = this.isCursorInSlice(angle, totalDeg, degPer, inRange);
+            float radius = Math.max(0F, Math.min((this.timeIn + partialTicks - seg * 6F / this.segments) * 40F, radiusMax));
 
             GL11.glBegin(GL11.GL_TRIANGLE_STRIP);
 
             float gs = 0.25F;
-            if (seg % 2 == 0)
+            if (seg % 2 == 0) {
                 gs += 0.1F;
+            }
 
             float r = gs;
-            float g = gs + (seg == modeIndex ? 1F : 0.0F);
+            float g = gs + (seg == modeIndex
+                ? 1F
+                : 0.0F);
             float b = gs;
             float a = 0.4F;
             if (mouseInSector) {
-                slotSelected = seg;
+                this.slotSelected = seg;
                 r = g = b = 1F;
             }
 
@@ -363,8 +413,9 @@ public class ModeRadialMenu extends Screen {
                 float rad = (float) ((i + totalDeg) / 180F * Math.PI);
                 double xp = x + Math.cos(rad) * radius;
                 double yp = y + Math.sin(rad) * radius;
-                if ((int) i == (int) (degPer / 2))
+                if ((int) i == (int) (degPer / 2)) {
                     nameData.add(new NameDisplayData((int) xp, (int) yp, mouseInSector, shouldCenter && (seg == indexBottom || seg == indexTop)));
+                }
 
                 GL11.glVertex2d(x + Math.cos(rad) * radius / 2.3F, y + Math.sin(rad) * radius / 2.3F);
                 GL11.glVertex2d(xp, yp);
@@ -385,33 +436,41 @@ public class ModeRadialMenu extends Screen {
             int yp = data.getY();
 
             String name;
-            if (tool.getItem() instanceof GadgetBuilding)
+            if (tool.getItem() instanceof GadgetBuilding) {
                 name = ForgeI18n.getPattern(BuildingModes.values()[i].getTranslationKey());
-            else if (tool.getItem() instanceof GadgetExchanger)
+            } else if (tool.getItem() instanceof GadgetExchanger) {
                 name = ForgeI18n.getPattern(ExchangingModes.values()[i].getTranslationKey());
-            else
+            } else {
                 name = GadgetCopyPaste.ToolMode.values()[i].getTranslation().format();
+            }
 
             int xsp = xp - 4;
             int ysp = yp;
-            int width = font.getStringWidth(name);
+            int width = this.font.getStringWidth(name);
 
-            if (xsp < x)
+            if (xsp < x) {
                 xsp -= width - 8;
-            if (ysp < y)
+            }
+            if (ysp < y) {
                 ysp -= 9;
+            }
 
-            Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
-            if (data.isSelected())
-                font.drawStringWithShadow(matrices, name, xsp + (data.isCentralized() ? width / 2f - 4 : 0), ysp, color.getRGB());
+            Color color = i == modeIndex
+                ? Color.GREEN
+                : Color.WHITE;
+            if (data.isSelected()) {
+                this.font.drawStringWithShadow(matrices, name, xsp + (data.isCentralized()
+                    ? width / 2f - 4
+                    : 0), ysp, color.getRGB());
+            }
 
             double mod = 0.7;
             int xdp = (int) ((xp - x) * mod + x);
             int ydp = (int) ((yp - y) * mod + y);
 
-            getMinecraft().getTextureManager().bindTexture(signs.get(i));
+            this.getMinecraft().getTextureManager().bindTexture(signs.get(i));
             RenderSystem.color4f(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
-            getMinecraft().getTextureManager().bindTexture(signs.get(i));
+            this.getMinecraft().getTextureManager().bindTexture(signs.get(i));
             blit(matrices, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
         }
 
@@ -422,8 +481,10 @@ public class ModeRadialMenu extends Screen {
 
         float s = 2.25F * fract;
         RenderSystem.scalef(s, s, s);
-        RenderSystem.translatef(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8F : 8.5F), y / s - 8, 0);
-        itemRenderer.renderItemAndEffectIntoGUI(tool, 0, 0);
+        RenderSystem.translatef(x / s - (tool.getItem() instanceof GadgetCopyPaste
+            ? 8F
+            : 8.5F), y / s - 8, 0);
+        this.itemRenderer.renderItemAndEffectIntoGUI(tool, 0, 0);
 
         RenderHelper.disableStandardItemLighting();
         RenderSystem.disableBlend();
@@ -437,66 +498,71 @@ public class ModeRadialMenu extends Screen {
     }
 
     private void changeMode() {
-        if (slotSelected >= 0) {
-            Item gadget = getGadget().getItem();
+        if (this.slotSelected >= 0) {
+            Item gadget = this.getGadget().getItem();
 
             // This should logically never fail but implementing a way to ensure that would
             // be a pretty solid idea for the next guy to touch this code.
             String mode;
-            if (gadget instanceof GadgetBuilding)
-                mode = ForgeI18n.getPattern(BuildingModes.values()[slotSelected].getTranslationKey());
-            else if (gadget instanceof GadgetExchanger)
-                mode = ForgeI18n.getPattern(ExchangingModes.values()[slotSelected].getTranslationKey());
-            else
-                mode = GadgetCopyPaste.ToolMode.values()[slotSelected].getTranslation().format();
+            if (gadget instanceof GadgetBuilding) {
+                mode = ForgeI18n.getPattern(BuildingModes.values()[this.slotSelected].getTranslationKey());
+            } else if (gadget instanceof GadgetExchanger) {
+                mode = ForgeI18n.getPattern(ExchangingModes.values()[this.slotSelected].getTranslationKey());
+            } else {
+                mode = GadgetCopyPaste.ToolMode.values()[this.slotSelected].getTranslation().format();
+            }
 
-            assert getMinecraft().player != null;
-            getMinecraft().player.sendStatusMessage(MessageTranslation.MODE_SET.componentTranslation(mode).setStyle(Styles.AQUA), true);
+            assert this.getMinecraft().player != null;
+            this.getMinecraft().player.sendStatusMessage(MessageTranslation.MODE_SET.componentTranslation(mode).setStyle(Styles.AQUA), true);
 
-            PacketHandler.sendToServer(new PacketToggleMode(slotSelected));
+            PacketHandler.sendToServer(new PacketToggleMode(this.slotSelected));
             OurSounds.BEEP.playSound();
         }
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int mouseButton) {
-        changeMode();
+        this.changeMode();
         return super.mouseClicked(mouseX, mouseY, mouseButton);
     }
 
     @Override
     public void tick() {
         if (!InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), KeyBindings.menuSettings.getKey().getKeyCode())) {
-            closeScreen();
-            changeMode();
+            this.closeScreen();
+            this.changeMode();
         }
 
-        ImmutableSet<KeyBinding> set = ImmutableSet.of(getMinecraft().gameSettings.keyBindForward, getMinecraft().gameSettings.keyBindLeft, getMinecraft().gameSettings.keyBindBack, getMinecraft().gameSettings.keyBindRight, getMinecraft().gameSettings.keyBindSneak, getMinecraft().gameSettings.keyBindSprint, getMinecraft().gameSettings.keyBindJump);
-        for (KeyBinding k : set)
+        ImmutableSet<KeyBinding> set = ImmutableSet.of(this.getMinecraft().gameSettings.keyBindForward, this.getMinecraft().gameSettings.keyBindLeft, this.getMinecraft().gameSettings.keyBindBack, this.getMinecraft().gameSettings.keyBindRight, this.getMinecraft().gameSettings.keyBindSneak, this.getMinecraft().gameSettings.keyBindSprint, this.getMinecraft().gameSettings.keyBindJump);
+        for (KeyBinding k : set) {
             KeyBinding.setKeyBindState(k.getKey(), k.isKeyDown());
+        }
 
-        timeIn++;
-        ItemStack tool = getGadget();
+        this.timeIn++;
+        ItemStack tool = this.getGadget();
         boolean builder = tool.getItem() instanceof GadgetBuilding;
-        if (!builder && !(tool.getItem() instanceof GadgetExchanger))
+        if (!builder && !(tool.getItem() instanceof GadgetExchanger)) {
             return;
+        }
 
         boolean curent;
         boolean changed = false;
-        for (int i = 0; i < conditionalButtons.size(); i++) {
-            Button button = conditionalButtons.get(i);
-            if (builder)
+        for (int i = 0; i < this.conditionalButtons.size(); i++) {
+            Button button = this.conditionalButtons.get(i);
+            if (builder) {
                 curent = GadgetBuilding.getToolMode(tool) == BuildingModes.SURFACE;
-            else
+            } else {
                 curent = i == 0 || GadgetExchanger.getToolMode(tool) == ExchangingModes.SURFACE;
+            }
 
             if (button.visible != curent) {
                 button.visible = curent;
                 changed = true;
             }
         }
-        if (changed)
-            updateButtons(tool);
+        if (changed) {
+            this.updateButtons(tool);
+        }
     }
 
     @Override
@@ -504,17 +570,14 @@ public class ModeRadialMenu extends Screen {
         return false;
     }
 
-    private static float mouseAngle(int x, int y, int mx, int my) {
-        Vector2f baseVec = new Vector2f(1F, 0F);
-        Vector2f mouseVec = new Vector2f(mx - x, my - y);
-
-        float ang = (float) (Math.acos(baseVec.dot(mouseVec) / (baseVec.length() * mouseVec.length())) * (180F / Math.PI));
-        return my < y ? 360F - ang : ang;
+    private void sendRangeUpdate(int valueNew) {
+        if (valueNew != GadgetUtils.getToolRange(this.getGadget())) {
+            PacketHandler.sendToServer(new PacketChangeRange(valueNew));
+        }
     }
 
-    private void sendRangeUpdate(int valueNew) {
-        if (valueNew != GadgetUtils.getToolRange(getGadget()))
-            PacketHandler.sendToServer(new PacketChangeRange(valueNew));
+    public enum ScreenPosition {
+        RIGHT, LEFT, BOTTOM, TOP
     }
 
     private static final class NameDisplayData {
@@ -531,19 +594,19 @@ public class ModeRadialMenu extends Screen {
         }
 
         private int getX() {
-            return x;
+            return this.x;
         }
 
         private int getY() {
-            return y;
+            return this.y;
         }
 
         private boolean isSelected() {
-            return selected;
+            return this.selected;
         }
 
         private boolean isCentralized() {
-            return centralize;
+            return this.centralize;
         }
     }
 
