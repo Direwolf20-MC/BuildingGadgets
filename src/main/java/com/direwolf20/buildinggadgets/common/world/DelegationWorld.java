@@ -4,8 +4,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.crash.CrashReport;
-import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
@@ -19,7 +17,6 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.DynamicRegistries;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.ITickList;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -294,18 +291,18 @@ public class DelegationWorld extends World {
     public void close() {
     }
 
-    @Override
-    public CrashReportCategory fillCrashReport(CrashReport report) {
-        CrashReportCategory crashreportcategory = report.makeCategory("Building Gadgets");
-        crashreportcategory.addDetail(
-            "DelegationWorld", () -> {
-            }
-        );
-        return crashreportcategory;
-    }
+//    @Override
+//    public CrashReportCategory fillCrashReport(CrashReport report) {
+//        CrashReportCategory crashreportcategory = report.makeCategory("Building Gadgets");
+//        crashreportcategory.addDetail(
+//            "DelegationWorld", () -> {
+//            }
+//        );
+//        return crashreportcategory;
+//    }
 
-    @Override
-    public DimensionType getDimensionType() {
-        return OVERWORLD;
-    }
+//    @Override
+//    public DimensionType getDimensionType() {
+//        return OVERWORLD;
+//    }
 }

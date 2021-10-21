@@ -9,14 +9,12 @@ import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.button.Button;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.ForgeI18n;
 
 import javax.annotation.Nonnull;
 import java.awt.*;
@@ -79,19 +77,23 @@ public class DestructionGUI extends Screen {
     }
 
     private boolean isWithinBounds() {
-        int x = left.getValueInt() + right.getValueInt();
-        int y = up.getValueInt() + down.getValueInt();
+        int x = 1 + left.getValueInt() + right.getValueInt();
+        int y = 1 + up.getValueInt() + down.getValueInt();
         int z = depth.getValueInt();
         int dim = Config.GADGETS.GADGET_DESTRUCTION.destroySize.get();
 
-        return x <= dim && y <= dim && z <= dim;
+        return x <= (dim + 1) && y <= (dim + 1) && z <= dim;
     }
 
     private String getSizeString() {
+        int x = 1 + left.getValueInt() + right.getValueInt(),
+                y = 1 + up.getValueInt() + down.getValueInt(),
+                z = depth.getValueInt();
+
         return String.format("%d x %d x %d",
-                left.getValueInt() + right.getValueInt(),
-                up.getValueInt() + down.getValueInt(),
-                depth.getValueInt()
+                x,
+                y,
+                z
         );
     }
 
