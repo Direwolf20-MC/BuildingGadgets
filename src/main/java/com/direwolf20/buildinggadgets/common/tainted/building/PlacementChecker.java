@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.tainted.building;
 
+import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
-import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.MatchResult;
@@ -12,11 +12,9 @@ import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.WaterFluid;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IServerWorld;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.LazyOptional;
@@ -50,7 +48,7 @@ public final class PlacementChecker {
      * @implNote This code is so god damn messy. Good luck understanding it.
      */
     public CheckResult checkPositionWithResult(BuildContext context, PlacementTarget target, boolean giveBackItems) {
-        if (target.getPos().getY() > context.getWorld().getHeight() || target.getPos().getY() < 0 || ! placeCheck.test(context, target))
+        if (target.getPos().getY() > context.getWorld().getMaxBuildHeight() || target.getPos().getY() < 0 || ! placeCheck.test(context, target))
             return new CheckResult(MatchResult.failure(), ImmutableMultiset.of(), false, false);
         int energy = energyFun.applyAsInt(target);
         Multiset<IUniqueObject<?>> insertedItems = ImmutableMultiset.of();
@@ -61,10 +59,10 @@ public final class PlacementChecker {
         if (! isCreative && storage.extractPower(energy, true) != energy)
             return new CheckResult(MatchResult.failure(), insertedItems, false, false);
 
-        RayTraceResult targetRayTrace = null;
+        HitResult targetRayTrace = null;
         if (context.getPlayer() != null) {
-            PlayerEntity player = context.getPlayer();
-            targetRayTrace = CommonUtils.fakeRayTrace(player.getPositionVec(), target.getPos());
+            Player player = context.getPlayer();
+            targetRayTrace = CommonUtils.fakeRayTrace(player.position(), target.getPos());
         }
         MaterialList materials = target.getRequiredMaterials(context, targetRayTrace);
         MatchResult match = index.tryMatch(materials);
@@ -76,8 +74,8 @@ public final class PlacementChecker {
             usePaste = true;
         }
 
-        BlockSnapshot blockSnapshot = BlockSnapshot.create(context.getServerWorld().getDimensionKey(), context.getWorld(), target.getPos());
-        boolean isAir = blockSnapshot.getCurrentBlock().isAir(context.getWorld(), target.getPos());
+        BlockSnapshot blockSnapshot = BlockSnapshot.create(context.getServerWorld().dimension(), context.getWorld(), target.getPos());
+        boolean isAir = blockSnapshot.getCurrentBlock().isAir();
         if (firePlaceEvents && ForgeEventFactory.onBlockPlace(context.getPlayer(), blockSnapshot, Direction.UP))
             return new CheckResult(match, insertedItems, false, usePaste);
         if (! isAir) {
@@ -89,7 +87,7 @@ public final class PlacementChecker {
                     return new CheckResult(match, insertedItems, false, usePaste);
             }
             if (giveBackItems) {
-                insertedItems = TileSupport.createTileData(context.getWorld().getTileEntity(target.getPos()))
+                insertedItems = TileSupport.createTileData(context.getWorld().getBlockEntity(target.getPos()))
                         .getRequiredItems(context, blockSnapshot.getCurrentBlock(), null, target.getPos()).iterator().next();
                 index.insert(insertedItems);
             }

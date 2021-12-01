@@ -10,14 +10,14 @@ import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.PacketPasteGUI;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.button.AbstractButton;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class PasteGUI extends Screen {
     private ItemStack copyPasteTool;
 
     PasteGUI(ItemStack tool) {
-        super(new StringTextComponent(""));
+        super(new TextComponent(""));
         this.copyPasteTool = tool;
     }
 
@@ -51,7 +51,7 @@ public class PasteGUI extends Screen {
         List<AbstractButton> buttons = new ArrayList<AbstractButton>() {{
             add(new CopyGUI.CenteredButton(y + 20, 70, GuiTranslation.SINGLE_CONFIRM.componentTranslation(), (button) -> {
                 PacketHandler.sendToServer(new PacketPasteGUI(X.getValue(), Y.getValue(), Z.getValue()));
-                closeScreen();
+                onClose();
             }));
 
             add(new CopyGUI.CenteredButton(y + 20, 40, GuiTranslation.SINGLE_RESET.componentTranslation(), (button) -> {
@@ -64,8 +64,8 @@ public class PasteGUI extends Screen {
 
         CopyGUI.CenteredButton.centerButtonList(buttons, x);
 
-        buttons.forEach(this::addButton);
-        fields.forEach(this::addButton);
+        buttons.forEach(this::addRenderableWidget);
+        fields.forEach(this::addRenderableWidget);
     }
 
     private void sendPacket() {
@@ -94,17 +94,17 @@ public class PasteGUI extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
         drawLabel(matrices, "X", -75);
         drawLabel(matrices, "Y", 0);
         drawLabel(matrices, "Z", 75);
 
-        drawCenteredString(matrices, Minecraft.getInstance().fontRenderer, I18n.format(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), (int)(width / 2f), (int)(height / 2f) - 60, 0xFFFFFF);
+        drawCenteredString(matrices, Minecraft.getInstance().font, I18n.get(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), (int)(width / 2f), (int)(height / 2f) - 60, 0xFFFFFF);
 
         super.render(matrices, mouseX, mouseY, partialTicks);
     }
 
-    private void drawLabel(MatrixStack matrices, String name, int x) {
-        font.drawStringWithShadow(matrices, name, (width / 2f) + x, (height / 2f) - 30, 0xFFFFFF);
+    private void drawLabel(PoseStack matrices, String name, int x) {
+        font.drawShadow(matrices, name, (width / 2f) + x, (height / 2f) - 30, 0xFFFFFF);
     }
 }

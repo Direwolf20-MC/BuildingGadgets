@@ -1,16 +1,8 @@
 package com.direwolf20.buildinggadgets.common.events;
 
-import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
-import net.minecraft.block.Block;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-
-import java.util.List;
 
 @EventBusSubscriber
 public class BreakEventHandler {

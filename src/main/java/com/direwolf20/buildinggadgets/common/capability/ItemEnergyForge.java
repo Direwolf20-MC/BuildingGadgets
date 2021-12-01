@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.capability;
 
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.function.IntSupplier;
 
@@ -15,12 +15,12 @@ public final class ItemEnergyForge extends ConfigEnergyStorage implements IPriva
     }
 
     protected void writeEnergy() {
-        CompoundNBT nbt = stack.getOrCreateTag();
+        CompoundTag nbt = stack.getOrCreateTag();
         nbt.putInt(NBTKeys.ENERGY, getEnergyStoredCache());
     }
 
     protected void updateEnergy() {
-        CompoundNBT nbt = stack.getOrCreateTag();
+        CompoundTag nbt = stack.getOrCreateTag();
         if (nbt.contains(NBTKeys.ENERGY))
             setEnergy(nbt.getInt(NBTKeys.ENERGY));
         updateMaxEnergy();

@@ -4,89 +4,84 @@ import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.tileentities.OurTileEntities;
 import com.direwolf20.buildinggadgets.common.tileentities.TemplateManagerTileEntity;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.network.NetworkHooks;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 import javax.annotation.Nullable;
 
-public class TemplateManager extends Block {
+public class TemplateManager extends Block implements EntityBlock {
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public TemplateManager() {
-        super(Block.Properties.create(Material.ROCK).hardnessAndResistance(2f));
-        setDefaultState(getStateContainer().getBaseState().with(FACING, Direction.SOUTH));
+        super(Block.Properties.of(Material.STONE).strength(2f));
+        registerDefaultState(getStateDefinition().any().setValue(FACING, Direction.SOUTH));
     }
 
     @Override
-    protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-        super.fillStateContainer(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING);
     }
 
     @Override
-    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+    public void onRemove(BlockState state, Level worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
         if (newState.getBlock() != this) {
             GadgetUtils.dropTileEntityInventory(worldIn, pos);
-            super.onReplaced(state, worldIn, pos, newState, isMoving);
+            super.onRemove(state, worldIn, pos, newState, isMoving);
         }
     }
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockItemUseContext context) {
-        return getDefaultState().with(FACING, context.getPlacementHorizontalFacing().getOpposite());
-    }
-
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return OurTileEntities.TEMPLATE_MANAGER_TILE_ENTITY.get().create();
+    public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+        return OurTileEntities.TEMPLATE_MANAGER_TILE_ENTITY.get().create(blockPos, blockState);
     }
 
     @Override
-    public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-        if (worldIn.isRemote)
-            return ActionResultType.SUCCESS;
+    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
+        if (worldIn.isClientSide)
+            return InteractionResult.SUCCESS;
 
-        TileEntity te = worldIn.getTileEntity(pos);
+        BlockEntity te = worldIn.getBlockEntity(pos);
         if (! (te instanceof TemplateManagerTileEntity))
-            return ActionResultType.FAIL;
+            return InteractionResult.FAIL;
 
         te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
             worldIn.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).ifPresent(provider -> {
                 for (int i = 0; i < handler.getSlots(); i++) {
                     ItemStack itemStack = handler.getStackInSlot(i);
                     itemStack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key ->
-                            provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) player)));
+                            provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayer) player)));
                 }
             });
         });
 
-        NetworkHooks.openGui((ServerPlayerEntity) player, (TemplateManagerTileEntity) te, pos);
-        return ActionResultType.SUCCESS;
+        NetworkHooks.openGui((ServerPlayer) player, (TemplateManagerTileEntity) te, pos);
+        return InteractionResult.SUCCESS;
     }
 }

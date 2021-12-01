@@ -2,12 +2,11 @@ package com.direwolf20.buildinggadgets.common.entities;
 
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.EntityReference;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.EntityType;
-import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 
@@ -22,7 +21,7 @@ public class OurEntities {
     @SubscribeEvent
     public static void registerEntities(RegistryEvent.Register<EntityType<?>> event) {
         event.getRegistry().register(
-                EntityType.Builder.<ConstructionBlockEntity>create(ConstructionBlockEntity::new, EntityClassification.MISC)
+                EntityType.Builder.<ConstructionBlockEntity>of(ConstructionBlockEntity::new, MobCategory.MISC)
                         .setTrackingRange(64)
                         .setUpdateInterval(1)
                         .setShouldReceiveVelocityUpdates(false)
@@ -33,7 +32,7 @@ public class OurEntities {
     }
 
     @SubscribeEvent
-    public static void registerModels(ModelRegistryEvent evt) {
-        RenderingRegistry.registerEntityRenderingHandler(ConstructionBlockEntity.TYPE, ConstructionBlockEntityRender::new);
+    public static void registerModels(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(ConstructionBlockEntity.TYPE, ConstructionBlockEntityRender::new);
     }
 }

@@ -7,10 +7,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Streams;
 import com.google.gson.*;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import java.util.ArrayList;
@@ -123,12 +123,12 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
         }
 
         @Override
-        public SubMaterialListEntry readFromNBT(CompoundNBT nbt, boolean persisted) {
-            ListNBT list = nbt.getList(NBTKeys.KEY_SUB_ENTRIES, NBT.TAG_COMPOUND);
+        public SubMaterialListEntry readFromNBT(CompoundTag nbt, boolean persisted) {
+            ListTag list = nbt.getList(NBTKeys.KEY_SUB_ENTRIES, NBT.TAG_COMPOUND);
             ImmutableList.Builder<MaterialListEntry<?>> entryBuilder = ImmutableList.builder();
             ImmutableList.Builder<SimpleMaterialListEntry> simpleBuilder = ImmutableList.builder();
-            for (INBT subEntry : list) {
-                MaterialListEntry<?> entry = MaterialList.readEntry((CompoundNBT) subEntry, persisted);
+            for (Tag subEntry : list) {
+                MaterialListEntry<?> entry = MaterialList.readEntry((CompoundTag) subEntry, persisted);
                 if (entry instanceof SimpleMaterialListEntry)
                     simpleBuilder.add((SimpleMaterialListEntry) entry);
                 else
@@ -138,12 +138,12 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
         }
 
         @Override
-        public CompoundNBT writeToNBT(SubMaterialListEntry entry, boolean persisted) {
-            ListNBT list = new ListNBT();
+        public CompoundTag writeToNBT(SubMaterialListEntry entry, boolean persisted) {
+            ListTag list = new ListTag();
             entry.getAllSubEntries()
                     .map(subEntry -> MaterialList.writeEntry(subEntry, persisted))
                     .forEach(list::add);
-            CompoundNBT nbt = new CompoundNBT();
+            CompoundTag nbt = new CompoundTag();
             nbt.put(NBTKeys.KEY_SUB_ENTRIES, list);
             return nbt;
         }

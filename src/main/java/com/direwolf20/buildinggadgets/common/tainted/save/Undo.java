@@ -22,18 +22,16 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
 import com.google.common.collect.Multisets;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.nbt.*;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Tuple;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import java.util.Collections;
@@ -43,16 +41,16 @@ import java.util.function.IntFunction;
 import java.util.function.ToIntFunction;
 
 public final class Undo {
-    static Undo deserialize(CompoundNBT nbt) {
+    static Undo deserialize(CompoundTag nbt) {
         Preconditions.checkArgument(nbt.contains(NBTKeys.WORLD_SAVE_DIM, NBT.TAG_STRING)
                 && nbt.contains(NBTKeys.WORLD_SAVE_UNDO_ITEMS_SERIALIZER_LIST, NBT.TAG_LIST)
                 && nbt.contains(NBTKeys.WORLD_SAVE_UNDO_BLOCK_LIST, NBT.TAG_LIST)
                 && nbt.contains(NBTKeys.WORLD_SAVE_UNDO_DATA_LIST, NBT.TAG_LIST)
                 && nbt.contains(NBTKeys.WORLD_SAVE_UNDO_DATA_SERIALIZER_LIST, NBT.TAG_LIST));
         DataDecompressor<ITileDataSerializer> serializerReverseObjectIncrementer = new DataDecompressor<>(
-                (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_DATA_SERIALIZER_LIST),
+                (ListTag) nbt.get(NBTKeys.WORLD_SAVE_UNDO_DATA_SERIALIZER_LIST),
                 inbt -> {
-                    String s = inbt.getString();
+                    String s = inbt.getAsString();
                     ITileDataSerializer serializer = RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), s);
                     if (serializer == null) {
                         BuildingGadgets.LOG.warn("Found unknown serializer {}. Replacing with dummy!", s);
@@ -65,13 +63,13 @@ public final class Undo {
                     return TileSupport.dummyTileEntityData().getSerializer();
                 });
         DataDecompressor<BlockData> dataReverseObjectIncrementer = new DataDecompressor<>(
-                (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_DATA_LIST),
-                inbt -> BlockData.deserialize((CompoundNBT) inbt, serializerReverseObjectIncrementer, true),
+                (ListTag) nbt.get(NBTKeys.WORLD_SAVE_UNDO_DATA_LIST),
+                inbt -> BlockData.deserialize((CompoundTag) inbt, serializerReverseObjectIncrementer, true),
                 value -> BlockData.AIR);
         DataDecompressor<IUniqueObjectSerializer> itemSerializerIncrementer = new DataDecompressor<>(
-                (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_ITEMS_SERIALIZER_LIST),
+                (ListTag) nbt.get(NBTKeys.WORLD_SAVE_UNDO_ITEMS_SERIALIZER_LIST),
                 inbt -> {
-                    String s = inbt.getString();
+                    String s = inbt.getAsString();
                     IUniqueObjectSerializer serializer = RegistryUtils.getFromString(Registries.getUniqueObjectSerializers(), s);
                     if (serializer == null)
                         return SerialisationSupport.uniqueItemSerializer();
@@ -82,21 +80,21 @@ public final class Undo {
                     return SerialisationSupport.uniqueItemSerializer();
                 });
         DataDecompressor<Multiset<IUniqueObject<?>>> itemSetReverseObjectIncrementer = new DataDecompressor<>(
-                (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_ITEMS_LIST),
-                inbt -> NBTHelper.deserializeMultisetEntries((ListNBT) inbt, HashMultiset.create(), entry -> readEntry(entry, itemSerializerIncrementer)),
+                (ListTag) nbt.get(NBTKeys.WORLD_SAVE_UNDO_ITEMS_LIST),
+                inbt -> NBTHelper.deserializeMultisetEntries((ListTag) inbt, HashMultiset.create(), entry -> readEntry(entry, itemSerializerIncrementer)),
                 value -> HashMultiset.create());
         Map<BlockPos, BlockInfo> map = NBTHelper.deserializeMap(
-                (ListNBT) nbt.get(NBTKeys.WORLD_SAVE_UNDO_BLOCK_LIST), new HashMap<>(),
-                inbt -> NBTUtil.readBlockPos((CompoundNBT) inbt),
-                inbt -> BlockInfo.deserialize((CompoundNBT) inbt, dataReverseObjectIncrementer, itemSetReverseObjectIncrementer));
+                (ListTag) nbt.get(NBTKeys.WORLD_SAVE_UNDO_BLOCK_LIST), new HashMap<>(),
+                inbt -> NbtUtils.readBlockPos((CompoundTag) inbt),
+                inbt -> BlockInfo.deserialize((CompoundTag) inbt, dataReverseObjectIncrementer, itemSetReverseObjectIncrementer));
 
-        RegistryKey<World> dim = RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(nbt.getString(NBTKeys.WORLD_SAVE_DIM)));
+        ResourceKey<Level> dim = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(nbt.getString(NBTKeys.WORLD_SAVE_DIM)));
         Region bounds = Region.deserializeFrom(nbt.getCompound(NBTKeys.WORLD_SAVE_UNDO_BOUNDS));
         return new Undo(dim, map, bounds);
     }
 
-    private static Tuple<IUniqueObject<?>, Integer> readEntry(INBT inbt, IntFunction<IUniqueObjectSerializer> serializerIntFunction) {
-        CompoundNBT nbt = (CompoundNBT) inbt;
+    private static Tuple<IUniqueObject<?>, Integer> readEntry(Tag inbt, IntFunction<IUniqueObjectSerializer> serializerIntFunction) {
+        CompoundTag nbt = (CompoundTag) inbt;
         IUniqueObjectSerializer serializer = serializerIntFunction.apply(nbt.getInt(NBTKeys.UNIQUE_ITEM_SERIALIZER));
         int count = nbt.getInt(NBTKeys.UNIQUE_ITEM_COUNT);
         IUniqueObject<?> item = serializer.deserialize(nbt.getCompound(NBTKeys.UNIQUE_ITEM_ITEM));
@@ -107,11 +105,11 @@ public final class Undo {
         return new Builder();
     }
 
-    private RegistryKey<World> dim;
+    private ResourceKey<Level> dim;
     private Map<BlockPos, BlockInfo> dataMap;
     private Region boundingBox;
 
-    public Undo(RegistryKey<World> dim, Map<BlockPos, BlockInfo> dataMap, Region boundingBox) {
+    public Undo(ResourceKey<Level> dim, Map<BlockPos, BlockInfo> dataMap, Region boundingBox) {
         this.dim = dim;
         this.dataMap = dataMap;
         this.boundingBox = boundingBox;
@@ -125,18 +123,18 @@ public final class Undo {
         return Collections.unmodifiableMap(dataMap);
     }
 
-    CompoundNBT serialize() {
+    CompoundTag serialize() {
         DataCompressor<BlockData> dataObjectIncrementer = new DataCompressor<>();
         DataCompressor<IUniqueObjectSerializer> itemSerializerIncrementer = new DataCompressor<>();
         DataCompressor<Multiset<IUniqueObject<?>>> itemObjectIncrementer = new DataCompressor<>();
         DataCompressor<ITileDataSerializer> serializerObjectIncrementer = new DataCompressor<>();
-        CompoundNBT res = new CompoundNBT();
+        CompoundTag res = new CompoundTag();
 
-        ListNBT infoList = NBTHelper.serializeMap(dataMap, NBTUtil::writeBlockPos, i -> i.serialize(dataObjectIncrementer, itemObjectIncrementer));
-        ListNBT dataList = dataObjectIncrementer.write(d -> d.serialize(serializerObjectIncrementer, true));
-        ListNBT itemSetList = itemObjectIncrementer.write(ms -> NBTHelper.writeIterable(ms.entrySet(), entry -> writeEntry(entry, itemSerializerIncrementer)));
-        ListNBT dataSerializerList = serializerObjectIncrementer.write(ts -> StringNBT.valueOf(ts.getRegistryName().toString()));
-        ListNBT itemSerializerList = itemSerializerIncrementer.write(s -> StringNBT.valueOf(s.getRegistryName().toString()));
+        ListTag infoList = NBTHelper.serializeMap(dataMap, NbtUtils::writeBlockPos, i -> i.serialize(dataObjectIncrementer, itemObjectIncrementer));
+        ListTag dataList = dataObjectIncrementer.write(d -> d.serialize(serializerObjectIncrementer, true));
+        ListTag itemSetList = itemObjectIncrementer.write(ms -> NBTHelper.writeIterable(ms.entrySet(), entry -> writeEntry(entry, itemSerializerIncrementer)));
+        ListTag dataSerializerList = serializerObjectIncrementer.write(ts -> StringTag.valueOf(ts.getRegistryName().toString()));
+        ListTag itemSerializerList = itemSerializerIncrementer.write(s -> StringTag.valueOf(s.getRegistryName().toString()));
 
         res.putString(NBTKeys.WORLD_SAVE_DIM, dim.getRegistryName().toString());
         res.put(NBTKeys.WORLD_SAVE_UNDO_BLOCK_LIST, infoList);
@@ -149,8 +147,8 @@ public final class Undo {
         return res;
     }
 
-    private CompoundNBT writeEntry(Entry<IUniqueObject<?>> entry, ToIntFunction<IUniqueObjectSerializer> serializerObjectIncrementer) {
-        CompoundNBT res = new CompoundNBT();
+    private CompoundTag writeEntry(Entry<IUniqueObject<?>> entry, ToIntFunction<IUniqueObjectSerializer> serializerObjectIncrementer) {
+        CompoundTag res = new CompoundTag();
         res.putInt(NBTKeys.UNIQUE_ITEM_SERIALIZER, serializerObjectIncrementer.applyAsInt(entry.getElement().getSerializer()));
         res.put(NBTKeys.UNIQUE_ITEM_ITEM, entry.getElement().getSerializer().serialize(entry.getElement(), true));
         res.putInt(NBTKeys.UNIQUE_ITEM_COUNT, entry.getCount());
@@ -158,7 +156,7 @@ public final class Undo {
     }
 
     public static final class BlockInfo {
-        private static BlockInfo deserialize(CompoundNBT nbt, IntFunction<BlockData> dataSupplier, IntFunction<Multiset<IUniqueObject<?>>> itemSetSupplier) {
+        private static BlockInfo deserialize(CompoundTag nbt, IntFunction<BlockData> dataSupplier, IntFunction<Multiset<IUniqueObject<?>>> itemSetSupplier) {
             BlockData data = dataSupplier.apply(nbt.getInt(NBTKeys.WORLD_SAVE_UNDO_RECORDED_DATA));
             BlockData placedData = dataSupplier.apply(nbt.getInt(NBTKeys.WORLD_SAVE_UNDO_PLACED_DATA));
             Multiset<IUniqueObject<?>> usedItems = itemSetSupplier.apply(nbt.getInt(NBTKeys.WORLD_SAVE_UNDO_ITEMS_USED));
@@ -178,8 +176,8 @@ public final class Undo {
             this.producedItems = producedItems;
         }
 
-        private CompoundNBT serialize(ToIntFunction<BlockData> dataIdSupplier, ToIntFunction<Multiset<IUniqueObject<?>>> itemIdSupplier) {
-            CompoundNBT res = new CompoundNBT();
+        private CompoundTag serialize(ToIntFunction<BlockData> dataIdSupplier, ToIntFunction<Multiset<IUniqueObject<?>>> itemIdSupplier) {
+            CompoundTag res = new CompoundTag();
             res.putInt(NBTKeys.WORLD_SAVE_UNDO_RECORDED_DATA, dataIdSupplier.applyAsInt(recordedData));
             res.putInt(NBTKeys.WORLD_SAVE_UNDO_PLACED_DATA, dataIdSupplier.applyAsInt(placedData));
             res.putInt(NBTKeys.WORLD_SAVE_UNDO_ITEMS_USED, itemIdSupplier.applyAsInt(usedItems));
@@ -213,9 +211,9 @@ public final class Undo {
             regionBuilder = null;
         }
 
-        public Builder record(IBlockReader reader, BlockPos pos, BlockData placeData, Multiset<IUniqueObject<?>> requiredItems, Multiset<IUniqueObject<?>> producedItems) {
+        public Builder record(BlockGetter reader, BlockPos pos, BlockData placeData, Multiset<IUniqueObject<?>> requiredItems, Multiset<IUniqueObject<?>> producedItems) {
             BlockState state = reader.getBlockState(pos);
-            TileEntity te = reader.getTileEntity(pos);
+            BlockEntity te = reader.getBlockEntity(pos);
             ITileEntityData data = te != null ? NBTTileEntityData.ofTile(te) : TileSupport.dummyTileEntityData();
             return record(pos, new BlockData(state, data), placeData, requiredItems, producedItems);
         }
@@ -228,8 +226,8 @@ public final class Undo {
             return this;
         }
 
-        public Undo build(World dim) {
-            return new Undo(dim.getDimensionKey(), mapBuilder.build(), regionBuilder != null ? regionBuilder.build() : Region.singleZero());
+        public Undo build(Level dim) {
+            return new Undo(dim.dimension(), mapBuilder.build(), regionBuilder != null ? regionBuilder.build() : Region.singleZero());
         }
     }
 }

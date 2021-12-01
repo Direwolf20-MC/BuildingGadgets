@@ -5,14 +5,14 @@ import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.util.exceptions.CapabilityNotPresentException;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.network.NetworkEvent.Context;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 public final class PacketTemplateManagerTemplateCreated extends UUIDPacket {
     private final BlockPos pos;
 
-    public PacketTemplateManagerTemplateCreated(PacketBuffer buffer) {
+    public PacketTemplateManagerTemplateCreated(FriendlyByteBuf buffer) {
         super(buffer);
         this.pos = buffer.readBlockPos();
     }
@@ -33,18 +33,18 @@ public final class PacketTemplateManagerTemplateCreated extends UUIDPacket {
     }
 
     @Override
-    public void encode(PacketBuffer buffer) {
+    public void encode(FriendlyByteBuf buffer) {
         super.encode(buffer);
         buffer.writeBlockPos(pos);
     }
 
-    public void handle(Supplier<Context> contextSupplier) {
-        Context ctx = contextSupplier.get();
+    public void handle(Supplier<NetworkEvent.Context> contextSupplier) {
+        NetworkEvent.Context ctx = contextSupplier.get();
         ctx.enqueueWork(() -> {
             if (contextSupplier.get().getDirection().getReceptionSide() == LogicalSide.SERVER) {
-                World world = contextSupplier.get().getSender().world;
-                if (world.isBlockLoaded(pos)) {
-                    TileEntity tileEntity = world.getTileEntity(pos);
+                Level world = contextSupplier.get().getSender().level;
+                if (world.hasChunkAt(pos)) {
+                    BlockEntity tileEntity = world.getBlockEntity(pos);
                     if (tileEntity != null) {
                         tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handler -> {
                             ItemStack stack = new ItemStack(OurItems.TEMPLATE_ITEM.get());

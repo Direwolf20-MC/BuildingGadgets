@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.util.lang;
 
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public final class LangUtil {
     private LangUtil() {}
@@ -16,7 +16,7 @@ public final class LangUtil {
     }
 
     public static String getFormattedBlockName(Block block) {
-        return block.getTranslatedName().getString();
+        return block.getName().getString();
     }
 
 }

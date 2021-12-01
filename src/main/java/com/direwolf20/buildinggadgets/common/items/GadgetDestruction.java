@@ -19,21 +19,21 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
 import com.google.common.collect.ImmutableMultiset;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -77,8 +77,8 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
-        super.addInformation(stack, world, tooltip, flag);
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, world, tooltip, flag);
         addEnergyInformation(tooltip, stack);
 
         tooltip.add(TooltipTranslation.GADGET_DESTROYWARNING
@@ -106,15 +106,15 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public static void setAnchorSide(ItemStack stack, Direction side) {
-        CompoundNBT tag = stack.getOrCreateTag();
+        CompoundTag tag = stack.getOrCreateTag();
         if (side == null)
             tag.remove(NBTKeys.GADGET_ANCHOR_SIDE);
         else
-            tag.putString(NBTKeys.GADGET_ANCHOR_SIDE, side.getName2());
+            tag.putString(NBTKeys.GADGET_ANCHOR_SIDE, side.getName());
     }
 
     public static Direction getAnchorSide(ItemStack stack) {
-        CompoundNBT tag = stack.getOrCreateTag();
+        CompoundTag tag = stack.getOrCreateTag();
         String facing = tag.getString(NBTKeys.GADGET_ANCHOR_SIDE);
         if (facing.isEmpty())
             return null;
@@ -130,7 +130,7 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     public static boolean getOverlay(ItemStack stack) {
-        CompoundNBT tag = stack.getOrCreateTag();
+        CompoundTag tag = stack.getOrCreateTag();
         if (tag.contains(NBTKeys.GADGET_OVERLAY))
             return tag.getBoolean(NBTKeys.GADGET_OVERLAY);
 
@@ -143,10 +143,10 @@ public class GadgetDestruction extends AbstractGadget {
         stack.getOrCreateTag().putBoolean(NBTKeys.GADGET_OVERLAY, showOverlay);
     }
 
-    public static void switchOverlay(PlayerEntity player, ItemStack stack) {
+    public static void switchOverlay(Player player, ItemStack stack) {
         boolean newOverlay = ! getOverlay(stack);
         setOverlay(stack, newOverlay);
-        player.sendStatusMessage(TooltipTranslation.GADGET_DESTROYSHOWOVERLAY
+        player.displayClientMessage(TooltipTranslation.GADGET_DESTROYSHOWOVERLAY
                 .componentTranslation(newOverlay).setStyle(Styles.AQUA), true);
     }
 
@@ -159,64 +159,64 @@ public class GadgetDestruction extends AbstractGadget {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        player.setActiveHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        player.startUsingItem(hand);
 
-        if (!world.isRemote) {
-            if (! player.isSneaking()) {
+        if (!world.isClientSide) {
+            if (! player.isShiftKeyDown()) {
                 BlockPos anchorPos = getAnchor(stack);
                 Direction anchorSide = getAnchorSide(stack);
                 if (anchorPos != null && anchorSide != null) {
-                    clearArea(world, anchorPos, anchorSide, (ServerPlayerEntity) player, stack);
+                    clearArea(world, anchorPos, anchorSide, (ServerPlayer) player, stack);
                     onAnchorRemoved(stack, player);
-                    return new ActionResult<>(ActionResultType.SUCCESS, stack);
+                    return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
                 }
 
-                BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, stack);
-                if (! world.isAirBlock(lookingAt.getPos())) {
-                    clearArea(world, lookingAt.getPos(), lookingAt.getFace(), (ServerPlayerEntity) player, stack);
+                BlockHitResult lookingAt = VectorHelper.getLookingAt(player, stack);
+                if (! world.isEmptyBlock(lookingAt.getBlockPos())) {
+                    clearArea(world, lookingAt.getBlockPos(), lookingAt.getDirection(), (ServerPlayer) player, stack);
                     onAnchorRemoved(stack, player);
-                    return new ActionResult<>(ActionResultType.SUCCESS, stack);
+                    return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
                 }
 
-                return new ActionResult<>(ActionResultType.FAIL, stack);
+                return new InteractionResultHolder<>(InteractionResult.FAIL, stack);
             }
-        } else if (player.isSneaking()) {
+        } else if (player.isShiftKeyDown()) {
             GuiMod.DESTRUCTION.openScreen(player);
         }
-        return new ActionResult<>(ActionResultType.SUCCESS, stack);
+        return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
     }
 
     @Override
-    protected void onAnchorSet(ItemStack stack, PlayerEntity player, BlockRayTraceResult lookingAt) {
+    protected void onAnchorSet(ItemStack stack, Player player, BlockHitResult lookingAt) {
         super.onAnchorSet(stack, player, lookingAt);
-        setAnchorSide(stack, lookingAt.getFace());
+        setAnchorSide(stack, lookingAt.getDirection());
     }
 
     @Override
-    protected void onAnchorRemoved(ItemStack stack, PlayerEntity player) {
+    protected void onAnchorRemoved(ItemStack stack, Player player) {
         super.onAnchorRemoved(stack, player);
         setAnchorSide(stack, null);
     }
 
-    public static List<BlockPos> getArea(World world, BlockPos pos, Direction incomingSide, PlayerEntity player, ItemStack stack) {
+    public static List<BlockPos> getArea(Level world, BlockPos pos, Direction incomingSide, Player player, ItemStack stack) {
         ItemStack tool = getGadget(player);
         int depth = getToolValue(stack, NBTKeys.GADGET_VALUE_DEPTH);
 
-        if (tool.isEmpty() || depth == 0 || ! player.isAllowEdit())
+        if (tool.isEmpty() || depth == 0 || ! player.mayBuild())
             return new ArrayList<>();
 
         boolean vertical = incomingSide.getAxis().isVertical();
-        Direction up = vertical ? player.getHorizontalFacing() : Direction.UP;
+        Direction up = vertical ? player.getDirection() : Direction.UP;
         Direction down = up.getOpposite();
-        Direction right = vertical ? up.rotateY() : incomingSide.rotateYCCW();
+        Direction right = vertical ? up.getClockWise() : incomingSide.getCounterClockWise();
         Direction left = right.getOpposite();
 
-        BlockPos first = pos.offset(left, getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT)).offset(up, getToolValue(stack, NBTKeys.GADGET_VALUE_UP));
-        BlockPos second = pos.offset(right, getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT))
-                .offset(down, getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN))
-                .offset(incomingSide.getOpposite(), depth - 1);
+        BlockPos first = pos.relative(left, getToolValue(stack, NBTKeys.GADGET_VALUE_LEFT)).relative(up, getToolValue(stack, NBTKeys.GADGET_VALUE_UP));
+        BlockPos second = pos.relative(right, getToolValue(stack, NBTKeys.GADGET_VALUE_RIGHT))
+                .relative(down, getToolValue(stack, NBTKeys.GADGET_VALUE_DOWN))
+                .relative(incomingSide.getOpposite(), depth - 1);
 
         boolean isFluidOnly = getIsFluidOnly(stack);
         return new Region(first, second).stream()
@@ -225,11 +225,11 @@ public class GadgetDestruction extends AbstractGadget {
                             ? isFluidBlock(world, e)
                             : isValidBlock(world, e, player, world.getBlockState(e))
                 )
-                .sorted(Comparator.comparing(player.getPosition()::distanceSq))
+                .sorted(Comparator.comparing(player.blockPosition()::distSqr))
                 .collect(Collectors.toList());
     }
 
-    public static boolean isFluidBlock(World world, BlockPos pos) {
+    public static boolean isFluidBlock(Level world, BlockPos pos) {
         if (world.getFluidState(pos).isEmpty()) {
             return false;
         }
@@ -237,18 +237,18 @@ public class GadgetDestruction extends AbstractGadget {
         return ForgeRegistries.FLUIDS.containsKey(world.getBlockState(pos).getBlock().getRegistryName());
     }
 
-    public static boolean isValidBlock(World world, BlockPos voidPos, PlayerEntity player, BlockState currentBlock) {
-        if (world.isAirBlock(voidPos) ||
-                currentBlock.equals(OurBlocks.EFFECT_BLOCK.get().getDefaultState()) ||
-                currentBlock.getBlockHardness(world, voidPos) < 0 ||
-                ! world.isBlockModifiable(player, voidPos)) return false;
+    public static boolean isValidBlock(Level world, BlockPos voidPos, Player player, BlockState currentBlock) {
+        if (world.isEmptyBlock(voidPos) ||
+                currentBlock.equals(OurBlocks.EFFECT_BLOCK.get().defaultBlockState()) ||
+                currentBlock.getDestroySpeed(world, voidPos) < 0 ||
+                ! world.mayInteract(player, voidPos)) return false;
 
-        TileEntity te = world.getTileEntity(voidPos);
+        BlockEntity te = world.getBlockEntity(voidPos);
         if ((te != null) && ! (te instanceof ConstructionBlockTileEntity))
             return false;
 
-        if (! world.isRemote) {
-            BlockSnapshot blockSnapshot = BlockSnapshot.create(world.getDimensionKey(), world, voidPos);
+        if (! world.isClientSide) {
+            BlockSnapshot blockSnapshot = BlockSnapshot.create(world.dimension(), world, voidPos);
             if (ForgeEventFactory.onBlockPlace(player, blockSnapshot, Direction.UP))
                 return false;
             BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(world, voidPos, currentBlock, player);
@@ -257,13 +257,13 @@ public class GadgetDestruction extends AbstractGadget {
         return true;
     }
 
-    public void clearArea(World world, BlockPos pos, Direction side, ServerPlayerEntity player, ItemStack stack) {
+    public void clearArea(Level world, BlockPos pos, Direction side, ServerPlayer player, ItemStack stack) {
         List<BlockPos> positions = getArea(world, pos, side, player, stack);
         Undo.Builder builder = Undo.builder();
 
         for (BlockPos clearPos : positions) {
             BlockState state = world.getBlockState(clearPos);
-            TileEntity te = world.getTileEntity(clearPos);
+            BlockEntity te = world.getBlockEntity(clearPos);
             if (!isAllowedBlock(state.getBlock()))
                 continue;
             if (te == null || state.getBlock() == OurBlocks.CONSTRUCTION_BLOCK.get() && te instanceof ConstructionBlockTileEntity) {
@@ -274,8 +274,8 @@ public class GadgetDestruction extends AbstractGadget {
         pushUndo(stack, builder.build(world));
     }
 
-    private boolean destroyBlock(World world, BlockPos voidPos, ServerPlayerEntity player, Undo.Builder builder) {
-        if (world.isAirBlock(voidPos))
+    private boolean destroyBlock(Level world, BlockPos voidPos, ServerPlayer player, Undo.Builder builder) {
+        if (world.isEmptyBlock(voidPos))
             return false;
 
         ItemStack tool = getGadget(player);
@@ -291,7 +291,7 @@ public class GadgetDestruction extends AbstractGadget {
         return true;
     }
 
-    public static ItemStack getGadget(PlayerEntity player) {
+    public static ItemStack getGadget(Player player) {
         ItemStack stack = AbstractGadget.getGadget(player);
         if (!(stack.getItem() instanceof GadgetDestruction))
             return ItemStack.EMPTY;

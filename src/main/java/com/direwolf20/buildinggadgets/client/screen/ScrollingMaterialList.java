@@ -11,14 +11,15 @@ import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Multiset;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.widget.list.ExtendedList;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.gui.components.ObjectSelectionList;
+import com.mojang.blaze3d.platform.Lighting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -37,7 +38,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
 
     private static final int SLOT_SIZE = 18;
     private static final int MARGIN = 2;
-    private static final int ENTRY_HEIGHT = Math.max(SLOT_SIZE + MARGIN * 2, Minecraft.getInstance().fontRenderer.FONT_HEIGHT * 2 + MARGIN * 3);
+    private static final int ENTRY_HEIGHT = Math.max(SLOT_SIZE + MARGIN * 2, Minecraft.getInstance().font.lineHeight * 2 + MARGIN * 3);
     private static final int LINE_SIDE_MARGIN = 8;
 
     private MaterialListGUI gui;
@@ -64,7 +65,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
             multisetIterator = list != null ? list.iterator() : Iterators.singletonIterator(ImmutableMultiset.of());
         }
 
-        PlayerEntity player = Minecraft.getInstance().player;
+        Player player = Minecraft.getInstance().player;
 
         // Could likely just assert
         if( player == null )
@@ -91,14 +92,14 @@ class ScrollingMaterialList extends EntryList<Entry> {
         if (keyCode == GLFW.GLFW_KEY_E) {
             assert Minecraft.getInstance().player != null;
 
-            Minecraft.getInstance().player.closeScreen();
+            Minecraft.getInstance().player.closeContainer();
             return true;
         }
         return super.keyPressed(keyCode, scanCode, modifiers);
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTicks) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
         if (lastUpdate + UPDATE_MILLIS < System.currentTimeMillis())
             updateEntries();
 
@@ -109,7 +110,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
         multisetIterator = null;
     }
 
-    static class Entry extends ExtendedList.AbstractListEntry<Entry> {
+    static class Entry extends ObjectSelectionList.Entry<Entry> {
 
         private ScrollingMaterialList parent;
         private int required;
@@ -126,19 +127,19 @@ class ScrollingMaterialList extends EntryList<Entry> {
         public Entry(ScrollingMaterialList parent, IUniqueObject<?> item, int required, int available) {
             this.parent = parent;
             this.required = required;
-            this.available = MathHelper.clamp(available, 0, required);
+            this.available = Mth.clamp(available, 0, required);
 
             this.stack = item.createStack();
-            this.itemName = stack.getDisplayName().getString();
+            this.itemName = stack.getHoverName().getString();
 
             // Use this.available since the parameter is not clamped
             this.amount = this.available + "/" + required;
-            this.widthItemName = Minecraft.getInstance().fontRenderer.getStringWidth(itemName);
-            this.widthAmount = Minecraft.getInstance().fontRenderer.getStringWidth(amount);
+            this.widthItemName = Minecraft.getInstance().font.width(itemName);
+            this.widthAmount = Minecraft.getInstance().font.width(amount);
         }
 
         @Override
-        public void render(MatrixStack matrices, int index, int topY, int leftX, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float particleTicks) {
+        public void render(PoseStack matrices, int index, int topY, int leftX, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float particleTicks) {
             // Weird render issue with GuiSlot where the right border is slightly offset
             // MARGIN * 2 is just a magic number that made it look nice
             int right = leftX + entryWidth - MARGIN * 2;
@@ -148,16 +149,16 @@ class ScrollingMaterialList extends EntryList<Entry> {
             int slotX = leftX + MARGIN;
             int slotY = topY + MARGIN;
 
-            drawIcon(stack, slotX, slotY);
+            drawIcon(matrices, stack, slotX, slotY);
             drawTextOverlay(matrices, right, topY, bottom, slotX);
             drawHoveringText(stack, slotX, slotY, mouseX, mouseY);
         }
 
-        private void drawTextOverlay(MatrixStack matrices, int right, int top, int bottom, int slotX) {
+        private void drawTextOverlay(PoseStack matrices, int right, int top, int bottom, int slotX) {
             int itemNameX = slotX + SLOT_SIZE + MARGIN;
             // -1 because the bottom x coordinate is exclusive
             renderTextVerticalCenter(matrices, itemName, itemNameX, top, bottom, Color.WHITE.getRGB());
-            renderTextHorizontalRight(matrices, amount, right, getYForAlignedCenter(top, bottom, Minecraft.getInstance().fontRenderer.FONT_HEIGHT), getTextColor());
+            renderTextHorizontalRight(matrices, amount, right, getYForAlignedCenter(top, bottom, Minecraft.getInstance().font.lineHeight), getTextColor());
 
             drawGuidingLine(right, top, bottom, itemNameX, widthItemName, widthAmount);
         }
@@ -170,13 +171,13 @@ class ScrollingMaterialList extends EntryList<Entry> {
                 RenderSystem.enableBlend();
                 RenderSystem.disableTexture();
                 RenderSystem.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                RenderSystem.color4f(255, 255, 255, 34);
+                RenderSystem.setShaderColor(255, 255, 255, 34);
 
-                glLineWidth(1);
-                glBegin(GL_LINES);
-                glVertex3f(lineXStart, lineY, 0);
-                glVertex3f(lineXEnd, lineY, 0);
-                glEnd();
+//                glLineWidth(1);
+//                glBegin(GL_LINES);
+//                glVertex3f(lineXStart, lineY, 0);
+//                glVertex3f(lineXEnd, lineY, 0);
+//                glEnd();
 
                 RenderSystem.enableTexture();
             }
@@ -187,13 +188,11 @@ class ScrollingMaterialList extends EntryList<Entry> {
                 parent.gui.setTaskHoveringText(mouseX, mouseY, parent.gui.getTooltipFromItem(item));
         }
 
-        private void drawIcon(ItemStack item, int slotX, int slotY) {
-            RenderSystem.pushMatrix();
-            RenderHelper.enableStandardItemLighting();
-            Minecraft.getInstance().getItemRenderer().renderItemAndEffectIntoGUI(item, slotX, slotY);
-            RenderSystem.disableLighting();
-            RenderSystem.color3f(1, 1, 1);
-            RenderSystem.popMatrix();
+        private void drawIcon(PoseStack matrices, ItemStack item, int slotX, int slotY) {
+            Lighting.setupForFlatItems();
+            Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(item, slotX, slotY);
+//            RenderSystem.color3f(1, 1, 1);
+            Lighting.setupFor3DItems();
         }
 
         private boolean hasEnoughItems() {
@@ -246,6 +245,11 @@ class ScrollingMaterialList extends EntryList<Entry> {
         public boolean isSelected() {
             return parent.getSelected() == this;
         }
+
+        @Override
+        public Component getNarration() {
+            return null;
+        }
     }
 
     public SortingModes getSortingMode() {
@@ -258,7 +262,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
     }
 
     private void sort() {
-        getEventListeners().sort(sortingMode.getComparator());
+        children().sort(sortingMode.getComparator());
     }
 
     enum SortingModes {

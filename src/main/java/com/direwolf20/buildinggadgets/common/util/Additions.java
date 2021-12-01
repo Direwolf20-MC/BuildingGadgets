@@ -5,8 +5,8 @@ import com.direwolf20.buildinggadgets.common.util.lang.ITranslationProvider;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -80,13 +80,13 @@ public final class Additions {
     }
 
     // even though it's called sizeInvalid to hide it's purpose, it invokes the 9X9 easter egg
-    public static boolean sizeInvalid(PlayerEntity player, Region region) {
+    public static boolean sizeInvalid(Player player, Region region) {
         BlockPos size = region.getMax().subtract(region.getMin());
         if (size.getX() == 8 && size.getZ() == 8) { //size is 8 if it's a 9X9
-            List<ITranslationProvider> list = player.getName().getUnformattedComponentText().equals("Direwolf20") ? DireNineByNineTranslation.VALUES : NineByNineTranslation.VALUES;
+            List<ITranslationProvider> list = player.getName().getContents().equals("Direwolf20") ? DireNineByNineTranslation.VALUES : NineByNineTranslation.VALUES;
             int pos = EASTER_RAND.nextInt(list.size());
             ITranslationProvider provider = list.get(pos);
-            player.sendStatusMessage(provider.componentTranslation().setStyle(Styles.DK_GREEN), true);
+            player.displayClientMessage(provider.componentTranslation().setStyle(Styles.DK_GREEN), true);
             return true;
         }
         return false;

@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tainted.building.tilesupport;
 
 import com.direwolf20.buildinggadgets.common.tainted.registry.Registries.TileEntityData;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 import javax.annotation.Nullable;
 
@@ -24,5 +24,5 @@ public interface ITileDataFactory {
      * @return A new {@link ITileEntityData} if this {@code ITileDataFactory} can create one for the given tileEntity or null if not.
      */
     @Nullable
-    ITileEntityData createDataFor(TileEntity tileEntity);
+    ITileEntityData createDataFor(BlockEntity tileEntity);
 }

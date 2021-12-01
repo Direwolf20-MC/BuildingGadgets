@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tainted.save;
 
 import com.direwolf20.buildinggadgets.common.tainted.save.UndoWorldSave.UndoValue;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -11,9 +11,22 @@ import java.util.function.IntSupplier;
 public class UndoWorldSave extends TimedDataSave<UndoValue> {
     private final IntSupplier undoMaxLength;
 
-    public UndoWorldSave(String name, IntSupplier undoMaxLength) {
-        super(name);
+    public UndoWorldSave(IntSupplier undoMaxLength) {
+        super();
         this.undoMaxLength = Objects.requireNonNull(undoMaxLength);
+    }
+
+    public static UndoWorldSave loads(CompoundTag tag) {
+        UndoWorldSave undoWorldSave = new UndoWorldSave(() -> tag.getInt("maxUndo"));
+        undoWorldSave.load(tag);
+        return undoWorldSave;
+    }
+
+    @Override
+    public CompoundTag save(CompoundTag compound) {
+        CompoundTag save = super.save(compound);
+        save.putInt("maxUndo", this.undoMaxLength.getAsInt());
+        return save;
     }
 
     public void insertUndo(UUID uuid, Undo undo) {
@@ -45,14 +58,14 @@ public class UndoWorldSave extends TimedDataSave<UndoValue> {
     }
 
     @Override
-    protected UndoValue readValue(CompoundNBT nbt) {
+    protected UndoValue readValue(CompoundTag nbt) {
         return new UndoValue(nbt, undoMaxLength);
     }
 
     static final class UndoValue extends TimedDataSave.TimedValue { //for reasons I don't understand it doesn't compile if you leave the TimedDataSave out!
         private final UndoHistory history;
 
-        private UndoValue(CompoundNBT nbt, IntSupplier supplier) {
+        private UndoValue(CompoundTag nbt, IntSupplier supplier) {
             super(nbt);
             this.history = new UndoHistory(supplier);
             history.read(nbt);
@@ -68,8 +81,8 @@ public class UndoWorldSave extends TimedDataSave<UndoValue> {
         }
 
         @Override
-        public CompoundNBT write() {
-            CompoundNBT nbt = super.write();
+        public CompoundTag write() {
+            CompoundTag nbt = super.write();
             history.write(nbt);
             return nbt;
         }

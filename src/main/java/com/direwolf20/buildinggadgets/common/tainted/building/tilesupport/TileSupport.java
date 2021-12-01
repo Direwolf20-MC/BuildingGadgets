@@ -5,10 +5,10 @@ import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.registry.Registries.TileEntityData;
 import com.direwolf20.buildinggadgets.common.tainted.template.SerialisationSupport;
 import com.google.common.base.MoreObjects;
-import net.minecraft.block.BlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
 
 import javax.annotation.Nullable;
 import java.util.Iterator;
@@ -31,7 +31,7 @@ public final class TileSupport {
         return DATA_PROVIDER_FACTORY;
     }
 
-    public static ITileEntityData createTileData(@Nullable TileEntity te) {
+    public static ITileEntityData createTileData(@Nullable BlockEntity te) {
         if (te == null)
             return dummyTileEntityData();
         ITileEntityData res;
@@ -46,23 +46,23 @@ public final class TileSupport {
         return dummyTileEntityData();
     }
 
-    public static ITileEntityData createTileData(IBlockReader world, BlockPos pos) {
-        TileEntity te = world.getTileEntity(pos);
+    public static ITileEntityData createTileData(BlockGetter world, BlockPos pos) {
+        BlockEntity te = world.getBlockEntity(pos);
         return createTileData(te);
     }
 
-    public static BlockData createBlockData(BlockState state, @Nullable TileEntity te) {
+    public static BlockData createBlockData(BlockState state, @Nullable BlockEntity te) {
         return new BlockData(Objects.requireNonNull(state), createTileData(te));
     }
 
-    public static BlockData createBlockData(IBlockReader world, BlockPos pos) {
+    public static BlockData createBlockData(BlockGetter world, BlockPos pos) {
         return new BlockData(world.getBlockState(pos), createTileData(world, pos));
     }
 
     private static class DataProviderFactory implements ITileDataFactory {
         @Nullable
         @Override
-        public ITileEntityData createDataFor(TileEntity tileEntity) {
+        public ITileEntityData createDataFor(BlockEntity tileEntity) {
             if (tileEntity instanceof ITileDataProvider)
                 return ((ITileDataProvider) tileEntity).createTileData();
             return null;
@@ -77,7 +77,7 @@ public final class TileSupport {
 
         @Override
         public boolean placeIn(BuildContext context, BlockState state, BlockPos position) {
-            return context.getWorld().setBlockState(position, state, 0);
+            return context.getWorld().setBlock(position, state, 0);
         }
 
         @Override

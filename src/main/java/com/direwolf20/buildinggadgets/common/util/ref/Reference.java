@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.util.ref;
 
 import com.direwolf20.buildinggadgets.common.tainted.Tainted;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 
 // todo: remove. I Don't like how Botania does it and I don't like it here either.
 //       if you want to have a string used in mutiple places, find a home for it. Magic classes

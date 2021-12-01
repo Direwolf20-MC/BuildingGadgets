@@ -1,11 +1,10 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        jcenter()
+        maven { url = 'https://maven.minecraftforge.net' }
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
 
@@ -26,10 +25,10 @@ if (env.GITHUB_RUN_NUMBER) {
     version = version + "-SNAPSHOT-" + "${env.GITHUB_RUN_NUMBER}"
 }
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 minecraft {
-    mappings channel: 'snapshot', version: "${mcp_mappings}"
+    mappings channel: 'official', version: "${minecraft_version}"
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -84,30 +83,31 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+//    implementation('cpw.mods:securejarhandler') { version { strictly '0.9.45' } }
 
-    // JEI curse.maven:modurl-projectid:fileid
+    //JEI
     compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
     runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
-
+//    runtimeOnly fg.deobf("curse.maven:create-328085:3158185")
     // deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
     // deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
     // runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
 }
 
 // Processes main only resources
-processResources {
-    inputs.property('version', project.version)
-    inputs.property('forge_major', forge_major)
-
-    from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
-        expand 'version': project.version, 'forge_major': forge_major
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'META-INF/mods.toml'
-    }
-}
+//processResources {
+//    inputs.property('version', project.version)
+//    inputs.property('forge_major', forge_major)
+//
+//    from(sourceSets.main.resources.srcDirs) {
+//        include 'META-INF/mods.toml'
+//        expand 'version':project.version, 'forge_major':forge_major
+//    }
+//
+//    from(sourceSets.main.resources.srcDirs) {
+//        exclude 'META-INF/mods.toml'
+//    }
+//}
 
 jar {
     group = 'artifact'

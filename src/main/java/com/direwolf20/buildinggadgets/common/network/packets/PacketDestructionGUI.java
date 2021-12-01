@@ -2,9 +2,9 @@ package com.direwolf20.buildinggadgets.common.network.packets;
 
 import com.direwolf20.buildinggadgets.common.items.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -20,7 +20,7 @@ public class PacketDestructionGUI {
         depth = dep;
     }
 
-    public static void encode(PacketDestructionGUI msg, PacketBuffer buffer) {
+    public static void encode(PacketDestructionGUI msg, FriendlyByteBuf buffer) {
         buffer.writeInt(msg.left);
         buffer.writeInt(msg.right);
         buffer.writeInt(msg.up);
@@ -28,7 +28,7 @@ public class PacketDestructionGUI {
         buffer.writeInt(msg.depth);
     }
 
-    public static PacketDestructionGUI decode(PacketBuffer buffer) {
+    public static PacketDestructionGUI decode(FriendlyByteBuf buffer) {
         return new PacketDestructionGUI(buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt(), buffer.readInt());
     }
 

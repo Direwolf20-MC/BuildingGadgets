@@ -4,9 +4,9 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -49,10 +49,10 @@ public final class OurItems {
             = ITEMS.register("template_manager", () -> new BlockItem(OurBlocks.TEMPLATE_MANGER_BLOCK.get(), OurItems.itemProperties()));
 
     public static Item.Properties itemProperties() {
-        return new Item.Properties().group(BuildingGadgets.creativeTab);
+        return new Item.Properties().tab(BuildingGadgets.creativeTab);
     }
 
     public static Item.Properties nonStackableItemProperties() {
-        return itemProperties().maxStackSize(1);
+        return itemProperties().stacksTo(1);
     }
 }

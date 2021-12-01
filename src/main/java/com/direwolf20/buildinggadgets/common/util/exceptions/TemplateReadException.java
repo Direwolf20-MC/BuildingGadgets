@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.util.exceptions;
 
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 public class TemplateReadException extends Exception {
     public TemplateReadException() {
@@ -57,19 +57,19 @@ public class TemplateReadException extends Exception {
     }
 
     public static class IllegalNBTDataException extends TemplateReadException {
-        private final CompoundNBT nbt;
+        private final CompoundTag nbt;
 
-        public IllegalNBTDataException(CompoundNBT nbt) {
+        public IllegalNBTDataException(CompoundTag nbt) {
             super("Could not read nbt data format.");
             this.nbt = nbt;
         }
 
-        public IllegalNBTDataException(Throwable cause, CompoundNBT nbt) {
+        public IllegalNBTDataException(Throwable cause, CompoundTag nbt) {
             super("Could not read nbt data format.", cause);
             this.nbt = nbt;
         }
 
-        public CompoundNBT getNbt() {
+        public CompoundTag getNbt() {
             return nbt;
         }
     }

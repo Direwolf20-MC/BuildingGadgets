@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
 import com.direwolf20.buildinggadgets.common.tainted.Tainted;
-import net.minecraft.util.Direction.Axis;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.Direction.Axis;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.core.BlockPos;
 
 @Tainted(reason = "Shouldn't exist.")
 public final class MathUtils {
@@ -105,7 +105,7 @@ public final class MathUtils {
     }
 
     private static int cosineForRotation(Rotation rot) {
-        return sineForRotation(rot.add(Rotation.CLOCKWISE_90));
+        return sineForRotation(rot.getRotated(Rotation.CLOCKWISE_90));
     }
 
     public static int[][] rotationMatrixFor(Axis axis, Rotation rotation) {

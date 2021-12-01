@@ -10,9 +10,8 @@ import com.direwolf20.buildinggadgets.common.util.tools.JsonBiDiSerializer;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multiset;
 import com.google.gson.*;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.util.Constants.NBT;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 
@@ -32,7 +31,7 @@ public final class TemplateHeader {
     /**
      * Must be updated for each new MC version :cry:
      */
-    public static final String HIGHEST_MC_VERSION = "1.16.5";
+    public static final String HIGHEST_MC_VERSION = "1.17.1";
 
     /**
      * The lowest possible minecraft version we support. This could be lower but seeing as the mod only uses
@@ -124,7 +123,7 @@ public final class TemplateHeader {
                 .requiredItems(header.getRequiredItems());
     }
 
-    public static Builder builderFromNBT(CompoundNBT nbt, boolean persisted) {
+    public static Builder builderFromNBT(CompoundTag nbt, boolean persisted) {
         Preconditions.checkArgument(nbt.contains(NBTKeys.KEY_BOUNDS, NBT.TAG_COMPOUND),
                 "Cannot construct a TemplateHeader without '" + NBTKeys.KEY_BOUNDS + "'!");
         Region region = Region.deserializeFrom(nbt.getCompound(NBTKeys.KEY_BOUNDS));
@@ -138,11 +137,11 @@ public final class TemplateHeader {
         return builder;
     }
 
-    public static Builder builderFromNBT(CompoundNBT nbt) {
+    public static Builder builderFromNBT(CompoundTag nbt) {
         return builderFromNBT(nbt, true);
     }
 
-    public static TemplateHeader fromNBT(CompoundNBT nbt) {
+    public static TemplateHeader fromNBT(CompoundTag nbt) {
         return TemplateHeader.builderFromNBT(nbt).build();
     }
 
@@ -218,8 +217,8 @@ public final class TemplateHeader {
      * @implNote If this is called with persisted=false then this will never write {@link #getRequiredItems()}.
      * This is done in order not to prevent updates from changing the required Items for an {@link Template}.
      */
-    public CompoundNBT toNBT(boolean persisted) {
-        CompoundNBT nbt = new CompoundNBT();
+    public CompoundTag toNBT(boolean persisted) {
+        CompoundTag nbt = new CompoundTag();
         nbt.put(NBTKeys.KEY_BOUNDS, getBoundingBox().serialize());
         if (getName() != null)
             nbt.putString(NBTKeys.KEY_NAME, getName());

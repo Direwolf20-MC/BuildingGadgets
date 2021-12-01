@@ -1,6 +1,6 @@
 package com.direwolf20.buildinggadgets.common.tainted.inventory;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
 /**

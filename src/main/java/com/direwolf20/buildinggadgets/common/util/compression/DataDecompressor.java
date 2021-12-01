@@ -2,8 +2,8 @@ package com.direwolf20.buildinggadgets.common.util.compression;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
 
 import java.util.function.Function;
 import java.util.function.IntFunction;
@@ -24,11 +24,11 @@ public class DataDecompressor<T> implements IntFunction<T> {
     private Int2ObjectMap<T> int2ObjectMap;
     private IntFunction<T> defaultFun;
 
-    public DataDecompressor(ListNBT list, Function<INBT, T> deserializer, IntFunction<T> defaultFun) {
+    public DataDecompressor(ListTag list, Function<Tag, T> deserializer, IntFunction<T> defaultFun) {
         int2ObjectMap = new Int2ObjectOpenHashMap<>(list.size());
         this.defaultFun = defaultFun;
         int count = 0;
-        for (INBT entry : list) {
+        for (Tag entry : list) {
             int2ObjectMap.put(count++, deserializer.apply(entry));
         }
     }

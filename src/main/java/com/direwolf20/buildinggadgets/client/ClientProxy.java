@@ -12,23 +12,23 @@ import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SimpleSound;
-import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.ItemOverrideList;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockDisplayReader;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -54,10 +54,10 @@ public class ClientProxy {
         MinecraftForge.EVENT_BUS.addListener(EventTooltip::onDrawTooltip);
         MinecraftForge.EVENT_BUS.addListener(ClientProxy::onPlayerLoggedOut);
 
-        ScreenManager.registerFactory(OurContainers.TEMPLATE_MANAGER_CONTAINER.get(), TemplateManagerGUI::new);
+        MenuScreens.register(OurContainers.TEMPLATE_MANAGER_CONTAINER.get(), TemplateManagerGUI::new);
         ((ConstructionBlock) OurBlocks.CONSTRUCTION_BLOCK.get()).initColorHandler(Minecraft.getInstance().getBlockColors());
 
-        RenderTypeLookup.setRenderLayer(OurBlocks.CONSTRUCTION_BLOCK.get(), (RenderType) -> true);
+        ItemBlockRenderTypes.setRenderLayer(OurBlocks.CONSTRUCTION_BLOCK.get(), (RenderType) -> true);
         CACHE_TEMPLATE_PROVIDER.registerUpdateListener(((GadgetCopyPaste) OurItems.COPY_PASTE_GADGET_ITEM.get()).getRender());
     }
 
@@ -67,7 +67,7 @@ public class ClientProxy {
     }
 
     public static void playSound(SoundEvent sound, float pitch) {
-        Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(sound, pitch));
+        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(sound, pitch));
     }
 
     private static void onPlayerLoggedOut(PlayerLoggedOutEvent event) {
@@ -76,7 +76,7 @@ public class ClientProxy {
 
     private static void bakeModels(ModelBakeEvent event) {
         ResourceLocation ConstrName = new ResourceLocation(Reference.MODID, "construction_block");
-        TextureAtlasSprite breakPart = Minecraft.getInstance().getBlockRendererDispatcher().getModelForState(Blocks.STONE.getDefaultState()).getParticleTexture();
+        TextureAtlasSprite breakPart = Minecraft.getInstance().getBlockRenderer().getBlockModel(Blocks.STONE.defaultBlockState()).getParticleIcon();
         ModelResourceLocation ConstrLocation1 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=false,neighbor_brightness=false");
         ModelResourceLocation ConstrLocation1a = new ModelResourceLocation(ConstrName, "ambient_occlusion=true,bright=false,neighbor_brightness=false");
         ModelResourceLocation ConstrLocation2 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=true,neighbor_brightness=false");
@@ -87,55 +87,56 @@ public class ClientProxy {
         ModelResourceLocation ConstrLocation4a = new ModelResourceLocation(ConstrName, "ambient_occlusion=true,bright=true,neighbor_brightness=true");
         IDynamicBakedModel constructionBakedModel = new ConstructionBakedModel();
         IDynamicBakedModel bakedModelLoader = new IDynamicBakedModel() {
+
             @Override
             public boolean isGui3d() {
                 return false;
             }
 
             @Override
-            public boolean isSideLit() { //isSideLit maybe?
+            public boolean usesBlockLight() { //isSideLit maybe?
                 return false;
             }
 
             @Override
-            public boolean isBuiltInRenderer() {
+            public boolean isCustomRenderer() {
                 return false;
             }
 
             @Override
-            public boolean isAmbientOcclusion() {
+            public boolean useAmbientOcclusion() {
                 return true;
             }
 
             @Override
             public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData modelData) {
-                IBakedModel model;
+                BakedModel model;
                 BlockState facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 RenderType layer = MinecraftForgeClient.getRenderLayer();
-                if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
-                    facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
-                if (layer != null && ! RenderTypeLookup.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
+                if (facadeState == null || facadeState == Blocks.AIR.defaultBlockState())
+                    facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().defaultBlockState();
+                if (layer != null && ! ItemBlockRenderTypes.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
-                model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);
+                model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(facadeState);
                 return model.getQuads(facadeState, side, rand);
 
             }
 
             @Override
-            public TextureAtlasSprite getParticleTexture() {
+            public TextureAtlasSprite getParticleIcon() {
                 //Fixes a crash until forge does something
                 return breakPart;
             }
 
             @Override
-            public ItemOverrideList getOverrides() {
+            public ItemOverrides getOverrides() {
                 return null;
             }
 
             @Nonnull
             @Override
-            public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+            public IModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
                 return tileData;
             }
         };
@@ -147,49 +148,49 @@ public class ClientProxy {
             }
 
             @Override
-            public boolean isSideLit() {
+            public boolean usesBlockLight() {
                 return false;
             } // is side lit maybe?
 
             @Override
-            public boolean isBuiltInRenderer() {
+            public boolean isCustomRenderer() {
                 return false;
             }
 
             @Override
-            public boolean isAmbientOcclusion() {
+            public boolean useAmbientOcclusion() {
                 return true;
             }
 
             @Override
             public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData modelData) {
-                IBakedModel model;
-                BlockState facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
+                BakedModel model;
+                facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 RenderType layer = MinecraftForgeClient.getRenderLayer();
-                if (facadeState == null || facadeState == Blocks.AIR.getDefaultState())
-                    facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().getDefaultState();
-                if (layer != null && ! RenderTypeLookup.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
+                if (facadeState == null || facadeState == Blocks.AIR.defaultBlockState())
+                    facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().defaultBlockState();
+                if (layer != null && ! ItemBlockRenderTypes.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
-                model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(facadeState);
+                model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(facadeState);
                 return model.getQuads(facadeState, side, rand);
 
             }
 
             @Override
-            public TextureAtlasSprite getParticleTexture() {
+            public TextureAtlasSprite getParticleIcon() {
                 //Fixes a crash until forge does something
                 return breakPart;
             }
 
             @Override
-            public ItemOverrideList getOverrides() {
+            public ItemOverrides getOverrides() {
                 return null;
             }
 
             @Nonnull
             @Override
-            public IModelData getModelData(@Nonnull IBlockDisplayReader world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+            public IModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
                 return tileData;
             }
         };

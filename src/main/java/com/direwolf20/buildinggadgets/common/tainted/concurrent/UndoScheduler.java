@@ -12,9 +12,9 @@ import com.direwolf20.buildinggadgets.common.tainted.save.Undo;
 import com.direwolf20.buildinggadgets.common.tainted.save.Undo.BlockInfo;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.google.common.base.Preconditions;
-import net.minecraft.block.BlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.BlockEvent.BreakEvent;
 
@@ -62,17 +62,17 @@ public final class UndoScheduler extends SteppedScheduler {
     private void undoBlock(Map.Entry<BlockPos, BlockInfo> entry) {
         //if the block that was placed is no longer there, we should not undo anything
         BlockState state = context.getWorld().getBlockState(entry.getKey());
-        TileEntity te = context.getWorld().getTileEntity(entry.getKey());
+        BlockEntity te = context.getWorld().getBlockEntity(entry.getKey());
         BlockData data;
         if (state.getBlock() == OurBlocks.CONSTRUCTION_BLOCK.get() && te instanceof ConstructionBlockTileEntity) {
             data = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
         } else
             data = TileSupport.createBlockData(state, te);
-        if (data.getState().getBlock().getDefaultState() != entry.getValue().getPlacedData().getState().getBlock().getDefaultState()) {
+        if (data.getState().getBlock().defaultBlockState() != entry.getValue().getPlacedData().getState().getBlock().defaultBlockState()) {
             lastWasSuccess = false;
             return;
         }
-        if (! state.isAir(context.getWorld(), entry.getKey())) {
+        if (! state.isAir()) {
             BreakEvent event = new BreakEvent(context.getServerWorld(), entry.getKey(), state, context.getPlayer());
             if (MinecraftForge.EVENT_BUS.post(event)) {
                 lastWasSuccess = false;

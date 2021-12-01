@@ -7,22 +7,24 @@ import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSu
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.tileentities.EffectBlockTileEntity;
-import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.material.MaterialColor;
-import net.minecraft.block.material.PushReaction;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import com.direwolf20.buildinggadgets.common.tileentities.OurTileEntities;
+import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
+import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.util.Constants;
@@ -34,37 +36,37 @@ import java.util.List;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class EffectBlock extends Block {
+public class EffectBlock extends BaseEntityBlock {
 
     public enum Mode {
         // Serialization and networking based on `ordinal()`, please DO NOT CHANGE THE ORDER of the enums
         PLACE() {
             @Override
             public void onBuilderRemoved(EffectBlockTileEntity builder) {
-                World world = builder.getWorld();
+                Level world = builder.getLevel();
                 if( world == null )
                     return;
 
-                BlockPos targetPos = builder.getPos();
+                BlockPos targetPos = builder.getBlockPos();
                 BlockData targetBlock = builder.getRenderedBlock();
                 if (builder.isUsingPaste()) {
-                    world.setBlockState(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().getDefaultState());
-                    TileEntity te = world.getTileEntity(targetPos);
+                    world.setBlockAndUpdate(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().defaultBlockState());
+                    BlockEntity te = world.getBlockEntity(targetPos);
                     if (te instanceof ConstructionBlockTileEntity) {
                         ((ConstructionBlockTileEntity) te).setBlockState(targetBlock);
                     }
-                    world.addEntity(new ConstructionBlockEntity(world, targetPos, false));
+                    world.addFreshEntity(new ConstructionBlockEntity(world, targetPos, false));
                 } else {
                     if( targetBlock.getState().getBlock() instanceof LeavesBlock) {
-                        targetBlock = new BlockData(targetBlock.getState().with(LeavesBlock.PERSISTENT, true), targetBlock.getTileData());
+                        targetBlock = new BlockData(targetBlock.getState().setValue(LeavesBlock.PERSISTENT, true), targetBlock.getTileData());
                     }
 
                     targetBlock.placeIn(BuildContext.builder().build(world), targetPos);
 
                     // Instead of removing the block, we just sync the client & server to know that the block has been replaced
-                    world.notifyBlockUpdate(targetPos, targetBlock.getState(), targetBlock.getState(), Constants.BlockFlags.DEFAULT_AND_RERENDER);
+                    world.sendBlockUpdated(targetPos, targetBlock.getState(), targetBlock.getState(), Block.UPDATE_ALL_IMMEDIATE);
 
-                    BlockPos upPos = targetPos.up();
+                    BlockPos upPos = targetPos.above();
                     world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos, false);
                 }
             }
@@ -72,13 +74,13 @@ public class EffectBlock extends Block {
         REMOVE() {
             @Override
             public void onBuilderRemoved(EffectBlockTileEntity builder) {
-                builder.getWorld().removeBlock(builder.getPos(), false);
+                builder.getLevel().removeBlock(builder.getBlockPos(), false);
             }
         },
         REPLACE() {
             @Override
             public void onBuilderRemoved(EffectBlockTileEntity builder) {
-                spawnEffectBlock(builder.getWorld(), builder.getPos(), builder.getSourceBlock(), PLACE, builder.isUsingPaste());
+                spawnEffectBlock(builder.getLevel(), builder.getBlockPos(), builder.getSourceBlock(), PLACE, builder.isUsingPaste());
             }
         };
 
@@ -87,21 +89,27 @@ public class EffectBlock extends Block {
         public abstract void onBuilderRemoved(EffectBlockTileEntity builder);
     }
 
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return createTickerHelper(type, OurTileEntities.EFFECT_BLOCK_TILE_ENTITY.get(), EffectBlockTileEntity::tick);
+    }
+
     /**
      * As the effect block is effectively air it needs to have a material just like Air.
      * We don't use Material.AIR as this is replaceable.
      */
-    private static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MaterialColor.AIR).notSolid().build();
+    private static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MaterialColor.NONE).nonSolid().build();
 
     public static void spawnUndoBlock(BuildContext context, PlacementTarget target) {
         BlockState state = context.getWorld().getBlockState(target.getPos());
 
-        TileEntity curTe = context.getWorld().getTileEntity(target.getPos());
+        BlockEntity curTe = context.getWorld().getBlockEntity(target.getPos());
         //can't use .isAir, because it's not build yet
-        if (target.getData().getState() != Blocks.AIR.getDefaultState()) {
-            Mode mode = state.isAir(context.getWorld(), target.getPos()) ? Mode.PLACE : Mode.REPLACE;
+        if (target.getData().getState() != Blocks.AIR.defaultBlockState()) {
+            Mode mode = state.isAir() ? Mode.PLACE : Mode.REPLACE;
             spawnEffectBlock(curTe, state, context.getWorld(), target.getPos(), target.getData(), mode, false);
-        } else if (! state.isAir(context.getWorld(), target.getPos())) {
+        } else if (! state.isAir()) {
             spawnEffectBlock(curTe, state, context.getWorld(), target.getPos(), TileSupport.createBlockData(state, curTe), Mode.REMOVE, false);
         }
     }
@@ -110,54 +118,49 @@ public class EffectBlock extends Block {
         spawnEffectBlock(context.getWorld(), target.getPos(), target.getData(), mode, usePaste);
     }
 
-    public static void spawnEffectBlock(IWorld world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
+    public static void spawnEffectBlock(LevelAccessor world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
         BlockState state = world.getBlockState(spawnPos);
-        TileEntity curTe = world.getTileEntity(spawnPos);
+        BlockEntity curTe = world.getBlockEntity(spawnPos);
         spawnEffectBlock(curTe, state, world, spawnPos, spawnBlock, mode, usePaste);
     }
 
-    private static void spawnEffectBlock(@Nullable TileEntity curTe, BlockState curState, IWorld world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
-        BlockState state = OurBlocks.EFFECT_BLOCK.get().getDefaultState();
-        world.setBlockState(spawnPos, state, 3);
+    private static void spawnEffectBlock(@Nullable BlockEntity curTe, BlockState curState, LevelAccessor world, BlockPos spawnPos, BlockData spawnBlock, Mode mode, boolean usePaste) {
+        BlockState state = OurBlocks.EFFECT_BLOCK.get().defaultBlockState();
+        world.setBlock(spawnPos, state, 3);
 
-        TileEntity tile = world.getTileEntity(spawnPos);
+        BlockEntity tile = world.getBlockEntity(spawnPos);
         if (!(tile instanceof EffectBlockTileEntity)) {
             // Fail safely by replacing with air. Kinda voids but meh...
-            world.setBlockState(spawnPos, Blocks.AIR.getDefaultState(), 3);
+            world.setBlock(spawnPos, Blocks.AIR.defaultBlockState(), 3);
             return;
         }
 
         ((EffectBlockTileEntity) tile).initializeData(curState, curTe, spawnBlock, mode, usePaste);
         // Send data to client
-        if (world instanceof World)
-            ((World) world).notifyBlockUpdate(spawnPos, state, state, Constants.BlockFlags.DEFAULT);
+        if (world instanceof Level)
+            ((Level) world).sendBlockUpdated(spawnPos, state, state, Constants.BlockFlags.DEFAULT);
     }
 
     public EffectBlock() {
-        super(Block.Properties.create(EFFECT_BLOCK_MATERIAL)
-                .hardnessAndResistance(20f)
+        super(Block.Properties.of(EFFECT_BLOCK_MATERIAL)
+                .strength(20f)
                 .noDrops());
-    }
-
-    @Override
-    public boolean hasTileEntity(BlockState state) {
-        return true;
     }
 
     @Nullable
     @Override
-    public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return new EffectBlockTileEntity();
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return OurTileEntities.EFFECT_BLOCK_TILE_ENTITY.get().create(pos, state);
     }
 
     @Override
-    public VoxelShape getRenderShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
-        return VoxelShapes.empty();
+    public VoxelShape getOcclusionShape(BlockState state, BlockGetter worldIn, BlockPos pos) {
+        return Shapes.empty();
     }
 
     @Override
-    public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-        return VoxelShapes.fullCube();
+    public VoxelShape getShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext context) {
+        return Shapes.block();
     }
 
     /**
@@ -166,14 +169,15 @@ public class EffectBlock extends Block {
      * @deprecated call via {@link BlockState#getRenderType()} whenever possible. Implementing/overriding is fine.
      */
     @Override
+    @Deprecated
     @SuppressWarnings("deprecation")
-    public BlockRenderType getRenderType(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         // We still make effect blocks invisible because all effects (scaling block, transparent box) are dynamic so they has to be in the TER
-        return BlockRenderType.INVISIBLE;
+        return RenderShape.INVISIBLE;
     }
 
     @Override
-    public boolean isSideInvisible(BlockState p_200122_1_, BlockState p_200122_2_, Direction p_200122_3_) {
+    public boolean skipRendering(BlockState p_200122_1_, BlockState p_200122_2_, Direction p_200122_3_) {
         return true;
     }
 
@@ -191,18 +195,19 @@ public class EffectBlock extends Block {
      * @deprecated call via {@link BlockState#getPushReaction()} whenever possible. Implementing/overriding is fine.
      */
     @Override
-    public PushReaction getPushReaction(BlockState state) {
+    @Deprecated
+    public PushReaction getPistonPushReaction(BlockState state) {
         return PushReaction.BLOCK;
     }
 
     @Override
-    public int getOpacity(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public int getLightBlock(BlockState state, BlockGetter worldIn, BlockPos pos) {
         return 0;
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public float getAmbientOcclusionLightValue(BlockState state, IBlockReader worldIn, BlockPos pos) {
+    public float getShadeBrightness(BlockState state, BlockGetter worldIn, BlockPos pos) {
         return 1.0f;
     }
 }

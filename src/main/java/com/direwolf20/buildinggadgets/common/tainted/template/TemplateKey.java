@@ -1,4 +1,5 @@
 package com.direwolf20.buildinggadgets.common.tainted.template;
+
 import javax.annotation.Nullable;
 import java.util.UUID;
 import java.util.function.Supplier;

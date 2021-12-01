@@ -3,9 +3,9 @@ package com.direwolf20.buildinggadgets.common.tainted.save;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.Preconditions;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
 
 import java.util.Deque;
 import java.util.LinkedList;
@@ -38,16 +38,16 @@ final class UndoHistory {
         return Optional.ofNullable(history.peekFirst());
     }
 
-    void read(CompoundNBT nbt) {
+    void read(CompoundTag nbt) {
         this.history.clear();
-        INBT list = nbt.get(NBTKeys.WORLD_SAVE_UNDO_HISTORY);
-        if (list instanceof ListNBT) {
-            NBTHelper.deserializeCollection((ListNBT) list, history, inbt -> Undo.deserialize((CompoundNBT) inbt));
+        Tag list = nbt.get(NBTKeys.WORLD_SAVE_UNDO_HISTORY);
+        if (list instanceof ListTag) {
+            NBTHelper.deserializeCollection((ListTag) list, history, inbt -> Undo.deserialize((CompoundTag) inbt));
             ensureSize();
         }
     }
 
-    public void write(CompoundNBT nbt) {
+    public void write(CompoundTag nbt) {
         nbt.put(NBTKeys.WORLD_SAVE_UNDO_HISTORY, NBTHelper.writeIterable(history, Undo::serialize));
     }
 

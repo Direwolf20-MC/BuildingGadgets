@@ -5,7 +5,7 @@ import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.util.spliterator.MappingSpliterator;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 import java.util.Map;
 import java.util.Objects;
@@ -43,7 +43,7 @@ public final class PositionalBuildView implements IBuildView {
     @Override
     public Spliterator<PlacementTarget> spliterator() {
         BlockPos translation = this.translation;
-        return new MappingSpliterator<>(map.entrySet().spliterator(), e -> new PlacementTarget(e.getKey().add(translation), e.getValue()));
+        return new MappingSpliterator<>(map.entrySet().spliterator(), e -> new PlacementTarget(e.getKey().offset(translation), e.getValue()));
     }
 
     @Override

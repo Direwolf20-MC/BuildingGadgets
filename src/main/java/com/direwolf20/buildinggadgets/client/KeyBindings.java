@@ -1,29 +1,29 @@
 package com.direwolf20.buildinggadgets.client;
 
-import com.direwolf20.buildinggadgets.common.items.TemplateItem;
 import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
+import com.direwolf20.buildinggadgets.common.items.TemplateItem;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.util.InputMappings;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Hand;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.client.settings.KeyConflictContext;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fmlclient.registry.ClientRegistry;
 import org.lwjgl.glfw.GLFW;
 
 public class KeyBindings {
 
     private static final KeyConflictContextGadget CONFLICT_CONTEXT_GADGET = new KeyConflictContextGadget();
-    public static KeyBinding menuSettings;
-    public static KeyBinding range;
-    public static KeyBinding rotateMirror;
-    public static KeyBinding undo;
-    public static KeyBinding anchor;
-    public static KeyBinding fuzzy;
-    public static KeyBinding connectedArea;
-    public static KeyBinding materialList;
+    public static KeyMapping menuSettings;
+    public static KeyMapping range;
+    public static KeyMapping rotateMirror;
+    public static KeyMapping undo;
+    public static KeyMapping anchor;
+    public static KeyMapping fuzzy;
+    public static KeyMapping connectedArea;
+    public static KeyMapping materialList;
 
     public static void init() {
         menuSettings = createBinding("settings_menu", GLFW.GLFW_KEY_G);
@@ -36,8 +36,8 @@ public class KeyBindings {
         materialList = createBinding("material_list", GLFW.GLFW_KEY_M);
     }
 
-    private static KeyBinding createBinding(String name, int key) {
-        KeyBinding keyBinding = new KeyBinding(getKey(name), CONFLICT_CONTEXT_GADGET, InputMappings.Type.KEYSYM.getOrMakeInput(key), getKey("category"));
+    private static KeyMapping createBinding(String name, int key) {
+        KeyMapping keyBinding = new KeyMapping(getKey(name), CONFLICT_CONTEXT_GADGET, InputConstants.Type.KEYSYM.getOrCreate(key), getKey("category"));
         ClientRegistry.registerKeyBinding(keyBinding);
         return keyBinding;
     }
@@ -50,10 +50,10 @@ public class KeyBindings {
     {
         @Override
         public boolean isActive() {
-            PlayerEntity player = Minecraft.getInstance().player;
+            Player player = Minecraft.getInstance().player;
             return !KeyConflictContext.GUI.isActive() && player != null
                     && (!AbstractGadget.getGadget(player).isEmpty()
-                        || (player.getHeldItem(Hand.MAIN_HAND).getItem() instanceof TemplateItem || player.getHeldItem(Hand.OFF_HAND).getItem() instanceof TemplateItem));
+                        || (player.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof TemplateItem || player.getItemInHand(InteractionHand.OFF_HAND).getItem() instanceof TemplateItem));
         }
 
         @Override

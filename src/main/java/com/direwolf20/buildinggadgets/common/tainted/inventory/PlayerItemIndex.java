@@ -5,11 +5,11 @@ import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.Materia
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObject;
 import com.google.common.collect.*;
 import com.google.common.collect.Multiset.Entry;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 import java.util.*;
 
@@ -22,9 +22,9 @@ public final class PlayerItemIndex implements IItemIndex {
     private Map<Class<?>, Map<Object, List<IObjectHandle<?>>>> handleMap;
     private List<IInsertProvider> insertProviders;
     private final ItemStack stack;
-    private final PlayerEntity player;
+    private final Player player;
 
-    public PlayerItemIndex(ItemStack stack, PlayerEntity player) {
+    public PlayerItemIndex(ItemStack stack, Player player) {
         this.stack = stack;
         this.player = player;
         reIndex();
@@ -116,8 +116,8 @@ public final class PlayerItemIndex implements IItemIndex {
             ItemStack copy = stack.copy();
             copy.setCount(Math.min(remainingCount, copy.getMaxStackSize()));
             remainingCount -= copy.getCount();
-            ItemEntity itemEntity = new ItemEntity(player.world, player.getPosX(), player.getPosY(), player.getPosZ(), copy);
-            player.world.addEntity(itemEntity);
+            ItemEntity itemEntity = new ItemEntity(player.level, player.getX(), player.getY(), player.getZ(), copy);
+            player.level.addFreshEntity(itemEntity);
         }
     }
 

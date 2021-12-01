@@ -10,7 +10,7 @@ import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.google.common.base.Preconditions;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.minecraftforge.registries.ObjectHolder;
@@ -33,12 +33,12 @@ public final class SerialisationSupport {
         }
 
         @Override
-        public CompoundNBT serialize(ITileEntityData data, boolean persisted) {
-            return new CompoundNBT();
+        public CompoundTag serialize(ITileEntityData data, boolean persisted) {
+            return new CompoundTag();
         }
 
         @Override
-        public ITileEntityData deserialize(CompoundNBT tagCompound, boolean persisted) {
+        public ITileEntityData deserialize(CompoundTag tagCompound, boolean persisted) {
             return TileSupport.dummyTileEntityData();
         }
     }
@@ -55,10 +55,10 @@ public final class SerialisationSupport {
         private NBTTileEntityDataSerializer() {}
 
         @Override
-        public CompoundNBT serialize(ITileEntityData data, boolean persisted) {
+        public CompoundTag serialize(ITileEntityData data, boolean persisted) {
             Preconditions.checkArgument(data instanceof NBTTileEntityData);
             NBTTileEntityData nbtData = (NBTTileEntityData) data;
-            CompoundNBT res = new CompoundNBT();
+            CompoundTag res = new CompoundTag();
             res.put(NBTKeys.KEY_DATA, nbtData.getNBT());
             if (nbtData.getRequiredMaterials() != null)
                 res.put(NBTKeys.KEY_MATERIALS, nbtData.getRequiredMaterials().serialize(persisted));
@@ -66,8 +66,8 @@ public final class SerialisationSupport {
         }
 
         @Override
-        public ITileEntityData deserialize(CompoundNBT tagCompound, boolean persisted) {
-            CompoundNBT data = tagCompound.getCompound(NBTKeys.KEY_DATA);
+        public ITileEntityData deserialize(CompoundTag tagCompound, boolean persisted) {
+            CompoundTag data = tagCompound.getCompound(NBTKeys.KEY_DATA);
             MaterialList materialList = null;
             if (tagCompound.contains(NBTKeys.KEY_MATERIALS, NBT.TAG_COMPOUND))
                 materialList = MaterialList.deserialize(tagCompound.getCompound(NBTKeys.KEY_MATERIALS), persisted);

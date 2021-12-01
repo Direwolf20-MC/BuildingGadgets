@@ -5,10 +5,10 @@ import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
 import com.google.common.collect.Multiset;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.HitResult;
 
 import javax.annotation.Nullable;
 
@@ -46,7 +46,7 @@ public interface ITileEntityData {
      * @param pos The {@link BlockPos} where a block is simulated for this Method
      * @return A {@link Multiset} of required Items.
      */
-    default MaterialList getRequiredItems(BuildContext context, BlockState state, @Nullable RayTraceResult target, @Nullable BlockPos pos) {
+    default MaterialList getRequiredItems(BuildContext context, BlockState state, @Nullable HitResult target, @Nullable BlockPos pos) {
         ItemStack stack = null;
         try {
             stack = state.getBlock().getPickBlock(state, target, context.getWorld(), pos, context.getPlayer());

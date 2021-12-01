@@ -7,9 +7,8 @@ import com.direwolf20.buildinggadgets.common.network.packets.SplitPacketUpdateTe
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateKey;
 import com.direwolf20.buildinggadgets.common.tainted.template.ITemplateProvider;
 import com.direwolf20.buildinggadgets.common.tainted.template.Template;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraftforge.fml.network.PacketDistributor;
-import net.minecraftforge.fml.network.PacketDistributor.PacketTarget;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import org.apache.logging.log4j.util.TriConsumer;
 
 import java.util.Collections;
@@ -73,12 +72,12 @@ public final class SaveTemplateProvider implements ITemplateProvider {
         return key.getTemplateId(this::getFreeId);
     }
 
-    public boolean requestRemoteUpdate(ITemplateKey key, ServerPlayerEntity playerEntity) {
+    public boolean requestRemoteUpdate(ITemplateKey key, ServerPlayer playerEntity) {
         return requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> playerEntity));
     }
 
     @Override
-    public boolean requestRemoteUpdate(ITemplateKey key, PacketTarget target) {
+    public boolean requestRemoteUpdate(ITemplateKey key, PacketDistributor.PacketTarget target) {
         UUID id = getId(key);
         Template template = getSave().getTemplate(id);
         PacketHandler.getSplitManager().send(new SplitPacketUpdateTemplate(id, template), target);
@@ -86,7 +85,7 @@ public final class SaveTemplateProvider implements ITemplateProvider {
     }
 
     @Override
-    public boolean requestUpdate(ITemplateKey key, PacketTarget target) {
+    public boolean requestUpdate(ITemplateKey key, PacketDistributor.PacketTarget target) {
         UUID id = getId(key);
         PacketHandler.HANDLER.send(target, new PacketRequestTemplate(id));
         return true;

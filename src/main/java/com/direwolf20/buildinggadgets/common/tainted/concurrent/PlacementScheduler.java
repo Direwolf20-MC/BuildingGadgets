@@ -12,9 +12,9 @@ import com.direwolf20.buildinggadgets.common.tainted.building.view.IBuildView;
 import com.direwolf20.buildinggadgets.common.tainted.save.Undo;
 import com.direwolf20.buildinggadgets.common.tainted.save.Undo.Builder;
 import com.google.common.base.Preconditions;
-import net.minecraft.block.DoorBlock;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 
 import java.util.Objects;
 import java.util.Spliterator;
@@ -78,8 +78,8 @@ public final class PlacementScheduler extends SteppedScheduler {
 
             BuildContext context = view.getContext();
             BlockData targetBlock = target.getData();
-            if (target.getData().getState().getBlock() instanceof DoorBlock && targetBlock.getState().get(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER && context.getWorld().isAirBlock(target.getPos().up())) {
-                EffectBlock.spawnEffectBlock(context.getWorld(), target.getPos().up(), new BlockData(targetBlock.getState().with(BlockStateProperties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.UPPER), TileSupport.dummyTileEntityData()), Mode.PLACE, false);
+            if (target.getData().getState().getBlock() instanceof DoorBlock && targetBlock.getState().getValue(BlockStateProperties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER && context.getWorld().isEmptyBlock(target.getPos().above())) {
+                EffectBlock.spawnEffectBlock(context.getWorld(), target.getPos().above(), new BlockData(targetBlock.getState().setValue(BlockStateProperties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.UPPER), TileSupport.dummyTileEntityData()), Mode.PLACE, false);
             }
         }
     }

@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.common.tainted.inventory.handle;
 
 import com.direwolf20.buildinggadgets.common.tainted.registry.Registries;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.CapabilityItemHandler;

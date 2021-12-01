@@ -2,11 +2,10 @@ package com.direwolf20.buildinggadgets.common.tainted.save;
 
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.SaveReference;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.WorldSavedData;
-import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.fmlserverevents.FMLServerStartedEvent;
+import net.minecraftforge.fmlserverevents.FMLServerStoppedEvent;
 
 import javax.annotation.Nullable;
 import java.util.LinkedList;
@@ -27,7 +26,7 @@ public enum SaveManager {
         this.undoSaves = new LinkedList<>();
     }
 
-    public Supplier<UndoWorldSave> registerUndoSave(Function<ServerWorld, UndoWorldSave> ctrFun) {
+    public Supplier<UndoWorldSave> registerUndoSave(Function<ServerLevel, UndoWorldSave> ctrFun) {
         UndoSaveContainer container = new UndoSaveContainer(Objects.requireNonNull(ctrFun));
         this.undoSaves.add(container);
         return container::getCurrentSave;
@@ -35,7 +34,7 @@ public enum SaveManager {
 
     public void onServerStarted(FMLServerStartedEvent event) {
         BuildingGadgets.LOG.debug("Loading World Saves.");
-        ServerWorld world = event.getServer().getWorld(World.OVERWORLD);
+        ServerLevel world = event.getServer().getLevel(Level.OVERWORLD);
         for (UndoSaveContainer c : undoSaves) {
             c.acquire(world);
         }
@@ -52,17 +51,17 @@ public enum SaveManager {
         BuildingGadgets.LOG.debug("Finished clearing save caches");
     }
 
-    public static UndoWorldSave getUndoSave(ServerWorld world, IntSupplier maxLengthSupplier, String name) {
-        return get(world, () -> new UndoWorldSave(name, maxLengthSupplier), name);
+    public static UndoWorldSave getUndoSave(ServerLevel world, IntSupplier maxLengthSupplier, String name) {
+        return world.getDataStorage().computeIfAbsent(UndoWorldSave::loads, () -> new UndoWorldSave(maxLengthSupplier), name);
     }
 
-    private static TemplateSave getTemplateSave(ServerWorld world, String name) {
-        return get(world, () -> new TemplateSave(name), name);
+    private static TemplateSave getTemplateSave(ServerLevel world, String name) {
+        return world.getDataStorage().computeIfAbsent(TemplateSave::loads, TemplateSave::new, name);
     }
 
-    private static <T extends WorldSavedData> T get(ServerWorld world, Supplier<T> supplier, String name) {
-        return world.getSavedData().getOrCreate(supplier, name);
-    }
+//    private static <T extends SavedData> T get(ServerLevel world, Function<CompoundTag, T> loader, Supplier<T> supplier, String name) {
+//        return world.getDataStorage().computeIfAbsent(loader, supplier, name);
+//    }
 
     public SaveTemplateProvider getTemplateProvider() {
         return templateProvider;
@@ -73,16 +72,16 @@ public enum SaveManager {
     }
 
     private static final class UndoSaveContainer {
-        private final Function<ServerWorld, UndoWorldSave> constructor;
+        private final Function<ServerLevel, UndoWorldSave> constructor;
         @Nullable
         private UndoWorldSave currentSave;
 
-        private UndoSaveContainer(Function<ServerWorld, UndoWorldSave> constructor) {
+        private UndoSaveContainer(Function<ServerLevel, UndoWorldSave> constructor) {
             this.constructor = constructor;
             this.currentSave = null;
         }
 
-        private void acquire(ServerWorld world) {
+        private void acquire(ServerLevel world) {
             this.currentSave = constructor.apply(world);
         }
 

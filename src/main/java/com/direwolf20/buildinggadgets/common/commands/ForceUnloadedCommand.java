@@ -3,10 +3,10 @@ package com.direwolf20.buildinggadgets.common.commands;
 import com.direwolf20.buildinggadgets.common.util.lang.CommandTranslation;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.EntityArgument;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
 
@@ -16,7 +16,7 @@ public class ForceUnloadedCommand {
             CommandTranslation.FORCE_UNLOADED_LIST, "allow unloaded chunks"
     );
 
-    public static void toggleAllowUnloadedChunks(PlayerEntity player) {
+    public static void toggleAllowUnloadedChunks(Player player) {
         ALLOW_UNLOADED_CHUNKS.toggleAllowOverride(player);
     }
 
@@ -28,29 +28,29 @@ public class ForceUnloadedCommand {
         return ALLOW_UNLOADED_CHUNKS.mayOverride(uuid);
     }
 
-    public static boolean mayForceUnloadedChunks(PlayerEntity player) {
+    public static boolean mayForceUnloadedChunks(Player player) {
         return ALLOW_UNLOADED_CHUNKS.mayOverride(player);
     }
 
-    public static LiteralArgumentBuilder<CommandSource> registerToggle() {
+    public static LiteralArgumentBuilder<CommandSourceStack> registerToggle() {
         return Commands.literal("ForceLoadChunks")
-                .requires(commandSource -> commandSource.hasPermissionLevel(2))
+                .requires(commandSource -> commandSource.hasPermission(2))
                 .then(Commands.argument("player", EntityArgument.player())
                         .executes(context -> executeToggle(context, EntityArgument.getPlayer(context, "player")))
                 );
     }
 
-    public static LiteralArgumentBuilder<CommandSource> registerList() {
+    public static LiteralArgumentBuilder<CommandSourceStack> registerList() {
         return Commands.literal("ForceLoadChunksList")
-                .requires(commandSource -> commandSource.hasPermissionLevel(2))
+                .requires(commandSource -> commandSource.hasPermission(2))
                 .executes(ForceUnloadedCommand::executeList);
     }
 
-    private static int executeToggle(CommandContext<CommandSource> context, PlayerEntity player) {
+    private static int executeToggle(CommandContext<CommandSourceStack> context, Player player) {
         return ALLOW_UNLOADED_CHUNKS.executeToggle(context, player);
     }
 
-    private static int executeList(CommandContext<CommandSource> context) {
+    private static int executeList(CommandContext<CommandSourceStack> context) {
         return ALLOW_UNLOADED_CHUNKS.executeList(context);
     }
 }

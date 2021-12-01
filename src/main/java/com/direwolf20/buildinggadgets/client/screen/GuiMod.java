@@ -5,9 +5,9 @@ import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.GadgetDestruction;
 import com.direwolf20.buildinggadgets.common.util.lang.LangUtil;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 import java.awt.*;
 import java.util.function.Function;
@@ -19,10 +19,10 @@ public enum GuiMod {
     DESTRUCTION(GadgetDestruction::getGadget, stack -> () -> new DestructionGUI(stack)),
     MATERIAL_LIST(TemplateItem::getTemplateItem, stack -> () -> new MaterialListGUI(stack));
 
-    private Function<PlayerEntity, ItemStack> stackReader;
+    private Function<Player, ItemStack> stackReader;
     private Function<ItemStack, Supplier<? extends Screen>> clientScreenProvider;
 
-    GuiMod(Function<PlayerEntity, ItemStack> stackReader, Function<ItemStack, Supplier<? extends Screen>> clientScreenProvider) {
+    GuiMod(Function<Player, ItemStack> stackReader, Function<ItemStack, Supplier<? extends Screen>> clientScreenProvider) {
         this.stackReader = stackReader;
         this.clientScreenProvider = clientScreenProvider;
     }
@@ -32,7 +32,7 @@ public enum GuiMod {
         return screen;
     }
 
-    public boolean openScreen(PlayerEntity player) {
+    public boolean openScreen(Player player) {
         if (clientScreenProvider == null)
             return false;
 
@@ -41,7 +41,7 @@ public enum GuiMod {
             return false;
 
         Screen screen = clientScreenProvider.apply(stack).get();
-        Minecraft.getInstance().displayGuiScreen(screen);
+        Minecraft.getInstance().setScreen(screen);
         return screen == null;
     }
 

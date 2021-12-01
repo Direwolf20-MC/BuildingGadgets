@@ -5,22 +5,22 @@ import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import it.unimi.dsi.fastutil.longs.Long2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectSortedMap;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraftforge.common.util.Constants.NBT;
 
 import java.util.*;
 import java.util.function.Function;
 
-public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData {
+public abstract class TimedDataSave<T extends TimedValue> extends SavedData {
     private Map<UUID, T> idToValue;
     private Long2ObjectSortedMap<Set<UUID>> timeToId;
 
-    public TimedDataSave(String name) {
-        super(name);
+    public TimedDataSave() {
+        super();
         this.idToValue = new HashMap<>();
         this.timeToId = new Long2ObjectRBTreeMap<>();
     }
@@ -30,9 +30,9 @@ public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData
         return idToValue.containsKey(res) ? getFreeUUID() : res;
     }
 
-    protected void writeAllIds(PacketBuffer buffer) {
+    protected void writeAllIds(FriendlyByteBuf buffer) {
         for (UUID id : idToValue.keySet()) {
-            buffer.writeUniqueId(id);
+            buffer.writeUUID(id);
         }
     }
 
@@ -41,7 +41,7 @@ public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData
     }
 
     protected T get(UUID id, Function<UUID, T> factory) {
-        markDirty();
+        setDirty();
         return idToValue.computeIfAbsent(id, factory);
     }
 
@@ -65,13 +65,12 @@ public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData
         return get(id).getUpdateTime();
     }
 
-    @Override
-    public void read(CompoundNBT nbt) {
-        INBT timeList = nbt.get(NBTKeys.WORD_SAVE_DATA_MAP);
+    public void load(CompoundTag nbt) {
+        Tag timeList = nbt.get(NBTKeys.WORD_SAVE_DATA_MAP);
         timeToId.clear();
         idToValue.clear();
-        if (timeList instanceof ListNBT) {
-            NBTHelper.deserializeUUIDMap((ListNBT) timeList, idToValue, inbt -> readValue((CompoundNBT) inbt));
+        if (timeList instanceof ListTag) {
+            NBTHelper.deserializeUUIDMap((ListTag) timeList, idToValue, inbt -> readValue((CompoundTag) inbt));
             for (Map.Entry<UUID, T> entry : idToValue.entrySet()) {
                 timeToId.computeIfAbsent(entry.getValue().getUpdateTime(), i -> new HashSet<>()).add(entry.getKey());
             }
@@ -79,20 +78,20 @@ public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData
     }
 
     @Override
-    public CompoundNBT write(CompoundNBT compound) {
-        ListNBT data = NBTHelper.serializeUUIDMap(idToValue, TimedValue::write);
+    public CompoundTag save(CompoundTag compound) {
+        ListTag data = NBTHelper.serializeUUIDMap(idToValue, TimedValue::write);
         compound.put(NBTKeys.WORD_SAVE_DATA_MAP, data);
         return compound;
     }
 
     protected abstract T createValue();
 
-    protected abstract T readValue(CompoundNBT nbt);
+    protected abstract T readValue(CompoundTag nbt);
 
     public static class TimedValue {
         private long lastUpdateTime;
 
-        protected TimedValue(CompoundNBT nbt) {
+        protected TimedValue(CompoundTag nbt) {
             this(nbt.contains(NBTKeys.WORLD_SAVE_TIME, NBT.TAG_LONG) ? nbt.getLong(NBTKeys.WORLD_SAVE_TIME) : System.currentTimeMillis());
         }
 
@@ -113,8 +112,8 @@ public abstract class TimedDataSave<T extends TimedValue> extends WorldSavedData
             return lastUpdateTime;
         }
 
-        public CompoundNBT write() {
-            CompoundNBT nbt = new CompoundNBT();
+        public CompoundTag write() {
+            CompoundTag nbt = new CompoundTag();
             nbt.putLong(NBTKeys.WORLD_SAVE_TIME, lastUpdateTime);
             return nbt;
         }

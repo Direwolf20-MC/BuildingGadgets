@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items.modes;
 
 import com.direwolf20.buildinggadgets.common.config.Config;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,13 +11,13 @@ public class BuildToMeMode extends AbstractMode {
     public BuildToMeMode() { super(false); }
 
     @Override
-    public List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
+    public List<BlockPos> collect(UseContext context, Player player, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
         XYZ facingXYZ = XYZ.fromFacing(context.getHitSide());
 
         int startCoord = XYZ.posToXYZ(start, facingXYZ);
-        int playerCoord = XYZ.posToXYZ(player.getPosition(), facingXYZ);
+        int playerCoord = XYZ.posToXYZ(player.blockPosition(), facingXYZ);
 
         // Clamp the value to the max range of the gadgets raytrace
         double difference = Math.max(0, Math.min(Config.GENERAL.rayTraceRange.get(), Math.abs(startCoord - playerCoord)));

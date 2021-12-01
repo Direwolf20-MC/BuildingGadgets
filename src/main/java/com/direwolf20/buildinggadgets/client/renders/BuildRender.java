@@ -15,19 +15,19 @@ import com.direwolf20.buildinggadgets.common.items.GadgetExchanger;
 import com.direwolf20.buildinggadgets.common.items.modes.AbstractMode;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.block.BlockState;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
@@ -42,23 +42,23 @@ import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.getToolBloc
 
 public class BuildRender extends BaseRenderer {
     private final boolean isExchanger;
-    private static final BlockState DEFAULT_EFFECT_BLOCK = OurBlocks.EFFECT_BLOCK.get().getDefaultState();
+    private static final BlockState DEFAULT_EFFECT_BLOCK = OurBlocks.EFFECT_BLOCK.get().defaultBlockState();
 
     public BuildRender(boolean isExchanger) {
         this.isExchanger = isExchanger;
     }
 
     @Override
-    public void render(RenderWorldLastEvent evt, PlayerEntity player, ItemStack heldItem) {
+    public void render(RenderWorldLastEvent evt, Player player, ItemStack heldItem) {
         super.render(evt, player, heldItem);
 
-        BlockRayTraceResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
+        BlockHitResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
 
         BlockState state = AIR;
         Optional<List<BlockPos>> anchor = getAnchor(heldItem);
 
-        BlockState startBlock = player.world.getBlockState(lookingAt.getPos());
-        if( (player.world.isAirBlock(lookingAt.getPos()) && !anchor.isPresent()) || startBlock == DEFAULT_EFFECT_BLOCK )
+        BlockState startBlock = player.level.getBlockState(lookingAt.getBlockPos());
+        if( (player.level.isEmptyBlock(lookingAt.getBlockPos()) && !anchor.isPresent()) || startBlock == DEFAULT_EFFECT_BLOCK )
             return;
 
         BlockData data = getToolBlock(heldItem);
@@ -70,7 +70,7 @@ public class BuildRender extends BaseRenderer {
         List<BlockPos> coordinates = anchor.orElseGet(() -> {
             AbstractMode mode = !this.isExchanger ? GadgetBuilding.getToolMode(heldItem).getMode() : GadgetExchanger.getToolMode(heldItem).getMode();
             return mode.getCollection(
-                    new AbstractMode.UseContext(player.world, renderBlockState, lookingAt.getPos(), heldItem, lookingAt.getFace(), !this.isExchanger && GadgetBuilding.shouldPlaceAtop(heldItem), !this.isExchanger ? GadgetBuilding.getConnectedArea(heldItem) : GadgetExchanger.getConnectedArea(heldItem)),
+                    new AbstractMode.UseContext(player.level, renderBlockState, lookingAt.getBlockPos(), heldItem, lookingAt.getDirection(), !this.isExchanger && GadgetBuilding.shouldPlaceAtop(heldItem), !this.isExchanger ? GadgetBuilding.getConnectedArea(heldItem) : GadgetExchanger.getConnectedArea(heldItem)),
                     player
             );
         });
@@ -79,20 +79,20 @@ public class BuildRender extends BaseRenderer {
 //        coordinates = SortingHelper.Blocks.byDistance(coordinates, player);
 
         //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
-        getBuilderWorld().setWorldAndState(player.world, renderBlockState, coordinates);
+        getBuilderWorld().setWorldAndState(player.level, renderBlockState, coordinates);
 
-        Vector3d playerPos = getMc().gameRenderer.getActiveRenderInfo().getProjectedView();
-        IRenderTypeBuffer.Impl buffer = Minecraft.getInstance().getRenderTypeBuffers().getBufferSource();
+        Vec3 playerPos = getMc().gameRenderer.getMainCamera().getPosition();
+        MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
 
         //Save the current position that is being rendered (I think)
-        MatrixStack matrix = evt.getMatrixStack();
-        matrix.push();
-        matrix.translate(-playerPos.getX(), -playerPos.getY(), -playerPos.getZ());
+        PoseStack matrix = evt.getMatrixStack();
+        matrix.pushPose();
+        matrix.translate(-playerPos.x(), -playerPos.y(), -playerPos.z());
 
-        BlockRendererDispatcher dispatcher = getMc().getBlockRendererDispatcher();
+        BlockRenderDispatcher dispatcher = getMc().getBlockRenderer();
 
         for (BlockPos coordinate : coordinates) {
-            matrix.push();
+            matrix.pushPose();
             matrix.translate(coordinate.getX(), coordinate.getY(), coordinate.getZ());
             if( this.isExchanger ) {
                 matrix.translate(-0.0005f, -0.0005f, -0.0005f);
@@ -106,29 +106,29 @@ public class BuildRender extends BaseRenderer {
 //                } catch (Exception ignored) {}
 //            }
 
-            OurRenderTypes.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new OurRenderTypes.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().getRenderTypeBuffers().getBufferSource(), .55f);
+            OurRenderTypes.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new OurRenderTypes.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().renderBuffers().bufferSource(), .55f);
             try {
-                dispatcher.renderBlock(
+                dispatcher.renderSingleBlock(
                         state, matrix, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE
                 );
             } catch (Exception ignored) {} // I'm sure if this is an issue someone will report it
 
             //Move the render position back to where it was
-            matrix.pop();
+            matrix.popPose();
             RenderSystem.disableDepthTest();
-            buffer.finish(); // @mcp: finish (mcp) = draw (yarn)
+            buffer.endBatch(); // @mcp: finish (mcp) = draw (yarn)
         }
 
         // Don't even waste the time checking to see if we have the right energy, items, etc for creative mode
         if (!player.isCreative()) {
-            IVertexBuilder builder;
+            VertexConsumer builder;
 
             boolean hasLinkedInventory = getCacheInventory().maintainCache(heldItem);
             int remainingCached = getCacheInventory().getCache() == null ? -1 : getCacheInventory().getCache().count(new UniqueItem(data.getState().getBlock().asItem()));
 
             // Figure out how many of the block we're rendering we have in the inventory of the player.
             IItemIndex index = new RecordingItemIndex(InventoryHelper.index(heldItem, player));
-            BuildContext context = new BuildContext(player.world, player, heldItem);
+            BuildContext context = new BuildContext(player.level, player, heldItem);
 
             MaterialList materials = data.getRequiredItems(context, null, null);
             int hasEnergy = getEnergy(player, heldItem);
@@ -149,22 +149,22 @@ public class BuildRender extends BaseRenderer {
                         renderFree = true;
                         remainingCached --;
                     } else {
-                        renderMissingBlock(matrix.getLast().getMatrix(), builder, coordinate);
+                        renderMissingBlock(matrix.last().pose(), builder, coordinate);
                     }
                 } else {
                     index.applyMatch(match); //notify the recording index that this counts
-                    renderBoxSolid(matrix.getLast().getMatrix(), builder, coordinate, .97f, 1f, .99f, .1f);
+                    renderBoxSolid(matrix.last().pose(), builder, coordinate, .97f, 1f, .99f, .1f);
                 }
 
                 if (renderFree) {
-                    renderBoxSolid(matrix.getLast().getMatrix(), builder, coordinate, .97f, 1f, .99f, .1f);
+                    renderBoxSolid(matrix.last().pose(), builder, coordinate, .97f, 1f, .99f, .1f);
                 }
             }
         }
 
-        matrix.pop();
+        matrix.popPose();
         RenderSystem.disableDepthTest();
-        buffer.finish(); // @mcp: finish (mcp) = draw (yarn)
+        buffer.endBatch(); // @mcp: finish (mcp) = draw (yarn)
     }
 
     @Override

@@ -1,9 +1,9 @@
 package com.direwolf20.buildinggadgets.client.renderer;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.datafixers.util.Pair;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.util.math.vector.Matrix4f;
+import com.mojang.math.Matrix4f;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.CompletableFuture;
@@ -53,7 +53,7 @@ public class DireVertexBuffer implements AutoCloseable {
         Pair<DireBufferBuilder.DrawState, ByteBuffer> pair = bufferIn.getNextBuffer();
         if (this.glBufferId != -1) {
             ByteBuffer bytebuffer = pair.getSecond();
-            this.count = bytebuffer.remaining() / this.vertexFormat.getSize();
+            this.count = bytebuffer.remaining() / this.vertexFormat.getVertexSize();
             this.bindBuffer();
             RenderSystem.glBufferData(34962, bytebuffer, 35044);
             unbindBuffer();
@@ -61,11 +61,12 @@ public class DireVertexBuffer implements AutoCloseable {
     }
 
     public void draw(Matrix4f matrixIn, int modeIn) {
-        RenderSystem.pushMatrix();
-        RenderSystem.loadIdentity();
-        RenderSystem.multMatrix(matrixIn);
-        RenderSystem.drawArrays(modeIn, 0, this.count);
-        RenderSystem.popMatrix();
+//        Render
+//        RenderSystem.pushMatrix();
+//        RenderSystem.loadIdentity();
+//        RenderSystem.multMatrix(matrixIn);
+//        RenderSystem.drawArrays(modeIn, 0, this.count);
+//        RenderSystem.popMatrix();
     }
 
     public static void unbindBuffer() {

@@ -3,14 +3,20 @@ package com.direwolf20.buildinggadgets.common.tainted.save;
 import com.direwolf20.buildinggadgets.common.tainted.save.TemplateSave.TemplateInfo;
 import com.direwolf20.buildinggadgets.common.tainted.template.Template;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.UUID;
 
 public final class TemplateSave extends TimedDataSave<TemplateInfo> {
 
-    public TemplateSave(String name) {
-        super(name);
+    public TemplateSave() {
+        super();
+    }
+
+    public static TemplateSave loads(CompoundTag tag) {
+        TemplateSave templateSave = new TemplateSave();
+        templateSave.load(tag);
+        return templateSave;
     }
 
     public Template getTemplate(UUID id) {
@@ -24,7 +30,7 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
 
     void removeTemplate(UUID id) {
         remove(id);
-        markDirty();
+        setDirty();
     }
 
     @Override
@@ -33,19 +39,19 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
     }
 
     @Override
-    protected TemplateInfo readValue(CompoundNBT nbt) {
+    protected TemplateInfo readValue(CompoundTag nbt) {
         return new TemplateInfo(nbt);
     }
 
     private TemplateInfo markDirtyAndUpdate(TemplateInfo info) {
-        markDirty();
+        setDirty();
         return info.updateTime();
     }
 
     static final class TemplateInfo extends TimedDataSave.TimedValue { //for reasons I don't understand it doesn't compile if you leave the TimedDataSave out!
         private Template template;
 
-        private TemplateInfo(CompoundNBT nbt) {
+        private TemplateInfo(CompoundTag nbt) {
             super(nbt);
             template = Template.deserialize(nbt.getCompound(NBTKeys.KEY_DATA), null, true);
         }
@@ -79,8 +85,8 @@ public final class TemplateSave extends TimedDataSave<TemplateInfo> {
         }
 
         @Override
-        public CompoundNBT write() {
-            CompoundNBT nbt = super.write();
+        public CompoundTag write() {
+            CompoundTag nbt = super.write();
             nbt.put(NBTKeys.KEY_DATA, template.serialize(true));
             return nbt;
         }

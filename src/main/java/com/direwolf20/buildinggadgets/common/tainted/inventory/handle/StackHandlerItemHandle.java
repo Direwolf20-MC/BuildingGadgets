@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.tainted.inventory.handle;
 
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObject;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 

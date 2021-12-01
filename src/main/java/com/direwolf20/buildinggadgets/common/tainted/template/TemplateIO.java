@@ -11,8 +11,8 @@ import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateWriteExcept
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtIo;
 
 import javax.annotation.Nullable;
 import java.io.*;
@@ -27,9 +27,9 @@ public final class TemplateIO {
     }
 
     public static void writeTemplate(Template template, OutputStream stream, boolean persisted) throws TemplateWriteException {
-        CompoundNBT nbt = template.serialize(persisted);
+        CompoundTag nbt = template.serialize(persisted);
         try {
-            CompressedStreamTools.writeCompressed(nbt, stream);
+            NbtIo.writeCompressed(nbt, stream);
         } catch (IOException e) {
             throw new DataCannotBeWrittenException(e, nbt);
         }
@@ -51,7 +51,7 @@ public final class TemplateIO {
      */
     public static Template readTemplate(InputStream stream, @Nullable TemplateHeader header, boolean persisted) throws TemplateReadException {
         try {
-            return readTemplate(CompressedStreamTools.readCompressed(stream), header, persisted);
+            return readTemplate(NbtIo.readCompressed(stream), header, persisted);
         } catch (IOException e) {
             throw new DataCannotBeReadException(e);
         }
@@ -63,7 +63,7 @@ public final class TemplateIO {
      * @param header    The TemplateHeader if present. Null otherwise.
      * @return A TemplateItem if the serializer is known. Null if not.
      */
-    public static Template readTemplate(CompoundNBT nbt, @Nullable TemplateHeader header, boolean persisted) throws TemplateReadException {
+    public static Template readTemplate(CompoundTag nbt, @Nullable TemplateHeader header, boolean persisted) throws TemplateReadException {
         try {
             return Template.deserialize(nbt, header, persisted);
         } catch (Exception e) {
@@ -133,8 +133,8 @@ public final class TemplateIO {
         private Template getTemplate() throws TemplateReadException {
             try {
                 byte[] bytes = Base64.getDecoder().decode(body);
-                CompoundNBT nbt;
-                nbt = CompressedStreamTools.readCompressed(new ByteArrayInputStream(bytes));
+                CompoundTag nbt;
+                nbt = NbtIo.readCompressed(new ByteArrayInputStream(bytes));
                 return Template.deserialize(nbt, header, true);
             } catch (IOException | NullPointerException e) {
                 throw new CorruptDataException(e, body);

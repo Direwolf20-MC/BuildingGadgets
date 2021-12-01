@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items.modes;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ public class VerticalColumnMode extends AbstractMode {
     }
 
     @Override
-    List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
+    List<BlockPos> collect(UseContext context, Player player, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
         // If up or down, full height from start block
@@ -22,7 +22,7 @@ public class VerticalColumnMode extends AbstractMode {
         if( XYZ.isAxisY(context.getHitSide()) ) {
             // The exchanger handles the Y completely differently :sad: means more code
             if( isExchanging() ) {
-                Direction playerFacing = player.getHorizontalFacing();
+                Direction playerFacing = player.getDirection();
                 for (int i = -halfRange; i <= halfRange; i++)
                     coordinates.add(XYZ.extendPosSingle(i, start, playerFacing, XYZ.fromFacing(playerFacing)));
             } else {

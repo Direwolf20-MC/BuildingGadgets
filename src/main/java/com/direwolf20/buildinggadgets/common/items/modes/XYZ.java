@@ -1,7 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.modes;
 
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 
 /**
  * Mostly used to turn a {@link Direction} into an {@link XYZ} representation.

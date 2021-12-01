@@ -3,11 +3,11 @@ package com.direwolf20.buildinggadgets.common.tainted.building;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSortedSet;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.world.level.LevelReader;
 
 import java.io.Serializable;
 import java.util.Comparator;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
  * Represents a region in the world with a finite and nonzero size.
  */
 public final class Region implements Serializable {
-    private static final Region ZERO = new Region(BlockPos.NULL_VECTOR);
+    private static final Region ZERO = new Region(BlockPos.ZERO);
 
     public static Region singleZero() {
         return ZERO;
@@ -50,7 +50,7 @@ public final class Region implements Serializable {
 
     private static final long serialVersionUID = 8391481277782374853L;
 
-    public static Region deserializeFrom(CompoundNBT tag) {
+    public static Region deserializeFrom(CompoundTag tag) {
         return new Region(
                 tag.getInt(NBTKeys.KEY_MIN_X),
                 tag.getInt(NBTKeys.KEY_MIN_Y),
@@ -77,11 +77,11 @@ public final class Region implements Serializable {
         this.maxZ = Math.max(minZ, maxZ);
     }
 
-    public Region(Vector3i vertex) {
+    public Region(Vec3i vertex) {
         this(vertex, vertex);
     }
 
-    public Region(Vector3i min, Vector3i max) {
+    public Region(Vec3i min, Vec3i max) {
         this(min.getX(), min.getY(), min.getZ(), max.getX(), max.getY(), max.getZ());
     }
 
@@ -103,11 +103,11 @@ public final class Region implements Serializable {
      * @param direction Direction to translate to
      * @return {@link Region}
      */
-    public Region translate(Vector3i direction) {
+    public Region translate(Vec3i direction) {
         return this.translate(direction.getX(), direction.getY(), direction.getZ());
     }
 
-    public Region inverseTranslate(Vector3i direction) {
+    public Region inverseTranslate(Vec3i direction) {
         return this.translate(- direction.getX(), - direction.getY(), - direction.getZ());
     }
 
@@ -187,7 +187,7 @@ public final class Region implements Serializable {
         return new Region(minX - x, minY - y, minZ - z, maxX + x, maxY + y, maxZ + z);
     }
 
-    public Region expand(Vector3i vec) {
+    public Region expand(Vec3i vec) {
         return expand(vec.getX(), vec.getY(), vec.getZ());
     }
 
@@ -223,7 +223,7 @@ public final class Region implements Serializable {
      * @param vec Vector3i to collapse to
      * @return {@link Region}
      */
-    public Region collapse(Vector3i vec) {
+    public Region collapse(Vec3i vec) {
         return collapse(vec.getX(), vec.getY(), vec.getZ());
     }
 
@@ -350,7 +350,7 @@ public final class Region implements Serializable {
         return containsX(x) && containsY(y) && containsZ(z);
     }
 
-    public boolean contains(Vector3i vec) {
+    public boolean contains(Vec3i vec) {
         return mayContain(vec.getX(), vec.getY(), vec.getZ());
     }
 
@@ -364,7 +364,7 @@ public final class Region implements Serializable {
     }
 
     public Stream<BlockPos> stream() {
-        return BlockPos.getAllInBox(minX, minY, minZ, maxX, maxY, maxZ).map(BlockPos::toImmutable);
+        return BlockPos.betweenClosedStream(minX, minY, minZ, maxX, maxY, maxZ).map(BlockPos::immutable);
     }
 
 //    /**
@@ -423,28 +423,28 @@ public final class Region implements Serializable {
     }
 
     @SuppressWarnings("deprecation")
-    public ImmutableSortedSet<ChunkPos> getUnloadedChunks(IWorldReader reader) {
-        ImmutableSortedSet.Builder<ChunkPos> posBuilder = ImmutableSortedSet.orderedBy(Comparator.comparing(ChunkPos::getXStart).thenComparing(ChunkPos::getZStart));
+    public ImmutableSortedSet<ChunkPos> getUnloadedChunks(LevelReader reader) {
+        ImmutableSortedSet.Builder<ChunkPos> posBuilder = ImmutableSortedSet.orderedBy(Comparator.comparing(ChunkPos::getMinBlockX).thenComparing(ChunkPos::getMinBlockZ));
         for (int i = minX; i <= maxX; i += 16) {
             for (int j = minZ; j <= maxZ; j += 16) {
-                if (! reader.chunkExists(i >> 4, j >> 4))
+                if (! reader.hasChunk(i >> 4, j >> 4))
                     posBuilder.add(new ChunkPos(i >> 4, j >> 4));
             }
         }
         for (int j = minZ; j <= maxZ; j += 16) {//check the last x row
-            if (! reader.chunkExists(maxX >> 4, j >> 4))
+            if (! reader.hasChunk(maxX >> 4, j >> 4))
                 posBuilder.add(new ChunkPos(maxX >> 4, j >> 4));
         }
-        if (! reader.chunkExists(maxX >> 4, maxZ >> 4))// might have still missed the last one
+        if (! reader.hasChunk(maxX >> 4, maxZ >> 4))// might have still missed the last one
             posBuilder.add(new ChunkPos(maxX >> 4, maxZ >> 4));
         return posBuilder.build();
     }
 
-    public CompoundNBT serialize() {
-        return serializeTo(new CompoundNBT());
+    public CompoundTag serialize() {
+        return serializeTo(new CompoundTag());
     }
 
-    public CompoundNBT serializeTo(CompoundNBT tag) {
+    public CompoundTag serializeTo(CompoundTag tag) {
         tag.putInt(NBTKeys.KEY_MIN_X, minX);
         tag.putInt(NBTKeys.KEY_MIN_Y, minY);
         tag.putInt(NBTKeys.KEY_MIN_Z, minZ);
@@ -482,8 +482,8 @@ public final class Region implements Serializable {
          * @return The {@code Builder} to allow for Method chaining
          * @see #enclose(Vector3i)
          */
-        public Builder encloseAll(Iterable<? extends Vector3i> iterable) {
-            for (Vector3i vec : iterable) {
+        public Builder encloseAll(Iterable<? extends Vec3i> iterable) {
+            for (Vec3i vec : iterable) {
                 enclose(vec);
             }
             return this;
@@ -501,7 +501,7 @@ public final class Region implements Serializable {
          *
          * @return {@link Builder}
          */
-        public Builder enclose(Vector3i vec) {
+        public Builder enclose(Vec3i vec) {
             return enclose(vec.getX(), vec.getY(), vec.getZ());
         }
 

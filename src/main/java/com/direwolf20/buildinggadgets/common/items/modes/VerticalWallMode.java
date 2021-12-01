@@ -1,8 +1,8 @@
 package com.direwolf20.buildinggadgets.common.items.modes;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.core.Direction;
+import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,14 +15,14 @@ public class VerticalWallMode extends AbstractMode {
     public VerticalWallMode() { super(false); }
 
     @Override
-    List<BlockPos> collect(UseContext context, PlayerEntity player, BlockPos start) {
+    List<BlockPos> collect(UseContext context, Player player, BlockPos start) {
         List<BlockPos> coordinates = new ArrayList<>();
 
         // Handle top and bottom
         int halfRange = context.getRange() / 2;
         if( XYZ.isAxisY(context.getHitSide()) ) {
             // This allows us to figure out how to move the render
-            XYZ xyz = XYZ.fromFacing(player.getHorizontalFacing().getOpposite());
+            XYZ xyz = XYZ.fromFacing(player.getDirection().getOpposite());
             for(int i = 0; i < context.getRange(); i ++ ) {
                 for(int j = -halfRange; j <= halfRange; j ++) {
                     int value = XYZ.invertOnFace(context.getHitSide(), i);

@@ -1,15 +1,16 @@
 package com.direwolf20.buildinggadgets.client.screen.components;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.util.Mth;
+import net.minecraft.network.chat.TextComponent;
 
 import javax.annotation.Nullable;
 
-public class GuiIncrementer extends Widget {
+public class GuiIncrementer extends AbstractWidget {
     // this is the width of all components in a line
     public static final int WIDTH = 64;
 
@@ -26,7 +27,7 @@ public class GuiIncrementer extends Widget {
     private DireButton plusButton;
 
     public GuiIncrementer(int x, int y, int min, int max, @Nullable IIncrementerChanged onChange) {
-        super(x, y, WIDTH, 20, StringTextComponent.EMPTY);
+        super(x, y, WIDTH, 20, TextComponent.EMPTY);
 
         this.x = x;
         this.y = y;
@@ -35,11 +36,11 @@ public class GuiIncrementer extends Widget {
         this.value = 0;
         this.onChange = onChange;
 
-        this.minusButton = new DireButton(this.x, this.y - 1, 12, 17, new StringTextComponent("-"), (button) -> this.updateValue(true));
-        this.field = new GuiTextFieldBase(Minecraft.getInstance().fontRenderer, x + 13, y, 40).setDefaultInt(this.value).restrictToNumeric();
-        this.plusButton = new DireButton(this.x + 40 + 14, this.y - 1, 12, 17, new StringTextComponent("+"), (button) -> this.updateValue(false));
+        this.minusButton = new DireButton(this.x, this.y - 1, 12, 17, new TextComponent("-"), (button) -> this.updateValue(true));
+        this.field = new GuiTextFieldBase(Minecraft.getInstance().font, x + 13, y, 40).setDefaultInt(this.value).restrictToNumeric();
+        this.plusButton = new DireButton(this.x + 40 + 14, this.y - 1, 12, 17, new TextComponent("+"), (button) -> this.updateValue(false));
 
-        this.field.setText(String.valueOf(this.value));
+        this.field.setValue(String.valueOf(this.value));
     }
 
     public GuiIncrementer(int x, int y) {
@@ -64,15 +65,15 @@ public class GuiIncrementer extends Widget {
         if( value == this.value )
             return;
 
-        this.value = MathHelper.clamp(value, this.min, this.max);
-        this.field.setText(String.valueOf(this.value));
+        this.value = Mth.clamp(value, this.min, this.max);
+        this.field.setValue(String.valueOf(this.value));
 
         if( this.onChange != null )
             this.onChange.onChange(value);
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float partialTick) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float partialTick) {
         this.plusButton.render(matrices, mouseX, mouseY, partialTick);
         this.minusButton.render(matrices, mouseX, mouseY, partialTick);
         this.field.render(matrices, mouseX, mouseY, partialTick);
@@ -102,11 +103,11 @@ public class GuiIncrementer extends Widget {
             return false;
 
         this.field.charTyped(p_charTyped_1_, p_charTyped_2_);
-        if( this.field.getText().length() > 1 && this.field.getText().charAt(0) == '0' )
-            this.field.setText(String.valueOf(this.field.getInt()));
+        if( this.field.getValue().length() > 1 && this.field.getValue().charAt(0) == '0' )
+            this.field.setValue(String.valueOf(this.field.getInt()));
 
         if( this.field.getInt() > this.max )
-            this.field.setText(String.valueOf(this.max));
+            this.field.setValue(String.valueOf(this.max));
 
         return true;
     }
@@ -123,6 +124,11 @@ public class GuiIncrementer extends Widget {
 
     public int getY() {
         return y;
+    }
+
+    @Override
+    public void updateNarration(NarrationElementOutput p_169152_) {
+
     }
 
     public interface IIncrementerChanged {

@@ -10,8 +10,8 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.PeekingIterator;
 import com.google.gson.*;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Type;
@@ -28,7 +28,7 @@ public final class MaterialList implements Iterable<ImmutableMultiset<IUniqueObj
 
     private static final MaterialList EMPTY = new MaterialList();
 
-    public static MaterialList deserialize(CompoundNBT nbt, boolean persisted) {
+    public static MaterialList deserialize(CompoundTag nbt, boolean persisted) {
         return new MaterialList(readEntry(nbt, persisted));
     }
 
@@ -80,7 +80,7 @@ public final class MaterialList implements Iterable<ImmutableMultiset<IUniqueObj
         return serializer;
     }
 
-    static MaterialListEntry<?> readEntry(CompoundNBT nbt, boolean persisted) {
+    static MaterialListEntry<?> readEntry(CompoundTag nbt, boolean persisted) {
         ResourceLocation id = new ResourceLocation(nbt.getString(NBTKeys.KEY_SERIALIZER));
         MaterialListEntry.Serializer<?> serializer = getSerializerForId(id);
         Preconditions.checkArgument(serializer != null,
@@ -91,9 +91,9 @@ public final class MaterialList implements Iterable<ImmutableMultiset<IUniqueObj
 
     @SuppressWarnings("unchecked")
     //This is ok - the only unchecked is the implicit cast for writing the data which only uses the appropriate serializer
-    static CompoundNBT writeEntry(MaterialListEntry entry, boolean persisted) {
+    static CompoundTag writeEntry(MaterialListEntry entry, boolean persisted) {
         assert entry.getSerializer().getRegistryName() != null;
-        CompoundNBT res = new CompoundNBT();
+        CompoundTag res = new CompoundTag();
         res.putString(NBTKeys.KEY_SERIALIZER, entry.getSerializer().getRegistryName().toString());
         res.put(NBTKeys.KEY_DATA, entry.getSerializer().writeToNBT(entry, persisted));
         return res;
@@ -126,7 +126,7 @@ public final class MaterialList implements Iterable<ImmutableMultiset<IUniqueObj
         return simpleEntry.getItems();
     }
 
-    public CompoundNBT serialize(boolean persisted) {
+    public CompoundTag serialize(boolean persisted) {
         return writeEntry(rootEntry, persisted);
     }
 
