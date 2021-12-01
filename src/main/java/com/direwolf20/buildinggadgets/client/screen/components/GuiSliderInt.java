@@ -61,7 +61,6 @@ public class GuiSliderInt extends Slider {
     public void render(PoseStack matrices, int mouseX, int mouseY, float partial) {
         if (!visible)
             return;
-        }
 
         Minecraft mc = Minecraft.getInstance();
         this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
@@ -88,7 +87,6 @@ public class GuiSliderInt extends Slider {
     protected void renderBg(PoseStack matrices, Minecraft mc, int mouseX, int mouseY) {
         if (!visible)
             return;
-        }
 
         if (this.dragging) {
             this.sliderValue = (mouseX - (this.x + 4)) / (float) (this.width - 8);
@@ -123,7 +121,6 @@ public class GuiSliderInt extends Slider {
         public void render(PoseStack matrices, int mouseX, int mouseY, float partial) {
             if (!visible)
                 return;
-            }
 
             Minecraft mc = Minecraft.getInstance();
             this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;

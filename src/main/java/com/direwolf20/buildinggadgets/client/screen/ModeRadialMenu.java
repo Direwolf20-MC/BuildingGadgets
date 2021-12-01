@@ -105,7 +105,6 @@ public class ModeRadialMenu extends Screen {
             addRenderableWidget(new PositionedIconActionable(RadialTranslation.DESTRUCTION_OVERLAY, "destroy_overlay", right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketChangeRange());
-                }
 
                 return GadgetDestruction.getOverlay(this.getGadget());
             }));
@@ -113,7 +112,6 @@ public class ModeRadialMenu extends Screen {
             addRenderableWidget(new PositionedIconActionable(RadialTranslation.FLUID_ONLY, "fluid_only", right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleFluidOnly());
-                }
 
                 return GadgetDestruction.getIsFluidOnly(this.getGadget());
             }));
@@ -121,14 +119,12 @@ public class ModeRadialMenu extends Screen {
             addRenderableWidget(new PositionedIconActionable(RadialTranslation.ROTATE, "rotate", left, false, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.ROTATE));
-                }
 
                 return false;
             }));
             addRenderableWidget(new PositionedIconActionable(RadialTranslation.MIRROR, "mirror", left, false, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketRotateMirror(PacketRotateMirror.Operation.MIRROR));
-                }
 
                 return false;
             }));
@@ -178,7 +174,6 @@ public class ModeRadialMenu extends Screen {
             addRenderableWidget(new PositionedIconActionable(RadialTranslation.OPEN_GUI, "copypaste_opengui", right, send -> {
                 if (!send)
                     return false;
-                }
 
                 assert this.getMinecraft().player != null;
 
@@ -192,7 +187,6 @@ public class ModeRadialMenu extends Screen {
             addRenderableWidget(new PositionedIconActionable(RadialTranslation.OPEN_MATERIAL_LIST, "copypaste_materiallist", right, send -> {
                 if (!send)
                     return false;
-                }
 
                 assert this.getMinecraft().player != null;
 
@@ -204,7 +198,6 @@ public class ModeRadialMenu extends Screen {
         addRenderableWidget(new PositionedIconActionable(RadialTranslation.RAYTRACE_FLUID, "raytrace_fluid", right, send -> {
             if (send)
                 PacketHandler.sendToServer(new PacketToggleRayTraceFluid());
-            }
 
             return AbstractGadget.shouldRayTraceFluid(this.getGadget());
         }));
@@ -212,7 +205,6 @@ public class ModeRadialMenu extends Screen {
             addRenderableWidget(new PositionedIconActionable(RadialTranslation.PLACE_ON_TOP, "building_place_atop", right, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketToggleBlockPlacement());
-                }
 
                 return GadgetBuilding.shouldPlaceAtop(this.getGadget());
             }));
@@ -220,7 +212,6 @@ public class ModeRadialMenu extends Screen {
         addRenderableWidget(new PositionedIconActionable(RadialTranslation.ANCHOR, "anchor", left, send -> {
             if (send)
                 PacketHandler.sendToServer(new PacketAnchor());
-            }
 
             ItemStack stack = this.getGadget();
             if (stack.getItem() instanceof GadgetCopyPaste || stack.getItem() instanceof GadgetDestruction) {
@@ -234,7 +225,6 @@ public class ModeRadialMenu extends Screen {
             addRenderableWidget(new PositionedIconActionable(RadialTranslation.UNDO, "undo", left, false, send -> {
                 if (send)
                     PacketHandler.sendToServer(new PacketUndo());
-                }
 
                 return false;
             }));
@@ -253,7 +243,6 @@ public class ModeRadialMenu extends Screen {
         for (GuiEventListener widget : children()) {
             if (!(widget instanceof PositionedIconActionable))
                 continue;
-            }
 
             PositionedIconActionable button = (PositionedIconActionable) widget;
 
@@ -281,7 +270,6 @@ public class ModeRadialMenu extends Screen {
         for (GuiEventListener widget : children()) {
             if (!(widget instanceof PositionedIconActionable))
                 continue;
-            }
 
             PositionedIconActionable button = (PositionedIconActionable) widget;
             if (!button.visible) {
@@ -330,7 +318,7 @@ public class ModeRadialMenu extends Screen {
         if (this.segments != 0) {
             inRange = dist > radiusMin && dist < radiusMax;
             for (GuiEventListener button : children()) {
-                if (button instanceof PositionedIconActionable)
+                if (button instanceof PositionedIconActionable) {
                     ((PositionedIconActionable) button).setFaded(inRange);
                 }
             }
@@ -406,7 +394,6 @@ public class ModeRadialMenu extends Screen {
                 float yp = (float) (y + Math.sin(rad) * radius);
                 if ((int) i == (int) (degPer / 2))
                     nameData.add(new NameDisplayData((int) xp, (int) yp, mouseInSector, shouldCenter && (seg == indexBottom || seg == indexTop)));
-                }
 
                 Matrix4f pose = matrices.last().pose();
                 buffer.vertex(pose, (float) (x + Math.cos(rad) * radius / 2.3F), (float) (y + Math.sin(rad) * radius / 2.3F), 0).color(r, g, b, a).endVertex();
