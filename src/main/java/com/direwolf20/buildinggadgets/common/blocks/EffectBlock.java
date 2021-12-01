@@ -64,7 +64,7 @@ public class EffectBlock extends BaseEntityBlock {
                     targetBlock.placeIn(BuildContext.builder().build(world), targetPos);
 
                     // Instead of removing the block, we just sync the client & server to know that the block has been replaced
-                    world.sendBlockUpdated(targetPos, targetBlock.getState(), targetBlock.getState(), Constants.BlockFlags.DEFAULT);
+                    world.sendBlockUpdated(targetPos, targetBlock.getState(), targetBlock.getState(), Block.UPDATE_ALL_IMMEDIATE);
 
                     BlockPos upPos = targetPos.above();
                     world.getBlockState(targetPos).neighborChanged(world, targetPos, world.getBlockState(upPos).getBlock(), upPos, false);
