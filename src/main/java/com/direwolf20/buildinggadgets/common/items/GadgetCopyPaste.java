@@ -42,6 +42,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
@@ -62,10 +63,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -243,7 +243,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     @Nullable
     public static BlockPos getUpperRegionBound(ItemStack stack) {
         CompoundTag nbt = stack.getOrCreateTag();
-        if (nbt.contains(NBTKeys.GADGET_START_POS, NBT.TAG_COMPOUND))
+        if (nbt.contains(NBTKeys.GADGET_START_POS, Tag.TAG_COMPOUND))
             return NbtUtils.readBlockPos(nbt.getCompound(NBTKeys.GADGET_START_POS));
         return null;
     }
@@ -251,7 +251,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     @Nullable
     public static BlockPos getLowerRegionBound(ItemStack stack) {
         CompoundTag nbt = stack.getOrCreateTag();
-        if (nbt.contains(NBTKeys.GADGET_END_POS, NBT.TAG_COMPOUND))
+        if (nbt.contains(NBTKeys.GADGET_END_POS, Tag.TAG_COMPOUND))
             return NbtUtils.readBlockPos(nbt.getCompound(NBTKeys.GADGET_END_POS));
         return null;
     }
@@ -264,7 +264,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     public static ToolMode getToolMode(ItemStack stack) {
         CompoundTag tagCompound = stack.getOrCreateTag();
         ToolMode mode = ToolMode.COPY;
-        if (! tagCompound.contains(NBTKeys.GADGET_MODE, NBT.TAG_BYTE)) {
+        if (! tagCompound.contains(NBTKeys.GADGET_MODE, Tag.TAG_BYTE)) {
             setToolMode(stack, mode);
             return mode;
         }

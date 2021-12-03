@@ -4,8 +4,8 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.SaveReference;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fmlserverevents.FMLServerStartedEvent;
-import net.minecraftforge.fmlserverevents.FMLServerStoppedEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.server.ServerStoppedEvent;
 
 import javax.annotation.Nullable;
 import java.util.LinkedList;
@@ -32,7 +32,7 @@ public enum SaveManager {
         return container::getCurrentSave;
     }
 
-    public void onServerStarted(FMLServerStartedEvent event) {
+    public void onServerStarted(ServerStartedEvent event) {
         BuildingGadgets.LOG.debug("Loading World Saves.");
         ServerLevel world = event.getServer().getLevel(Level.OVERWORLD);
         for (UndoSaveContainer c : undoSaves) {
@@ -42,7 +42,7 @@ public enum SaveManager {
         BuildingGadgets.LOG.debug("Finished Loading saves");
     }
 
-    public void onServerStopped(FMLServerStoppedEvent event) {
+    public void onServerStopped(ServerStoppedEvent event) {
         BuildingGadgets.LOG.debug("Clearing save caches");
         for (UndoSaveContainer c : undoSaves) {
             c.release();

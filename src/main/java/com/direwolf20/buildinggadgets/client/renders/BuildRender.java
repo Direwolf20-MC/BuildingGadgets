@@ -28,7 +28,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -49,7 +49,7 @@ public class BuildRender extends BaseRenderer {
     }
 
     @Override
-    public void render(RenderWorldLastEvent evt, Player player, ItemStack heldItem) {
+    public void render(RenderLevelLastEvent evt, Player player, ItemStack heldItem) {
         super.render(evt, player, heldItem);
 
         BlockHitResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
@@ -85,7 +85,7 @@ public class BuildRender extends BaseRenderer {
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
 
         //Save the current position that is being rendered (I think)
-        PoseStack matrix = evt.getMatrixStack();
+        PoseStack matrix = evt.getPoseStack();
         matrix.pushPose();
         matrix.translate(-playerPos.x(), -playerPos.y(), -playerPos.z());
 

@@ -20,7 +20,6 @@ import net.minecraft.core.Direction.Axis;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.core.BlockPos;
-import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -29,17 +28,17 @@ import java.util.function.Function;
 
 public final class Template {
     public static Template deserialize(CompoundTag nbt, @Nullable TemplateHeader externalHeader, boolean persisted) {
-        ListTag posList = nbt.getList(NBTKeys.KEY_POS, NBT.TAG_LONG);
+        ListTag posList = nbt.getList(NBTKeys.KEY_POS, Tag.TAG_LONG);
         TemplateHeader.Builder header = TemplateHeader.builderFromNBT(nbt.getCompound(NBTKeys.KEY_HEADER));
         if (externalHeader != null)
             header = header.name(externalHeader.getName()).author(externalHeader.getAuthor());
         DataDecompressor<ITileDataSerializer> serializerDecompressor = persisted ? new DataDecompressor<>(
-                nbt.getList(NBTKeys.KEY_SERIALIZER, NBT.TAG_STRING),
+                nbt.getList(NBTKeys.KEY_SERIALIZER, Tag.TAG_STRING),
                 inbt -> RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), inbt.getAsString()),
                 value -> SerialisationSupport.dummyDataSerializer())
                 : null;
         DataDecompressor<BlockData> dataDecompressor = new DataDecompressor<>(
-                nbt.getList(NBTKeys.KEY_DATA, NBT.TAG_COMPOUND),
+                nbt.getList(NBTKeys.KEY_DATA, Tag.TAG_COMPOUND),
                 inbt -> persisted ?
                         BlockData.tryDeserialize((CompoundTag) inbt, serializerDecompressor, true) :
                         BlockData.tryDeserialize((CompoundTag) inbt, false),

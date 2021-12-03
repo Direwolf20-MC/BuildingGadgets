@@ -139,8 +139,8 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
         blit(matrices, leftPos - 20, topPos - 12, 0, 0, imageWidth, imageHeight + 25);
         blit(matrices, (leftPos - 20) + imageWidth, topPos + 8, imageWidth + 3, 30, 71, imageHeight);
 
-        if (! buttonCopy.isHovered() && ! buttonPaste.isHovered()) {
-            if( buttonLoad.isHovered() )
+        if (! buttonCopy.isHoveredOrFocused() && ! buttonPaste.isHoveredOrFocused()) {
+            if( buttonLoad.isHoveredOrFocused() )
                 blit(matrices, (leftPos + imageWidth) - 44, topPos + 38, imageWidth, 0, 17, 24);
             else
                 blit(matrices, (leftPos + imageWidth) - 44, topPos + 38, imageWidth + 17, 0, 16, 24);
@@ -475,8 +475,8 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
         if (! nameField.isFocused() && nameField.getValue().isEmpty())
             getMinecraft().font.draw(matrices, GuiTranslation.TEMPLATE_PLACEHOLDER.format(), nameField.x - leftPos + 4, (nameField.y + 2) - topPos, - 10197916);
 
-        if (buttonSave.isHovered() || buttonLoad.isHovered() || buttonPaste.isHovered())
-            drawSlotOverlay(matrices, buttonLoad.isHovered() ? container.getSlot(0) : container.getSlot(1));
+        if (buttonSave.isHoveredOrFocused() || buttonLoad.isHoveredOrFocused() || buttonPaste.isHoveredOrFocused())
+            drawSlotOverlay(matrices, buttonLoad.isHoveredOrFocused() ? container.getSlot(0) : container.getSlot(1));
     }
 
     private void drawSlotOverlay(PoseStack matrices, Slot slot) {

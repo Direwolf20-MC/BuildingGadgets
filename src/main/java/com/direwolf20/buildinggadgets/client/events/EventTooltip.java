@@ -29,6 +29,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -95,14 +96,14 @@ public class EventTooltip {
     }
 
     @SubscribeEvent
-    public static void onDrawTooltip(RenderTooltipEvent.PostText event) {
+    public static void onDrawTooltip(RenderTooltipEvent.Color event) {
         if (!Screen.hasShiftDown())
             return;
 
         //This method will draw items on the tooltip
-        ItemStack stack = event.getStack();
+        ItemStack stack = event.getItemStack();
         Minecraft mc = Minecraft.getInstance();
-        PoseStack matrices = event.getMatrixStack();
+        PoseStack matrices = event.getPoseStack();
 
         if( mc.level == null || mc.player == null )
             return;
@@ -128,7 +129,7 @@ public class EventTooltip {
                 int by = event.getY();
                 int j = 0;
                 int totalMissing = 0;
-                List<? extends FormattedText> tooltip = event.getLines();
+                List<? extends FormattedText> tooltip = event.getItemStack().getTooltipLines(mc.player, TooltipFlag.Default.NORMAL); // TODO: Likely wrong
                 Font fontRenderer = Minecraft.getInstance().font;
                 for (FormattedText s : tooltip) {
                     if (s.getString().trim().equals(PLACE_HOLDER))

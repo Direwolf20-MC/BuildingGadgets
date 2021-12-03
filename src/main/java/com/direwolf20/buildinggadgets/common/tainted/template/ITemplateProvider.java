@@ -3,7 +3,7 @@ package com.direwolf20.buildinggadgets.common.tainted.template;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.NonNullSupplier;
-import net.minecraftforge.fmllegacy.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.UUID;
 
