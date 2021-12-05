@@ -1,5 +1,6 @@
 package com.direwolf20.buildinggadgets.common.items;
 
+import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.client.renders.CopyPasteRender;
 import com.direwolf20.buildinggadgets.client.screen.GuiMod;
@@ -42,6 +43,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
@@ -50,6 +52,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -62,10 +65,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -83,7 +85,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         static {
             BY_ID = new Byte2ObjectOpenHashMap<>();
             for (ToolMode mode : VALUES) {
-                assert ! BY_ID.containsKey(mode.getId());
+                assert !BY_ID.containsKey(mode.getId());
                 BY_ID.put(mode.getId(), mode);
             }
         }
@@ -109,6 +111,7 @@ public class GadgetCopyPaste extends AbstractGadget {
             return translation;
         }
     }
+
     private static final Joiner CHUNK_JOINER = Joiner.on("; ");
 
     public GadgetCopyPaste() {
@@ -148,24 +151,24 @@ public class GadgetCopyPaste extends AbstractGadget {
     @Override
     public boolean performRotate(ItemStack stack, Player player) {
         return player.level.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
-                stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).map(key -> {
-                    Template template = provider.getTemplateForKey(key);
-                    provider.setTemplate(key, template.rotate(Rotation.CLOCKWISE_90));
-                    provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayer) player));
-                    return true;
-                }).orElse(false))
+                        stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).map(key -> {
+                            Template template = provider.getTemplateForKey(key);
+                            provider.setTemplate(key, template.rotate(Rotation.CLOCKWISE_90));
+                            provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayer) player));
+                            return true;
+                        }).orElse(false))
                 .orElse(false);
     }
 
     @Override
     public boolean performMirror(ItemStack stack, Player player) {
         return player.level.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
-                stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).map(key -> {
-                    Template template = provider.getTemplateForKey(key);
-                    provider.setTemplate(key, template.mirror(player.getDirection().getAxis()));
-                    provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayer) player));
-                    return true;
-                }).orElse(false))
+                        stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).map(key -> {
+                            Template template = provider.getTemplateForKey(key);
+                            provider.setTemplate(key, template.mirror(player.getDirection().getAxis()));
+                            provider.requestRemoteUpdate(key, PacketDistributor.PLAYER.with(() -> (ServerPlayer) player));
+                            return true;
+                        }).orElse(false))
                 .orElse(false);
     }
 
@@ -243,7 +246,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     @Nullable
     public static BlockPos getUpperRegionBound(ItemStack stack) {
         CompoundTag nbt = stack.getOrCreateTag();
-        if (nbt.contains(NBTKeys.GADGET_START_POS, NBT.TAG_COMPOUND))
+        if (nbt.contains(NBTKeys.GADGET_START_POS, Tag.TAG_COMPOUND))
             return NbtUtils.readBlockPos(nbt.getCompound(NBTKeys.GADGET_START_POS));
         return null;
     }
@@ -251,7 +254,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     @Nullable
     public static BlockPos getLowerRegionBound(ItemStack stack) {
         CompoundTag nbt = stack.getOrCreateTag();
-        if (nbt.contains(NBTKeys.GADGET_END_POS, NBT.TAG_COMPOUND))
+        if (nbt.contains(NBTKeys.GADGET_END_POS, Tag.TAG_COMPOUND))
             return NbtUtils.readBlockPos(nbt.getCompound(NBTKeys.GADGET_END_POS));
         return null;
     }
@@ -264,7 +267,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     public static ToolMode getToolMode(ItemStack stack) {
         CompoundTag tagCompound = stack.getOrCreateTag();
         ToolMode mode = ToolMode.COPY;
-        if (! tagCompound.contains(NBTKeys.GADGET_MODE, NBT.TAG_BYTE)) {
+        if (!tagCompound.contains(NBTKeys.GADGET_MODE, Tag.TAG_BYTE)) {
             setToolMode(stack, mode);
             return mode;
         }
@@ -285,7 +288,7 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     public static ItemStack getGadget(Player player) {
         ItemStack stack = AbstractGadget.getGadget(player);
-        if (! (stack.getItem() instanceof GadgetCopyPaste))
+        if (!(stack.getItem() instanceof GadgetCopyPaste))
             return ItemStack.EMPTY;
 
         return stack;
@@ -294,10 +297,12 @@ public class GadgetCopyPaste extends AbstractGadget {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag flag) {
         super.appendHoverText(stack, world, tooltip, flag);
+
         addEnergyInformation(tooltip, stack);
 
         tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack).translation.format()).setStyle(Styles.AQUA));
         tooltip.add(new TextComponent("My renders don't really work yet, outlines for now :D").setStyle(Styles.GRAY));
+
         addInformationRayTraceFluid(tooltip, stack);
         GadgetUtils.addTooltipNameAndAuthor(stack, world, tooltip);
     }
@@ -317,7 +322,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         BlockEntity tileEntity = world.getBlockEntity(posLookingAt.getBlockPos());
         boolean lookingAtInventory = tileEntity != null && tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).isPresent();
 
-        if (! world.isClientSide()) {
+        if (!world.isClientSide()) {
             if (player.isShiftKeyDown() && lookingAtInventory) {
                 return InteractionResultHolder.pass(stack);
             }
@@ -325,7 +330,7 @@ public class GadgetCopyPaste extends AbstractGadget {
             if (getToolMode(stack) == ToolMode.COPY) {
                 if (world.getBlockState(posLookingAt.getBlockPos()) != Blocks.AIR.defaultBlockState())
                     setRegionAndCopy(stack, world, player, posLookingAt.getBlockPos());
-            } else if (getToolMode(stack) == ToolMode.PASTE && ! player.isShiftKeyDown())
+            } else if (getToolMode(stack) == ToolMode.PASTE && !player.isShiftKeyDown())
                 getActivePos(player, stack).ifPresent(pos -> build(stack, world, player, pos));
         } else {
             if (player.isShiftKeyDown() && Screen.hasControlDown() && lookingAtInventory) {
@@ -345,18 +350,23 @@ public class GadgetCopyPaste extends AbstractGadget {
         return new InteractionResultHolder<>(InteractionResult.SUCCESS, stack);
     }
 
+    @Override
+    public Optional<TooltipComponent> getTooltipImage(ItemStack p_150902_) {
+        return Optional.of(new EventTooltip.CopyPasteTooltipComponent.Data(p_150902_));
+    }
+
     private void setRegionAndCopy(ItemStack stack, Level world, Player player, BlockPos lookedAt) {
         if (player.isShiftKeyDown()) {
-            if (getLowerRegionBound(stack) != null && ! checkCopy(world, player, new Region(lookedAt, getLowerRegionBound(stack))))
+            if (getLowerRegionBound(stack) != null && !checkCopy(world, player, new Region(lookedAt, getLowerRegionBound(stack))))
                 return;
             setUpperRegionBound(stack, lookedAt);
         } else {
-            if (getUpperRegionBound(stack) != null && ! checkCopy(world, player, new Region(lookedAt, getUpperRegionBound(stack))))
+            if (getUpperRegionBound(stack) != null && !checkCopy(world, player, new Region(lookedAt, getUpperRegionBound(stack))))
                 return;
             setLowerRegionBound(stack, lookedAt);
         }
         Optional<Region> regionOpt = getSelectedRegion(stack);
-        if (! regionOpt.isPresent()) //notify of single copy
+        if (!regionOpt.isPresent()) //notify of single copy
             player.displayClientMessage(MessageTranslation.FIRST_COPY.componentTranslation().setStyle(Styles.DK_GREEN), true);
         regionOpt.ifPresent(region -> tryCopy(stack, world, player, region));
     }
@@ -372,9 +382,9 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private boolean checkCopy(Level world, Player player, Region region) {
-        if (! ForceUnloadedCommand.mayForceUnloadedChunks(player)) {
+        if (!ForceUnloadedCommand.mayForceUnloadedChunks(player)) {
             ImmutableSortedSet<ChunkPos> unloaded = region.getUnloadedChunks(world);
-            if (! unloaded.isEmpty()) {
+            if (!unloaded.isEmpty()) {
                 player.displayClientMessage(MessageTranslation.COPY_UNLOADED.componentTranslation(unloaded.size()).setStyle(Styles.RED), true);
                 BuildingGadgets.LOG.debug("Prevented copy because {} chunks where detected as unloaded.", unloaded.size());
                 BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", CHUNK_JOINER.join(unloaded));
@@ -383,7 +393,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         }
         int maxDimension = Config.GADGETS.GADGET_COPY_PASTE.maxCopySize.get();
         if (region.getXSize() > 0xFFFF || region.getYSize() > 255 || region.getZSize() > 0xFFFF ||  //these are the max dimensions of a Template
-                ((region.getXSize() > maxDimension || region.getYSize() > maxDimension || region.getZSize() > maxDimension) && ! OverrideCopySizeCommand.mayPerformLargeCopy(player))) {
+                ((region.getXSize() > maxDimension || region.getYSize() > maxDimension || region.getZSize() > maxDimension) && !OverrideCopySizeCommand.mayPerformLargeCopy(player))) {
             BlockPos sizeVec = region.getMax().subtract(region.getMin());
             player.displayClientMessage(MessageTranslation.COPY_TOO_LARGE
                     .componentTranslation(sizeVec.getX(), sizeVec.getY(), sizeVec.getZ(), Math.min(maxDimension, 0xFFFF), Math.min(maxDimension, 255), Math.min(maxDimension, 0xFFFF))
@@ -408,7 +418,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void onCopyFinished(Template newTemplate, ItemStack stack, Player player) {
-        if (! Additions.sizeInvalid(player, newTemplate.getHeader().getBoundingBox()))
+        if (!Additions.sizeInvalid(player, newTemplate.getHeader().getBoundingBox()))
             sendMessage(stack, player, MessageTranslation.AREA_COPIED, Styles.DK_GREEN);
         ITemplateKey key = stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).orElseThrow(CapabilityNotPresentException::new);
         SaveManager.INSTANCE.getTemplateProvider().setTemplate(key, newTemplate);
@@ -425,7 +435,7 @@ public class GadgetCopyPaste extends AbstractGadget {
                         .build(world);
                 IBuildView view = template.createViewInContext(buildContext);
                 view.translateTo(pos);
-                if (! checkPlacement(world, player, view.getBoundingBox()))
+                if (!checkPlacement(world, player, view.getBoundingBox()))
                     return;
                 schedulePlacement(stack, view, player);
             });
@@ -433,9 +443,9 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private boolean checkPlacement(Level world, Player player, Region region) {
-        if (! ForceUnloadedCommand.mayForceUnloadedChunks(player)) {
+        if (!ForceUnloadedCommand.mayForceUnloadedChunks(player)) {
             ImmutableSortedSet<ChunkPos> unloaded = region.getUnloadedChunks(world);
-            if (! unloaded.isEmpty()) {
+            if (!unloaded.isEmpty()) {
                 player.displayClientMessage(MessageTranslation.BUILD_UNLOADED.componentTranslation(unloaded.size()).setStyle(Styles.RED), true);
                 BuildingGadgets.LOG.debug("Prevented build because {} chunks where detected as unloaded.", unloaded.size());
                 BuildingGadgets.LOG.trace("The following chunks were detected as unloaded {}.", CHUNK_JOINER.join(unloaded));
@@ -444,7 +454,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         }
         int maxDimension = Config.GADGETS.GADGET_COPY_PASTE.maxBuildSize.get();
         if ((region.getXSize() > maxDimension || region.getYSize() > maxDimension || region.getZSize() > maxDimension) &&
-                ! OverrideBuildSizeCommand.mayPerformLargeBuild(player)) {
+                !OverrideBuildSizeCommand.mayPerformLargeBuild(player)) {
             BlockPos sizeVec = region.getMax().subtract(region.getMin());
             player.displayClientMessage(MessageTranslation.BUILD_TOO_LARGE
                     .componentTranslation(sizeVec.getX(), sizeVec.getY(), sizeVec.getZ(), maxDimension, maxDimension, maxDimension)
@@ -473,7 +483,7 @@ public class GadgetCopyPaste extends AbstractGadget {
     }
 
     private void onBuildFinished(ItemStack stack, Player player, Region bounds) {
-        if (! Additions.sizeInvalid(player, bounds))
+        if (!Additions.sizeInvalid(player, bounds))
             sendMessage(stack, player, MessageTranslation.TEMPLATE_BUILD, Styles.DK_GREEN);
     }
 

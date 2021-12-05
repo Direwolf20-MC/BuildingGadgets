@@ -7,12 +7,12 @@ import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSu
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.util.Constants.NBT;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -94,7 +94,7 @@ public class EffectBlockTileEntity extends BlockEntity {
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         // Vanilla uses the type parameter to indicate which type of tile entity (command block, skull, or beacon?) is receiving the packet, but it seems like Forge has overridden this behavior
-        return new ClientboundBlockEntityDataPacket(worldPosition, 0, getUpdateTag());
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Nonnull
@@ -130,10 +130,10 @@ public class EffectBlockTileEntity extends BlockEntity {
     public void load(CompoundTag nbt) {
         super.load(nbt);
 
-        if (nbt.contains(NBTKeys.GADGET_TICKS, NBT.TAG_INT) &&
-                nbt.contains(NBTKeys.GADGET_MODE, NBT.TAG_INT) &&
-                nbt.contains(NBTKeys.GADGET_SOURCE_BLOCK, NBT.TAG_COMPOUND) &&
-                nbt.contains(NBTKeys.GADGET_REPLACEMENT_BLOCK, NBT.TAG_COMPOUND) &&
+        if (nbt.contains(NBTKeys.GADGET_TICKS, Tag.TAG_INT) &&
+                nbt.contains(NBTKeys.GADGET_MODE, Tag.TAG_INT) &&
+                nbt.contains(NBTKeys.GADGET_SOURCE_BLOCK, Tag.TAG_COMPOUND) &&
+                nbt.contains(NBTKeys.GADGET_REPLACEMENT_BLOCK, Tag.TAG_COMPOUND) &&
                 nbt.contains(NBTKeys.GADGET_USE_PASTE)) {
 
             ticks = nbt.getInt(NBTKeys.GADGET_TICKS);

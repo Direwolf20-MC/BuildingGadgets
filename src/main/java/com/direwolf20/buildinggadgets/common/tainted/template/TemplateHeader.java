@@ -11,8 +11,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Multiset;
 import com.google.gson.*;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.Constants.NBT;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 
 import javax.annotation.Nonnull;
@@ -96,7 +96,7 @@ public final class TemplateHeader {
     /**
      * Creates a new {@link Builder} which can be used to create {@code TemplateHeader} objects.
      *
-     * @param boundingBox a {@link BlockPos} representing the x-y-z size of the corresponding {@link Template}.
+     * @param boundingBox a {@link net.minecraft.core.BlockPos} representing the x-y-z size of the corresponding {@link Template}.
      * @return A new {@link Builder} for the specified serializer and boundingBox.
      */
     public static Builder builder(Region boundingBox) {
@@ -124,15 +124,15 @@ public final class TemplateHeader {
     }
 
     public static Builder builderFromNBT(CompoundTag nbt, boolean persisted) {
-        Preconditions.checkArgument(nbt.contains(NBTKeys.KEY_BOUNDS, NBT.TAG_COMPOUND),
+        Preconditions.checkArgument(nbt.contains(NBTKeys.KEY_BOUNDS, Tag.TAG_COMPOUND),
                 "Cannot construct a TemplateHeader without '" + NBTKeys.KEY_BOUNDS + "'!");
         Region region = Region.deserializeFrom(nbt.getCompound(NBTKeys.KEY_BOUNDS));
         Builder builder = builder(region);
-        if (nbt.contains(NBTKeys.KEY_NAME, NBT.TAG_STRING))
+        if (nbt.contains(NBTKeys.KEY_NAME, Tag.TAG_STRING))
             builder.name(nbt.getString(NBTKeys.KEY_NAME));
-        if (nbt.contains(NBTKeys.KEY_AUTHOR, NBT.TAG_STRING))
+        if (nbt.contains(NBTKeys.KEY_AUTHOR, Tag.TAG_STRING))
             builder.author(nbt.getString(NBTKeys.KEY_AUTHOR));
-        if (nbt.contains(NBTKeys.KEY_MATERIALS, NBT.TAG_COMPOUND))
+        if (nbt.contains(NBTKeys.KEY_MATERIALS, Tag.TAG_COMPOUND))
             builder.requiredItems(MaterialList.deserialize(nbt.getCompound(NBTKeys.KEY_MATERIALS), persisted));
         return builder;
     }
@@ -213,7 +213,7 @@ public final class TemplateHeader {
 
     /**
      * @param persisted whether or not the save may be persisted
-     * @return A new {@link CompoundNBT} which can be used for {@link #fromNBT(CompoundNBT)}
+     * @return A new {@link CompoundTag} which can be used for {@link #fromNBT(CompoundTag)}
      * @implNote If this is called with persisted=false then this will never write {@link #getRequiredItems()}.
      * This is done in order not to prevent updates from changing the required Items for an {@link Template}.
      */

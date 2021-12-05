@@ -16,7 +16,6 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.TickList;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.Block;
@@ -39,6 +38,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.ticks.LevelTickAccess;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -142,22 +142,27 @@ public class MockDelegationWorld implements LevelAccessor {
         return delegate.getMoonPhase();
     }
 
-    @Override
-    public TickList<Block> getBlockTicks() {
-        return delegate.getBlockTicks();
-    }
-
-    @Override
-    public TickList<Fluid> getLiquidTicks() {
-        return delegate.getLiquidTicks();
-    }
-
     /**
      * Gets the chunk at the specified location.
      */
     @Override
     public ChunkAccess getChunk(int chunkX, int chunkZ) {
         return delegate.getChunk(chunkX, chunkZ);
+    }
+
+    @Override
+    public long nextSubTickCount() {
+        return delegate.nextSubTickCount();
+    }
+
+    @Override
+    public LevelTickAccess<Block> getBlockTicks() {
+        return delegate.getBlockTicks();
+    }
+
+    @Override
+    public LevelTickAccess<Fluid> getFluidTicks() {
+        return delegate.getFluidTicks();
     }
 
     @Override

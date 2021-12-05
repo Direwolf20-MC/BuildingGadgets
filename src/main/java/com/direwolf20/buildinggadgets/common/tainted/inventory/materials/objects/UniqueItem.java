@@ -20,7 +20,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 
@@ -53,9 +52,9 @@ public final class UniqueItem implements IUniqueObject<Item> {
                     }
                     if (! other.contains(key, val.getId()) || other.get(key) == null)
                         return false;
-                    if (val.getId() == NBT.TAG_COMPOUND && ! match((CompoundTag) val, other.getCompound(key)))
+                    if (val.getId() == Tag.TAG_COMPOUND && ! match((CompoundTag) val, other.getCompound(key)))
                         return false;
-                    else if (val.getId() != NBT.TAG_COMPOUND && ! val.getAsString().equals(other.get(key).getAsString()))
+                    else if (val.getId() != Tag.TAG_COMPOUND && ! val.getAsString().equals(other.get(key).getAsString()))
                         return false;
                 }
                 return true;
@@ -232,7 +231,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
             CompoundTag capNbt = res.getCompound(NBTKeys.KEY_CAP_NBT);
             ComparisonMode capMode = ComparisonMode.byId(res.getByte(NBTKeys.KEY_CAP_COMPARISON));
             Item item;
-            if (res.contains(NBTKeys.KEY_ID, NBT.TAG_INT))
+            if (res.contains(NBTKeys.KEY_ID, Tag.TAG_INT))
                 item = RegistryUtils.getById(ForgeRegistries.ITEMS, res.getInt(NBTKeys.KEY_ID));
             else
                 item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(res.getString(NBTKeys.KEY_ID)));

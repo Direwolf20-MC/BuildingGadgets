@@ -27,8 +27,6 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.Constants;
-
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -138,7 +136,7 @@ public class EffectBlock extends BaseEntityBlock {
         ((EffectBlockTileEntity) tile).initializeData(curState, curTe, spawnBlock, mode, usePaste);
         // Send data to client
         if (world instanceof Level)
-            ((Level) world).sendBlockUpdated(spawnPos, state, state, Constants.BlockFlags.DEFAULT);
+            ((Level) world).sendBlockUpdated(spawnPos, state, state, Block.UPDATE_ALL_IMMEDIATE);
     }
 
     public EffectBlock() {

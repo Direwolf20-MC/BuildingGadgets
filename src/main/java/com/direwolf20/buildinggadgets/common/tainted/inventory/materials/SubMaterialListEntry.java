@@ -11,7 +11,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.util.Constants.NBT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,7 +123,7 @@ abstract class SubMaterialListEntry implements MaterialListEntry<SubMaterialList
 
         @Override
         public SubMaterialListEntry readFromNBT(CompoundTag nbt, boolean persisted) {
-            ListTag list = nbt.getList(NBTKeys.KEY_SUB_ENTRIES, NBT.TAG_COMPOUND);
+            ListTag list = nbt.getList(NBTKeys.KEY_SUB_ENTRIES, Tag.TAG_COMPOUND);
             ImmutableList.Builder<MaterialListEntry<?>> entryBuilder = ImmutableList.builder();
             ImmutableList.Builder<SimpleMaterialListEntry> simpleBuilder = ImmutableList.builder();
             for (Tag subEntry : list) {

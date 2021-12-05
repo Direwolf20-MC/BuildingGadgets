@@ -58,7 +58,7 @@ public class ConstructionBakedModel implements IDynamicBakedModel {
     public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData modelData) {
         BakedModel model;
         facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
-        RenderType layer = MinecraftForgeClient.getRenderLayer();
+        RenderType layer = MinecraftForgeClient.getRenderType();
         if (facadeState == null || facadeState == Blocks.AIR.defaultBlockState())
             facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().defaultBlockState();
         if (layer != null && ! ItemBlockRenderTypes.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up

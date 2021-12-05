@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.Mod;
 public class EventRenderWorldLast {
 
     @SubscribeEvent
-    static void renderWorldLastEvent(RenderWorldLastEvent evt) {
+    static void RenderLevelLastEvent(RenderLevelLastEvent evt) {
         Player player = Minecraft.getInstance().player;
         if( player == null )
             return;

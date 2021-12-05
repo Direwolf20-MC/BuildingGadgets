@@ -9,7 +9,7 @@ import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateReadExcepti
 import com.direwolf20.buildinggadgets.common.util.exceptions.TemplateWriteException;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

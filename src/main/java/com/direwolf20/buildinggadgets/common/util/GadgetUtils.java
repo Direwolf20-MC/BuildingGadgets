@@ -1,6 +1,5 @@
 package com.direwolf20.buildinggadgets.common.util;
 
-import com.direwolf20.buildinggadgets.client.events.EventTooltip;
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
 import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
@@ -59,10 +58,10 @@ import java.util.stream.Collectors;
 public class GadgetUtils {
     // TODO: migrate to tags
     private static final ImmutableList<Block> DISALLOWED_BLOCKS = ImmutableList.of(
-        Blocks.END_PORTAL, Blocks.NETHER_PORTAL, Blocks.END_PORTAL_FRAME, Blocks.BEDROCK, Blocks.SPAWNER
+            Blocks.END_PORTAL, Blocks.NETHER_PORTAL, Blocks.END_PORTAL_FRAME, Blocks.BEDROCK, Blocks.SPAWNER
     );
 
-    private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http","www");
+    private static final ImmutableList<String> LINK_STARTS = ImmutableList.of("http", "www");
 
     public static boolean mightBeLink(final String s) {
         return LINK_STARTS.stream().anyMatch(s::startsWith);
@@ -74,14 +73,14 @@ public class GadgetUtils {
                 stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> {
                     Template template = provider.getTemplateForKey(key);
                     TemplateHeader header = template.getHeader();
-                    if (header.getName() != null && ! header.getName().isEmpty())
+                    if (header.getName() != null && !header.getName().isEmpty())
                         tooltip.add(TooltipTranslation.TEMPLATE_NAME.componentTranslation(header.getName()).setStyle(Styles.AQUA));
-                    if (header.getAuthor() != null && ! header.getAuthor().isEmpty())
+                    if (header.getAuthor() != null && !header.getAuthor().isEmpty())
                         tooltip.add(TooltipTranslation.TEMPLATE_AUTHOR.componentTranslation(header.getAuthor()).setStyle(Styles.AQUA));
                 });
             });
         }
-        EventTooltip.addTemplatePadding(stack, tooltip);
+//        EventTooltip.addTemplatePadding(stack, tooltip);
     }
 
     @Nullable
@@ -185,7 +184,7 @@ public class GadgetUtils {
             return InteractionResultHolder.fail(Blocks.AIR);
 
         BlockState state = world.getBlockState(lookingAt.getBlockPos());
-        if (! ((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock()) || state.getBlock() instanceof EffectBlock)
+        if (!((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock()) || state.getBlock() instanceof EffectBlock)
             return InteractionResultHolder.fail(state.getBlock());
 
         if (DISALLOWED_BLOCKS.contains(state.getBlock())) {
@@ -224,7 +223,7 @@ public class GadgetUtils {
         //Stores the current visual blocks in NBT on the tool, so the player can look around without moving the visual render
         Optional<List<BlockPos>> anchorCoords = getAnchor(stack);
 
-        if( anchorCoords.isPresent() ) {  //If theres already an anchor, remove it.
+        if (anchorCoords.isPresent()) {  //If theres already an anchor, remove it.
             setAnchor(stack);
             player.displayClientMessage(MessageTranslation.ANCHOR_REMOVED.componentTranslation().setStyle(Styles.AQUA), true);
             return true;
@@ -278,7 +277,7 @@ public class GadgetUtils {
     @Nullable
     public static BlockPos getPOSFromNBT(ItemStack stack, String tagName) {
         CompoundTag stackTag = stack.getOrCreateTag();
-        if (! stackTag.contains(tagName))
+        if (!stackTag.contains(tagName))
             return null;
         CompoundTag posTag = stack.getOrCreateTag().getCompound(tagName);
         if (posTag.isEmpty())

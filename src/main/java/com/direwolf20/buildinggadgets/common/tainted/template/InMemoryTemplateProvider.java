@@ -1,6 +1,7 @@
 package com.direwolf20.buildinggadgets.common.tainted.template;
 
-import net.minecraftforge.fmllegacy.network.PacketDistributor;
+
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.Map;

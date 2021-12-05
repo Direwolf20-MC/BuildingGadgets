@@ -29,7 +29,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.client.event.RenderLevelLastEvent;
 
 import java.io.Closeable;
 import java.util.*;
@@ -52,7 +52,7 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
     }
 
     @Override
-    public void render(RenderWorldLastEvent evt, Player player, ItemStack heldItem) {
+    public void render(RenderLevelLastEvent evt, Player player, ItemStack heldItem) {
         // We can completely trust that heldItem isn't empty and that it's a copy paste gadget.
         super.render(evt, player, heldItem);
 
@@ -60,7 +60,7 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
         Vec3 cameraView = getMc().gameRenderer.getMainCamera().getPosition();
 
         // translate the matric to the projected view
-        PoseStack stack = evt.getMatrixStack(); //Get current matrix position from the evt call
+        PoseStack stack = evt.getPoseStack(); //Get current matrix position from the evt call
         stack.pushPose(); //Save the render position from RenderWorldLast
         stack.translate(-cameraView.x(), -cameraView.y(), -cameraView.z()); //Sets render position to 0,0,0
 
