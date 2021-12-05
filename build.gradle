@@ -73,9 +73,6 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-//    maven {
-//        url "https://dvs1.progwml6.com/files/maven"
-//    }
     maven {
         url = "https://modmaven.dev/"
     }
@@ -83,31 +80,10 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-//    implementation('cpw.mods:securejarhandler') { version { strictly '0.9.45' } }
 
-    //JEI
-//    compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
-//    runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
-//    runtimeOnly fg.deobf("curse.maven:create-328085:3158185")
-    // deobfCompile "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}:api"
-    // deobfCompile "refinedstorage:refinedstorage:${rs_version}:api"
-    // runtime "team.chisel.ctm:CTM:MC${minecraft_version}-${ctm_version}"
+    compileOnly fg.deobf("mezz.jei:jei-${jei_version}:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-${jei_version}")
 }
-
-// Processes main only resources
-//processResources {
-//    inputs.property('version', project.version)
-//    inputs.property('forge_major', forge_major)
-//
-//    from(sourceSets.main.resources.srcDirs) {
-//        include 'META-INF/mods.toml'
-//        expand 'version':project.version, 'forge_major':forge_major
-//    }
-//
-//    from(sourceSets.main.resources.srcDirs) {
-//        exclude 'META-INF/mods.toml'
-//    }
-//}
 
 jar {
     group = 'artifact'
@@ -133,7 +109,10 @@ task sourcesJar(type: Jar) {
     archiveName = "${baseName}-${version}-sources.${extension}"
 }
 
+jar.finalizedBy('reobfJar')
+
 artifacts {
+    archives jar
     archives deobfJar
     archives sourcesJar
 }
