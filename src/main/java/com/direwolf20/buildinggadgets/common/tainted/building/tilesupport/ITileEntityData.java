@@ -5,9 +5,9 @@ import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
 import com.google.common.collect.Multiset;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 
 import javax.annotation.Nullable;
@@ -30,7 +30,7 @@ public interface ITileEntityData {
     /**
      * Attempts to place this {@link ITileEntityData} in the given {@link BuildContext}. If this is called but {@link #allowPlacement(BuildContext, BlockState, BlockPos)}
      * would have returned false, placement should still be attempted and counted as a "forced placement".<br>
-     * This Method should also set any data on the {@link net.minecraft.tileentity.TileEntity} represented by this {@code ITileEntityData}.
+     * This Method should also set any data on the {@link net.minecraft.world.level.block.entity.BlockEntity} represented by this {@code ITileEntityData}.
      * @param context The {@link BuildContext} to place in.
      * @param state The {@link BlockState} to place.
      * @param position The {@link BlockPos} at which to place
@@ -42,15 +42,14 @@ public interface ITileEntityData {
     /**
      * @param context The context in which to query required items.
      * @param state The {@link BlockState} to retrieve items for
-     * @param target {@link RayTraceResult} the target at which a click is simulated
+     * @param target {@link HitResult} the target at which a click is simulated
      * @param pos The {@link BlockPos} where a block is simulated for this Method
      * @return A {@link Multiset} of required Items.
      */
     default MaterialList getRequiredItems(BuildContext context, BlockState state, @Nullable HitResult target, @Nullable BlockPos pos) {
         ItemStack stack = null;
         try {
-            // todo: fix
-//            stack = state.getBlock().getPickBlock(state, target, context.getWorld(), pos, context.getPlayer());
+            stack = state.getCloneItemStack(target, context.getWorld(), pos, context.getPlayer());
         } catch (Exception e) {
             BuildingGadgets.LOG.trace("Failed to retrieve pickBlock for {}.", state, e);
         }
