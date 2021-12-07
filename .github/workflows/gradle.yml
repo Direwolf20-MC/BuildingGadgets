@@ -18,7 +18,9 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
       - name: Build with Gradle
-        run: ./gradlew build --no-daemon
+        run: |
+          chmod +x ./gradlew
+          ./gradlew build --no-daemon
       - name: Setting mod version
         run: |
           cat $GITHUB_WORKSPACE/gradle.properties | grep ^version= >> $GITHUB_ENV
