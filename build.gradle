@@ -136,9 +136,6 @@ publishing {
 if (ENV.CURSE_TOKEN) {
     curseforge {
         apiKey = ENV.CURSE_TOKEN
-        options {
-            debug = true
-        }
         project {
             id = "298187"
             releaseType = "release"
