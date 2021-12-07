@@ -48,7 +48,7 @@ public final class PlacementChecker {
      * @implNote This code is so god damn messy. Good luck understanding it.
      */
     public CheckResult checkPositionWithResult(BuildContext context, PlacementTarget target, boolean giveBackItems) {
-        if (target.getPos().getY() > context.getWorld().getMaxBuildHeight() || target.getPos().getY() < 0 || ! placeCheck.test(context, target))
+        if (target.getPos().getY() > context.getWorld().getMaxBuildHeight() || target.getPos().getY() < context.getWorld().getMinBuildHeight() || !placeCheck.test(context, target))
             return new CheckResult(MatchResult.failure(), ImmutableMultiset.of(), false, false);
         int energy = energyFun.applyAsInt(target);
         Multiset<IUniqueObject<?>> insertedItems = ImmutableMultiset.of();
@@ -56,7 +56,7 @@ public final class PlacementChecker {
 
         // We're using the IPrivateEnergy interface to get around the simulated power class
         IPrivateEnergy storage = (IPrivateEnergy) energyCap.orElseThrow(CapabilityNotPresentException::new);
-        if (! isCreative && storage.extractPower(energy, true) != energy)
+        if (!isCreative && storage.extractPower(energy, true) != energy)
             return new CheckResult(MatchResult.failure(), insertedItems, false, false);
 
         HitResult targetRayTrace = null;
@@ -67,9 +67,9 @@ public final class PlacementChecker {
         MaterialList materials = target.getRequiredMaterials(context, targetRayTrace);
         MatchResult match = index.tryMatch(materials);
         boolean usePaste = false;
-        if (! match.isSuccess()) {
+        if (!match.isSuccess()) {
             match = index.tryMatch(InventoryHelper.PASTE_LIST);
-            if (! match.isSuccess())
+            if (!match.isSuccess())
                 return new CheckResult(match, insertedItems, false, false);
             usePaste = true;
         }
@@ -78,7 +78,7 @@ public final class PlacementChecker {
         boolean isAir = blockSnapshot.getCurrentBlock().isAir();
         if (firePlaceEvents && ForgeEventFactory.onBlockPlace(context.getPlayer(), blockSnapshot, Direction.UP))
             return new CheckResult(match, insertedItems, false, usePaste);
-        if (! isAir) {
+        if (!isAir) {
             if (firePlaceEvents) {
                 BlockEvent.BreakEvent e = new BlockEvent.BreakEvent(context.getServerWorld(),
                         target.getPos(), blockSnapshot.getCurrentBlock(),
@@ -93,7 +93,7 @@ public final class PlacementChecker {
             }
         }
         boolean success = true;
-        if (! isCreative)
+        if (!isCreative)
             success = storage.extractPower(energy, false) == energy;
         success = success && index.applyMatch(match);
         return new CheckResult(match, insertedItems, success, usePaste);

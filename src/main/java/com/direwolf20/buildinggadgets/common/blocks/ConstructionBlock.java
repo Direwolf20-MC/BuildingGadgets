@@ -86,6 +86,7 @@ public class ConstructionBlock extends Block implements EntityBlock /*implements
 //        manager.add((new TerrainParticle((ClientLevel) world, x, y, z, 0.0D, 0.0D, 0.0D, blockstate)).init(pos).setPower(0.2F).scale(0.6F));
 //    }
 
+
     @Override
     public boolean hasDynamicShape() {
         return true;
@@ -145,7 +146,7 @@ public class ConstructionBlock extends Block implements EntityBlock /*implements
                 try {
                     return blockColors.getColor(mimicBlock, world, pos, tintIndex);
                 } catch (Exception var8) {
-                    return - 1;
+                    return -1;
                 }
             }
             return -1;
@@ -226,7 +227,7 @@ public class ConstructionBlock extends Block implements EntityBlock /*implements
     /**
      * @deprecated call via whenever possible.
      * Implementing/overriding is fine.
-     *
+     * <p>
      * todo: removed 1.16 find replacement
      */
 //    @Override
@@ -273,7 +274,6 @@ public class ConstructionBlock extends Block implements EntityBlock /*implements
 //            return super.isNormalCube(state, world, pos);
 //        }
 //    }
-
     @Deprecated
     @OnlyIn(Dist.CLIENT)
     public float getShadeBrightness(BlockState state, BlockGetter worldIn, BlockPos pos) {

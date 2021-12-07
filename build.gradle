@@ -8,22 +8,22 @@ buildscript {
     }
 }
 
+plugins {
+    id "com.matthewprenger.cursegradle" version "1.4.0"
+}
+
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: 'net.minecraftforge.gradle'
 
-version = "$version"
-group = 'com.direwolf20.buildinggadgets'
-archivesBaseName = "buildinggadgets-${minecraft_version}"
+def ENV = System.getenv()
+
+version = "${version}-build.${ENV.GITHUB_RUN_NUMBER ?: 9999}+mc${minecraft_version}"
+group = 'com.direwolf20'
+archivesBaseName = "buildinggadgets"
 
 def forge_major = forge_version.tokenize('.')[0]
-
-// Used for CI/CD
-def env = System.getenv()
-if (env.GITHUB_RUN_NUMBER) {
-    version = version + "-SNAPSHOT-" + "${env.GITHUB_RUN_NUMBER}"
-}
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
@@ -86,33 +86,68 @@ dependencies {
 }
 
 jar {
-    group = 'artifact'
     manifest {
         attributes(["Specification-Title"     : "BuildingGadgets",
+                    "Specification-Vendor"    : "Direwolf20",
                     "Specification-Version"   : forge_major, // We are version 1 of the modlauncher specification
                     "Implementation-Title"    : project.archivesBaseName,
                     "Implementation-Version"  : project.version,
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
+                    "Implementation-Vendor"   : "Direwolf20",
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")])
     }
+}
 
-    from sourceSets.main.output
-    dependsOn classes
+java {
+    withSourcesJar()
 }
 
 task deobfJar(type: Jar) {
-    from(sourceSets.main.output)
-    archiveName = "${baseName}-${version}-deobf.${extension}"
-}
-
-task sourcesJar(type: Jar) {
-    from(sourceSets.main.allSource)
-    archiveName = "${baseName}-${version}-sources.${extension}"
+    from sourceSets.main.output
+    classifier 'deobf'
 }
 
 jar.finalizedBy('reobfJar')
 
 artifacts {
-    archives jar
     archives deobfJar
-    archives sourcesJar
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+
+            artifact(deobfJar) {
+                classifier 'deobf'
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/Direwolf20-MC/BuildingGadgets"
+            credentials {
+                username = ENV.GITHUB_ACTOR
+                password = ENV.GITHUB_TOKEN
+            }
+        }
+    }
+}
+
+if (ENV.CURSE_TOKEN) {
+    curseforge {
+        apiKey = ENV.CURSE_TOKEN
+        project {
+            id = "298187"
+            releaseType = "release"
+            addGameVersion "${minecraft_version}"
+            mainArtifact(jar) {
+                relations {
+                    optionalDependency 'charging-gadgets'
+                }
+            }
+            changelog = file('CHANGELOG.md')
+            changelogType = 'markdown'
+        }
+    }
 }
