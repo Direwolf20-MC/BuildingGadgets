@@ -94,9 +94,9 @@ public class TemplateManagerTileEntity extends BlockEntity implements MenuProvid
 
     @Nonnull
     @Override
-    public CompoundTag save(CompoundTag compound) {
+    protected void saveAdditional(CompoundTag compound) {
         compound.put(NBTKeys.TE_TEMPLATE_MANAGER_ITEMS, itemStackHandler.serializeNBT());
-        return super.save(compound);
+        super.saveAdditional(compound);
     }
 
     public boolean canInteractWith(Player playerIn) {
