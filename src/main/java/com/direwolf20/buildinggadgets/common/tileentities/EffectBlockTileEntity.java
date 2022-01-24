@@ -100,7 +100,9 @@ public class EffectBlockTileEntity extends BlockEntity {
     @Nonnull
     @Override
     public CompoundTag getUpdateTag() {
-        return save(new CompoundTag());
+        CompoundTag compoundTag = new CompoundTag();
+        saveAdditional(compoundTag);
+        return compoundTag;
     }
 
     @Override
@@ -115,7 +117,7 @@ public class EffectBlockTileEntity extends BlockEntity {
 
     @Nonnull
     @Override
-    public CompoundTag save(@Nonnull CompoundTag compound) {
+    protected void saveAdditional(CompoundTag compound) {
         if (mode != null && renderedBlock != null && sourceBlock != null) {
             compound.putInt(NBTKeys.GADGET_TICKS, ticks);
             compound.putInt(NBTKeys.GADGET_MODE, mode.ordinal());
@@ -123,7 +125,7 @@ public class EffectBlockTileEntity extends BlockEntity {
             compound.put(NBTKeys.GADGET_SOURCE_BLOCK, sourceBlock.serialize(true));
             compound.putBoolean(NBTKeys.GADGET_USE_PASTE, usePaste);
         }
-        return super.save(compound);
+        super.saveAdditional(compound);
     }
 
     @Override
