@@ -62,11 +62,11 @@ public class ConstructionBlockTileEntity extends BlockEntity {
 
     @Nonnull
     @Override
-    public CompoundTag save(@Nonnull CompoundTag compound) {
+    protected void saveAdditional(CompoundTag compound) {
         if (blockState != null) {
             compound.put(NBTKeys.TE_CONSTRUCTION_STATE, blockState.serialize(true));
         }
-        return super.save(compound);
+        super.saveAdditional(compound);
     }
 
     private void markDirtyClient() {
@@ -81,14 +81,14 @@ public class ConstructionBlockTileEntity extends BlockEntity {
     @Override
     public CompoundTag getUpdateTag() {
         CompoundTag updateTag = super.getUpdateTag();
-        save(updateTag);
+        saveAdditional(updateTag);
         return updateTag;
     }
 
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         CompoundTag nbtTag = new CompoundTag();
-        save(nbtTag);
+        saveAdditional(nbtTag);
         return ClientboundBlockEntityDataPacket.create(this);
     }
 

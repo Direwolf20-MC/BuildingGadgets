@@ -17,8 +17,7 @@ import java.util.Objects;
 
 public class NBTTileEntityData implements ITileEntityData {
     public static NBTTileEntityData ofTile(BlockEntity te) {
-        CompoundTag nbt = new CompoundTag();
-        te.save(nbt);
+        CompoundTag nbt = te.saveWithoutMetadata();
         return new NBTTileEntityData(nbt);
     }
     @Nonnull
