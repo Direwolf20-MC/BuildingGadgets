@@ -59,6 +59,9 @@
   "1.18.1": {
     "3.10.1": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/releases/tag/release%2F3.10.1"
   },
+  "1.18.2": {
+    "3.11.0": "Changelog: https://github.com/Direwolf20-MC/BuildingGadgets/releases/tag/release%2F3.11.0"
+  },
   "promos": {
     "1.12.2-latest": "2.8.2",
     "1.12.2-recommended": "2.8.2",
@@ -81,6 +84,8 @@
     "1.18-latest": "3.10.0",
     "1.18-recommended": "3.10.0",
     "1.18.1-latest": "3.10.1",
-    "1.18.1-recommended": "3.10.1"
+    "1.18.1-recommended": "3.10.1",
+    "1.18.2-latest": "3.11.0",
+    "1.18.2-recommended": "3.11.0"
   }
 }

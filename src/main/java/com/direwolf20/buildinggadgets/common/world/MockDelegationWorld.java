@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.MinecraftServer;
@@ -218,13 +219,13 @@ public class MockDelegationWorld implements LevelAccessor {
     }
 
     @Override
-    public Biome getBiome(BlockPos pos) {
-        return delegate.getBiome(pos);
+    public Holder<Biome> getBiome(BlockPos p_204167_) {
+        return LevelAccessor.super.getBiome(p_204167_);
     }
 
     @Override
-    public Biome getUncachedNoiseBiome(int x, int y, int z) {
-        return null;
+    public Holder<Biome> getUncachedNoiseBiome(int p_204159_, int p_204160_, int p_204161_) {
+        return delegate.getUncachedNoiseBiome(p_204159_, p_204160_, p_204161_);
     }
 
     @Override
@@ -342,7 +343,7 @@ public class MockDelegationWorld implements LevelAccessor {
     @Override
     public boolean destroyBlock(BlockPos pos, boolean dropBlock) {
         // adapted from World
-        return ! this.getBlockState(pos).isAir() && removeBlock(pos, true);
+        return !this.getBlockState(pos).isAir() && removeBlock(pos, true);
     }
 
     @Override
@@ -434,7 +435,7 @@ public class MockDelegationWorld implements LevelAccessor {
 
         public BlockInfo setState(BlockState state) {
             Preconditions.checkNotNull(state);
-            if (this.state.getBlock() != state.getBlock() || ! state.hasBlockEntity()) {
+            if (this.state.getBlock() != state.getBlock() || !state.hasBlockEntity()) {
                 onRemove();
             }
             this.state = state;

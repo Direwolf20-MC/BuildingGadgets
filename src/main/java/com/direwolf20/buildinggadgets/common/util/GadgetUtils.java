@@ -184,7 +184,7 @@ public class GadgetUtils {
             return InteractionResultHolder.fail(Blocks.AIR);
 
         BlockState state = world.getBlockState(lookingAt.getBlockPos());
-        if (!((AbstractGadget) stack.getItem()).isAllowedBlock(state.getBlock()) || state.getBlock() instanceof EffectBlock)
+        if (!((AbstractGadget) stack.getItem()).isAllowedBlock(state) || state.getBlock() instanceof EffectBlock)
             return InteractionResultHolder.fail(state.getBlock());
 
         if (DISALLOWED_BLOCKS.contains(state.getBlock())) {

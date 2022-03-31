@@ -109,7 +109,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
 
         int x = (leftPos - 20) + 180;
         buttonSave = addRenderableWidget(new Button(x, topPos + 17, 60, 20, GuiTranslation.BUTTON_SAVE.componentTranslation(), b -> onSave()));
-        buttonLoad = addRenderableWidget(new Button(x,topPos + 39, 60, 20, GuiTranslation.BUTTON_LOAD.componentTranslation(), b -> onLoad()));
+        buttonLoad = addRenderableWidget(new Button(x, topPos + 39, 60, 20, GuiTranslation.BUTTON_LOAD.componentTranslation(), b -> onLoad()));
         buttonCopy = addRenderableWidget(new Button(x, topPos + 66, 60, 20, GuiTranslation.BUTTON_COPY.componentTranslation(), b -> onCopy()));
         buttonPaste = addRenderableWidget(new Button(x, topPos + 89, 60, 20, GuiTranslation.BUTTON_PASTE.componentTranslation(), b -> onPaste()));
 
@@ -139,8 +139,8 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
         blit(matrices, leftPos - 20, topPos - 12, 0, 0, imageWidth, imageHeight + 25);
         blit(matrices, (leftPos - 20) + imageWidth, topPos + 8, imageWidth + 3, 30, 71, imageHeight);
 
-        if (! buttonCopy.isHoveredOrFocused() && ! buttonPaste.isHoveredOrFocused()) {
-            if( buttonLoad.isHoveredOrFocused() )
+        if (!buttonCopy.isHoveredOrFocused() && !buttonPaste.isHoveredOrFocused()) {
+            if (buttonLoad.isHoveredOrFocused())
                 blit(matrices, (leftPos + imageWidth) - 44, topPos + 38, imageWidth, 0, 17, 24);
             else
                 blit(matrices, (leftPos + imageWidth) - 44, topPos + 38, imageWidth + 17, 0, 16, 24);
@@ -149,14 +149,14 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
         this.nameField.render(matrices, mouseX, mouseY, partialTicks);
 //        fill(matrices, guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
 
-        if( this.template != null ) {
+        if (this.template != null) {
             renderPanel();
         }
     }
 
     private void validateCache(float partialTicks) {
         // Invalidate the render
-        if( container.getSlot(0).getItem().isEmpty() && template != null ) {
+        if (container.getSlot(0).getItem().isEmpty() && template != null) {
             template = null;
             resetViewport();
             return;
@@ -165,7 +165,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
         container.getSlot(0).getItem().getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).ifPresent(key -> templateProvider.ifPresent(provider -> {
             // Make sure we're not re-creating the same cache.
             Template template = provider.getTemplateForKey(key);
-            if( this.template == template )
+            if (this.template == template)
                 return;
 
             this.template = template;
@@ -249,7 +249,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
 
     private void renderRequirement(PoseStack matrices, int mouseX, int mouseY) {
         MaterialList requirements = this.template.getHeaderAndForceMaterials(BuildContext.builder().build(getWorld())).getRequiredItems();
-        if( requirements == null )
+        if (requirements == null)
             return;
 
         Lighting.setupForFlatItems();
@@ -271,7 +271,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
                 .reversed(), list.getChosenOption().entrySet());
 
         int index = 0, column = 0;
-        for(Multiset.Entry<IUniqueObject<?>> e: sortedEntries) {
+        for (Multiset.Entry<IUniqueObject<?>> e : sortedEntries) {
             ItemStack stack = e.getElement().createStack();
             int x = (-20 - (column * 25)), y = (20 + (index * 25));
 
@@ -285,9 +285,9 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
                 renderTooltip(matrices, Lists.transform(stack.getTooltipLines(this.getMinecraft().player, TooltipFlag.Default.NORMAL), Component::getVisualOrderText), x + 15, y + 25);
             }
 
-            index ++;
-            if( index % 8 == 0 ) {
-                column ++;
+            index++;
+            if (index % 8 == 0) {
+                column++;
                 index = 0;
             }
         }
@@ -319,7 +319,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
         if (stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).isPresent())
             return false;
 
-        else if (TemplateManagerTileEntity.TEMPLATE_CONVERTIBLES.contains(stack.getItem())) {
+        else if (stack.is(TemplateManagerTileEntity.TEMPLATE_CONVERTIBLES)) {
             container.setItem(1, container.getStateId(), new ItemStack(OurItems.TEMPLATE_ITEM.get()));
             return true;
         }
@@ -472,8 +472,8 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
         momentumX *= momentumDampening;
         momentumY *= momentumDampening;
 
-        if (! nameField.isFocused() && nameField.getValue().isEmpty())
-            getMinecraft().font.draw(matrices, GuiTranslation.TEMPLATE_PLACEHOLDER.format(), nameField.x - leftPos + 4, (nameField.y + 2) - topPos, - 10197916);
+        if (!nameField.isFocused() && nameField.getValue().isEmpty())
+            getMinecraft().font.draw(matrices, GuiTranslation.TEMPLATE_PLACEHOLDER.format(), nameField.x - leftPos + 4, (nameField.y + 2) - topPos, -10197916);
 
         if (buttonSave.isHoveredOrFocused() || buttonLoad.isHoveredOrFocused() || buttonPaste.isHoveredOrFocused())
             drawSlotOverlay(matrices, buttonLoad.isHoveredOrFocused() ? container.getSlot(0) : container.getSlot(1));
@@ -482,7 +482,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
     private void drawSlotOverlay(PoseStack matrices, Slot slot) {
         matrices.pushPose();
         matrices.translate(0, 0, 1000);
-        fill(matrices, slot.x, slot.y, slot.x + 16, slot.y + 16, - 1660903937);
+        fill(matrices, slot.x, slot.y, slot.x + 16, slot.y + 16, -1660903937);
         matrices.popPose();
     }
 
@@ -500,7 +500,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
         super.containerTick();
 
         nameField.tick();
-        if (! panelClicked) {
+        if (!panelClicked) {
             initRotX = rotX;
             initRotY = rotY;
             initZoom = zoom;
@@ -600,7 +600,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
                             .build(getWorld());
                     try {
                         Template template = provider.getTemplateForKey(key);
-                        if (! nameField.getValue().isEmpty())
+                        if (!nameField.getValue().isEmpty())
                             template = template.withName(nameField.getValue());
                         String json = TemplateIO.writeTemplateJson(template, buildContext);
                         getMinecraft().keyboardHandler.setClipboard(json);
@@ -636,13 +636,14 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
                 return;
 
             }
-        } catch (CommandSyntaxException ignored) {}
+        } catch (CommandSyntaxException ignored) {
+        }
 
         // todo: this needs to be put onto some kind of readTemplateFromJson(input stream).onError(e -> error)
         try {
             Template template = TemplateIO.readTemplateFromJson(CBString);
             Template readTemplate = template.clearMaterials();
-            if (! nameField.getValue().isEmpty())
+            if (!nameField.getValue().isEmpty())
                 readTemplate = readTemplate.withName(nameField.getValue());
             boolean replaced = replaceStack();
             ItemStack stack = container.getSlot(1).getItem();

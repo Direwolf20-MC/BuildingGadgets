@@ -1,5 +1,5 @@
 # Changelog
 
-## Fixed
+## Changed
 
-- Server crash on tile saving
+- Ported to 1.18.2

@@ -38,6 +38,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig.Type;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.NewRegistryEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -112,8 +113,8 @@ public final class BuildingGadgets {
         PacketHandler.register();
     }
 
-    private void registerRegistries(RegistryEvent.NewRegistry event) {
-        Registries.onCreateRegistries();
+    private void registerRegistries(NewRegistryEvent event) {
+        Registries.onCreateRegistries(event);
     }
 
     private void loadComplete(FMLLoadCompleteEvent event) {
@@ -154,8 +155,8 @@ public final class BuildingGadgets {
     private void onRecipeRegister(final RegistryEvent.Register<RecipeSerializer<?>> e) {
         e.getRegistry().register(
                 Serializer.INSTANCE.setRegistryName(
-                    new ResourceLocation(Reference.MODID, "construction_paste")
-            )
+                        new ResourceLocation(Reference.MODID, "construction_paste")
+                )
         );
     }
 
