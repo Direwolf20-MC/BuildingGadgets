@@ -1,12 +1,12 @@
 package com.direwolf20.buildinggadgets.common.tainted.concurrent;
 
+import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
+import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tainted.building.PlacementTarget;
 import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.IBuildView;
-import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
-import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.core.BlockPos;
@@ -43,7 +43,7 @@ public final class CopyScheduler extends SteppedScheduler {
     @Override
     protected StepResult advance() {
         return StepResult.ofBoolean(targets.tryAdvance(t -> {
-            if (! t.getData().getState().isAir() && ((GadgetCopyPaste) OurItems.COPY_PASTE_GADGET_ITEM.get()).isAllowedBlock(t.getData().getState().getBlock())) {
+            if (!t.getData().getState().isAir() && ((GadgetCopyPaste) OurItems.COPY_PASTE_GADGET_ITEM.get()).isAllowedBlock(t.getData().getState())) {
                 builder.put(t.getPos(), t.getData());
                 if (regionBuilder == null)
                     regionBuilder = Region.enclosingBuilder();

@@ -24,14 +24,15 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
@@ -41,6 +42,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -62,27 +64,28 @@ import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
 public abstract class AbstractGadget extends Item {
     private BaseRenderer renderer;
-    private final Tag.Named<Block> whiteList;
-    private final Tag.Named<Block> blackList;
+    private final TagKey<Block> whiteList;
+    private final TagKey<Block> blackList;
     private Supplier<UndoWorldSave> saveSupplier;
 
     public AbstractGadget(Properties builder, IntSupplier undoLengthSupplier, String undoName, ResourceLocation whiteListTag, ResourceLocation blackListTag) {
         super(builder.setNoRepair());
 
         renderer = DistExecutor.runForDist(this::createRenderFactory, () -> () -> null);
-        this.whiteList = BlockTags.bind(whiteListTag.toString());
-        this.blackList = BlockTags.bind(blackListTag.toString());
+        this.whiteList = TagKey.create(Registry.BLOCK_REGISTRY, whiteListTag);
+        this.blackList = TagKey.create(Registry.BLOCK_REGISTRY, blackListTag);
         saveSupplier = SaveManager.INSTANCE.registerUndoSave(w -> SaveManager.getUndoSave(w, undoLengthSupplier, undoName));
     }
 
     public abstract int getEnergyMax();
+
     public abstract int getEnergyCost(ItemStack tool);
 
-    public Tag.Named<Block> getWhiteList() {
+    public TagKey<Block> getWhiteList() {
         return whiteList;
     }
 
-    public Tag.Named<Block> getBlackList() {
+    public TagKey<Block> getBlackList() {
         return blackList;
     }
 
@@ -112,7 +115,7 @@ public abstract class AbstractGadget extends Item {
     @Override
     public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
         super.fillItemCategory(group, items);
-        if( !allowdedIn(group) )
+        if (!allowdedIn(group))
             return;
 
         ItemStack charged = new ItemStack(this);
@@ -123,7 +126,7 @@ public abstract class AbstractGadget extends Item {
     @Override
     public int getBarWidth(ItemStack stack) {
         LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
-        if( !cap.isPresent() )
+        if (!cap.isPresent())
             return super.getBarWidth(stack);
 
         return cap.map(e -> Math.min(13 * e.getEnergyStored() / e.getMaxEnergyStored(), 13))
@@ -133,7 +136,7 @@ public abstract class AbstractGadget extends Item {
     @Override
     public int getBarColor(ItemStack stack) {
         LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
-        if( !cap.isPresent() )
+        if (!cap.isPresent())
             return super.getBarColor(stack);
 
         Pair<Integer, Integer> energyStorage = cap.map(e -> Pair.of(e.getEnergyStored(), e.getMaxEnergyStored())).orElse(Pair.of(0, 0));
@@ -143,7 +146,7 @@ public abstract class AbstractGadget extends Item {
     @Override
     public boolean isDamaged(ItemStack stack) {
         LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
-        if( !cap.isPresent() )
+        if (!cap.isPresent())
             return super.isDamaged(stack);
 
         Pair<Integer, Integer> energyStorage = cap.map(e -> Pair.of(e.getEnergyStored(), e.getMaxEnergyStored())).orElse(Pair.of(0, 0));
@@ -164,10 +167,12 @@ public abstract class AbstractGadget extends Item {
         return !toRepair.getCapability(CapabilityEnergy.ENERGY).isPresent() && repair.getItem() == Items.DIAMOND;
     }
 
-    public boolean isAllowedBlock(Block block) {
-        if (getWhiteList().getValues().isEmpty())
-            return ! getBlackList().contains(block);
-        return getWhiteList().contains(block);
+    public boolean isAllowedBlock(BlockState block) {
+        if (Lists.newArrayList(Registry.BLOCK.getTagOrEmpty(getWhiteList())).isEmpty()) {
+            return !block.is(getWhiteList());
+        }
+
+        return block.is(getWhiteList());
     }
 
     public static ItemStack getGadget(Player player) {
@@ -196,13 +201,13 @@ public abstract class AbstractGadget extends Item {
     }
 
     protected void addEnergyInformation(List<Component> tooltip, ItemStack stack) {
-        if( getEnergyMax() == 0 )
+        if (getEnergyMax() == 0)
             return;
 
         stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(energy -> {
             tooltip.add(TooltipTranslation.GADGET_ENERGY
-                                .componentTranslation(withSuffix(energy.getEnergyStored()), withSuffix(energy.getMaxEnergyStored()))
-                                .setStyle(Styles.GRAY));
+                    .componentTranslation(withSuffix(energy.getEnergyStored()), withSuffix(energy.getMaxEnergyStored()))
+                    .setStyle(Styles.GRAY));
         });
     }
 
@@ -280,14 +285,14 @@ public abstract class AbstractGadget extends Item {
 
     public static void addInformationRayTraceFluid(List<Component> tooltip, ItemStack stack) {
         tooltip.add(TooltipTranslation.GADGET_RAYTRACE_FLUID
-                            .componentTranslation(String.valueOf(shouldRayTraceFluid(stack)))
-                            .setStyle(Styles.BLUE));
+                .componentTranslation(String.valueOf(shouldRayTraceFluid(stack)))
+                .setStyle(Styles.BLUE));
     }
 
     //this should only be called Server-Side!!!
     public UUID getUUID(ItemStack stack) {
         CompoundTag nbt = stack.getOrCreateTag();
-        if (! nbt.hasUUID(NBTKeys.GADGET_UUID)) {
+        if (!nbt.hasUUID(NBTKeys.GADGET_UUID)) {
             UUID newId = getUndoSave().getFreeUUID();
             nbt.putUUID(NBTKeys.GADGET_UUID, newId);
             return newId;
@@ -297,13 +302,13 @@ public abstract class AbstractGadget extends Item {
 
     // Todo: tweak and fix.
     public static int getRangeInBlocks(int range, AbstractMode mode) {
-        if( mode instanceof StairMode ||
+        if (mode instanceof StairMode ||
                 mode instanceof VerticalColumnMode ||
                 mode instanceof HorizontalColumnMode)
             return range;
 
-        if( mode instanceof GridMode)
-            return range < 7 ? 9 : range < 13 ? 11 * 11: 19 * 19;
+        if (mode instanceof GridMode)
+            return range < 7 ? 9 : range < 13 ? 11 * 11 : 19 * 19;
 
         return range == 1 ? 1 : (range + 1) * (range + 1);
     }
@@ -325,9 +330,9 @@ public abstract class AbstractGadget extends Item {
         if (undoOptional.isPresent()) {
             Undo undo = undoOptional.get();
             IItemIndex index = InventoryHelper.index(stack, player);
-            if (! ForceUnloadedCommand.mayForceUnloadedChunks(player)) {//TODO separate command
+            if (!ForceUnloadedCommand.mayForceUnloadedChunks(player)) {//TODO separate command
                 ImmutableSortedSet<ChunkPos> unloadedChunks = undo.getBoundingBox().getUnloadedChunks(world);
-                if (! unloadedChunks.isEmpty()) {
+                if (!unloadedChunks.isEmpty()) {
                     pushUndo(stack, undo);
                     player.displayClientMessage(MessageTranslation.UNDO_UNLOADED.componentTranslation().setStyle(Styles.RED), true);
                     BuildingGadgets.LOG.error("Player attempted to undo a Region missing {} unloaded chunks. Denied undo!", unloadedChunks.size());

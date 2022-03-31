@@ -16,8 +16,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
+import net.minecraftforge.registries.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -28,13 +27,12 @@ import java.util.function.Supplier;
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public final class Registries {
 
-    private Registries() {}
+    private Registries() {
+    }
 
     private static TopologicalRegistryBuilder<ITileDataFactory> tileDataFactoryBuilder = TopologicalRegistryBuilder.create();
     private static TopologicalRegistryBuilder<IHandleProvider> handleProviderBuilder = TopologicalRegistryBuilder.create();
 
-    private static IForgeRegistry<ITileDataSerializer> tileDataSerializers = null;
-    private static IForgeRegistry<IUniqueObjectSerializer> uniqueObjectSerializers = null;
     private static ImmutableOrderedRegistry<ITileDataFactory> tileDataFactories = null;
     private static ImmutableOrderedRegistry<IHandleProvider> handleProviders = null;
 
@@ -43,21 +41,27 @@ public final class Registries {
     }
 
     public static IForgeRegistry<IUniqueObjectSerializer> getUniqueObjectSerializers() {
+        ForgeRegistry<IUniqueObjectSerializer> registry = RegistryManager.ACTIVE.getRegistry(Reference.UniqueObjectSerializerReference.REGISTRY_ID_UNIQUE_OBJECT_SERIALIZER);
+
         Preconditions
-                .checkState(uniqueObjectSerializers != null, "Attempted to retrieve UniqueObjectSerializerRegistry before registries were created!");
-        return uniqueObjectSerializers;
+                .checkState(registry != null, "Attempted to retrieve UniqueObjectSerializerRegistry before registries were created!");
+
+        return registry;
     }
 
-    public static void onCreateRegistries() {
+    public static void onCreateRegistries(NewRegistryEvent event) {
         BuildingGadgets.LOG.trace("Creating ForgeRegistries");
-        tileDataSerializers = new RegistryBuilder<ITileDataSerializer>()
+
+        event.create(new RegistryBuilder<ITileDataSerializer>()
                 .setType(ITileDataSerializer.class)
                 .setName(Reference.TileDataSerializerReference.REGISTRY_ID_TILE_DATA_SERIALIZER)
-                .create();
-        uniqueObjectSerializers = new RegistryBuilder<IUniqueObjectSerializer>()
+        );
+
+        event.create(new RegistryBuilder<IUniqueObjectSerializer>()
                 .setType(IUniqueObjectSerializer.class)
                 .setName(Reference.UniqueObjectSerializerReference.REGISTRY_ID_UNIQUE_OBJECT_SERIALIZER)
-                .create();
+        );
+
         BuildingGadgets.LOG.trace("Finished Creating ForgeRegistries");
     }
 
@@ -122,7 +126,8 @@ public final class Registries {
     }
 
     public static final class TileEntityData {
-        private TileEntityData() {}
+        private TileEntityData() {
+        }
 
         public static ImmutableOrderedRegistry<ITileDataFactory> getTileDataFactories() {
             Preconditions
@@ -131,14 +136,18 @@ public final class Registries {
         }
 
         public static IForgeRegistry<ITileDataSerializer> getTileDataSerializers() {
+            ForgeRegistry<ITileDataSerializer> registry = RegistryManager.ACTIVE.getRegistry(Reference.TileDataSerializerReference.REGISTRY_ID_TILE_DATA_SERIALIZER);
+
             Preconditions
-                    .checkState(tileDataSerializers != null, "Attempted to retrieve TileDataSerializerRegistry before registries were created!");
-            return tileDataSerializers;
+                    .checkState(registry != null, "Attempted to retrieve TileDataSerializerRegistry before registries were created!");
+
+            return registry;
         }
     }
 
     public static final class HandleProvider {
-        private HandleProvider() {}
+        private HandleProvider() {
+        }
 
         public static ImmutableOrderedRegistry<IHandleProvider> getHandleProviders() {
             Preconditions

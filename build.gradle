@@ -140,6 +140,8 @@ if (ENV.CURSE_TOKEN) {
             id = "298187"
             releaseType = "release"
             addGameVersion "${minecraft_version}"
+            addGameVersion "Forge"
+            addGameVersion "Java 17"
             mainArtifact(jar) {
                 relations {
                     optionalDependency 'charging-gadgets'
