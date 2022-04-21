@@ -10,7 +10,7 @@ authors = "Direwolf20"
 
 [[mods]]
 modId = "buildinggadgets"
-version = "${file.jarVersion}}"
+version = "${file.jarVersion}"
 displayName = "Building Gadgets"
 description = '''Adds some gadgets to help you build!
             Building and Exchanging Gadget offer basic building & exchanging functionality for easily creating walls/columns etc.
