@@ -115,7 +115,7 @@ public abstract class AbstractGadget extends Item {
     @Override
     public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
         super.fillItemCategory(group, items);
-        if (!allowdedIn(group))
+        if (!allowedIn(group))
             return;
 
         ItemStack charged = new ItemStack(this);

@@ -11,8 +11,8 @@ import com.google.common.collect.*;
 import com.google.common.collect.Multiset.Entry;
 import com.google.gson.*;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Comparator;
@@ -49,6 +49,7 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
         private static final Comparator<Entry<IUniqueObject<?>>> COMPARATOR = Comparator
                 .<Entry<IUniqueObject<?>>, ResourceLocation>comparing(e -> e.getElement().getObjectRegistryName())
                 .thenComparingInt(Entry::getCount);
+
         @Override
         public SimpleMaterialListEntry readFromNBT(CompoundTag nbt, boolean persisted) {
             ListTag nbtList = nbt.getList(NBTKeys.KEY_DATA, Tag.TAG_COMPOUND);
@@ -56,8 +57,8 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
             for (Tag nbtEntry : nbtList) {
                 CompoundTag compoundEntry = (CompoundTag) nbtEntry;
                 IUniqueObjectSerializer serializer = persisted ?
-                        RegistryUtils.getFromString(Registries.getUniqueObjectSerializers(), compoundEntry.getString(NBTKeys.KEY_SERIALIZER)) :
-                        RegistryUtils.getById(Registries.getUniqueObjectSerializers(), compoundEntry.getInt(NBTKeys.KEY_SERIALIZER));
+                        RegistryUtils.getFromString(Registries.getUniqueObjectSerializersKey(), compoundEntry.getString(NBTKeys.KEY_SERIALIZER)) :
+                        RegistryUtils.getById(Registries.getUniqueObjectSerializersKey(), compoundEntry.getInt(NBTKeys.KEY_SERIALIZER));
                 if (serializer == null) {
                     BuildingGadgets.LOG.error("Found unknown UniqueItem serializer {}. Skipping!", compoundEntry.getString(NBTKeys.KEY_SERIALIZER));
                     continue;
@@ -76,9 +77,9 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
             for (Entry<IUniqueObject<?>> entry : listEntry.getItems().entrySet()) {
                 CompoundTag nbtEntry = new CompoundTag();
                 if (persisted)
-                    nbtEntry.putString(NBTKeys.KEY_SERIALIZER, entry.getElement().getSerializer().getRegistryName().toString());
+                    nbtEntry.putString(NBTKeys.KEY_SERIALIZER, Registries.UNIQUE_DATA_SERIALIZER_REGISTRY.get().getKey(entry.getElement().getSerializer()).toString());
                 else
-                    nbtEntry.putInt(NBTKeys.KEY_SERIALIZER, RegistryUtils.getId(Registries.getUniqueObjectSerializers(), entry.getElement().getSerializer()));
+                    nbtEntry.putInt(NBTKeys.KEY_SERIALIZER, RegistryUtils.getId(Registries.getUniqueObjectSerializersKey(), entry.getElement().getSerializer()));
                 nbtEntry.put(NBTKeys.KEY_DATA, entry.getElement().getSerializer().serialize(entry.getElement(), persisted));
                 nbtEntry.putInt(NBTKeys.KEY_COUNT, entry.getCount());
                 nbtList.add(nbtEntry);
@@ -98,7 +99,7 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
                             .asJsonSerializer(printName, extended)
                             .serialize(entry.getElement(), entry.getElement().getClass(), context);
                     JsonObject obj = new JsonObject();
-                    obj.add(JsonKeys.MATERIAL_LIST_ITEM_TYPE, context.serialize(entry.getElement().getSerializer().getRegistryName()));
+                    obj.add(JsonKeys.MATERIAL_LIST_ITEM_TYPE, context.serialize(Registries.UNIQUE_DATA_SERIALIZER_REGISTRY.get().getKey(entry.getElement().getSerializer())));
                     obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_COUNT, entry.getCount());
                     obj.add(JsonKeys.MATERIAL_LIST_ITEM, element);
                     jsonArray.add(obj);
@@ -115,7 +116,7 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
                 for (JsonElement element : array) {
                     JsonObject object = element.getAsJsonObject();
                     ResourceLocation id = context.deserialize(object.get(JsonKeys.MATERIAL_LIST_ITEM_TYPE), ResourceLocation.class);
-                    IUniqueObjectSerializer serializer = Registries.getUniqueObjectSerializers().getValue(id);
+                    IUniqueObjectSerializer serializer = Registries.getUniqueObjectSerializersKey().getValue(id);
                     if (serializer == null)
                         continue;
                     int count = object.getAsJsonPrimitive(JsonKeys.MATERIAL_LIST_ITEM_COUNT).getAsInt();

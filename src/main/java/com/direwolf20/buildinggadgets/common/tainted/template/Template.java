@@ -15,11 +15,11 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.tools.MathUtils;
 import com.direwolf20.buildinggadgets.common.util.tools.RegistryUtils;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.nbt.*;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
+import net.minecraft.nbt.*;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.core.BlockPos;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -32,17 +32,20 @@ public final class Template {
         TemplateHeader.Builder header = TemplateHeader.builderFromNBT(nbt.getCompound(NBTKeys.KEY_HEADER));
         if (externalHeader != null)
             header = header.name(externalHeader.getName()).author(externalHeader.getAuthor());
+
         DataDecompressor<ITileDataSerializer> serializerDecompressor = persisted ? new DataDecompressor<>(
                 nbt.getList(NBTKeys.KEY_SERIALIZER, Tag.TAG_STRING),
                 inbt -> RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), inbt.getAsString()),
                 value -> SerialisationSupport.dummyDataSerializer())
                 : null;
+
         DataDecompressor<BlockData> dataDecompressor = new DataDecompressor<>(
                 nbt.getList(NBTKeys.KEY_DATA, Tag.TAG_COMPOUND),
                 inbt -> persisted ?
                         BlockData.tryDeserialize((CompoundTag) inbt, serializerDecompressor, true) :
                         BlockData.tryDeserialize((CompoundTag) inbt, false),
                 value -> BlockData.AIR);
+
         ImmutableMap.Builder<BlockPos, BlockData> mapBuilder = ImmutableMap.builder();
         for (Tag inbt : posList) {
             LongTag longNBT = (LongTag) inbt;
@@ -93,7 +96,7 @@ public final class Template {
     }
 
     public CompoundTag serialize(boolean persisted) {
-        if (! isNormalized)
+        if (!isNormalized)
             return normalize().serialize(persisted);
         CompoundTag res = new CompoundTag();
         ListTag posList = new ListTag();
@@ -106,7 +109,7 @@ public final class Template {
         ListTag dataList = blockDataCompressor.write(d -> persisted ?
                 d.serialize(dataSerializerCompressor, true)
                 : d.serialize(false));
-        ListTag serializerList = persisted ? dataSerializerCompressor.write(s -> StringTag.valueOf(s.getRegistryName().toString())) : null;
+        ListTag serializerList = persisted ? dataSerializerCompressor.write(s -> StringTag.valueOf(Registries.TILE_DATA_SERIALIZER_REGISTRY.get().getKey(s).toString())) : null;
         res.put(NBTKeys.KEY_DATA, dataList);
         res.put(NBTKeys.KEY_POS, posList);
         res.put(NBTKeys.KEY_HEADER, header.toNBT(persisted));
@@ -141,11 +144,11 @@ public final class Template {
         switch (axis) {
             case X:
                 mirror = Mirror.LEFT_RIGHT;
-                zFac = - 1;
+                zFac = -1;
                 break;
             case Z:
                 mirror = Mirror.FRONT_BACK;
-                xFac = - 1;
+                xFac = -1;
                 break;
             default:
                 mirror = Mirror.NONE;

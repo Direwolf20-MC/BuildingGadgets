@@ -55,7 +55,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -96,7 +95,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
     private Template template;
 
     public TemplateManagerGUI(TemplateManagerContainer container, Inventory playerInventory, Component title) {
-        super(container, playerInventory, new TextComponent(""));
+        super(container, playerInventory, Component.literal(""));
 
         this.container = container;
         this.te = container.getTe();

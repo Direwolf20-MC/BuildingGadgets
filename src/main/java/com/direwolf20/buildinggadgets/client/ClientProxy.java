@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.client;
 
 import com.direwolf20.buildinggadgets.client.cache.CacheTemplateProvider;
 import com.direwolf20.buildinggadgets.client.events.EventTooltip;
-import com.direwolf20.buildinggadgets.client.models.ConstructionBakedModel;
 import com.direwolf20.buildinggadgets.client.screen.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
@@ -26,6 +25,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,7 +42,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 public class ClientProxy {
     public static final CacheTemplateProvider CACHE_TEMPLATE_PROVIDER = new CacheTemplateProvider();
@@ -88,9 +87,8 @@ public class ClientProxy {
         ModelResourceLocation ConstrLocation3a = new ModelResourceLocation(ConstrName, "ambient_occlusion=true,bright=false,neighbor_brightness=true");
         ModelResourceLocation ConstrLocation4 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=true,neighbor_brightness=true");
         ModelResourceLocation ConstrLocation4a = new ModelResourceLocation(ConstrName, "ambient_occlusion=true,bright=true,neighbor_brightness=true");
-        IDynamicBakedModel constructionBakedModel = new ConstructionBakedModel();
-        IDynamicBakedModel bakedModelLoader = new IDynamicBakedModel() {
 
+        IDynamicBakedModel bakedModelLoader = new IDynamicBakedModel() {
             @Override
             public boolean isGui3d() {
                 return false;
@@ -112,7 +110,7 @@ public class ClientProxy {
             }
 
             @Override
-            public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData modelData) {
+            public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, IModelData modelData) {
                 BakedModel model;
                 BlockState facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 RenderType layer = MinecraftForgeClient.getRenderType();
@@ -166,7 +164,7 @@ public class ClientProxy {
             }
 
             @Override
-            public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, Random rand, IModelData modelData) {
+            public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, IModelData modelData) {
                 BakedModel model;
                 BlockState facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
                 RenderType layer = MinecraftForgeClient.getRenderType();

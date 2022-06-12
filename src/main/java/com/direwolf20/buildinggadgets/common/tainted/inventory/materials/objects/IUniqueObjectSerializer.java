@@ -3,9 +3,8 @@ package com.direwolf20.buildinggadgets.common.tainted.inventory.materials.object
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSerializer;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
-public interface IUniqueObjectSerializer extends IForgeRegistryEntry<IUniqueObjectSerializer> {
+public interface IUniqueObjectSerializer {
     CompoundTag serialize(IUniqueObject<?> item, boolean persisted);
 
     IUniqueObject<?> deserialize(CompoundTag res);

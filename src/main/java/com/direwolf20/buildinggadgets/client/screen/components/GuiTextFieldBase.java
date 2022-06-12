@@ -2,7 +2,7 @@ package com.direwolf20.buildinggadgets.client.screen.components;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 
 import java.util.function.BiConsumer;
 
@@ -12,7 +12,7 @@ public class GuiTextFieldBase extends EditBox {
     private BiConsumer<GuiTextFieldBase, String> postModification;
 
     public GuiTextFieldBase(Font fontRenderer, int x, int y, int width) {
-        super(fontRenderer, x, y, width, 15, TextComponent.EMPTY);
+        super(fontRenderer, x, y, width, 15, Component.empty());
 
         setMaxLength(50);
         setFilter(s -> {
@@ -55,7 +55,7 @@ public class GuiTextFieldBase extends EditBox {
     }
 
     public int getInt() {
-        try {            
+        try {
             return Integer.parseInt(getValue());
         } catch (NumberFormatException e) {
             return 0;

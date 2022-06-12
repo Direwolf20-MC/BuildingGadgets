@@ -18,6 +18,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
+import com.direwolf20.buildinggadgets.common.util.tools.RegistryUtils;
 import com.google.common.collect.ImmutableMultiset;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -234,7 +235,7 @@ public class GadgetDestruction extends AbstractGadget {
             return false;
         }
 
-        return ForgeRegistries.FLUIDS.containsKey(world.getBlockState(pos).getBlock().getRegistryName());
+        return ForgeRegistries.FLUIDS.containsKey(RegistryUtils.getBlockId(world.getBlockState(pos).getBlock()));
     }
 
     public static boolean isValidBlock(Level world, BlockPos voidPos, Player player, BlockState currentBlock) {
