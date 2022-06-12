@@ -3,12 +3,12 @@ package com.direwolf20.buildinggadgets.common.tainted.building.tilesupport;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
-import com.direwolf20.buildinggadgets.common.tainted.template.SerialisationSupport;
+import com.direwolf20.buildinggadgets.common.tainted.registry.Registries;
 import com.google.common.base.MoreObjects;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 
 import javax.annotation.Nonnull;
@@ -20,6 +20,7 @@ public class NBTTileEntityData implements ITileEntityData {
         CompoundTag nbt = te.saveWithoutMetadata();
         return new NBTTileEntityData(nbt);
     }
+
     @Nonnull
     private final CompoundTag nbt;
     @Nullable
@@ -36,7 +37,7 @@ public class NBTTileEntityData implements ITileEntityData {
 
     @Override
     public ITileDataSerializer getSerializer() {
-        return SerialisationSupport.nbtTileDataSerializer();
+        return Registries.NBT_TILE_DATA_SERIALIZER.get();
     }
 
     @Override
@@ -77,11 +78,11 @@ public class NBTTileEntityData implements ITileEntityData {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (! (o instanceof NBTTileEntityData)) return false;
+        if (!(o instanceof NBTTileEntityData)) return false;
 
         NBTTileEntityData that = (NBTTileEntityData) o;
 
-        if (! nbt.equals(that.nbt)) return false;
+        if (!nbt.equals(that.nbt)) return false;
         return getRequiredMaterials() != null ? getRequiredMaterials().equals(that.getRequiredMaterials()) : that.getRequiredMaterials() == null;
     }
 

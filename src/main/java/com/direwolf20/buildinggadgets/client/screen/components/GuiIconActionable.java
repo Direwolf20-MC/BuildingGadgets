@@ -25,15 +25,16 @@ public class GuiIconActionable extends Button {
     private boolean selected;
     private boolean isSelectable;
 
-    private Color selectedColor     = new Color(0, 255, 0, 50);
-    private Color deselectedColor   = new Color(255, 255, 255, 50);
+    private Color selectedColor = new Color(0, 255, 0, 50);
+    private Color deselectedColor = new Color(255, 255, 255, 50);
     private Color activeColor;
 
     private ResourceLocation selectedTexture;
     private ResourceLocation deselectedTexture;
 
     public GuiIconActionable(int x, int y, String texture, Component message, boolean isSelectable, Predicate<Boolean> action) {
-        super(x, y, 25, 25, message, (b) -> {});
+        super(x, y, 25, 25, message, (b) -> {
+        });
         this.activeColor = deselectedColor;
         this.isSelectable = isSelectable;
         this.action = action;
@@ -69,7 +70,7 @@ public class GuiIconActionable extends Button {
 
     @Override
     public void playDownSound(SoundManager soundHandler) {
-        soundHandler.play(SimpleSoundInstance.forUI(OurSounds.BEEP.getSound(), selected ? .6F: 1F));
+        soundHandler.play(SimpleSoundInstance.forUI(OurSounds.BEEP.get(), selected ? .6F : 1F));
     }
 
     @Override
@@ -77,7 +78,7 @@ public class GuiIconActionable extends Button {
         super.onClick(mouseX, mouseY);
         this.action.test(true);
 
-        if( !this.isSelectable )
+        if (!this.isSelectable)
             return;
 
         this.setSelected(!this.selected);
@@ -85,7 +86,7 @@ public class GuiIconActionable extends Button {
 
     @Override
     public void render(PoseStack matrices, int mouseX, int mouseY, float partialTick) {
-        if( !visible )
+        if (!visible)
             return;
 
         RenderSystem.enableBlend();
@@ -104,8 +105,8 @@ public class GuiIconActionable extends Button {
         RenderSystem.setShaderColor(1, 1, 1, 1);
         RenderSystem.disableBlend();
 
-        if( mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height )
-            drawString(matrices, Minecraft.getInstance().font, this.getMessage().getString(), mouseX > (Minecraft.getInstance().getWindow().getGuiScaledWidth() / 2) ?  mouseX + 2 : mouseX - Minecraft.getInstance().font.width(getMessage().getString()), mouseY - 10, activeColor.getRGB() | 0xFF000000);
+        if (mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height)
+            drawString(matrices, Minecraft.getInstance().font, this.getMessage().getString(), mouseX > (Minecraft.getInstance().getWindow().getGuiScaledWidth() / 2) ? mouseX + 2 : mouseX - Minecraft.getInstance().font.width(getMessage().getString()), mouseY - 10, activeColor.getRGB() | 0xFF000000);
 
     }
 }

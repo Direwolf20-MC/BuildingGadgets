@@ -1,7 +1,8 @@
 package com.direwolf20.buildinggadgets.common.util.lang;
 
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 
 public interface ITranslationProvider {
     /*Client side only! */
@@ -10,9 +11,9 @@ public interface ITranslationProvider {
         return I18n.get(getTranslationKey(), args);
     }
 
-    default TranslatableComponent componentTranslation(Object... args) {
+    default MutableComponent componentTranslation(Object... args) {
         assert areValidArguments(args);
-        return new TranslatableComponent(getTranslationKey(), args);
+        return Component.translatable(getTranslationKey(), args);
     }
 
     boolean areValidArguments(Object... args);

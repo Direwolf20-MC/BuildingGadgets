@@ -10,7 +10,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -68,7 +67,7 @@ public class TemplateManagerTileEntity extends BlockEntity implements MenuProvid
     @Override
     @Nonnull
     public Component getDisplayName() {
-        return new TextComponent("Template Manager GUI");
+        return Component.literal("Template Manager GUI");
     }
 
     @Nullable

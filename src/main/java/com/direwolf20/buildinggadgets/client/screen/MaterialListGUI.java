@@ -20,7 +20,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.util.LazyOptional;
@@ -90,8 +89,8 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         this.buttonCopyList = new Button(0, buttonY, 0, BUTTON_HEIGHT, MaterialListTranslation.BUTTON_COPY.componentTranslation(), (button) -> {
             getMinecraft().keyboardHandler.setClipboard(evaluateTemplateHeader().toJson(false, hasControlDown()));
 
-            if( getMinecraft().player != null )
-                getMinecraft().player.displayClientMessage(new TranslatableComponent(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
+            if (getMinecraft().player != null)
+                getMinecraft().player.displayClientMessage(Component.translatable(MaterialListTranslation.MESSAGE_COPY_SUCCESS.getTranslationKey()), true);
         });
 
         // Buttons will be placed left to right in this order
@@ -158,7 +157,7 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
     }
 
     public Template getTemplateCapability() {
-        if( getMinecraft().level == null || getMinecraft().player == null )
+        if (getMinecraft().level == null || getMinecraft().player == null)
             return null;
 
         LazyOptional<ITemplateProvider> providerCap = getMinecraft().level.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY);

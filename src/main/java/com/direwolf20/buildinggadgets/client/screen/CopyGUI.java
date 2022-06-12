@@ -15,7 +15,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -36,7 +35,7 @@ public class CopyGUI extends Screen {
     private List<GuiIncrementer> fields = new ArrayList<>();
 
     public CopyGUI(ItemStack tool) {
-        super(new TextComponent(""));
+        super(Component.literal(""));
         this.copyPasteTool = tool;
     }
 
@@ -82,7 +81,7 @@ public class CopyGUI extends Screen {
                 onClose();
             }));
 
-            if( Config.GENERAL.allowAbsoluteCoords.get() ) {
+            if (Config.GENERAL.allowAbsoluteCoords.get()) {
                 add(new CenteredButton(y + 20, 120, GuiTranslation.COPY_BUTTON_ABSOLUTE.componentTranslation(), (button) -> {
                     coordsModeSwitch();
                     updateTextFields();
@@ -164,7 +163,7 @@ public class CopyGUI extends Screen {
             int collectiveWidth = buttons.stream().mapToInt(AbstractButton::getWidth).sum() + (buttons.size() - 1) * 5;
 
             int nextX = startX - collectiveWidth / 2;
-            for(AbstractButton button : buttons) {
+            for (AbstractButton button : buttons) {
                 button.x = nextX;
                 nextX += button.getWidth() + 5;
             }

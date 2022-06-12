@@ -8,8 +8,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.network.chat.TranslatableComponent;
 
 import java.util.Map;
 import java.util.UUID;
@@ -44,7 +44,7 @@ final class AllowPlayerOverrideManager {
 
     void toggleAllowOverride(UUID uuid) {
         try {
-            allowPlayerOverrideCache.put(uuid, ! allowPlayerOverrideCache.get(uuid, () -> false));
+            allowPlayerOverrideCache.put(uuid, !allowPlayerOverrideCache.get(uuid, () -> false));
         } catch (ExecutionException e) {
             BuildingGadgets.LOG.warn("Failed to toggle '{}' for player {}", logMessage, uuid, e);
         }
@@ -72,8 +72,8 @@ final class AllowPlayerOverrideManager {
 
     int executeList(CommandContext<CommandSourceStack> context) {
         for (Map.Entry<UUID, Boolean> entry : allowPlayerOverrideCache.asMap().entrySet()) {
-            TranslatableComponent component = listTranslation.componentTranslation(entry.getKey(), entry.getValue());
-            component = (TranslatableComponent) (entry.getValue() ? component.setStyle(Styles.BLUE) : component.setStyle(Styles.DK_GREEN));
+            MutableComponent component = listTranslation.componentTranslation(entry.getKey(), entry.getValue());
+            component = entry.getValue() ? component.setStyle(Styles.BLUE) : component.setStyle(Styles.DK_GREEN);
             context.getSource().sendSuccess(component, true);
         }
         return 1;

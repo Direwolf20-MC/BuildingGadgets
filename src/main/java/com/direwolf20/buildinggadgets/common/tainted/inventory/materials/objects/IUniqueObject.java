@@ -1,11 +1,11 @@
 package com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects;
 
 import com.direwolf20.buildinggadgets.common.tainted.inventory.handle.IObjectHandle;
-import com.direwolf20.buildinggadgets.common.util.ref.Reference;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraft.world.level.ItemLike;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Map;
@@ -44,9 +44,10 @@ public interface IUniqueObject<T> {
     //used for writing material-list to a json-String
     default ResourceLocation getObjectRegistryName() {
         T indexObj = getIndexObject();
-        if (indexObj instanceof IForgeRegistryEntry)
-            return ((IForgeRegistryEntry) indexObj).getRegistryName();
-        return new ResourceLocation(Reference.MODID, getIndexClass().getSimpleName());
+        if (indexObj instanceof ItemLike item)
+            return ForgeRegistries.ITEMS.getKey(item.asItem());
+
+        throw new RuntimeException("Unable to configure name for unique object");
     }
 
     ItemStack createStack(int count);

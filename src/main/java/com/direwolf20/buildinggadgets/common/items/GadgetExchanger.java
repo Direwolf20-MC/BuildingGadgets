@@ -28,6 +28,7 @@ import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
 import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference.BlockReference.TagReference;
+import com.direwolf20.buildinggadgets.common.util.tools.RegistryUtils;
 import com.direwolf20.buildinggadgets.common.world.MockBuilderWorld;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.LinkedHashMultiset;
@@ -37,7 +38,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -137,22 +137,22 @@ public class GadgetExchanger extends AbstractGadget {
         ExchangingModes mode = getToolMode(stack);
         tooltip.add(TooltipTranslation.GADGET_MODE
                 .componentTranslation((mode == ExchangingModes.SURFACE && getConnectedArea(stack)
-                        ? TooltipTranslation.GADGET_CONNECTED.format(new TranslatableComponent(mode.getTranslationKey()).getString())
-                        : new TranslatableComponent(mode.getTranslationKey())))
+                        ? TooltipTranslation.GADGET_CONNECTED.format(Component.translatable(mode.getTranslationKey()).getString())
+                        : Component.translatable(mode.getTranslationKey())))
                 .setStyle(Styles.AQUA));
 
         tooltip.add(TooltipTranslation.GADGET_BLOCK
                 .componentTranslation(LangUtil.getFormattedBlockName(getToolBlock(stack).getState()))
-                            .setStyle(Styles.DK_GREEN));
+                .setStyle(Styles.DK_GREEN));
 
         int range = getToolRange(stack);
         tooltip.add(TooltipTranslation.GADGET_RANGE
-                            .componentTranslation(range, getRangeInBlocks(range, mode.getMode()))
-                            .setStyle(Styles.LT_PURPLE));
+                .componentTranslation(range, getRangeInBlocks(range, mode.getMode()))
+                .setStyle(Styles.LT_PURPLE));
 
         tooltip.add(TooltipTranslation.GADGET_FUZZY
-                            .componentTranslation(String.valueOf(getFuzzy(stack)))
-                            .setStyle(Styles.GOLD));
+                .componentTranslation(String.valueOf(getFuzzy(stack)))
+                .setStyle(Styles.GOLD));
 
         addInformationRayTraceFluid(tooltip, stack);
     }
@@ -164,15 +164,15 @@ public class GadgetExchanger extends AbstractGadget {
         if (!world.isClientSide) {
             if (player.isShiftKeyDown()) {
                 InteractionResultHolder<Block> result = selectBlock(itemstack, player);
-                if( !result.getResult().consumesAction() ) {
-                    player.displayClientMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(result.getObject().getRegistryName()).setStyle(Styles.AQUA), true);
+                if (!result.getResult().consumesAction()) {
+                    player.displayClientMessage(MessageTranslation.INVALID_BLOCK.componentTranslation(RegistryUtils.getBlockId(result.getObject())).setStyle(Styles.AQUA), true);
                     return super.use(world, player, hand);
                 }
             } else if (player instanceof ServerPlayer) {
                 exchange((ServerPlayer) player, itemstack);
             }
         } else {
-            if (! player.isShiftKeyDown()) {
+            if (!player.isShiftKeyDown()) {
                 BaseRenderer.updateInventoryCache();
             } else {
                 if (Screen.hasControlDown()) {
@@ -265,17 +265,17 @@ public class GadgetExchanger extends AbstractGadget {
         MaterialList requiredItems = setBlock.getRequiredItems(buildContext, null, pos);
         MatchResult match = index.tryMatch(requiredItems);
         boolean useConstructionPaste = false;
-        if (! match.isSuccess()) {
+        if (!match.isSuccess()) {
             if (setBlock.getState().hasBlockEntity())
                 return;
             match = index.tryMatch(InventoryHelper.PASTE_LIST);
-            if (! match.isSuccess())
+            if (!match.isSuccess())
                 return;
             else
                 useConstructionPaste = true;
         }
 
-        if (! player.mayBuild() || ! world.mayInteract(player, pos))
+        if (!player.mayBuild() || !world.mayInteract(player, pos))
             return;
 
         BlockSnapshot blockSnapshot = BlockSnapshot.create(world.dimension(), world, pos);
