@@ -1,6 +1,6 @@
 modLoader = "javafml"
 license = "MIT (https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/LICENSE.md)"
-loaderVersion = "[40,)"
+loaderVersion = "[41,)"
 updateJSONURL = "https://github.com/Direwolf20-MC/BuildingGadgets/raw/master/update.json"
 issueTrackerURL = "https://github.com/Direwolf20-MC/BuildingGadgets/issues"
 displayURL = "https://github.com/Direwolf20-MC/BuildingGadgets"
@@ -18,8 +18,8 @@ description = '''Adds some gadgets to help you build!
             '''
 
 [[dependencies.buildinggadgets]]
-modId = "forge"
-mandatory = true
-versionRange = "[40,)"
-ordering = "BEFORE"
-side = "BOTH"
+modId="forge"
+mandatory=true
+versionRange="[41,)"
+ordering="NONE"
+side="BOTH"

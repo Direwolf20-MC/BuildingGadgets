@@ -12,10 +12,15 @@ plugins {
     id "com.matthewprenger.cursegradle" version "1.4.0"
 }
 
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'maven-publish'
-apply plugin: 'net.minecraftforge.gradle'
+apply {
+    // "Simple" fix for M1 (Apple Silicon) macs in the dev environment... All thanks to @mezz
+    from "https://raw.githubusercontent.com/mezz/JustEnoughItems/1.18/Forge/buildtools/AppleSiliconSupport.gradle"
+
+    plugin "java"
+    plugin "idea"
+    plugin "maven-publish"
+    plugin "net.minecraftforge.gradle"
+}
 
 def ENV = System.getenv()
 

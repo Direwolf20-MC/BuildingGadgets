@@ -1,5 +1,9 @@
 # Changelog
 
+## Fixed
+
+- Forge being a derp on newer forge versions
+
 ## Changed
 
-- Ported to 1.18.2
+- Updated to Forge 41.0.45
