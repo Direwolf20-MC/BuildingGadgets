@@ -86,8 +86,9 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    compileOnly "mezz.jei:jei-1.19-forge-api:${jei_version}"
-    runtimeOnly "mezz.jei:jei-1.19-forge:${jei_version}"
+    compileOnly fg.deobf("mezz.jei:jei-1.19-common-api:${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-1.19-forge-api:${jei_version}")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:${jei_version}")
 }
 
 jar {
