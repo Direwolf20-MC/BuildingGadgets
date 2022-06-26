@@ -46,7 +46,6 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -301,7 +300,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         addEnergyInformation(tooltip, stack);
 
         tooltip.add(TooltipTranslation.GADGET_MODE.componentTranslation(getToolMode(stack).translation.format()).setStyle(Styles.AQUA));
-        tooltip.add(new TextComponent("My renders don't really work yet, outlines for now :D").setStyle(Styles.GRAY));
+        tooltip.add(Component.literal("My renders don't really work yet, outlines for now :D").setStyle(Styles.GRAY));
 
         addInformationRayTraceFluid(tooltip, stack);
         GadgetUtils.addTooltipNameAndAuthor(stack, world, tooltip);
@@ -411,7 +410,7 @@ public class GadgetCopyPaste extends AbstractGadget {
             Template newTemplate = new Template(map,
                     TemplateHeader.builder(region)
                             .name("Copy " + getAndIncrementCopyCounter(stack))
-                            .author(player.getName().getContents())
+                            .author(player.getName().getString())
                             .build());
             onCopyFinished(newTemplate.normalize(), stack, player);
         }, buildView, Config.GADGETS.GADGET_COPY_PASTE.copySteps.get());

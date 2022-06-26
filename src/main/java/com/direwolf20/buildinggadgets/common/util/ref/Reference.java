@@ -18,10 +18,12 @@ public final class Reference {
     public static final ResourceLocation NETWORK_CHANNEL_ID_MAIN = new ResourceLocation(Reference.MODID, "main_network_channel");
     public static final ResourceLocation WORLD_TEMPLATE_PROVIDER_ID = new ResourceLocation(MODID, "template_provider");
 
-    private Reference() {}
+    private Reference() {
+    }
 
     public static final class SaveReference {
-        private SaveReference() {}
+        private SaveReference() {
+        }
 
         public static final String TEMPLATE_SAVE_TEMPLATES = MODID + "_template_save";
         public static final String UNDO_BUILDING = MODID + "_undo_building";
@@ -33,7 +35,8 @@ public final class Reference {
     public static final class ItemReference {
         public static final ResourceLocation TAG_TEMPLATE_CONVERTIBLE = new ResourceLocation(MODID, "template_convertible");
 
-        private ItemReference() {}
+        private ItemReference() {
+        }
     }
 
     public static final class BlockReference {
@@ -48,44 +51,34 @@ public final class Reference {
             public static final ResourceLocation WHITELIST_EXCHANGING = new ResourceLocation(MODID, "whitelist/exchanging");
             public static final ResourceLocation WHITELIST_DESTRUCTION = new ResourceLocation(MODID, "whitelist/destruction");
 
-            private TagReference() {}
+            private TagReference() {
+            }
         }
 
-        private BlockReference() {}
+        private BlockReference() {
+        }
     }
 
-    public static final class EntityReference {
-        public static final String CONSTRUCTION_BLOCK_ENTITY = Reference.MODID + ":construction_block_entity";
-
-        public static final ResourceLocation CONSTRUCTION_BLOCK_ENTITY_RL = new ResourceLocation(CONSTRUCTION_BLOCK_ENTITY);
-
-        private EntityReference() {}
-    }
 
     public static final class TileDataSerializerReference {
         public static final ResourceLocation REGISTRY_ID_TILE_DATA_SERIALIZER = new ResourceLocation(MODID, "tile_data/serializer");
 
-        private TileDataSerializerReference() {}
-
-        public static final String DUMMY_SERIALIZER = MODID + ":dummy_serializer";
-        public static final ResourceLocation DUMMY_SERIALIZER_RL = new ResourceLocation(DUMMY_SERIALIZER);
-        public static final String NBT_TILE_ENTITY_DATA_SERIALIZER = MODID + ":nbt_tile_data_serializer";
-        public static final ResourceLocation NBT_TILE_ENTITY_DATA_SERIALIZER_RL = new ResourceLocation(NBT_TILE_ENTITY_DATA_SERIALIZER);
+        private TileDataSerializerReference() {
+        }
     }
 
     public static final class UniqueObjectSerializerReference {
         public static final ResourceLocation REGISTRY_ID_UNIQUE_OBJECT_SERIALIZER = new ResourceLocation(MODID, "unique_object/serializer");
 
-        private UniqueObjectSerializerReference() {}
-
-        public static final String SIMPLE_UNIQUE_ITEM_ID = MODID + ":simple_item";
-        public static final ResourceLocation SIMPLE_UNIQUE_ITEM_ID_RL = new ResourceLocation(SIMPLE_UNIQUE_ITEM_ID);
+        private UniqueObjectSerializerReference() {
+        }
     }
 
     public static final class TileDataFactoryReference {
         public static final String IMC_METHOD_TILEDATA_FACTORY = "imc_tile_data_factory";
 
-        private TileDataFactoryReference() {}
+        private TileDataFactoryReference() {
+        }
 
         public static final String DATA_PROVIDER_FACTORY = MODID + ":data_provider_factory";
         public static final ResourceLocation DATA_PROVIDER_FACTORY_RL = new ResourceLocation(DATA_PROVIDER_FACTORY);
@@ -94,7 +87,8 @@ public final class Reference {
     public static final class HandleProviderReference {
         public static final String IMC_METHOD_HANDLE_PROVIDER = "imc_handle_provider";
 
-        private HandleProviderReference() {}
+        private HandleProviderReference() {
+        }
 
         public static final String STACK_HANDLER_ITEM_HANDLE = MODID + ":stack_handler_provider";
         public static final ResourceLocation STACK_HANDLER_ITEM_HANDLE_RL = new ResourceLocation(STACK_HANDLER_ITEM_HANDLE);

@@ -13,15 +13,14 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -50,11 +49,11 @@ public final class UniqueItem implements IUniqueObject<Item> {
                         if (other.get(key) != null) return false;
                         else continue;
                     }
-                    if (! other.contains(key, val.getId()) || other.get(key) == null)
+                    if (!other.contains(key, val.getId()) || other.get(key) == null)
                         return false;
-                    if (val.getId() == Tag.TAG_COMPOUND && ! match((CompoundTag) val, other.getCompound(key)))
+                    if (val.getId() == Tag.TAG_COMPOUND && !match((CompoundTag) val, other.getCompound(key)))
                         return false;
-                    else if (val.getId() != Tag.TAG_COMPOUND && ! val.getAsString().equals(other.get(key).getAsString()))
+                    else if (val.getId() != Tag.TAG_COMPOUND && !val.getAsString().equals(other.get(key).getAsString()))
                         return false;
                 }
                 return true;
@@ -115,7 +114,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
         int hash = capMatch.hashCode() + 31 * tagMatch.hashCode();
         hash = tagCompound != null ? tagCompound.hashCode() + 31 * hash : hash;
         hash = forgeCaps != null ? forgeCaps.hashCode() + 31 * hash : hash;
-        this.hash = Objects.requireNonNull(item.getRegistryName()).hashCode() + 31 * hash;
+        this.hash = RegistryUtils.getItemId(item).hashCode() + 31 * hash;
     }
 
     @Override
@@ -149,7 +148,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
     public boolean matches(ItemStack stack) {
         if (stack.getItem() != getIndexObject())
             return false;
-        if (tagCompound != null && ! tagMatch.match(tagCompound, stack.getTag()))
+        if (tagCompound != null && !tagMatch.match(tagCompound, stack.getTag()))
             return false;
         if (forgeCaps != null) {
             //There's no getter for this, so we need to hack or way into it...
@@ -180,11 +179,11 @@ public final class UniqueItem implements IUniqueObject<Item> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (! (o instanceof UniqueItem)) return false;
+        if (!(o instanceof UniqueItem)) return false;
         UniqueItem that = (UniqueItem) o;
-        if (! item.equals(that.item)) return false;
-        if (tagCompound != null ? ! tagCompound.equals(that.tagCompound) : that.tagCompound != null) return false;
-        if (forgeCaps != null ? ! forgeCaps.equals(that.forgeCaps) : that.forgeCaps != null) return false;
+        if (!item.equals(that.item)) return false;
+        if (tagCompound != null ? !tagCompound.equals(that.tagCompound) : that.tagCompound != null) return false;
+        if (forgeCaps != null ? !forgeCaps.equals(that.forgeCaps) : that.forgeCaps != null) return false;
         if (tagMatch != that.tagMatch) return false;
         return capMatch == that.capMatch;
     }
@@ -197,7 +196,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("item", getIndexObject().getRegistryName())
+                .add("item", RegistryUtils.getItemId(getIndexObject()))
                 .add("tagCompound", tagCompound)
                 .add("forgeCaps", forgeCaps)
                 .add("tagMatch", tagMatch)
@@ -205,7 +204,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
                 .toString();
     }
 
-    public static final class Serializer extends ForgeRegistryEntry<IUniqueObjectSerializer> implements IUniqueObjectSerializer {
+    public static final class Serializer implements IUniqueObjectSerializer {
         @Override
         public CompoundTag serialize(IUniqueObject<?> obj, boolean persisted) {
             UniqueItem item = (UniqueItem) obj;
@@ -215,7 +214,7 @@ public final class UniqueItem implements IUniqueObject<Item> {
             if (item.forgeCaps != null)
                 res.put(NBTKeys.KEY_CAP_NBT, item.forgeCaps);
             if (persisted)
-                res.putString(NBTKeys.KEY_ID, item.getIndexObject().getRegistryName().toString());
+                res.putString(NBTKeys.KEY_ID, RegistryUtils.getItemId(item.getIndexObject()).toString());
             else
                 res.putInt(NBTKeys.KEY_ID, RegistryUtils.getId(ForgeRegistries.ITEMS, item.item));
             res.putByte(NBTKeys.KEY_DATA_COMPARISON, item.tagMatch.getId());
@@ -246,13 +245,13 @@ public final class UniqueItem implements IUniqueObject<Item> {
                 Item item = element.getIndexObject();
                 if (printName)
                     obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NAME, I18n.get(item.getDescriptionId(element.createStack())));
-                obj.add(JsonKeys.MATERIAL_LIST_ITEM_ID, context.serialize(element.getIndexObject().getRegistryName()));
+                obj.add(JsonKeys.MATERIAL_LIST_ITEM_ID, context.serialize(RegistryUtils.getItemId(element.getIndexObject())));
                 if (extended) {
-                    if (element.tagCompound != null && ! element.tagCompound.isEmpty()) {
+                    if (element.tagCompound != null && !element.tagCompound.isEmpty()) {
                         obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_NBT, element.tagCompound.toString());
                         obj.add(JsonKeys.MATERIAL_LIST_ITEM_NBT_MATCH, context.serialize(element.tagMatch));
                     }
-                    if (element.forgeCaps != null && ! element.forgeCaps.isEmpty()) {
+                    if (element.forgeCaps != null && !element.forgeCaps.isEmpty()) {
                         obj.addProperty(JsonKeys.MATERIAL_LIST_CAP_NBT, element.forgeCaps.toString());
                         obj.add(JsonKeys.MATERIAL_LIST_CAP_NBT_MATCH, context.serialize(element.capMatch));
                     }

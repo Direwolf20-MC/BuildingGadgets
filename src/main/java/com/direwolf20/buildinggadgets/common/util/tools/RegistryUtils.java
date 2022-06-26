@@ -1,27 +1,40 @@
 package com.direwolf20.buildinggadgets.common.util.tools;
 
-import com.direwolf20.buildinggadgets.common.tainted.Tainted;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import javax.annotation.Nullable;
 
-@Tainted(reason = "Oh god no. This shouldn't exist")
 public final class RegistryUtils {
-    private RegistryUtils() {}
+    private RegistryUtils() {
+    }
 
-    public static <T extends IForgeRegistryEntry<T>> int getId(IForgeRegistry<T> registry, T value) {
+    public static <T> int getId(IForgeRegistry<T> registry, T value) {
         return ((ForgeRegistry<T>) registry).getID(value);
     }
 
-    public static <T extends IForgeRegistryEntry<T>> T getById(IForgeRegistry<T> registry, int id) {
+    public static <T> T getById(IForgeRegistry<T> registry, int id) {
         return ((ForgeRegistry<T>) registry).getValue(id);
     }
 
     @Nullable
-    public static <T extends IForgeRegistryEntry<T>> T getFromString(IForgeRegistry<T> registry, String resourceLocation) {
+    public static <T> T getFromString(IForgeRegistry<T> registry, String resourceLocation) {
         return registry.getValue(new ResourceLocation(resourceLocation));
+    }
+
+    public static <T> ResourceLocation getIdFromRegistry(IForgeRegistry<T> registry, T element) {
+        return registry.getKey(element);
+    }
+
+    public static ResourceLocation getItemId(Item item) {
+        return getIdFromRegistry(ForgeRegistries.ITEMS, item);
+    }
+
+    public static ResourceLocation getBlockId(Block item) {
+        return getIdFromRegistry(ForgeRegistries.BLOCKS, item);
     }
 }

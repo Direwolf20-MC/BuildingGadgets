@@ -12,11 +12,13 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.Block;
@@ -38,6 +40,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.ticks.LevelTickAccess;
 import net.minecraftforge.api.distmarker.Dist;
@@ -78,6 +81,11 @@ public class MockDelegationWorld implements LevelAccessor {
 
     @Override
     public void levelEvent(@Nullable Player p_217378_1_, int p_217378_2_, BlockPos p_217378_3_, int p_217378_4_) {
+
+    }
+
+    @Override
+    public void gameEvent(GameEvent p_220404_, Vec3 p_220405_, GameEvent.Context p_220406_) {
 
     }
 
@@ -197,7 +205,7 @@ public class MockDelegationWorld implements LevelAccessor {
 
 
     @Override
-    public Random getRandom() {
+    public RandomSource getRandom() {
         return delegate.getRandom();
     }
 
@@ -394,10 +402,10 @@ public class MockDelegationWorld implements LevelAccessor {
     }
 
     @Override
-    public float getBrightness(BlockPos pos) {
-        return delegate.getBrightness(pos);
+    public int getBrightness(LightLayer p_45518_, BlockPos p_45519_) {
+        return delegate.getBrightness(p_45518_, p_45519_);
     }
-
+    
     @Override
     public float getShade(Direction p_230487_1_, boolean p_230487_2_) {
         return 0;

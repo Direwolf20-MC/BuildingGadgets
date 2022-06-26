@@ -16,7 +16,9 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.material.MaterialColor;
@@ -27,6 +29,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -42,7 +45,7 @@ public class EffectBlock extends BaseEntityBlock {
             @Override
             public void onBuilderRemoved(EffectBlockTileEntity builder) {
                 Level world = builder.getLevel();
-                if( world == null )
+                if (world == null)
                     return;
 
                 BlockPos targetPos = builder.getBlockPos();
@@ -55,7 +58,7 @@ public class EffectBlock extends BaseEntityBlock {
                     }
                     world.addFreshEntity(new ConstructionBlockEntity(world, targetPos, false));
                 } else {
-                    if( targetBlock.getState().getBlock() instanceof LeavesBlock) {
+                    if (targetBlock.getState().getBlock() instanceof LeavesBlock) {
                         targetBlock = new BlockData(targetBlock.getState().setValue(LeavesBlock.PERSISTENT, true), targetBlock.getTileData());
                     }
 
@@ -107,7 +110,7 @@ public class EffectBlock extends BaseEntityBlock {
         if (target.getData().getState() != Blocks.AIR.defaultBlockState()) {
             Mode mode = state.isAir() ? Mode.PLACE : Mode.REPLACE;
             spawnEffectBlock(curTe, state, context.getWorld(), target.getPos(), target.getData(), mode, false);
-        } else if (! state.isAir()) {
+        } else if (!state.isAir()) {
             spawnEffectBlock(curTe, state, context.getWorld(), target.getPos(), TileSupport.createBlockData(state, curTe), Mode.REMOVE, false);
         }
     }
@@ -141,8 +144,7 @@ public class EffectBlock extends BaseEntityBlock {
 
     public EffectBlock() {
         super(Block.Properties.of(EFFECT_BLOCK_MATERIAL)
-                .strength(20f)
-                .noDrops());
+                .strength(20f));
     }
 
     @Nullable
@@ -164,7 +166,7 @@ public class EffectBlock extends BaseEntityBlock {
     /**
      * @param state blockState
      * @return Render Type
-     * @deprecated call via {@link BlockState#getRenderType()} whenever possible. Implementing/overriding is fine.
+     * @deprecated call via {@link BlockState#getRenderShape()} ()} whenever possible. Implementing/overriding is fine.
      */
     @Override
     @Deprecated
@@ -190,7 +192,7 @@ public class EffectBlock extends BaseEntityBlock {
     }
 
     /**
-     * @deprecated call via {@link BlockState#getPushReaction()} whenever possible. Implementing/overriding is fine.
+     * @deprecated call via {@link BlockState#getPistonPushReaction()} whenever possible. Implementing/overriding is fine.
      */
     @Override
     @Deprecated
