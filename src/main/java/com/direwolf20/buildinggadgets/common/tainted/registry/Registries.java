@@ -28,22 +28,22 @@ import java.util.function.Supplier;
 
 @EventBusSubscriber(modid = Reference.MODID, bus = Bus.MOD)
 public final class Registries {
-    // Registry keys
-    public static final ResourceKey<Registry<ITileDataSerializer>> TILE_DATA_SERIALIZERS_KEY = ResourceKey.createRegistryKey(new ResourceLocation(Reference.MODID, "tile_data/serializer"));
-    public static final ResourceKey<Registry<IUniqueObjectSerializer>> UNIQUE_OBJECT_SERIALIZERS_KEY = ResourceKey.createRegistryKey(new ResourceLocation(Reference.MODID, "unique_object/serializer"));
+//    // Registry keys
+//    public static final ResourceKey<Registry<ITileDataSerializer>> TILE_DATA_SERIALIZERS_KEY = ResourceKey.createRegistryKey(new ResourceLocation(Reference.MODID, "tile_data/serializer"));
+//    public static final ResourceKey<Registry<IUniqueObjectSerializer>> UNIQUE_OBJECT_SERIALIZERS_KEY = ResourceKey.createRegistryKey(new ResourceLocation(Reference.MODID, "unique_object/serializer"));
 
-    // Actual thing we register too
-    public static final DeferredRegister<ITileDataSerializer> TILE_DATA_SERIALIZER_DEFERRED_REGISTER = DeferredRegister.create(TILE_DATA_SERIALIZERS_KEY, Reference.MODID);
-    public static final DeferredRegister<IUniqueObjectSerializer> UNIQUE_OBJECT_SERIALIZER_DEFERRED_REGISTER = DeferredRegister.create(UNIQUE_OBJECT_SERIALIZERS_KEY, Reference.MODID);
+//    // Actual thing we register too
+//    public static final DeferredRegister<ITileDataSerializer> TILE_DATA_SERIALIZER_DEFERRED_REGISTER = DeferredRegister.create(TILE_DATA_SERIALIZERS_KEY, Reference.MODID);
+//    public static final DeferredRegister<IUniqueObjectSerializer> UNIQUE_OBJECT_SERIALIZER_DEFERRED_REGISTER = DeferredRegister.create(UNIQUE_OBJECT_SERIALIZERS_KEY, Reference.MODID);
 
     // Create the custom registries
-    public static final Supplier<IForgeRegistry<ITileDataSerializer>> TILE_DATA_SERIALIZER_REGISTRY = TILE_DATA_SERIALIZER_DEFERRED_REGISTER.makeRegistry(() -> new RegistryBuilder<ITileDataSerializer>().disableSaving().disableSync());
-    public static final Supplier<IForgeRegistry<IUniqueObjectSerializer>> UNIQUE_DATA_SERIALIZER_REGISTRY = UNIQUE_OBJECT_SERIALIZER_DEFERRED_REGISTER.makeRegistry(() -> new RegistryBuilder<IUniqueObjectSerializer>().disableSaving().disableSync());
+//    public static final Supplier<IForgeRegistry<ITileDataSerializer>> TILE_DATA_SERIALIZER_REGISTRY = TILE_DATA_SERIALIZER_DEFERRED_REGISTER.makeRegistry(() -> new RegistryBuilder<ITileDataSerializer>().disableSaving().disableSync());
+//    public static final Supplier<IForgeRegistry<IUniqueObjectSerializer>> UNIQUE_DATA_SERIALIZER_REGISTRY = UNIQUE_OBJECT_SERIALIZER_DEFERRED_REGISTER.makeRegistry(() -> new RegistryBuilder<IUniqueObjectSerializer>().disableSaving().disableSync());
 
-    // The things we're registering
-    public static final RegistryObject<ITileDataSerializer> NBT_TILE_DATA_SERIALIZER = TILE_DATA_SERIALIZER_DEFERRED_REGISTER.register("nbt_tile_data_serializer", SerialisationSupport::createNbtSerializer);
-    public static final RegistryObject<ITileDataSerializer> DUMMY_TILE_DATA_SERIALIZER = TILE_DATA_SERIALIZER_DEFERRED_REGISTER.register("dummy_serializer", SerialisationSupport::createDummySerializer);
-    public static final RegistryObject<IUniqueObjectSerializer> UNIQUE_OBJECT_SERIALIZER = UNIQUE_OBJECT_SERIALIZER_DEFERRED_REGISTER.register("simple_item", UniqueItem.Serializer::new);
+//    // The things we're registering
+//    public static final RegistryObject<ITileDataSerializer> NBT_TILE_DATA_SERIALIZER = TILE_DATA_SERIALIZER_DEFERRED_REGISTER.register("nbt_tile_data_serializer", SerialisationSupport::createNbtSerializer);
+//    public static final RegistryObject<ITileDataSerializer> DUMMY_TILE_DATA_SERIALIZER = TILE_DATA_SERIALIZER_DEFERRED_REGISTER.register("dummy_serializer", SerialisationSupport::createDummySerializer);
+//    public static final RegistryObject<IUniqueObjectSerializer> UNIQUE_OBJECT_SERIALIZER = UNIQUE_OBJECT_SERIALIZER_DEFERRED_REGISTER.register("simple_item", UniqueItem.Serializer::new);
 
     private Registries() {
     }

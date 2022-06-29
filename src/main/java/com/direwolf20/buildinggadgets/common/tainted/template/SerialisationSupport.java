@@ -6,6 +6,7 @@ import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.NBTTil
 import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSupport;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.IUniqueObjectSerializer;
+import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.objects.UniqueItem;
 import com.direwolf20.buildinggadgets.common.tainted.registry.Registries;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.base.Preconditions;
@@ -16,8 +17,10 @@ public final class SerialisationSupport {
     private SerialisationSupport() {
     }
 
+    private static final ITileDataSerializer SERIALIZER = SerialisationSupport.createDummySerializer();
+
     public static ITileDataSerializer dummyDataSerializer() {
-        return Registries.DUMMY_TILE_DATA_SERIALIZER.get();
+        return SERIALIZER;
     }
 
     public static final class DummyTileDataSerializer implements ITileDataSerializer {
@@ -71,8 +74,9 @@ public final class SerialisationSupport {
         }
     }
 
-    public static IUniqueObjectSerializer uniqueItemSerializer() {
-        return Registries.UNIQUE_OBJECT_SERIALIZER.get();
-    }
+    private static final IUniqueObjectSerializer SERIALIZER_UNIQUE = new UniqueItem.Serializer();
 
+    public static IUniqueObjectSerializer uniqueItemSerializer() {
+        return SERIALIZER_UNIQUE;
+    }
 }

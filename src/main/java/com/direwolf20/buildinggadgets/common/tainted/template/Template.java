@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.util.CommonUtils;
 import com.direwolf20.buildinggadgets.common.util.compression.DataCompressor;
 import com.direwolf20.buildinggadgets.common.util.compression.DataDecompressor;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.tools.MathUtils;
 import com.direwolf20.buildinggadgets.common.util.tools.RegistryUtils;
 import com.google.common.collect.ImmutableMap;
@@ -109,7 +110,7 @@ public final class Template {
         ListTag dataList = blockDataCompressor.write(d -> persisted ?
                 d.serialize(dataSerializerCompressor, true)
                 : d.serialize(false));
-        ListTag serializerList = persisted ? dataSerializerCompressor.write(s -> StringTag.valueOf(Registries.TILE_DATA_SERIALIZER_REGISTRY.get().getKey(s).toString())) : null;
+        ListTag serializerList = persisted ? dataSerializerCompressor.write(s -> StringTag.valueOf("%s:%s".formatted(Reference.MODID, s instanceof SerialisationSupport.NBTTileEntityDataSerializer ? "nbt_tile_data_serializer" : "dummy_serializer"))) : null;
         res.put(NBTKeys.KEY_DATA, dataList);
         res.put(NBTKeys.KEY_POS, posList);
         res.put(NBTKeys.KEY_HEADER, header.toNBT(persisted));

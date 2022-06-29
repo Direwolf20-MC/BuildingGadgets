@@ -77,7 +77,7 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
             for (Entry<IUniqueObject<?>> entry : listEntry.getItems().entrySet()) {
                 CompoundTag nbtEntry = new CompoundTag();
                 if (persisted)
-                    nbtEntry.putString(NBTKeys.KEY_SERIALIZER, Registries.UNIQUE_DATA_SERIALIZER_REGISTRY.get().getKey(entry.getElement().getSerializer()).toString());
+                    nbtEntry.putString(NBTKeys.KEY_SERIALIZER, entry.getElement().getSerializer() instanceof IUniqueObjectSerializer ? "buildinggadgets:simple_item" : "buildinggadgets:simple_item");
                 else
                     nbtEntry.putInt(NBTKeys.KEY_SERIALIZER, RegistryUtils.getId(Registries.getUniqueObjectSerializersKey(), entry.getElement().getSerializer()));
                 nbtEntry.put(NBTKeys.KEY_DATA, entry.getElement().getSerializer().serialize(entry.getElement(), persisted));
@@ -99,7 +99,7 @@ class SimpleMaterialListEntry implements MaterialListEntry<SimpleMaterialListEnt
                             .asJsonSerializer(printName, extended)
                             .serialize(entry.getElement(), entry.getElement().getClass(), context);
                     JsonObject obj = new JsonObject();
-                    obj.add(JsonKeys.MATERIAL_LIST_ITEM_TYPE, context.serialize(Registries.UNIQUE_DATA_SERIALIZER_REGISTRY.get().getKey(entry.getElement().getSerializer())));
+                    obj.add(JsonKeys.MATERIAL_LIST_ITEM_TYPE, context.serialize(entry.getElement().getSerializer() instanceof IUniqueObjectSerializer ? "buildinggadgets:simple_item" : "buildinggadgets:simple_item"));
                     obj.addProperty(JsonKeys.MATERIAL_LIST_ITEM_COUNT, entry.getCount());
                     obj.add(JsonKeys.MATERIAL_LIST_ITEM, element);
                     jsonArray.add(obj);

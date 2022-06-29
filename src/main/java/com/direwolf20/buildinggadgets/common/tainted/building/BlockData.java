@@ -7,7 +7,9 @@ import com.direwolf20.buildinggadgets.common.tainted.building.tilesupport.TileSu
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.tainted.registry.Registries;
+import com.direwolf20.buildinggadgets.common.tainted.template.SerialisationSupport;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.tools.RegistryUtils;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
@@ -153,7 +155,7 @@ public final class BlockData {
         CompoundTag tag = new CompoundTag();
         tag.put(NBTKeys.KEY_STATE, NbtUtils.writeBlockState(state));
         if (idGetter == null)
-            tag.putString(NBTKeys.KEY_SERIALIZER, Registries.TILE_DATA_SERIALIZER_REGISTRY.get().getKey(tileData.getSerializer()).toString());
+            tag.putString(NBTKeys.KEY_SERIALIZER,  "%s:%s".formatted(Reference.MODID, tileData.getSerializer() instanceof SerialisationSupport.NBTTileEntityDataSerializer ? "nbt_tile_data_serializer" : "dummy_serializer"));
         else
             tag.putInt(NBTKeys.KEY_SERIALIZER, idGetter.applyAsInt(tileData.getSerializer()));
         tag.put(NBTKeys.KEY_DATA, tileData.getSerializer().serialize(tileData, writeDataPersisted));

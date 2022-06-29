@@ -15,6 +15,7 @@ import com.direwolf20.buildinggadgets.common.util.compression.DataCompressor;
 import com.direwolf20.buildinggadgets.common.util.compression.DataDecompressor;
 import com.direwolf20.buildinggadgets.common.util.helpers.NBTHelper;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
+import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import com.direwolf20.buildinggadgets.common.util.tools.RegistryUtils;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultiset;
@@ -132,8 +133,8 @@ public final class Undo {
         ListTag infoList = NBTHelper.serializeMap(dataMap, NbtUtils::writeBlockPos, i -> i.serialize(dataObjectIncrementer, itemObjectIncrementer));
         ListTag dataList = dataObjectIncrementer.write(d -> d.serialize(serializerObjectIncrementer, true));
         ListTag itemSetList = itemObjectIncrementer.write(ms -> NBTHelper.writeIterable(ms.entrySet(), entry -> writeEntry(entry, itemSerializerIncrementer)));
-        ListTag dataSerializerList = serializerObjectIncrementer.write(ts -> StringTag.valueOf(Registries.TILE_DATA_SERIALIZER_REGISTRY.get().getKey(ts).toString()));
-        ListTag itemSerializerList = itemSerializerIncrementer.write(s -> StringTag.valueOf(Registries.UNIQUE_DATA_SERIALIZER_REGISTRY.get().getKey(s).toString()));
+        ListTag dataSerializerList = serializerObjectIncrementer.write(ts -> StringTag.valueOf("%s:%s".formatted(Reference.MODID, ts instanceof SerialisationSupport.NBTTileEntityDataSerializer ? "nbt_tile_data_serializer" : "dummy_serializer")));
+        ListTag itemSerializerList = itemSerializerIncrementer.write(s -> StringTag.valueOf(s instanceof IUniqueObjectSerializer ? "buildinggadgets:simple_item" : "buildinggadgets:simple_item"));
 
         res.putString(NBTKeys.WORLD_SAVE_DIM, dim.location().toString());
         res.put(NBTKeys.WORLD_SAVE_UNDO_BLOCK_LIST, infoList);

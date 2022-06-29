@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.BuildingGadgets;
 import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.materials.MaterialList;
 import com.direwolf20.buildinggadgets.common.tainted.registry.Registries;
+import com.direwolf20.buildinggadgets.common.tainted.template.SerialisationSupport;
 import com.google.common.base.MoreObjects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -21,6 +22,8 @@ public class NBTTileEntityData implements ITileEntityData {
         return new NBTTileEntityData(nbt);
     }
 
+    private static final ITileDataSerializer SERIALIZER = SerialisationSupport.createNbtSerializer();
+
     @Nonnull
     private final CompoundTag nbt;
     @Nullable
@@ -37,7 +40,7 @@ public class NBTTileEntityData implements ITileEntityData {
 
     @Override
     public ITileDataSerializer getSerializer() {
-        return Registries.NBT_TILE_DATA_SERIALIZER.get();
+        return SERIALIZER;
     }
 
     @Override

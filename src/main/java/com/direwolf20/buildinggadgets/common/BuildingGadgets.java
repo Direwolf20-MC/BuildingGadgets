@@ -82,8 +82,8 @@ public final class BuildingGadgets {
         OurEntities.ENTITY_REGISTER.register(eventBus);
 
         RECIPE_SERIALIZER.register(eventBus);
-        Registries.TILE_DATA_SERIALIZER_DEFERRED_REGISTER.register(eventBus);
-        Registries.UNIQUE_OBJECT_SERIALIZER_DEFERRED_REGISTER.register(eventBus);
+//        Registries.TILE_DATA_SERIALIZER_DEFERRED_REGISTER.register(eventBus);
+//        Registries.UNIQUE_OBJECT_SERIALIZER_DEFERRED_REGISTER.register(eventBus);
 
         MinecraftForge.EVENT_BUS.addListener(this::serverLoaded);
         MinecraftForge.EVENT_BUS.addListener(this::serverStopped);

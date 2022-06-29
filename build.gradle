@@ -81,6 +81,9 @@ repositories {
     maven {
         url = "https://modmaven.dev/"
     }
+    maven {
+        url = "https://cursemaven.com"
+    }
 }
 
 dependencies {
@@ -89,6 +92,12 @@ dependencies {
     compileOnly fg.deobf("mezz.jei:jei-1.19-common-api:${jei_version}")
     compileOnly fg.deobf("mezz.jei:jei-1.19-forge-api:${jei_version}")
     runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:${jei_version}")
+
+    runtimeOnly fg.deobf("curse.maven:simply-lights-300331:3822027")
+    runtimeOnly fg.deobf("curse.maven:simply-backpacks-311595:3823580")
+    runtimeOnly fg.deobf("curse.maven:toolbelt-260262:3826706")
+    runtimeOnly fg.deobf("curse.maven:travelers-backpack-321117:3852270")
+    runtimeOnly fg.deobf("curse.maven:better-furnaces-reforged-395653:3846928")
 }
 
 jar {
