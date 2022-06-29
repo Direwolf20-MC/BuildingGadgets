@@ -44,7 +44,7 @@ public final class BlockData {
      */
     @Nullable
     public static BlockData tryDeserialize(@Nullable CompoundTag tag, boolean persisted) {
-        return tryDeserialize(tag, persisted ? null : i -> RegistryUtils.getById(Registries.TileEntityData.getTileDataSerializers(), i), persisted);
+        return tryDeserialize(tag, persisted ? null : i -> RegistryUtils.getById(Registries.TILE_DATA_SERIALIZER_REGISTRY.get(), i), persisted);
     }
 
     @Nullable
@@ -56,7 +56,7 @@ public final class BlockData {
         try {
             if (serializerProvider == null)
                 serializer = RegistryUtils
-                        .getFromString(Registries.TileEntityData.getTileDataSerializers(), tag.getString(NBTKeys.KEY_SERIALIZER));
+                        .getFromString(Registries.TILE_DATA_SERIALIZER_REGISTRY.get(), tag.getString(NBTKeys.KEY_SERIALIZER));
             else
                 serializer = serializerProvider.apply(tag.getInt(NBTKeys.KEY_SERIALIZER));
         } catch (Exception e) {
@@ -77,7 +77,7 @@ public final class BlockData {
      * @throws NullPointerException     if the tag was null.
      */
     public static BlockData deserialize(CompoundTag tag, boolean persisted) {
-        return deserialize(tag, persisted ? null : i -> RegistryUtils.getById(Registries.TileEntityData.getTileDataSerializers(), i), persisted);
+        return deserialize(tag, persisted ? null : i -> RegistryUtils.getById(Registries.TILE_DATA_SERIALIZER_REGISTRY.get(), i), persisted);
     }
 
     public static BlockData deserialize(CompoundTag tag, @Nullable IntFunction<ITileDataSerializer> serializerProvider, boolean readDataPersisted) {
@@ -89,7 +89,7 @@ public final class BlockData {
         try {
             if (serializerProvider == null)
                 serializer = RegistryUtils
-                        .getFromString(Registries.TileEntityData.getTileDataSerializers(), tag.getString(NBTKeys.KEY_SERIALIZER));
+                        .getFromString(Registries.TILE_DATA_SERIALIZER_REGISTRY.get(), tag.getString(NBTKeys.KEY_SERIALIZER));
             else
                 serializer = serializerProvider.apply(tag.getInt(NBTKeys.KEY_SERIALIZER));
         } catch (Exception e) {
@@ -146,7 +146,7 @@ public final class BlockData {
      * @return The serialized form of this {@code BlockData}.
      */
     public CompoundTag serialize(boolean persisted) {
-        return serialize(persisted ? null : ser -> RegistryUtils.getId(Registries.TileEntityData.getTileDataSerializers(), ser), persisted);
+        return serialize(persisted ? null : ser -> RegistryUtils.getId(Registries.TILE_DATA_SERIALIZER_REGISTRY.get(), ser), persisted);
     }
 
     public CompoundTag serialize(@Nullable ToIntFunction<ITileDataSerializer> idGetter, boolean writeDataPersisted) {

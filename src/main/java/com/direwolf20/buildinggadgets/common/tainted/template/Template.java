@@ -35,7 +35,7 @@ public final class Template {
 
         DataDecompressor<ITileDataSerializer> serializerDecompressor = persisted ? new DataDecompressor<>(
                 nbt.getList(NBTKeys.KEY_SERIALIZER, Tag.TAG_STRING),
-                inbt -> RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), inbt.getAsString()),
+                inbt -> RegistryUtils.getFromString(Registries.TILE_DATA_SERIALIZER_REGISTRY.get(), inbt.getAsString()),
                 value -> SerialisationSupport.dummyDataSerializer())
                 : null;
 

@@ -2,9 +2,6 @@
 
 ## Fixed
 
-- Forge being a derp on newer forge versions
+- Actually fixed crashing
 
-## Changed
-
-- Updated to Forge 41.0.45
 

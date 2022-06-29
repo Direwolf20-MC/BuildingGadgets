@@ -58,29 +58,6 @@ public final class Registries {
         addDefaultOrdered();
     }
 
-    public static IForgeRegistry<IUniqueObjectSerializer> getUniqueObjectSerializersKey() {
-        ForgeRegistry<IUniqueObjectSerializer> registry = RegistryManager.ACTIVE.getRegistry(Reference.UniqueObjectSerializerReference.REGISTRY_ID_UNIQUE_OBJECT_SERIALIZER);
-
-        Preconditions
-                .checkState(registry != null, "Attempted to retrieve UniqueObjectSerializerRegistry before registries were created!");
-
-        return registry;
-    }
-
-    public static void onCreateRegistries(NewRegistryEvent event) {
-        BuildingGadgets.LOG.trace("Creating ForgeRegistries");
-
-        event.create(new RegistryBuilder<ITileDataSerializer>()
-                .setName(Reference.TileDataSerializerReference.REGISTRY_ID_TILE_DATA_SERIALIZER)
-        );
-
-        event.create(new RegistryBuilder<IUniqueObjectSerializer>()
-                .setName(Reference.UniqueObjectSerializerReference.REGISTRY_ID_UNIQUE_OBJECT_SERIALIZER)
-        );
-
-        BuildingGadgets.LOG.trace("Finished Creating ForgeRegistries");
-    }
-
     public static void createOrderedRegistries() {
         BuildingGadgets.LOG.trace("Creating Ordered Registries");
         Preconditions.checkState(tileDataFactoryBuilder != null, "Cannot create Ordered Registries twice!");
@@ -134,15 +111,6 @@ public final class Registries {
             Preconditions
                     .checkState(tileDataFactories != null, "Attempted to retrieve TileDataFactoryRegistry before it was created!");
             return tileDataFactories;
-        }
-
-        public static IForgeRegistry<ITileDataSerializer> getTileDataSerializers() {
-            ForgeRegistry<ITileDataSerializer> registry = RegistryManager.ACTIVE.getRegistry(Reference.TileDataSerializerReference.REGISTRY_ID_TILE_DATA_SERIALIZER);
-
-            Preconditions
-                    .checkState(registry != null, "Attempted to retrieve TileDataSerializerRegistry before registries were created!");
-
-            return registry;
         }
     }
 
