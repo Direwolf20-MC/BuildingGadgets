@@ -50,7 +50,7 @@ public final class Undo {
                 (ListTag) nbt.get(NBTKeys.WORLD_SAVE_UNDO_DATA_SERIALIZER_LIST),
                 inbt -> {
                     String s = inbt.getAsString();
-                    ITileDataSerializer serializer = RegistryUtils.getFromString(Registries.TileEntityData.getTileDataSerializers(), s);
+                    ITileDataSerializer serializer = RegistryUtils.getFromString(Registries.TILE_DATA_SERIALIZER_REGISTRY.get(), s);
                     if (serializer == null) {
                         BuildingGadgets.LOG.warn("Found unknown serializer {}. Replacing with dummy!", s);
                         serializer = TileSupport.dummyTileEntityData().getSerializer();
@@ -69,7 +69,7 @@ public final class Undo {
                 (ListTag) nbt.get(NBTKeys.WORLD_SAVE_UNDO_ITEMS_SERIALIZER_LIST),
                 inbt -> {
                     String s = inbt.getAsString();
-                    IUniqueObjectSerializer serializer = RegistryUtils.getFromString(Registries.getUniqueObjectSerializersKey(), s);
+                    IUniqueObjectSerializer serializer = RegistryUtils.getFromString(Registries.UNIQUE_DATA_SERIALIZER_REGISTRY.get(), s);
                     if (serializer == null)
                         return SerialisationSupport.uniqueItemSerializer();
                     return serializer;

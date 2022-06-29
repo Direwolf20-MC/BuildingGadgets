@@ -67,13 +67,6 @@ public final class Reference {
         }
     }
 
-    public static final class UniqueObjectSerializerReference {
-        public static final ResourceLocation REGISTRY_ID_UNIQUE_OBJECT_SERIALIZER = new ResourceLocation(MODID, "unique_object/serializer");
-
-        private UniqueObjectSerializerReference() {
-        }
-    }
-
     public static final class TileDataFactoryReference {
         public static final String IMC_METHOD_TILEDATA_FACTORY = "imc_tile_data_factory";
 

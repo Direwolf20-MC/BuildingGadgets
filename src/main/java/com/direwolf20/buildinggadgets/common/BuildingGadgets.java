@@ -88,7 +88,6 @@ public final class BuildingGadgets {
         MinecraftForge.EVENT_BUS.addListener(this::serverLoaded);
         MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
 
-        eventBus.addListener(this::registerRegistries);
         eventBus.addListener(this::setup);
         eventBus.addListener(this::clientSetup);
         eventBus.addListener(this::loadComplete);
@@ -109,10 +108,6 @@ public final class BuildingGadgets {
 
     private void setup(final FMLCommonSetupEvent event) {
         PacketHandler.register();
-    }
-
-    private void registerRegistries(NewRegistryEvent event) {
-        Registries.onCreateRegistries(event);
     }
 
     private void loadComplete(FMLLoadCompleteEvent event) {
