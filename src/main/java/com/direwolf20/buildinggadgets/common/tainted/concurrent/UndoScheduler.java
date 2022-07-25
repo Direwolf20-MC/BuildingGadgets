@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.world.BlockEvent.BreakEvent;
+import net.minecraftforge.event.level.BlockEvent;
 
 import java.util.Map;
 import java.util.Objects;
@@ -73,7 +73,7 @@ public final class UndoScheduler extends SteppedScheduler {
             return;
         }
         if (! state.isAir()) {
-            BreakEvent event = new BreakEvent(context.getServerWorld(), entry.getKey(), state, context.getPlayer());
+            BlockEvent.BreakEvent event = new BlockEvent.BreakEvent(context.getServerWorld(), entry.getKey(), state, context.getPlayer());
             if (MinecraftForge.EVENT_BUS.post(event)) {
                 lastWasSuccess = false;
                 return;

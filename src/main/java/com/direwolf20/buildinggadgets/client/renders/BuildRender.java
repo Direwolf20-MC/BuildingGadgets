@@ -18,6 +18,7 @@ import com.direwolf20.buildinggadgets.common.util.helpers.VectorHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
@@ -28,8 +29,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -49,7 +50,7 @@ public class BuildRender extends BaseRenderer {
     }
 
     @Override
-    public void render(RenderLevelLastEvent evt, Player player, ItemStack heldItem) {
+    public void render(RenderLevelStageEvent evt, Player player, ItemStack heldItem) {
         super.render(evt, player, heldItem);
 
         BlockHitResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
@@ -109,7 +110,7 @@ public class BuildRender extends BaseRenderer {
             OurRenderTypes.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new OurRenderTypes.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().renderBuffers().bufferSource(), .55f);
             try {
                 dispatcher.renderSingleBlock(
-                        state, matrix, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE
+                        state, matrix, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, ModelData.EMPTY, RenderType.solid()
                 );
             } catch (Exception ignored) {} // I'm sure if this is an issue someone will report it
 

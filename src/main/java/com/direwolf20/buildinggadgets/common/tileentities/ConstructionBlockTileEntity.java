@@ -8,9 +8,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraftforge.client.model.data.ModelData;
+import net.minecraftforge.client.model.data.ModelDataManager;
 import net.minecraftforge.client.model.data.ModelProperty;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 
@@ -29,15 +30,14 @@ public class ConstructionBlockTileEntity extends BlockEntity {
     }
 
     // TODO: query simulated Tile, if exists, and relay model data...
-    @Nonnull
     @Override
-    public IModelData getModelData() {
+    public @NotNull ModelData getModelData() {
         if (blockState == null) {
             return super.getModelData();
         }
 
         BlockState state = blockState.getState();
-        return new ModelDataMap.Builder().withInitial(FACADE_STATE, state).build();
+        return ModelData.builder().with(FACADE_STATE, state).build();
     }
 
     @Nonnull
