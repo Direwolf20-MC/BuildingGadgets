@@ -81,7 +81,7 @@ public class TemplateManager extends Block implements EntityBlock {
             });
         });
 
-        NetworkHooks.openGui((ServerPlayer) player, (TemplateManagerTileEntity) te, pos);
+        NetworkHooks.openScreen((ServerPlayer) player, (TemplateManagerTileEntity) te, pos);
         return InteractionResult.SUCCESS;
     }
 }

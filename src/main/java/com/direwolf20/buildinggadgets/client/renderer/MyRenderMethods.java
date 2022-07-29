@@ -24,7 +24,7 @@ public class MyRenderMethods {
                 f2 = 1f;
             }
 
-            builder.putBulkData(matrixEntry, bakedquad, f, f1, f2, alpha, combinedLightsIn, combinedOverlayIn);
+            builder.putBulkData(matrixEntry, bakedquad, f, f1, f2, alpha, combinedLightsIn, combinedOverlayIn, true);
         }
     }
 }

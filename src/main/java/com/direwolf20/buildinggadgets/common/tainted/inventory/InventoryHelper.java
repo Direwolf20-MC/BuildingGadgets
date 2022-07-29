@@ -124,7 +124,7 @@ public class InventoryHelper {
         List<Integer> slots = findItem(itemStack.getItem(), inv);
         for (int slot : slots) {
             ItemStack stackInSlot = inv.getItem(slot);
-            if (stackInSlot.getCount() < stackInSlot.getItem().getItemStackLimit(stackInSlot)) {
+            if (stackInSlot.getCount() < stackInSlot.getItem().getMaxStackSize(stackInSlot)) {
                 ItemStack giveItemStack = itemStack.copy();
                 boolean success = inv.add(giveItemStack);
                 if (success) return true;

@@ -8,14 +8,17 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.ClientRegistry;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import org.lwjgl.glfw.GLFW;
 
-public class KeyBindings {
+import java.util.ArrayList;
+import java.util.List;
 
+public class KeyBindings {
     private static final KeyConflictContextGadget CONFLICT_CONTEXT_GADGET = new KeyConflictContextGadget();
+
     public static KeyMapping menuSettings;
     public static KeyMapping range;
     public static KeyMapping rotateMirror;
@@ -24,6 +27,8 @@ public class KeyBindings {
     public static KeyMapping fuzzy;
     public static KeyMapping connectedArea;
     public static KeyMapping materialList;
+
+    private static final List<KeyMapping> keyMappings = new ArrayList<>();
 
     public static void init() {
         menuSettings = createBinding("settings_menu", GLFW.GLFW_KEY_G);
@@ -38,12 +43,17 @@ public class KeyBindings {
 
     private static KeyMapping createBinding(String name, int key) {
         KeyMapping keyBinding = new KeyMapping(getKey(name), CONFLICT_CONTEXT_GADGET, InputConstants.Type.KEYSYM.getOrCreate(key), getKey("category"));
-        ClientRegistry.registerKeyBinding(keyBinding);
+        keyMappings.add(keyBinding);
         return keyBinding;
     }
 
     private static String getKey(String name) {
         return String.join(".", "key", Reference.MODID, name);
+    }
+
+    public static void register(RegisterKeyMappingsEvent event) {
+        System.out.println(keyMappings.size());
+        keyMappings.forEach(event::register);
     }
 
     public static class KeyConflictContextGadget implements IKeyConflictContext

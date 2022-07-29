@@ -8,7 +8,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public final class OurContainers {
-    public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.CONTAINERS, Reference.MODID);
+    public static final DeferredRegister<MenuType<?>> CONTAINERS = DeferredRegister.create(ForgeRegistries.MENU_TYPES, Reference.MODID);
 
     public static final RegistryObject<MenuType<TemplateManagerContainer>> TEMPLATE_MANAGER_CONTAINER
             = CONTAINERS.register("template_manager_container", () -> IForgeMenuType.create(TemplateManagerContainer::new));

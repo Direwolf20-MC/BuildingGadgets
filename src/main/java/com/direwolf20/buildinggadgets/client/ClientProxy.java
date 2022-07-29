@@ -29,11 +29,11 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.client.model.data.IDynamicBakedModel;
-import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.IDynamicBakedModel;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -49,10 +49,10 @@ public class ClientProxy {
     public static void clientSetup(final IEventBus eventBus) {
         KeyBindings.init();
 
-        MinecraftForgeClient.registerTooltipComponentFactory(EventTooltip.CopyPasteTooltipComponent.Data.class, EventTooltip.CopyPasteTooltipComponent::new);
-
         eventBus.addListener(ClientProxy::bakeModels);
+        eventBus.addListener(KeyBindings::register);
         eventBus.addListener(ClientProxy::registerSprites);
+        eventBus.addListener(ClientProxy::registerTooltipFactory);
 //        MinecraftForge.EVENT_BUS.addListener(EventTooltip::onDrawTooltip);
         MinecraftForge.EVENT_BUS.addListener(ClientProxy::onPlayerLoggedOut);
 
@@ -61,6 +61,10 @@ public class ClientProxy {
 
         ItemBlockRenderTypes.setRenderLayer(OurBlocks.CONSTRUCTION_BLOCK.get(), (RenderType) -> true);
         CACHE_TEMPLATE_PROVIDER.registerUpdateListener(((GadgetCopyPaste) OurItems.COPY_PASTE_GADGET_ITEM.get()).getRender());
+    }
+
+    private static void registerTooltipFactory(RegisterClientTooltipComponentFactoriesEvent event) {
+        event.register(EventTooltip.CopyPasteTooltipComponent.Data.class, EventTooltip.CopyPasteTooltipComponent::new);
     }
 
     private static void registerSprites(TextureStitchEvent.Pre event) {
@@ -76,7 +80,7 @@ public class ClientProxy {
         CACHE_TEMPLATE_PROVIDER.clear();
     }
 
-    private static void bakeModels(ModelBakeEvent event) {
+    private static void bakeModels(ModelEvent.BakingCompleted event) {
         ResourceLocation ConstrName = new ResourceLocation(Reference.MODID, "construction_block");
         TextureAtlasSprite breakPart = Minecraft.getInstance().getBlockRenderer().getBlockModel(Blocks.STONE.defaultBlockState()).getParticleIcon();
         ModelResourceLocation ConstrLocation1 = new ModelResourceLocation(ConstrName, "ambient_occlusion=false,bright=false,neighbor_brightness=false");
@@ -110,18 +114,17 @@ public class ClientProxy {
             }
 
             @Override
-            public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, IModelData modelData) {
-                BakedModel model;
-                BlockState facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
-                RenderType layer = MinecraftForgeClient.getRenderType();
+            public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, ModelData modelData, RenderType type) {
+                BlockState facadeState = modelData.get(ConstructionBlockTileEntity.FACADE_STATE);
                 if (facadeState == null || facadeState == Blocks.AIR.defaultBlockState())
                     facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().defaultBlockState();
-                if (layer != null && !ItemBlockRenderTypes.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
+
+                BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(facadeState);
+                if (type != null && !model.getRenderTypes(facadeState, rand, modelData).contains(type)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
-                model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(facadeState);
-                return model.getQuads(facadeState, side, rand);
 
+                return model.getQuads(facadeState, side, rand, modelData, type);
             }
 
             @Override
@@ -137,7 +140,7 @@ public class ClientProxy {
 
             @Nonnull
             @Override
-            public IModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+            public ModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull ModelData tileData) {
                 return tileData;
             }
         };
@@ -164,18 +167,17 @@ public class ClientProxy {
             }
 
             @Override
-            public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, IModelData modelData) {
-                BakedModel model;
-                BlockState facadeState = modelData.getData(ConstructionBlockTileEntity.FACADE_STATE);
-                RenderType layer = MinecraftForgeClient.getRenderType();
+            public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction side, RandomSource rand, ModelData modelData, RenderType type) {
+                BlockState facadeState = modelData.get(ConstructionBlockTileEntity.FACADE_STATE);
                 if (facadeState == null || facadeState == Blocks.AIR.defaultBlockState())
                     facadeState = OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().defaultBlockState();
-                if (layer != null && !ItemBlockRenderTypes.canRenderInLayer(facadeState, layer)) { // always render in the null layer or the block-breaking textures don't show up
+
+                BakedModel model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(facadeState);
+                if (type != null && !model.getRenderTypes(facadeState, rand, modelData).contains(type)) { // always render in the null layer or the block-breaking textures don't show up
                     return Collections.emptyList();
                 }
-                model = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(facadeState);
-                return model.getQuads(facadeState, side, rand);
 
+                return model.getQuads(facadeState, side, rand, modelData, type);
             }
 
             @Override
@@ -191,17 +193,18 @@ public class ClientProxy {
 
             @Nonnull
             @Override
-            public IModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull IModelData tileData) {
+            public ModelData getModelData(@Nonnull BlockAndTintGetter world, @Nonnull BlockPos pos, @Nonnull BlockState state, @Nonnull ModelData tileData) {
                 return tileData;
             }
         };
-        event.getModelRegistry().put(ConstrLocation1, bakedModelLoader);
-        event.getModelRegistry().put(ConstrLocation2, bakedModelLoader);
-        event.getModelRegistry().put(ConstrLocation3, bakedModelLoader);
-        event.getModelRegistry().put(ConstrLocation4, bakedModelLoader);
-        event.getModelRegistry().put(ConstrLocation1a, bakedModelLoaderAmbient);
-        event.getModelRegistry().put(ConstrLocation2a, bakedModelLoaderAmbient);
-        event.getModelRegistry().put(ConstrLocation3a, bakedModelLoaderAmbient);
-        event.getModelRegistry().put(ConstrLocation4a, bakedModelLoaderAmbient);
+
+        event.getModels().put(ConstrLocation1, bakedModelLoader);
+        event.getModels().put(ConstrLocation2, bakedModelLoader);
+        event.getModels().put(ConstrLocation3, bakedModelLoader);
+        event.getModels().put(ConstrLocation4, bakedModelLoader);
+        event.getModels().put(ConstrLocation1a, bakedModelLoaderAmbient);
+        event.getModels().put(ConstrLocation2a, bakedModelLoaderAmbient);
+        event.getModels().put(ConstrLocation3a, bakedModelLoaderAmbient);
+        event.getModels().put(ConstrLocation4a, bakedModelLoaderAmbient);
     }
 }

@@ -4,7 +4,6 @@ import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.tainted.building.BlockData;
 import com.direwolf20.buildinggadgets.common.tileentities.EffectBlockTileEntity;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
@@ -16,7 +15,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.EmptyModelData;
 import net.minecraftforge.client.model.data.ModelData;
 
 public class EffectBlockTER implements BlockEntityRenderer<EffectBlockTileEntity> {
@@ -90,7 +88,7 @@ public class EffectBlockTER implements BlockEntityRenderer<EffectBlockTileEntity
 
         if (alpha > 0.33f)
             alpha = 0.33f;
-        
+
         Matrix4f matrix = stack.last().pose();
 
         // Down

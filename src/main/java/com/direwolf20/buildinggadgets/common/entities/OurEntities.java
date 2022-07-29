@@ -13,7 +13,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 @Mod.EventBusSubscriber(modid = Reference.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class OurEntities {
-    public static final DeferredRegister<EntityType<?>> ENTITY_REGISTER = DeferredRegister.create(ForgeRegistries.ENTITIES, Reference.MODID);
+    public static final DeferredRegister<EntityType<?>> ENTITY_REGISTER = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Reference.MODID);
 
     public static final RegistryObject<EntityType<ConstructionBlockEntity>> CONSTRUCTION_BLOCK_ENTITY = ENTITY_REGISTER.register("construction_block_entity", () -> EntityType.Builder.<ConstructionBlockEntity>of(ConstructionBlockEntity::new, MobCategory.MISC)
             .setTrackingRange(64)

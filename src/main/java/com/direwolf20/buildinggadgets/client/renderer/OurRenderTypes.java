@@ -211,11 +211,6 @@ public class OurRenderTypes extends RenderType {
             public void unsetDefaultColor() {
                 inner.unsetDefaultColor();
             }
-
-            @Override
-            public VertexFormat getVertexFormat() {
-                return inner.getVertexFormat();
-            }
         }
     }
 }
