@@ -2,7 +2,6 @@ package com.direwolf20.buildinggadgets.common.blocks;
 
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
 import com.direwolf20.buildinggadgets.common.tileentities.OurTileEntities;
-import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -109,7 +108,7 @@ public class ConstructionBlock extends Block implements EntityBlock /*implements
     }
 
     @Nullable
-    private BlockState getActualMimicBlock(BlockGetter blockAccess, BlockPos pos) {
+    public static BlockState getActualMimicBlock(BlockGetter blockAccess, BlockPos pos) {
         BlockEntity te = blockAccess.getBlockEntity(pos);
         if (te instanceof ConstructionBlockTileEntity) {
             return ((ConstructionBlockTileEntity) te).getConstructionBlockData().getState();
@@ -138,20 +137,6 @@ public class ConstructionBlock extends Block implements EntityBlock /*implements
 //        BlockState mimic = getActualMimicBlock(world, pos);
 //        return !isMimicNull(mimic) ? mimic.doesSideBlockRendering(world, pos, face) : super.doesSideBlockRendering(state, world, pos, face);
 //    }
-
-    public void initColorHandler(BlockColors blockColors) {
-        blockColors.register((state, world, pos, tintIndex) -> {
-            if (world != null) {
-                BlockState mimicBlock = getActualMimicBlock(world, pos);
-                try {
-                    return blockColors.getColor(mimicBlock, world, pos, tintIndex);
-                } catch (Exception var8) {
-                    return -1;
-                }
-            }
-            return -1;
-        }, this);
-    }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter worldIn, BlockPos pos, CollisionContext selectionContext) {

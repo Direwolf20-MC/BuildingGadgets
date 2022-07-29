@@ -157,7 +157,6 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
     }
 
     private void renderTargets(PoseStack matrix, Vec3 projectedView, BuildContext context, List<PlacementTarget> targets, BlockPos startPos, IBuildView view) {
-
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
         VertexConsumer builder = buffer.getBuffer(OurRenderTypes.lines());
 
@@ -196,7 +195,7 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
 
         buffer.endBatch(); // @mcp: draw = finish
         matrix.popPose();
-
+        
         // TODO: fix me plz
 //        tickTrack++;
 //        if (renderBuffer != null && tickTrack < 300) {
