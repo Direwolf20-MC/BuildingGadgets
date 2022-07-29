@@ -228,7 +228,7 @@ public class MockDelegationWorld implements LevelAccessor {
 
     @Override
     public Holder<Biome> getBiome(BlockPos p_204167_) {
-        return LevelAccessor.super.getBiome(p_204167_);
+        return delegate.getBiome(p_204167_);
     }
 
     @Override
@@ -405,7 +405,7 @@ public class MockDelegationWorld implements LevelAccessor {
     public int getBrightness(LightLayer p_45518_, BlockPos p_45519_) {
         return delegate.getBrightness(p_45518_, p_45519_);
     }
-    
+
     @Override
     public float getShade(Direction p_230487_1_, boolean p_230487_2_) {
         return 0;

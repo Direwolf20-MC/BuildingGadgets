@@ -8,7 +8,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 
 public final class OurTileEntities {
-    public static final DeferredRegister<BlockEntityType<?>> TILE_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITIES, Reference.MODID);
+    public static final DeferredRegister<BlockEntityType<?>> TILE_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, Reference.MODID);
 
     public static final RegistryObject<BlockEntityType<EffectBlockTileEntity>> EFFECT_BLOCK_TILE_ENTITY =
             TILE_ENTITIES.register("effect_block_tile", () -> BlockEntityType.Builder.of(EffectBlockTileEntity::new, OurBlocks.EFFECT_BLOCK.get()).build(null));

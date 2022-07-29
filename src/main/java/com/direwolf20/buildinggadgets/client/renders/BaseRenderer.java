@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.RenderLevelLastEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -41,7 +42,12 @@ public abstract class BaseRenderer {
 
     private static final RemoteInventoryCache cacheInventory = new RemoteInventoryCache(false);
 
-    public void render(RenderLevelLastEvent evt, Player player, ItemStack heldItem) {
+    public void render(RenderLevelStageEvent evt, Player player, ItemStack heldItem) {
+        // FIXME: might be wrong
+        if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
+            return;
+        }
+
         // This is necessary to prevent issues with not rendering the overlay's at all (when Botania being present) - See #329 for more information
         bindBlocks();
 
@@ -53,7 +59,7 @@ public abstract class BaseRenderer {
         RenderSystem.setShaderTexture(0, InventoryMenu.BLOCK_ATLAS);
     }
 
-    private static void renderLinkedInventoryOutline(RenderLevelLastEvent evt, ItemStack item, Player player) {
+    private static void renderLinkedInventoryOutline(RenderLevelStageEvent evt, ItemStack item, Player player) {
         Pair<BlockPos, ResourceKey<Level>> dataFromStack = InventoryLinker.getDataFromStack(item);
         if (dataFromStack == null) {
             return;

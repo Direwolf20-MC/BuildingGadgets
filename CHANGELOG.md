@@ -1,7 +1,7 @@
 # Changelog
 
-## Fixed
+## Changed
 
-- Actually fixed crashing
+- Ported to the latest version of forge
 
 

@@ -8,42 +8,52 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.ClientRegistry;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.settings.IKeyConflictContext;
 import net.minecraftforge.client.settings.KeyConflictContext;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
+@Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class KeyBindings {
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeyBindings.class);
 
     private static final KeyConflictContextGadget CONFLICT_CONTEXT_GADGET = new KeyConflictContextGadget();
-    public static KeyMapping menuSettings;
-    public static KeyMapping range;
-    public static KeyMapping rotateMirror;
-    public static KeyMapping undo;
-    public static KeyMapping anchor;
-    public static KeyMapping fuzzy;
-    public static KeyMapping connectedArea;
-    public static KeyMapping materialList;
 
-    public static void init() {
-        menuSettings = createBinding("settings_menu", GLFW.GLFW_KEY_G);
-        range = createBinding("range", GLFW.GLFW_KEY_R);
-        undo = createBinding("undo", GLFW.GLFW_KEY_U);
-        anchor = createBinding("anchor", GLFW.GLFW_KEY_H);
-        fuzzy = createBinding("fuzzy", GLFW.GLFW_KEY_UNKNOWN);
-        connectedArea = createBinding("connected_area", GLFW.GLFW_KEY_UNKNOWN);
-        rotateMirror = createBinding("rotate_mirror", GLFW.GLFW_KEY_UNKNOWN);
-        materialList = createBinding("material_list", GLFW.GLFW_KEY_M);
-    }
+    private static final List<KeyMapping> keyMappings = new ArrayList<>();
+
+    public static KeyMapping menuSettings = createBinding("settings_menu",GLFW.GLFW_KEY_G);
+    public static KeyMapping range = createBinding("range", GLFW.GLFW_KEY_R);
+    public static KeyMapping undo = createBinding("undo", GLFW.GLFW_KEY_U);
+    public static KeyMapping anchor = createBinding("anchor", GLFW.GLFW_KEY_H);
+    public static KeyMapping fuzzy = createBinding("fuzzy", GLFW.GLFW_KEY_UNKNOWN);
+    public static KeyMapping connectedArea = createBinding("connected_area", GLFW.GLFW_KEY_UNKNOWN);
+    public static KeyMapping rotateMirror = createBinding("rotate_mirror", GLFW.GLFW_KEY_UNKNOWN);
+    public static KeyMapping materialList = createBinding("material_list", GLFW.GLFW_KEY_M);
+
+    public static void init() {}
 
     private static KeyMapping createBinding(String name, int key) {
         KeyMapping keyBinding = new KeyMapping(getKey(name), CONFLICT_CONTEXT_GADGET, InputConstants.Type.KEYSYM.getOrCreate(key), getKey("category"));
-        ClientRegistry.registerKeyBinding(keyBinding);
+        keyMappings.add(keyBinding);
         return keyBinding;
     }
 
     private static String getKey(String name) {
         return String.join(".", "key", Reference.MODID, name);
+    }
+
+    @SubscribeEvent
+    static void register(RegisterKeyMappingsEvent event) {
+        LOGGER.debug("Registering {} keybinding for {}", keyMappings.size(), Reference.MODID);
+        keyMappings.forEach(event::register);
     }
 
     public static class KeyConflictContextGadget implements IKeyConflictContext

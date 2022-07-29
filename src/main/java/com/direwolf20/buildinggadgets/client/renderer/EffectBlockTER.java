@@ -9,12 +9,13 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Matrix4f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.data.ModelData;
 
 public class EffectBlockTER implements BlockEntityRenderer<EffectBlockTileEntity> {
 
@@ -56,7 +57,7 @@ public class EffectBlockTER implements BlockEntityRenderer<EffectBlockTileEntity
         OurRenderTypes.MultiplyAlphaRenderTypeBuffer mutatedBuffer = new OurRenderTypes.MultiplyAlphaRenderTypeBuffer(Minecraft.getInstance().renderBuffers().bufferSource(), .55f);
         try {
             dispatcher.renderSingleBlock(
-                    renderBlockState, stack, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, EmptyModelData.INSTANCE
+                    renderBlockState, stack, mutatedBuffer, 15728640, OverlayTexture.NO_OVERLAY, ModelData.EMPTY, RenderType.solid()
             );
         } catch (Exception ignored) {} // if it fails to render then we'll get a bug report I'm sure.
 
@@ -87,7 +88,7 @@ public class EffectBlockTER implements BlockEntityRenderer<EffectBlockTileEntity
 
         if (alpha > 0.33f)
             alpha = 0.33f;
-        
+
         Matrix4f matrix = stack.last().pose();
 
         // Down

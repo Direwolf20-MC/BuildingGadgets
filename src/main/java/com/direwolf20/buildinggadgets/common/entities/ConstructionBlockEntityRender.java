@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.client.model.data.ModelData;
 
 import static com.direwolf20.buildinggadgets.client.renderer.MyRenderMethods.renderModelBrightnessColorQuads;
 
@@ -51,7 +51,7 @@ public class ConstructionBlockEntityRender extends EntityRenderer<ConstructionBl
         float f2 = (float) (color & 255) / 255.0F;
         BakedModel ibakedmodel = blockrendererdispatcher.getBlockModel(renderBlockState);
         for (Direction direction : Direction.values()) {
-            renderModelBrightnessColorQuads(matrixStackIn.last(), builder, f, f1, f2, scale, ibakedmodel.getQuads(renderBlockState, direction, RandomSource.create(Mth.getSeed(entityIn.blockPosition())), EmptyModelData.INSTANCE), 15728640, 655360);
+            renderModelBrightnessColorQuads(matrixStackIn.last(), builder, f, f1, f2, scale, ibakedmodel.getQuads(renderBlockState, direction, RandomSource.create(Mth.getSeed(entityIn.blockPosition())), ModelData.EMPTY, OurRenderTypes.RenderBlock), 15728640, 655360);
         }
         matrixStackIn.popPose();
     }

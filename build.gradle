@@ -91,6 +91,25 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:${jei_version}")
 }
 
+processResources {
+    // This might be the wrong way of doing it but basically this file doesn't always get updated
+    // for some reason so I'm deleting it before it's generated again
+    def path = new File("${project.buildDir}/resources/main/META-INF/mods.toml")
+    if (path.exists()) {
+        path.delete()
+    }
+
+    exclude '.cache'
+    inputs.property "version", project.version
+
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version,
+                "forgeversion": project.forge_version,
+                "forgeshortversion": project.forge_version.split("\\.")[0],
+                "mcversion": project.minecraft_version
+    }
+}
+
 jar {
     finalizedBy 'reobfJar'
 
