@@ -195,7 +195,7 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
 
         buffer.endBatch(); // @mcp: draw = finish
         matrix.popPose();
-        
+
         // TODO: fix me plz
 //        tickTrack++;
 //        if (renderBuffer != null && tickTrack < 300) {
