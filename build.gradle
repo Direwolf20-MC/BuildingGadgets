@@ -1,25 +1,13 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-    }
-}
-
 plugins {
+    id 'eclipse'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '5.1.+'
     id "com.matthewprenger.cursegradle" version "1.4.0"
 }
 
 apply {
     // "Simple" fix for M1 (Apple Silicon) macs in the dev environment... All thanks to @mezz
     from "https://raw.githubusercontent.com/mezz/JustEnoughItems/1.18/Forge/buildtools/AppleSiliconSupport.gradle"
-
-    plugin "java"
-    plugin "idea"
-    plugin "maven-publish"
-    plugin "net.minecraftforge.gradle"
 }
 
 def ENV = System.getenv()
@@ -86,9 +74,9 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    compileOnly fg.deobf("mezz.jei:jei-1.19-common-api:${jei_version}")
-    compileOnly fg.deobf("mezz.jei:jei-1.19-forge-api:${jei_version}")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}")
+    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge-api:${jei_version}")
+    runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}-forge:${jei_version}")
 }
 
 processResources {
@@ -146,6 +134,7 @@ publishing {
             }
         }
     }
+
     repositories {
         maven {
             name = "GitHubPackages"
