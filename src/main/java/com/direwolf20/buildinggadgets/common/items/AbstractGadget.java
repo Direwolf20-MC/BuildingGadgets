@@ -46,9 +46,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.DistExecutor;
 import org.apache.commons.lang3.tuple.Pair;
@@ -125,7 +125,7 @@ public abstract class AbstractGadget extends Item {
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
+        LazyOptional<IEnergyStorage> cap = stack.getCapability(ForgeCapabilities.ENERGY);
         if (!cap.isPresent())
             return super.getBarWidth(stack);
 
@@ -135,7 +135,7 @@ public abstract class AbstractGadget extends Item {
 
     @Override
     public int getBarColor(ItemStack stack) {
-        LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
+        LazyOptional<IEnergyStorage> cap = stack.getCapability(ForgeCapabilities.ENERGY);
         if (!cap.isPresent())
             return super.getBarColor(stack);
 
@@ -145,7 +145,7 @@ public abstract class AbstractGadget extends Item {
 
     @Override
     public boolean isDamaged(ItemStack stack) {
-        LazyOptional<IEnergyStorage> cap = stack.getCapability(CapabilityEnergy.ENERGY);
+        LazyOptional<IEnergyStorage> cap = stack.getCapability(ForgeCapabilities.ENERGY);
         if (!cap.isPresent())
             return super.isDamaged(stack);
 
@@ -159,12 +159,12 @@ public abstract class AbstractGadget extends Item {
         if (stack.hasTag() && stack.getTag().contains(NBTKeys.CREATIVE_MARKER))
             return false;
 
-        return stack.getCapability(CapabilityEnergy.ENERGY).map(e -> e.getEnergyStored() != e.getMaxEnergyStored()).orElse(super.isBarVisible(stack));
+        return stack.getCapability(ForgeCapabilities.ENERGY).map(e -> e.getEnergyStored() != e.getMaxEnergyStored()).orElse(super.isBarVisible(stack));
     }
 
     @Override
     public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-        return !toRepair.getCapability(CapabilityEnergy.ENERGY).isPresent() && repair.getItem() == Items.DIAMOND;
+        return !toRepair.getCapability(ForgeCapabilities.ENERGY).isPresent() && repair.getItem() == Items.DIAMOND;
     }
 
     public boolean isAllowedBlock(BlockState block) {
@@ -190,21 +190,21 @@ public abstract class AbstractGadget extends Item {
         if (player.isCreative() || getEnergyMax() == 0)
             return true;
 
-        return getEnergyCost(tool) <= tool.getCapability(CapabilityEnergy.ENERGY).map(IEnergyStorage::getEnergyStored).orElse(0);
+        return getEnergyCost(tool) <= tool.getCapability(ForgeCapabilities.ENERGY).map(IEnergyStorage::getEnergyStored).orElse(0);
     }
 
     public void applyDamage(ItemStack tool, ServerPlayer player) {
         if (player.isCreative() || getEnergyMax() == 0)
             return;
 
-        tool.getCapability(CapabilityEnergy.ENERGY).ifPresent(e -> ((IPrivateEnergy) e).extractPower(getEnergyCost(tool), false));
+        tool.getCapability(ForgeCapabilities.ENERGY).ifPresent(e -> ((IPrivateEnergy) e).extractPower(getEnergyCost(tool), false));
     }
 
     protected void addEnergyInformation(List<Component> tooltip, ItemStack stack) {
         if (getEnergyMax() == 0)
             return;
 
-        stack.getCapability(CapabilityEnergy.ENERGY).ifPresent(energy -> {
+        stack.getCapability(ForgeCapabilities.ENERGY).ifPresent(energy -> {
             tooltip.add(TooltipTranslation.GADGET_ENERGY
                     .componentTranslation(withSuffix(energy.getEnergyStored()), withSuffix(energy.getMaxEnergyStored()))
                     .setStyle(Styles.GRAY));

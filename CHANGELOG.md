@@ -1,7 +1,8 @@
 # Changelog
 
-## Changed
+## Fixed
 
-- Ported to 1.19.1
+- Rewrote the Sliders for the Range slider and the Destruction Gadgets sliders. They should function a little nicer and be less buggy
+- General code cleanup
 
 

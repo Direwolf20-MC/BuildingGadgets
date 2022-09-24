@@ -23,10 +23,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.client.event.RenderLevelLastEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -90,7 +89,7 @@ public abstract class BaseRenderer {
 
 
     int getEnergy(Player player, ItemStack heldItem) {
-        LazyOptional<IEnergyStorage> energy = heldItem.getCapability(CapabilityEnergy.ENERGY);
+        LazyOptional<IEnergyStorage> energy = heldItem.getCapability(ForgeCapabilities.ENERGY);
         if (player.isCreative() || !energy.isPresent())
             return Integer.MAX_VALUE;
 

@@ -8,7 +8,8 @@ package com.direwolf20.buildinggadgets.client.screen;
 import com.direwolf20.buildinggadgets.client.KeyBindings;
 import com.direwolf20.buildinggadgets.client.OurSounds;
 import com.direwolf20.buildinggadgets.client.renderer.OurRenderTypes;
-import com.direwolf20.buildinggadgets.client.screen.components.GuiIconActionable;
+import com.direwolf20.buildinggadgets.client.screen.widgets.GuiIconActionable;
+import com.direwolf20.buildinggadgets.client.screen.widgets.IncrementalSliderWidget;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.*;
 import com.direwolf20.buildinggadgets.common.items.modes.BuildingModes;
@@ -16,6 +17,7 @@ import com.direwolf20.buildinggadgets.common.items.modes.ExchangingModes;
 import com.direwolf20.buildinggadgets.common.network.PacketHandler;
 import com.direwolf20.buildinggadgets.common.network.packets.*;
 import com.direwolf20.buildinggadgets.common.util.GadgetUtils;
+import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.MessageTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.RadialTranslation;
 import com.direwolf20.buildinggadgets.common.util.lang.Styles;
@@ -151,7 +153,9 @@ public class ModeRadialMenu extends Screen {
             }
             if (!isDestruction) {
                 int widthSlider = 82;
-//                GuiSliderInt sliderRange = new GuiSliderInt(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, GuiTranslation.SINGLE_RANGE.componentTranslation().append(Component.literal(": ")), Component.literal(""), 1, Config.GADGETS.maxRange.get(),
+                IncrementalSliderWidget sliderRange = new IncrementalSliderWidget(width / 2 - widthSlider / 2, height / 2 + 72, widthSlider, 14, 1, Config.GADGETS.maxRange.get(), GuiTranslation.SINGLE_RANGE.componentTranslation().append(": "),  GadgetUtils.getToolRange(tool), slider -> {
+                    sendRangeUpdate(slider.getValueInt());
+                });
 //                        GadgetUtils.getToolRange(tool), false, true, Color.DARK_GRAY, slider -> {
 //                    GuiSliderInt sliderI = (GuiSliderInt) slider;
 //                    this.sendRangeUpdate(sliderI.getValueInt());
@@ -163,8 +167,7 @@ public class ModeRadialMenu extends Screen {
 //                    slider.updateSlider();
 //                }
 //                );
-//                sliderRange.precision = 1;
-//                sliderRange.getComponents().forEach(this::addRenderableWidget);
+                sliderRange.getComponents().forEach(this::addRenderableWidget);
             }
         } else {
             // Copy Paste specific
