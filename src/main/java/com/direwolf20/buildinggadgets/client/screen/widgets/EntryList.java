@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.screen.components;
+package com.direwolf20.buildinggadgets.client.screen.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;

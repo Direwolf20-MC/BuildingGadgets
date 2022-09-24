@@ -63,9 +63,8 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult.Type;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
@@ -319,7 +318,7 @@ public class GadgetCopyPaste extends AbstractGadget {
 
         BlockHitResult posLookingAt = VectorHelper.getLookingAt(player, stack);
         BlockEntity tileEntity = world.getBlockEntity(posLookingAt.getBlockPos());
-        boolean lookingAtInventory = tileEntity != null && tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).isPresent();
+        boolean lookingAtInventory = tileEntity != null && tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).isPresent();
 
         if (!world.isClientSide()) {
             if (player.isShiftKeyDown() && lookingAtInventory) {
@@ -469,7 +468,7 @@ public class GadgetCopyPaste extends AbstractGadget {
         boolean overwrite = Config.GENERAL.allowOverwriteBlocks.get();
         BlockPlaceContext useContext = new BlockPlaceContext(new UseOnContext(player, InteractionHand.MAIN_HAND, VectorHelper.getLookingAt(player, stack)));
         PlacementChecker checker = new PlacementChecker(
-                stack.getCapability(CapabilityEnergy.ENERGY),
+                stack.getCapability(ForgeCapabilities.ENERGY),
                 t -> energyCost,
                 index,
                 (c, t) -> overwrite ? c.getWorld().getBlockState(t.getPos()).canBeReplaced(useContext) : c.getWorld().isEmptyBlock(t.getPos()),

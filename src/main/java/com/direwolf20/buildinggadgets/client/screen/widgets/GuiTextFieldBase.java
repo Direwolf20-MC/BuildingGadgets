@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.screen.components;
+package com.direwolf20.buildinggadgets.client.screen.widgets;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.EditBox;

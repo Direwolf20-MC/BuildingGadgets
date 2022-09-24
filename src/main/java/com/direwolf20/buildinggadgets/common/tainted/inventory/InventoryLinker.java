@@ -12,8 +12,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -25,7 +25,7 @@ public class InventoryLinker {
      */
     public static Result linkInventory(Level world, ItemStack stack, BlockHitResult trace) {
         BlockEntity tileEntity = world.getBlockEntity(trace.getBlockPos());
-        if (tileEntity == null || !tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).isPresent()) {
+        if (tileEntity == null || !tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).isPresent()) {
             return Result.fail(MessageTranslation.INVALID_BOUND_TILE);
         }
 
@@ -64,7 +64,7 @@ public class InventoryLinker {
             return LazyOptional.empty();
         }
 
-        return tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+        return tileEntity.getCapability(ForgeCapabilities.ITEM_HANDLER);
     }
 
     public static LazyOptional<IItemHandler> getLinkedInventory(Level world, ItemStack stack) {

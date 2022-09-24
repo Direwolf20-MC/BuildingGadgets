@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.screen.components;
+package com.direwolf20.buildinggadgets.client.screen.widgets;
 
 import com.direwolf20.buildinggadgets.client.OurSounds;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;

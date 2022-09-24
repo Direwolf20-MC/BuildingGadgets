@@ -4,9 +4,9 @@ import com.direwolf20.buildinggadgets.common.tainted.registry.Registries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import java.util.*;
@@ -44,7 +44,7 @@ public final class ItemHandlerProvider implements IHandleProvider {
     public boolean index(ICapabilityProvider capProvider, Map<Class<?>, Map<Object, List<IObjectHandle<?>>>> indexMap, Set<Class<?>> indexedClasses) {
         if (indexedClasses.contains(Item.class))
             return false;
-        LazyOptional<IItemHandler> cap = capProvider.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY);
+        LazyOptional<IItemHandler> cap = capProvider.getCapability(ForgeCapabilities.ITEM_HANDLER);
         if (! cap.isPresent())
             return false;
         IItemHandler handler = cap.orElseThrow(RuntimeException::new);

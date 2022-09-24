@@ -33,8 +33,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fml.InterModComms;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 
@@ -95,7 +95,7 @@ public class InventoryHelper {
         List<IItemHandler> handlers = new ArrayList<>();
 
         InventoryLinker.getLinkedInventory(player.level, stack).ifPresent(handlers::add);
-        player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).ifPresent(handlers::add);
+        player.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handlers::add);
 
         return handlers;
     }
@@ -218,7 +218,7 @@ public class InventoryHelper {
 
         for (int i = 0; i < 36; ++i) {
             ItemStack stack = inv.getItem(i);
-            stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+            stack.getCapability(ForgeCapabilities.ITEM_HANDLER)
                     .ifPresent(containers::add);
         }
 

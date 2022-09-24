@@ -1,4 +1,4 @@
-package com.direwolf20.buildinggadgets.client.screen.components;
+package com.direwolf20.buildinggadgets.client.screen.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
