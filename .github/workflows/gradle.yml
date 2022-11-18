@@ -16,11 +16,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: 'gradle'
-      - name: Build with Gradle
-        run: |
-          chmod +x ./gradlew
-          ./gradlew build --no-daemon
+      - name: Build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
       - name: Setting mod version
         run: |
           cat $GITHUB_WORKSPACE/gradle.properties | grep ^version= >> $GITHUB_ENV
