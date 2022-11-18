@@ -17,9 +17,6 @@ jobs:
           java-version: '17'
       - name: Publish to Maven & Curseforge
         uses: gradle/gradle-build-action@v2
-        run: |
-          chmod +x ./gradlew
-          ./gradlew build publish --no-daemon
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CURSE_TOKEN: ${{ secrets.CURSE_TOKEN }}
