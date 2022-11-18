@@ -1,5 +1,5 @@
 # Changelog
 
-## Changed
+## Fixed
 
-- Ported to 1.18.2
+- Resolved possible NPE issues with mimic blocks after forced removal

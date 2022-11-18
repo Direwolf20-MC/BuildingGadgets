@@ -143,6 +143,10 @@ public class ConstructionBlock extends Block implements EntityBlock /*implements
         blockColors.register((state, world, pos, tintIndex) -> {
             if (world != null) {
                 BlockState mimicBlock = getActualMimicBlock(world, pos);
+                if (isMimicNull(mimicBlock)) {
+                    return -1;
+                }
+
                 try {
                     return blockColors.getColor(mimicBlock, world, pos, tintIndex);
                 } catch (Exception var8) {
@@ -205,6 +209,10 @@ public class ConstructionBlock extends Block implements EntityBlock /*implements
     @Override
     public VoxelShape getOcclusionShape(BlockState state, BlockGetter worldIn, BlockPos pos) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
+        if (isMimicNull(mimic)) {
+            return super.getOcclusionShape(state, worldIn, pos);
+        }
+
         if (!mimic.canOcclude()) {
             return Shapes.empty();
         }
