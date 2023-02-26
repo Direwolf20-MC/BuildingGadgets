@@ -38,9 +38,9 @@ public class SurfaceMode extends AbstractMode {
     }
 
     @Override
-    public boolean validator(Player player, BlockPos pos, UseContext context) {
+    public boolean validator(BlockPos pos, UseContext context) {
         // Do our default checks, then do our more complex fuzzy aware checks.
-        boolean topRow = super.validator(player, pos, context);
+        boolean topRow = super.validator(pos, context);
         if( this.isExchanging() )
             return topRow;
 

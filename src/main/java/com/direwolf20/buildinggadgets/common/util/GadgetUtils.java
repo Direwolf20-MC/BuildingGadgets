@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.common.util;
 
 import com.direwolf20.buildinggadgets.common.blocks.EffectBlock;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityTemplate;
+import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.items.AbstractGadget;
 import com.direwolf20.buildinggadgets.common.items.GadgetBuilding;
 import com.direwolf20.buildinggadgets.common.items.GadgetExchanger;
@@ -129,7 +130,7 @@ public class GadgetUtils {
 
     public static int getToolRange(ItemStack stack) {
         CompoundTag tagCompound = stack.getOrCreateTag();
-        return Mth.clamp(tagCompound.getInt("range"), 1, 15);
+        return Mth.clamp(tagCompound.getInt("range"), 1, Config.GADGETS.maxRange.get());
     }
 
     public static BlockData rotateOrMirrorBlock(Player player, PacketRotateMirror.Operation operation, BlockData data) {
@@ -239,7 +240,7 @@ public class GadgetUtils {
             return false;
 
         BlockData blockData = getToolBlock(stack);
-        AbstractMode.UseContext context = new AbstractMode.UseContext(player.level, blockData.getState(), startBlock, stack, sideHit, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack), stack.getItem() instanceof GadgetBuilding ? GadgetBuilding.getConnectedArea(stack) : GadgetExchanger.getConnectedArea(stack));
+        AbstractMode.UseContext context = new AbstractMode.UseContext(player.level, player, blockData.getState(), startBlock, stack, sideHit, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack), stack.getItem() instanceof GadgetBuilding ? GadgetBuilding.getConnectedArea(stack) : GadgetExchanger.getConnectedArea(stack));
 
         List<BlockPos> coords = stack.getItem() instanceof GadgetBuilding
                 ? GadgetBuilding.getToolMode(stack).getMode().getCollection(context, player)

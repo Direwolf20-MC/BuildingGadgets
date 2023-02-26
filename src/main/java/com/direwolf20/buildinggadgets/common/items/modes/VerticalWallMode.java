@@ -1,10 +1,10 @@
 package com.direwolf20.buildinggadgets.common.items.modes;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,41 +16,20 @@ public class VerticalWallMode extends AbstractMode {
 
     @Override
     List<BlockPos> collect(UseContext context, Player player, BlockPos start) {
-        List<BlockPos> coordinates = new ArrayList<>();
+        int size = (context.getRange() - 1) / 2;
 
-        // Handle top and bottom
-        int halfRange = context.getRange() / 2;
-        if( XYZ.isAxisY(context.getHitSide()) ) {
-            // This allows us to figure out how to move the render
-            XYZ xyz = XYZ.fromFacing(player.getDirection().getOpposite());
-            for(int i = 0; i < context.getRange(); i ++ ) {
-                for(int j = -halfRange; j <= halfRange; j ++) {
-                    int value = XYZ.invertOnFace(context.getHitSide(), i);
+        Direction hitSide = context.getHitSide();
+        var side = hitSide.getAxis() == Direction.Axis.Y ? player.getDirection().getOpposite().getAxis() : hitSide.getAxis();
 
-                    // Depending on the player view, change the expansion point.
-                    coordinates.add(
-                            xyz == XYZ.X
-                                ? new BlockPos(start.getX(), start.getY() + value, start.getZ() + j)
-                                : new BlockPos(start.getX() + j, start.getY() + value, start.getZ())
-                    );
-                }
-            }
+        var startY = hitSide.getAxis() == Direction.Axis.Y ? start.getY() : start.getY() - size;
+        var endY = hitSide.getAxis() == Direction.Axis.Y ? start.getY() + ((context.getRange() - 1) * (hitSide == Direction.DOWN ? -1 : 1)) : start.getY() + size;
 
-            return coordinates;
-        }
+        AABB box = new AABB(
+            start.getX() - (side == Direction.Axis.Z ? size : 0), startY, start.getZ() - (side == Direction.Axis.X ? size : 0),
+            start.getX() + (side == Direction.Axis.Z ? size : 0), endY, start.getZ() + (side == Direction.Axis.X ? size : 0)
+        );
 
-        // Handle sides. Half and half :D
-        XYZ xyz = XYZ.fromFacing(context.getHitSide());
-        for (int i = -halfRange; i <= halfRange; i ++) {
-            for(int j = -halfRange; j <= halfRange; j++)
-                coordinates.add(
-                        xyz == XYZ.X
-                                ? new BlockPos(start.getX(), start.getY() + i, start.getZ() + j)
-                                : new BlockPos(start.getX() + j, start.getY() + i, start.getZ())
-                );
-        }
-
-        return coordinates;
+        return BlockPos.betweenClosedStream(box).map(BlockPos::immutable).toList();
     }
 
     /**
@@ -59,7 +38,7 @@ public class VerticalWallMode extends AbstractMode {
      * and ignore placeOnTop as this mode does the action by default.
      */
     @Override
-    public BlockPos withOffset(BlockPos pos, Direction side, boolean placeOnTop) {
-        return XYZ.isAxisY(side) ? super.withOffset(pos, side, placeOnTop) : pos;
+    public BlockPos withOffset(UseContext context) {
+        return XYZ.isAxisY(context.getHitSide()) ? super.withOffset(context) : context.getStartPos();
     }
 }

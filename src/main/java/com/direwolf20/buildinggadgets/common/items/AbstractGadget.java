@@ -169,7 +169,7 @@ public abstract class AbstractGadget extends Item {
 
     public boolean isAllowedBlock(BlockState block) {
         if (Lists.newArrayList(Registry.BLOCK.getTagOrEmpty(getWhiteList())).isEmpty()) {
-            return !block.is(getWhiteList());
+            return !block.is(getBlackList());
         }
 
         return block.is(getWhiteList());
