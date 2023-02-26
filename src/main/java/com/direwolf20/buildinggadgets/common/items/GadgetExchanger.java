@@ -224,7 +224,7 @@ public class GadgetExchanger extends AbstractGadget {
         // Get the anchor or build the collection
         Optional<List<BlockPos>> anchor = GadgetUtils.getAnchor(stack);
         List<BlockPos> coords = anchor.orElseGet(
-                () -> getToolMode(stack).getMode().getCollection(new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getBlockPos(), heldItem, lookingAt.getDirection(), getConnectedArea(heldItem)), player)
+                () -> getToolMode(stack).getMode().getCollection(new AbstractMode.UseContext(world, player, blockData.getState(), lookingAt.getBlockPos(), heldItem, lookingAt.getDirection(), getConnectedArea(heldItem)), player)
         );
 
         if (anchor.isPresent()) {

@@ -210,7 +210,7 @@ public class GadgetBuilding extends AbstractGadget {
 
             Direction sideHit = lookingAt.getDirection();
             coords = getToolMode(stack).getMode().getCollection(
-                    new AbstractMode.UseContext(world, blockData.getState(), lookingAt.getBlockPos(), heldItem, sideHit, placeAtop(stack), getConnectedArea(stack)),
+                    new AbstractMode.UseContext(world, player, blockData.getState(), lookingAt.getBlockPos(), heldItem, sideHit, placeAtop(stack), getConnectedArea(stack)),
                     player
             );
         } else  //If we do have an anchor, erase it (Even if the build fails)
