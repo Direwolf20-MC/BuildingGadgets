@@ -137,3 +137,46 @@ artifacts {
     archives deobfJar
     archives sourcesJar
 }
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            artifactId = project.archivesBaseName.toLowerCase()
+            artifact(deobfJar) {
+                classifier 'deobf'
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = "https://maven.pkg.github.com/Direwolf20-MC/BuildingGadgets"
+            credentials {
+                username = ENV.GITHUB_ACTOR
+                password = ENV.GITHUB_TOKEN
+            }
+        }
+    }
+}
+
+if (ENV.CURSE_TOKEN) {
+    curseforge {
+        apiKey = ENV.CURSE_TOKEN
+        project {
+            id = "298187"
+            releaseType = "release"
+            addGameVersion "${minecraft_version}"
+            addGameVersion "Forge"
+            addGameVersion "Java 8"
+            mainArtifact(jar) {
+                relations {
+                    optionalDependency 'charging-gadgets'
+                }
+            }
+            changelog = file('CHANGELOG.md')
+            changelogType = 'markdown'
+        }
+    }
+}

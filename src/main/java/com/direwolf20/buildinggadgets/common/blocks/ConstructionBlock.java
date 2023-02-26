@@ -250,10 +250,13 @@ public class ConstructionBlock extends Block /*implements IFacade*/ {
     @Override
     public VoxelShape getRenderShape(BlockState state, IBlockReader worldIn, BlockPos pos) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
+        if (isMimicNull(mimic)) {
+            return super.getRenderShape(state, worldIn, pos);
+        }
         if (!mimic.isSolid()) {
             return VoxelShapes.empty();
         }
-        return !isMimicNull(mimic) ? mimic.getRenderShape(worldIn, pos) : super.getRenderShape(state, worldIn, pos);
+        return mimic.getRenderShape(worldIn, pos);
     }
 
     @Override
