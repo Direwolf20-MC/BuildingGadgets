@@ -17,19 +17,12 @@ plugins {
 
 apply plugin: 'net.minecraftforge.gradle'
 
-version = "$version"
+def ENV = System.getenv()
+version = "${version}-build.${ENV.GITHUB_RUN_NUMBER ?: 9999}+mc${minecraft_version}"
 group = 'com.direwolf20.buildinggadgets'
 archivesBaseName = "buildinggadgets-${minecraft_version}"
 
 def forge_major = forge_version.tokenize('.')[0]
-
-// Used for CI/CD
-def ENV = System.getenv()
-
-if (ENV.GITHUB_RUN_NUMBER) {
-    version = version + "-SNAPSHOT-" + "${ENV.GITHUB_RUN_NUMBER}"
-}
-
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 minecraft {
