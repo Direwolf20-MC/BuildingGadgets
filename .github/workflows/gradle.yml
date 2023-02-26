@@ -1,8 +1,8 @@
-name: Gradle Build
+name: Build & Create artifact
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main, '1.*' ]
   pull_request:
     branches: [ master ]
 
@@ -10,28 +10,23 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-    - uses: actions/cache@v2
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-    - name: Build with Gradle
-      run: ./gradlew build
-    - name: Setting mod version
-      run: |
-        cat $GITHUB_WORKSPACE/gradle.properties | grep ^version= >> $GITHUB_ENV
-        cat $GITHUB_WORKSPACE/gradle.properties | grep ^minecraft_version= >> $GITHUB_ENV
-    - name: Create package name
-      run: echo "package_name=BuildingGadgets-$minecraft_version-$version-${{ github.head_ref || 'main' }}-SNAPSHOT-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
-    - uses: actions/upload-artifact@v2
-      with:
-        name: ${{ env.package_name }}
-        path: build/libs
+      - uses: actions/checkout@v3
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: 'temurin'
+      - name: Build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build
+      - name: Setting mod version
+        run: |
+          cat $GITHUB_WORKSPACE/gradle.properties | grep ^version= >> $GITHUB_ENV
+          cat $GITHUB_WORKSPACE/gradle.properties | grep ^minecraft_version= >> $GITHUB_ENV
+      - name: Create package name
+        run: echo "package_name=BuildingGadgets-$minecraft_version-$version-${{ github.head_ref || 'main' }}-SNAPSHOT-$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ env.package_name }}
+          path: build/libs
