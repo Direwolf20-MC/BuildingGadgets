@@ -100,13 +100,8 @@ processResources {
     inputs.property('version', project.version)
     inputs.property('forge_major', forge_major)
 
-    from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
+    from('META-INF/mods.toml') {
         expand 'version': project.version, 'forge_major': forge_major
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'META-INF/mods.toml'
     }
 }
 
