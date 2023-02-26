@@ -1,17 +1,20 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
-        jcenter()
+        maven { url = 'https://maven.minecraftforge.net' }
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
 
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'maven-publish'
+plugins {
+    id 'java'
+    id 'idea'
+    id 'maven-publish'
+    id "com.matthewprenger.cursegradle" version "1.4.0"
+}
+
 apply plugin: 'net.minecraftforge.gradle'
 
 version = "$version"
@@ -21,12 +24,13 @@ archivesBaseName = "buildinggadgets-${minecraft_version}"
 def forge_major = forge_version.tokenize('.')[0]
 
 // Used for CI/CD
-def env = System.getenv()
-if (env.GITHUB_RUN_NUMBER) {
-    version = version + "-SNAPSHOT-" + "${env.GITHUB_RUN_NUMBER}"
+def ENV = System.getenv()
+
+if (ENV.GITHUB_RUN_NUMBER) {
+    version = version + "-SNAPSHOT-" + "${ENV.GITHUB_RUN_NUMBER}"
 }
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 minecraft {
     mappings channel: 'snapshot', version: "${mcp_mappings}"
@@ -74,9 +78,6 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
-//    maven {
-//        url "https://dvs1.progwml6.com/files/maven"
-//    }
     maven {
         url = "https://modmaven.dev/"
     }
@@ -137,6 +138,8 @@ artifacts {
     archives deobfJar
     archives sourcesJar
 }
+
+jar.finalizedBy('reobfJar')
 
 publishing {
     publications {
