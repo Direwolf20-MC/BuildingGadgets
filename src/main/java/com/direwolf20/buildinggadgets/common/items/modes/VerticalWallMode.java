@@ -1,8 +1,7 @@
 package com.direwolf20.buildinggadgets.common.items.modes;
 
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +58,7 @@ public class VerticalWallMode extends AbstractMode {
      * and ignore placeOnTop as this mode does the action by default.
      */
     @Override
-    public BlockPos withOffset(BlockPos pos, Direction side, boolean placeOnTop) {
-        return XYZ.isAxisY(side) ? super.withOffset(pos, side, placeOnTop) : pos;
+    public BlockPos withOffset(UseContext context) {
+        return XYZ.isAxisY(context.getHitSide()) ? super.withOffset(context) : context.getStartPos();
     }
 }

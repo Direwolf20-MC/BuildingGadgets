@@ -38,7 +38,7 @@ public abstract class AbstractMode {
      * method from having to handle the world etc.
      */
     public List<BlockPos> getCollection(UseContext context, Player player) {
-        BlockPos startPos = this.withOffset(context.getStartPos(), context.getHitSide(), context.isPlaceOnTop());
+        BlockPos startPos = this.withOffset(context);
 
         // We don't need this unless we're using the exchanger but I also don't want to
         // have to remake the state for every block.
@@ -47,7 +47,7 @@ public abstract class AbstractMode {
         // We alternate the validator as the exchanger requires a more in-depth validation process.
         return collect(context, player, startPos)
                 .stream()
-                .filter(e -> isExchanging ? this.exchangingValidator(e, lookingAtState, context) : this.validator(player, e, context))
+                .filter(e -> isExchanging ? this.exchangingValidator(e, lookingAtState, context) : this.validator(e, context))
                 .sorted(Comparator.comparing((BlockPos pos) -> player.blockPosition().distSqr(pos)))
                 .collect(Collectors.toList());
     }
@@ -58,8 +58,8 @@ public abstract class AbstractMode {
      * @param context the use context instance
      * @return if the block is valid
      */
-    public boolean validator(Player player, BlockPos pos, UseContext context) {
-        if (!context.getWorldState(pos).canBeReplaced(context.createBlockUseContext(player)))
+    public boolean validator(BlockPos pos, UseContext context) {
+        if (!context.getWorldState(pos).canBeReplaced(context.createBlockUseContext()))
             return false;
 
         if (context.world.isOutsideBuildHeight(pos))
@@ -109,8 +109,8 @@ public abstract class AbstractMode {
         return hasSingeValid;
     }
 
-    public BlockPos withOffset(BlockPos pos, Direction side, boolean placeOnTop) {
-        return placeOnTop ? pos.relative(side, 1) : pos;
+    public BlockPos withOffset(UseContext context) {
+        return context.placeOnTop ? context.startPos.relative(context.hitSide, 1) : context.startPos;
     }
 
     public boolean isExchanging() {
@@ -122,6 +122,7 @@ public abstract class AbstractMode {
         private final BlockState setState;
         private final BlockPos startPos;
         private final Direction hitSide;
+        private final Player player;
 
         private final boolean isFuzzy;
         private final boolean placeOnTop;
@@ -129,10 +130,11 @@ public abstract class AbstractMode {
         private final boolean rayTraceFluid;
         private final boolean isConnected;
 
-        public UseContext(Level world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean placeOnTop, boolean isConnected) {
+        public UseContext(Level world, Player player, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean placeOnTop, boolean isConnected) {
             this.world = world;
             this.setState = setState;
             this.startPos = startPos;
+            this.player = player;
 
             this.range = GadgetUtils.getToolRange(gadget);
             this.isFuzzy = AbstractGadget.getFuzzy(gadget);
@@ -143,11 +145,11 @@ public abstract class AbstractMode {
             this.placeOnTop = placeOnTop;
         }
 
-        public UseContext(Level world, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean isConnected) {
-            this(world, setState, startPos, gadget, hitSide, false, isConnected);
+        public UseContext(Level world, Player player, BlockState setState, BlockPos startPos, ItemStack gadget, Direction hitSide, boolean isConnected) {
+            this(world, player, setState, startPos, gadget, hitSide, false, isConnected);
         }
 
-        public BlockPlaceContext createBlockUseContext(Player player) {
+        public BlockPlaceContext createBlockUseContext() {
             return new BlockPlaceContext(
                     new UseOnContext(
                             player,
@@ -195,6 +197,10 @@ public abstract class AbstractMode {
 
         public Direction getHitSide() {
             return this.hitSide;
+        }
+
+        public Player getPlayer() {
+            return player;
         }
 
         @Override
