@@ -114,7 +114,15 @@ public class ConstructionPasteContainer extends Item {
         Item item = stack.getItem();
         if (item instanceof ConstructionPasteContainer)
             return ((ConstructionPasteContainer) item).getPasteCount(stack);
-        BuildingGadgets.LOG.warn("Potential abuse of ConstructionPasteContainer#getPasteAmount(ItemStack) where the given ItemStack does not contain a ConstructionPasteContainer.");
+
+        return 0;
+    }
+
+    public static int getMaxPasteAmount(ItemStack stack) {
+        Item item = stack.getItem();
+        if (item instanceof ConstructionPasteContainer)
+            return ((ConstructionPasteContainer) item).getMaxCapacity();
+
         return 0;
     }
 

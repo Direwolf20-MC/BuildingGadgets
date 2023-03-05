@@ -7,6 +7,7 @@ import com.direwolf20.buildinggadgets.client.screen.TemplateManagerGUI;
 import com.direwolf20.buildinggadgets.common.blocks.ConstructionBlock;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.containers.OurContainers;
+import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
 import com.direwolf20.buildinggadgets.common.items.GadgetCopyPaste;
 import com.direwolf20.buildinggadgets.common.items.OurItems;
 import com.direwolf20.buildinggadgets.common.tileentities.ConstructionBlockTileEntity;
@@ -18,6 +19,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -26,6 +28,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.Blocks;
@@ -65,6 +68,18 @@ public class ClientProxy {
 
         MinecraftForge.EVENT_BUS.addListener(ClientProxy::onPlayerLoggedOut);
         CACHE_TEMPLATE_PROVIDER.registerUpdateListener(((GadgetCopyPaste) OurItems.COPY_PASTE_GADGET_ITEM.get()).getRender());
+
+        List.of(
+                OurItems.PASTE_CONTAINER_T1_ITEM,
+                OurItems.PASTE_CONTAINER_T2_ITEM,
+                OurItems.PASTE_CONTAINER_T3_ITEM,
+                OurItems.PASTE_CONTAINER_CREATIVE_ITEM
+        ).forEach(item -> {
+            ItemProperties.register(item.get(), ConstructionPasteContainer.LEVEL, (stack, clientLevel, entity, notSure) -> {
+                float percent = ConstructionPasteContainer.getPasteAmount(stack) / (float) ConstructionPasteContainer.getMaxPasteAmount(stack);
+                return Mth.floor(percent * 4) / 4F;
+            });
+        });
     }
 
     @SubscribeEvent

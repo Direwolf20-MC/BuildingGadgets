@@ -3,16 +3,11 @@ package com.direwolf20.buildinggadgets.common.items;
 import com.direwolf20.buildinggadgets.common.blocks.OurBlocks;
 import com.direwolf20.buildinggadgets.common.config.Config;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
-import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 public final class OurItems {
     private OurItems() {}
@@ -25,22 +20,17 @@ public final class OurItems {
     public static final RegistryObject<Item> COPY_PASTE_GADGET_ITEM = ITEMS.register("gadget_copy_paste", GadgetCopyPaste::new);
     public static final RegistryObject<Item> DESTRUCTION_GADGET_ITEM = ITEMS.register("gadget_destruction", GadgetDestruction::new);
 
-    private static final BiFunction<Boolean, Supplier<Integer>, Supplier<? extends Item>> REGISTER_CONTAINER = (creative, config) -> () -> {
-        ConstructionPasteContainer constructionPasteContainer = new ConstructionPasteContainer(creative, config::get);
-
-        ItemProperties.register(constructionPasteContainer, ConstructionPasteContainer.LEVEL, (stack, clientLevel, entity, notSure) -> {
-            float percent = ConstructionPasteContainer.getPasteAmount(stack) / (float) config.get();
-            return Mth.floor(percent * 4) / 4F;
-        });
-
-        return constructionPasteContainer;
-    };
 
     // Construction Paste Containers
-    public static final RegistryObject<Item> PASTE_CONTAINER_T1_ITEM = ITEMS.register("construction_paste_container_t1", REGISTER_CONTAINER.apply(false, Config.PASTE_CONTAINERS.capacityT1));
-    public static final RegistryObject<Item> PASTE_CONTAINER_T2_ITEM = ITEMS.register("construction_paste_container_t2", REGISTER_CONTAINER.apply(false, Config.PASTE_CONTAINERS.capacityT2));
-    public static final RegistryObject<Item> PASTE_CONTAINER_T3_ITEM = ITEMS.register("construction_paste_container_t3", REGISTER_CONTAINER.apply(false, Config.PASTE_CONTAINERS.capacityT3));
-    public static final RegistryObject<Item> PASTE_CONTAINER_CREATIVE_ITEM = ITEMS.register("construction_paste_container_creative", REGISTER_CONTAINER.apply(true, () -> Integer.MAX_VALUE));
+    public static final RegistryObject<Item> PASTE_CONTAINER_T1_ITEM = ITEMS.register("construction_paste_container_t1", () -> new ConstructionPasteContainer(false, Config.PASTE_CONTAINERS.capacityT1::get));
+
+    public static final RegistryObject<Item> PASTE_CONTAINER_T2_ITEM
+            = ITEMS.register("construction_paste_container_t2", () -> new ConstructionPasteContainer(false, Config.PASTE_CONTAINERS.capacityT2::get));
+    public static final RegistryObject<Item> PASTE_CONTAINER_T3_ITEM
+            = ITEMS.register("construction_paste_container_t3", () -> new ConstructionPasteContainer(false, Config.PASTE_CONTAINERS.capacityT3::get));
+    public static final RegistryObject<Item> PASTE_CONTAINER_CREATIVE_ITEM
+            = ITEMS.register("construction_paste_container_creative", () -> new ConstructionPasteContainer(true));
+
 
     // Construction Paste
     public static final RegistryObject<Item> CONSTRUCTION_PASTE_ITEM = ITEMS.register("construction_paste", ConstructionPaste::new);
