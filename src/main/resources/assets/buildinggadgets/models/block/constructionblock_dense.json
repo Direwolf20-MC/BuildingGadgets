@@ -1,6 +1,6 @@
 {
   "parent": "block/cube_all",
   "textures": {
-    "all": "buildinggadgets:blocks/constructionblock_dense"
+    "all": "buildinggadgets:block/constructionblock_dense"
   }
 }

@@ -25,16 +25,15 @@ public class GuiIconActionable extends Button {
     private boolean selected;
     private boolean isSelectable;
 
-    private Color selectedColor = new Color(0, 255, 0, 50);
-    private Color deselectedColor = new Color(255, 255, 255, 50);
+    private final Color selectedColor = new Color(0, 255, 0, 50);
+    private final Color deselectedColor = new Color(255, 255, 255, 50);
     private Color activeColor;
 
-    private ResourceLocation selectedTexture;
-    private ResourceLocation deselectedTexture;
+    private final ResourceLocation selectedTexture;
+    private final ResourceLocation deselectedTexture;
 
     public GuiIconActionable(int x, int y, String texture, Component message, boolean isSelectable, Predicate<Boolean> action) {
-        super(x, y, 25, 25, message, (b) -> {
-        });
+        super(builder(message, (button) -> {}).pos(x, y).size(25, 25));
         this.activeColor = deselectedColor;
         this.isSelectable = isSelectable;
         this.action = action;
@@ -61,7 +60,7 @@ public class GuiIconActionable extends Button {
     }
 
     /**
-     * This should be used when ever changing select.
+     * This should be used when ever-changing select.
      */
     public void setSelected(boolean selected) {
         this.selected = selected;
@@ -93,7 +92,7 @@ public class GuiIconActionable extends Button {
         RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 
-        fill(matrices, this.x, this.y, this.x + this.width, this.y + this.height, activeColor.getRGB());
+        fill(matrices, this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, activeColor.getRGB());
 
 //        RenderSystem.setShaderColor(activeColor.getRGB().getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, .15f);
 //        fill(matrices, this.x, this.y, this.x + this.width, this.y + this.height, -1873784752);
@@ -101,11 +100,11 @@ public class GuiIconActionable extends Button {
         RenderSystem.setShaderTexture(0, selected ? selectedTexture : deselectedTexture);
         RenderSystem.setShaderColor(activeColor.getRed() / 255f, activeColor.getGreen() / 255f, activeColor.getBlue() / 255f, alpha);
 
-        blit(matrices, this.x, this.y, 0, 0, this.width, this.height, this.width, this.height);
+        blit(matrices, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
         RenderSystem.setShaderColor(1, 1, 1, 1);
         RenderSystem.disableBlend();
 
-        if (mouseX >= x && mouseY >= y && mouseX < x + width && mouseY < y + height)
+        if (mouseX >= getX() && mouseY >= getY() && mouseX < getX() + width && mouseY < getY() + height)
             drawString(matrices, Minecraft.getInstance().font, this.getMessage().getString(), mouseX > (Minecraft.getInstance().getWindow().getGuiScaledWidth() / 2) ? mouseX + 2 : mouseX - Minecraft.getInstance().font.width(getMessage().getString()), mouseY - 10, activeColor.getRGB() | 0xFF000000);
 
     }

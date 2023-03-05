@@ -10,7 +10,7 @@ import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.Multiset.Entry;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,7 +46,7 @@ public class PacketSetRemoteInventoryCache {
         if (buf.readBoolean()) {
             Pair<BlockPos, ResourceKey<Level>> loc = new ImmutablePair<>(
                     buf.readBlockPos(),
-                    ResourceKey.create(Registry.DIMENSION_REGISTRY, buf.readResourceLocation())
+                    ResourceKey.create(Registries.DIMENSION, buf.readResourceLocation())
             );
             return new PacketSetRemoteInventoryCache(loc, isCopyPaste);
         }

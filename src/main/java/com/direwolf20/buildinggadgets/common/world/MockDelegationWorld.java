@@ -17,6 +17,8 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.biome.Biome;
@@ -128,6 +130,11 @@ public class MockDelegationWorld implements LevelAccessor {
     @Override
     public RegistryAccess registryAccess() {
         return null;
+    }
+
+    @Override
+    public FeatureFlagSet enabledFeatures() {
+        return FeatureFlags.DEFAULT_FLAGS;
     }
 
     @Override
@@ -358,12 +365,6 @@ public class MockDelegationWorld implements LevelAccessor {
     public boolean destroyBlock(BlockPos pos, boolean dropBlock, @Nullable Entity entity, int recursionLeft) {
         return false;
     }
-
-    // todo: 1.16 removed.
-//    @Override
-//    public boolean destroyBlock(BlockPos p_225521_1_, boolean p_225521_2_, @Nullable Entity p_225521_3_) {
-//        return false;
-//    }
 
     //-------------------Extra Methods--------------------
 

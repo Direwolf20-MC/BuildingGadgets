@@ -24,10 +24,8 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Lists;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -35,7 +33,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -51,6 +48,8 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.tags.ITagManager;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
@@ -72,8 +71,8 @@ public abstract class AbstractGadget extends Item {
         super(builder.setNoRepair());
 
         renderer = DistExecutor.runForDist(this::createRenderFactory, () -> () -> null);
-        this.whiteList = TagKey.create(Registry.BLOCK_REGISTRY, whiteListTag);
-        this.blackList = TagKey.create(Registry.BLOCK_REGISTRY, blackListTag);
+        this.whiteList = TagKey.create(Registries.BLOCK, whiteListTag);
+        this.blackList = TagKey.create(Registries.BLOCK, blackListTag);
         saveSupplier = SaveManager.INSTANCE.registerUndoSave(w -> SaveManager.getUndoSave(w, undoLengthSupplier, undoName));
     }
 
@@ -110,17 +109,6 @@ public abstract class AbstractGadget extends Item {
         ImmutableList.Builder<ICapabilityProvider> providerBuilder = ImmutableList.builder();
         addCapabilityProviders(providerBuilder, stack, tag);
         return new MultiCapabilityProvider(providerBuilder.build());
-    }
-
-    @Override
-    public void fillItemCategory(CreativeModeTab group, NonNullList<ItemStack> items) {
-        super.fillItemCategory(group, items);
-        if (!allowedIn(group))
-            return;
-
-        ItemStack charged = new ItemStack(this);
-        charged.getOrCreateTag().putDouble(NBTKeys.ENERGY, this.getEnergyMax());
-        items.add(charged);
     }
 
     @Override
@@ -168,7 +156,8 @@ public abstract class AbstractGadget extends Item {
     }
 
     public boolean isAllowedBlock(BlockState block) {
-        if (Lists.newArrayList(Registry.BLOCK.getTagOrEmpty(getWhiteList())).isEmpty()) {
+        ITagManager<Block> tags = ForgeRegistries.BLOCKS.tags();
+        if (tags != null && tags.getTag(getWhiteList()).isEmpty()) {
             return !block.is(getBlackList());
         }
 

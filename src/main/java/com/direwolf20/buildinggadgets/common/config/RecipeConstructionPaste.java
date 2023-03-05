@@ -4,6 +4,7 @@ import com.direwolf20.buildinggadgets.common.items.ConstructionPasteContainer;
 import com.google.gson.JsonObject;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.ShapedRecipe;
@@ -12,9 +13,9 @@ import net.minecraft.resources.ResourceLocation;
 
 public class RecipeConstructionPaste extends ShapedRecipe {
 
-    public RecipeConstructionPaste(ResourceLocation id, String group, int recipeWidth,
-            int recipeHeight, NonNullList<Ingredient> recipeItems, ItemStack recipeOutput) {
-        super(id, group, recipeWidth, recipeHeight, recipeItems, recipeOutput);
+    public RecipeConstructionPaste(ResourceLocation id, String group, CraftingBookCategory category, int recipeWidth,
+                                   int recipeHeight, NonNullList<Ingredient> recipeItems, ItemStack recipeOutput) {
+        super(id, group, category, recipeWidth, recipeHeight, recipeItems, recipeOutput);
     }
 
     @Override
@@ -42,7 +43,7 @@ public class RecipeConstructionPaste extends ShapedRecipe {
         @Override
         public ShapedRecipe fromJson(ResourceLocation recipeId, JsonObject json) {
             ShapedRecipe recipe = super.fromJson(recipeId, json);
-            return new RecipeConstructionPaste(recipe.getId(), recipe.getGroup(), recipe.getRecipeWidth(),
+            return new RecipeConstructionPaste(recipe.getId(), recipe.getGroup(), CraftingBookCategory.MISC, recipe.getRecipeWidth(),
                     recipe.getRecipeHeight(), recipe.getIngredients(), recipe.getResultItem());
         }
     }

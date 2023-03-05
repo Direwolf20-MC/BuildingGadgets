@@ -1,7 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "buildinggadgets:items/construction_paste_container_t3"
+    "layer0": "buildinggadgets:item/construction_paste_container_t3"
   },
   "overrides": [
     { "predicate": { "level": 0.0 }, "model": "buildinggadgets:item/construction_paste_container_t3" },

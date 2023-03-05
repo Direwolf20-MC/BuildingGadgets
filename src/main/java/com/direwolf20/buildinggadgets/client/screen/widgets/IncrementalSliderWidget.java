@@ -33,8 +33,8 @@ public class IncrementalSliderWidget extends ForgeSlider {
 
     @Override
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
-        fill(poseStack, this.x, this.y, this.x + this.width, this.y + this.height, BACKGROUND);
-        this.drawBorderedRect(poseStack, (this.x + (int)(this.value * (double)(this.width - 8)) + 4) - 4, this.y, 8, this.height);
+        fill(poseStack, this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, BACKGROUND);
+        this.drawBorderedRect(poseStack, (this.getX() + (int)(this.value * (double)(this.width - 8)) + 4) - 4, this.getY(), 8, this.height);
         this.renderText(poseStack);
     }
 
@@ -42,7 +42,7 @@ public class IncrementalSliderWidget extends ForgeSlider {
         int color = !active ? 10526880 : (isHovered ? 16777120 : -1);
 
         Minecraft minecraft = Minecraft.getInstance();
-        drawCenteredString(matrices, minecraft.font, this.prefix.copy().append(this.getValueString()), x + getWidth() / 2, y + (getHeight() - 8) / 2, color);
+        drawCenteredString(matrices, minecraft.font, this.prefix.copy().append(this.getValueString()), getX() + getWidth() / 2, getY() + (getHeight() - 8) / 2, color);
     }
 
     private void drawBorderedRect(PoseStack matrices, int x, int y, int width, int height) {
@@ -83,11 +83,11 @@ public class IncrementalSliderWidget extends ForgeSlider {
     public Collection<AbstractWidget> getComponents() {
         return ImmutableSet.of(
                 this,
-                new GuiButtonIncrement(x - height, y, height, height, Component.literal("-"), b -> {
+                new GuiButtonIncrement(getX() - height, getY(), height, height, Component.literal("-"), b -> {
                     this.setValue(this.getValueInt() - 1);
                     IncrementalSliderWidget.this.applyValue();
                 }),
-                new GuiButtonIncrement(x + width, y, height, height, Component.literal("+"), b -> {
+                new GuiButtonIncrement(getX() + width, getY(), height, height, Component.literal("+"), b -> {
                     this.setValue(this.getValueInt() + 1);
                     IncrementalSliderWidget.this.applyValue();
                 })
@@ -96,7 +96,9 @@ public class IncrementalSliderWidget extends ForgeSlider {
 
     private class GuiButtonIncrement extends Button {
         public GuiButtonIncrement(int x, int y, int width, int height, Component buttonText, OnPress action) {
-            super(x, y, width, height, buttonText, action);
+            super(builder(buttonText, action)
+                    .pos(x, y)
+                    .size(width, height));
         }
 
         @Override
@@ -107,10 +109,10 @@ public class IncrementalSliderWidget extends ForgeSlider {
             Minecraft minecraft = Minecraft.getInstance();
             Font font = minecraft.font;
 
-            this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-            fill(matrices, this.x, this.y, this.x + this.width, this.y + this.height, IncrementalSliderWidget.BACKGROUND);
-            IncrementalSliderWidget.this.drawBorderedRect(matrices, this.x, this.y, this.width, this.height);
-            drawCenteredString(matrices, font, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, getFGColor() | Mth.ceil(this.alpha * 255.0F) << 24);
+            this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
+            fill(matrices, this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, IncrementalSliderWidget.BACKGROUND);
+            IncrementalSliderWidget.this.drawBorderedRect(matrices, this.getX(), this.getY(), this.width, this.height);
+            drawCenteredString(matrices, font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, getFGColor() | Mth.ceil(this.alpha * 255.0F) << 24);
         }
 
         @Override

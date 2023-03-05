@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.util.tools.RegistryUtils;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.level.block.Blocks;
@@ -51,7 +52,9 @@ public final class BlockData {
     public static BlockData tryDeserialize(@Nullable CompoundTag tag, @Nullable IntFunction<ITileDataSerializer> serializerProvider, boolean readDataPersisted) {
         if (tag == null || !(tag.contains(NBTKeys.KEY_STATE) && tag.contains(NBTKeys.KEY_SERIALIZER) && tag.contains(NBTKeys.KEY_DATA)))
             return null;
-        BlockState state = NbtUtils.readBlockState(tag.getCompound(NBTKeys.KEY_STATE));
+
+        // NOTE: Ask around and see if there is a recommended replacement for this `BuiltInRegistries.BLOCK.asLookup()` can't be correct
+        BlockState state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), tag.getCompound(NBTKeys.KEY_STATE));
         ITileDataSerializer serializer;
         try {
             if (serializerProvider == null)
@@ -84,7 +87,9 @@ public final class BlockData {
         Preconditions.checkNotNull(tag, "Cannot deserialize from a null tag compound");
         Preconditions.checkArgument(tag.contains(NBTKeys.KEY_STATE) && tag.contains(NBTKeys.KEY_SERIALIZER) && tag.contains(NBTKeys.KEY_DATA),
                 "Given NBTTagCompound does not contain a valid BlockData instance. Missing NBT-Keys in Tag {}!", tag.toString());
-        BlockState state = NbtUtils.readBlockState(tag.getCompound(NBTKeys.KEY_STATE));
+
+        // NOTE: Ask around and see if there is a recommended replacement for this `BuiltInRegistries.BLOCK.asLookup()` can't be correct
+        BlockState state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), tag.getCompound(NBTKeys.KEY_STATE));
         ITileDataSerializer serializer;
         try {
             if (serializerProvider == null)
