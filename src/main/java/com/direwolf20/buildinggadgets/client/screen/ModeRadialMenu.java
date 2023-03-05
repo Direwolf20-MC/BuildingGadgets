@@ -28,7 +28,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix4f;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -42,6 +41,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ForgeI18n;
+import org.joml.Matrix4f;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -261,9 +261,9 @@ public class ModeRadialMenu extends Screen {
             button.setWidth(dim);
             button.setHeight(dim);
             if (isDestruction)
-                button.y = height / 2 + (isRight ? 10 : -button.getHeight() - 10);
+                button.setX(height / 2 + (isRight ? 10 : -button.getHeight() - 10));
             else
-                button.x = width / 2 + offset;
+                button.setX(width / 2 + offset);
         }
         posRight = resetPos(tool, padding, posRight);
         posLeft = resetPos(tool, padding, posLeft);
@@ -280,9 +280,9 @@ public class ModeRadialMenu extends Screen {
                     ? posRight
                     : posLeft;
             if (isDestruction) {
-                button.x = pos;
+                button.setX(pos);
             } else {
-                button.y = pos;
+                button.setY(pos);
             }
 
             if (isRight) {

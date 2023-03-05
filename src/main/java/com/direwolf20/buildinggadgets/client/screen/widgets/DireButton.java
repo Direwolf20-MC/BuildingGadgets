@@ -11,7 +11,9 @@ import net.minecraft.network.chat.Component;
 public class DireButton extends Button {
 
     public DireButton(int x, int y, int widthIn, int heightIn, Component buttonText, OnPress action) {
-        super(x, y, widthIn, heightIn, buttonText, action);
+        super(builder(buttonText, action)
+                .size(widthIn, heightIn)
+                .pos(x, y));
     }
 
     @Override
@@ -24,13 +26,13 @@ public class DireButton extends Button {
             RenderSystem.enableBlend();
             RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
             RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            this.blit(matrices, this.x, this.y, 0, 46, this.width / 2, this.height);
-            this.blit(matrices, this.x + this.width / 2, this.y, 200 - this.width / 2, 46, this.width / 2, this.height);
+            this.blit(matrices, this.getX(), this.getY(), 0, 46, this.width / 2, this.height);
+            this.blit(matrices, this.getX() + this.width / 2, this.getY(), 200 - this.width / 2, 46, this.width / 2, this.height);
 
 
             int bottomToDraw = 2;
-            this.blit(matrices, this.x, this.y + this.height - bottomToDraw, 0, 66 - bottomToDraw, this.width / 2, bottomToDraw);
-            this.blit(matrices, this.x + this.width / 2, this.y + this.height - bottomToDraw, 200 - this.width / 2, 66 - bottomToDraw, this.width / 2, bottomToDraw);
+            this.blit(matrices, this.getX(), this.getY() + this.height - bottomToDraw, 0, 66 - bottomToDraw, this.width / 2, bottomToDraw);
+            this.blit(matrices, this.getX() + this.width / 2, this.getY() + this.height - bottomToDraw, 200 - this.width / 2, 66 - bottomToDraw, this.width / 2, bottomToDraw);
 
             int j = 14737632;
 
@@ -42,7 +44,7 @@ public class DireButton extends Button {
                 j = 16777120;
             }
 
-            this.drawCenteredString(matrices, fontrenderer, this.getMessage().getString(), this.x + this.width / 2, this.y + (this.height - 7) / 2, j);
+            this.drawCenteredString(matrices, fontrenderer, this.getMessage().getString(), this.getX() + this.width / 2, this.getY() + (this.height - 7) / 2, j);
         }
     }
 }

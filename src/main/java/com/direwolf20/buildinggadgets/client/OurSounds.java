@@ -10,7 +10,7 @@ import net.minecraftforge.registries.RegistryObject;
 public interface OurSounds {
     DeferredRegister<SoundEvent> REGISTRY = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, Reference.MODID);
 
-    RegistryObject<SoundEvent> BEEP = REGISTRY.register("beep", () -> new SoundEvent(new ResourceLocation(Reference.MODID, "beep")));
+    RegistryObject<SoundEvent> BEEP = REGISTRY.register("beep", () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(Reference.MODID, "beep")));
 
     static void playSound(SoundEvent sound, float pitch) {
         ClientProxy.playSound(sound, pitch);

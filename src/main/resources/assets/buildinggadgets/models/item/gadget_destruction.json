@@ -1,7 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "buildinggadgets:items/gadget_destruction"
+    "layer0": "buildinggadgets:item/gadget_destruction"
   },
   "display": {
     "thirdperson_righthand": {

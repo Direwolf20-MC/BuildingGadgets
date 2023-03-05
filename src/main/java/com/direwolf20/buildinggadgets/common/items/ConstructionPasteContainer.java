@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.function.IntSupplier;
 
 public class ConstructionPasteContainer extends Item {
-    private static final ResourceLocation LEVEL = new ResourceLocation("level");
+    public static final ResourceLocation LEVEL = new ResourceLocation("level");
 
     private final IntSupplier maxCapacity;
     private final boolean isCreative;
@@ -36,13 +36,11 @@ public class ConstructionPasteContainer extends Item {
 
         this.isCreative = isCreative;
         this.maxCapacity = maxCapacity;
+    }
 
-        // This is used for setting up the texture change :D
-        // TODO ADD BACK 1.16
-//        addPropertyOverride(LEVEL, (stack, world, entity) -> {
-//            float percent = ConstructionPasteContainer.getPasteAmount(stack) / (float) this.maxCapacity.getAsInt();
-//            return MathHelper.floor(percent * 4) / 4F;
-//        });
+    @Override
+    public Object getRenderPropertiesInternal() {
+        return super.getRenderPropertiesInternal();
     }
 
     public ConstructionPasteContainer(boolean isCreative) {

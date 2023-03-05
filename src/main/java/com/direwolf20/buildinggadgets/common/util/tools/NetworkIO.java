@@ -14,7 +14,7 @@ import java.util.List;
 //import com.raoulvdberge.refinedstorage.api.util.Action;
 
 @Tainted(reason = "Not being used")
-public abstract class NetworkIO implements IItemHandler {// TODO 1.13
+public abstract class NetworkIO implements IItemHandler {
     private final List<ItemStack> stacks;
 
     protected NetworkIO(Collection<ItemStack> stacks) {

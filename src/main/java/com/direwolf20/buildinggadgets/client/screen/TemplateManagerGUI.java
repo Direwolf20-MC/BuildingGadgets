@@ -107,10 +107,10 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
         this.nameField = new EditBox(this.font, (this.leftPos - 20) + 8, topPos - 5, imageWidth - 16, this.font.lineHeight + 3, GuiTranslation.TEMPLATE_NAME_TIP.componentTranslation());
 
         int x = (leftPos - 20) + 180;
-        buttonSave = addRenderableWidget(new Button(x, topPos + 17, 60, 20, GuiTranslation.BUTTON_SAVE.componentTranslation(), b -> onSave()));
-        buttonLoad = addRenderableWidget(new Button(x, topPos + 39, 60, 20, GuiTranslation.BUTTON_LOAD.componentTranslation(), b -> onLoad()));
-        buttonCopy = addRenderableWidget(new Button(x, topPos + 66, 60, 20, GuiTranslation.BUTTON_COPY.componentTranslation(), b -> onCopy()));
-        buttonPaste = addRenderableWidget(new Button(x, topPos + 89, 60, 20, GuiTranslation.BUTTON_PASTE.componentTranslation(), b -> onPaste()));
+        buttonSave = addRenderableWidget(Button.builder(GuiTranslation.BUTTON_SAVE.componentTranslation(), b -> onSave()).pos(x, topPos + 17).size(60, 20).build());
+        buttonLoad = addRenderableWidget(Button.builder(GuiTranslation.BUTTON_LOAD.componentTranslation(), b -> onLoad()).pos(x, topPos + 39).size(60, 20).build());
+        buttonCopy = addRenderableWidget(Button.builder(GuiTranslation.BUTTON_COPY.componentTranslation(), b -> onCopy()).pos(x, topPos + 66).size(60, 20).build());
+        buttonPaste = addRenderableWidget(Button.builder(GuiTranslation.BUTTON_PASTE.componentTranslation(), b -> onPaste()).pos(x, topPos + 89).size(60, 20).build());
 
         this.nameField.setMaxLength(50);
         this.nameField.setVisible(true);
@@ -472,7 +472,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
         momentumY *= momentumDampening;
 
         if (!nameField.isFocused() && nameField.getValue().isEmpty())
-            getMinecraft().font.draw(matrices, GuiTranslation.TEMPLATE_PLACEHOLDER.format(), nameField.x - leftPos + 4, (nameField.y + 2) - topPos, -10197916);
+            getMinecraft().font.draw(matrices, GuiTranslation.TEMPLATE_PLACEHOLDER.format(), nameField.getX() - leftPos + 4, (nameField.getY() + 2) - topPos, -10197916);
 
         if (buttonSave.isHoveredOrFocused() || buttonLoad.isHoveredOrFocused() || buttonPaste.isHoveredOrFocused())
             drawSlotOverlay(matrices, buttonLoad.isHoveredOrFocused() ? container.getSlot(0) : container.getSlot(1));

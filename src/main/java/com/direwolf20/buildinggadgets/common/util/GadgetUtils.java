@@ -198,8 +198,7 @@ public class GadgetUtils {
 
         Optional<BlockData> data = InventoryHelper.getSafeBlockData(player, lookingAt.getBlockPos(), player.getUsedItemHand());
         data.ifPresent(placeState -> {
-            BlockState actualState = placeState.getState(); //.getExtendedState(world, lookingAt.getPos()); 1.14 @todo: fix?
-
+            BlockState actualState = placeState.getState();
             setToolBlock(stack, new BlockData(actualState, placeState.getTileData()));
         });
 

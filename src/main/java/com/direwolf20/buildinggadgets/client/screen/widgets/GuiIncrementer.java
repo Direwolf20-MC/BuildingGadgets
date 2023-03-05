@@ -126,8 +126,9 @@ public class GuiIncrementer extends AbstractWidget {
         return y;
     }
 
+
     @Override
-    public void updateNarration(NarrationElementOutput p_169152_) {
+    protected void updateWidgetNarration(NarrationElementOutput p_259858_) {
 
     }
 

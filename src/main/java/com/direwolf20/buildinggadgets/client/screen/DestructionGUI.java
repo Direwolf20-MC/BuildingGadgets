@@ -46,7 +46,7 @@ public class DestructionGUI extends Screen {
         int x = width / 2;
         int y = height / 2;
 
-        this.addRenderableWidget(confirm = new Button((x - 30) + 32, y + 65, 60, 20, Component.translatable(GuiMod.getLangKeySingle("confirm")), b -> {
+        this.addRenderableWidget(confirm = Button.builder(Component.translatable(GuiMod.getLangKeySingle("confirm")), b -> {
             if (Minecraft.getInstance().player == null) {
                 return;
             }
@@ -56,9 +56,15 @@ public class DestructionGUI extends Screen {
                 this.onClose();
             } else
                 Minecraft.getInstance().player.displayClientMessage(MessageTranslation.DESTRCUT_TOO_LARGE.componentTranslation(Config.GADGETS.GADGET_DESTRUCTION.destroySize.get()), true);
-        }));
+        })
+                .pos((x - 30) + 32, y + 65)
+                .size(60, 20)
+                .build());
 
-        this.addRenderableWidget(new Button((x - 30) - 32, y + 65, 60, 20, Component.translatable(GuiMod.getLangKeySingle("cancel")), b -> onClose()));
+        this.addRenderableWidget(Button.builder(Component.translatable(GuiMod.getLangKeySingle("cancel")), b -> onClose())
+                .pos((x - 30) - 32, y + 65)
+                .size(60, 20)
+                .build());
 
         sliders.clear();
         sliders.add(depth = this.createSlider(x - (70 / 2), y - (14 / 2), GuiTranslation.SINGLE_DEPTH, GadgetDestruction.getToolValue(destructionGadget, "depth")));

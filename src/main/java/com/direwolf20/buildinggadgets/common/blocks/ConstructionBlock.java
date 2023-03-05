@@ -161,12 +161,6 @@ public class ConstructionBlock extends Block implements EntityBlock /*implements
         return !isMimicNull(mimic) ? mimic.isPathfindable(worldIn, pos, type) : super.isPathfindable(state, worldIn, pos, type);
     }
 
-// @todo: removed 1.16, find replacement
-//    @Override
-//    public boolean hasTileEntity() {
-//        return true;
-//    }
-
     @Override
     public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side) {
         if (state.getBlock().equals(adjacentBlockState.getBlock())) return false;
@@ -208,18 +202,6 @@ public class ConstructionBlock extends Block implements EntityBlock /*implements
         BlockState mimic = getActualMimicBlock(reader, pos);
         return !isMimicNull(mimic) ? mimic.propagatesSkylightDown(reader, pos) : super.propagatesSkylightDown(state, reader, pos);
     }
-
-    /**
-     * @deprecated call via whenever possible.
-     * Implementing/overriding is fine.
-     * <p>
-     * todo: removed 1.16 find replacement
-     */
-//    @Override
-//    public Vector3d getOffset(BlockState state, IBlockReader worldIn, BlockPos pos) {
-//        BlockState mimic = getActualMimicBlock(worldIn, pos);
-//        return !isMimicNull(mimic) ? mimic.getOffset(worldIn, pos) : super.getOffset(state, worldIn, pos);
-//    }
 
     // Todo re-eval
    /* @Override

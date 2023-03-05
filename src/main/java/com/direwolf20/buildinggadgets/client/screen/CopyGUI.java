@@ -156,7 +156,10 @@ public class CopyGUI extends Screen {
 
     static class CenteredButton extends Button {
         CenteredButton(int y, int width, Component text, OnPress onPress) {
-            super(0, y, width, 20, text, onPress);
+            super(builder(text, onPress)
+                    .pos(0, y)
+                    .size(width, 20)
+            );
         }
 
         static void centerButtonList(List<AbstractButton> buttons, int startX) {
@@ -164,7 +167,7 @@ public class CopyGUI extends Screen {
 
             int nextX = startX - collectiveWidth / 2;
             for (AbstractButton button : buttons) {
-                button.x = nextX;
+                button.setX(nextX);
                 nextX += button.getWidth() + 5;
             }
         }
