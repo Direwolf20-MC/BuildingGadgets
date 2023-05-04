@@ -73,6 +73,7 @@ public final class BuildingGadgets {
 
         MinecraftForge.EVENT_BUS.addListener(this::serverLoaded);
         MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
+        MinecraftForge.EVENT_BUS.addListener(this::commandRegister);
 
         eventBus.addListener(this::setup);
         eventBus.addListener(this::clientSetup);
