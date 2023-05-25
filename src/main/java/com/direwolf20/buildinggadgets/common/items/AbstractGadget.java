@@ -1,18 +1,18 @@
 package com.direwolf20.buildinggadgets.common.items;
 
 
+import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.BuildingGadgets;
-import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
 import com.direwolf20.buildinggadgets.common.capability.CapabilityProviderEnergy;
 import com.direwolf20.buildinggadgets.common.capability.IPrivateEnergy;
 import com.direwolf20.buildinggadgets.common.capability.provider.MultiCapabilityProvider;
 import com.direwolf20.buildinggadgets.common.commands.ForceUnloadedCommand;
-import com.direwolf20.buildinggadgets.common.tainted.concurrent.UndoScheduler;
 import com.direwolf20.buildinggadgets.common.config.Config;
+import com.direwolf20.buildinggadgets.common.items.modes.*;
+import com.direwolf20.buildinggadgets.common.tainted.building.view.BuildContext;
+import com.direwolf20.buildinggadgets.common.tainted.concurrent.UndoScheduler;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.IItemIndex;
 import com.direwolf20.buildinggadgets.common.tainted.inventory.InventoryHelper;
-import com.direwolf20.buildinggadgets.common.items.modes.*;
-import com.direwolf20.buildinggadgets.client.renders.BaseRenderer;
 import com.direwolf20.buildinggadgets.common.tainted.save.SaveManager;
 import com.direwolf20.buildinggadgets.common.tainted.save.Undo;
 import com.direwolf20.buildinggadgets.common.tainted.save.UndoWorldSave;
@@ -44,6 +44,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -52,6 +53,7 @@ import net.minecraftforge.fml.DistExecutor;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -62,16 +64,16 @@ import static com.direwolf20.buildinggadgets.common.util.GadgetUtils.withSuffix;
 
 public abstract class AbstractGadget extends Item {
     private BaseRenderer renderer;
-    private final ITag.INamedTag<Block> whiteList;
-    private final ITag.INamedTag<Block> blackList;
+    private final Tags.IOptionalNamedTag<Block> whiteList;
+    private final Tags.IOptionalNamedTag<Block> blackList;
     private Supplier<UndoWorldSave> saveSupplier;
 
     public AbstractGadget(Properties builder, IntSupplier undoLengthSupplier, String undoName, ResourceLocation whiteListTag, ResourceLocation blackListTag) {
         super(builder.setNoRepair());
 
         renderer = DistExecutor.runForDist(this::createRenderFactory, () -> () -> null);
-        this.whiteList = BlockTags.makeWrapperTag(whiteListTag.toString());
-        this.blackList = BlockTags.makeWrapperTag(blackListTag.toString());
+        this.whiteList = BlockTags.createOptional(whiteListTag, new HashSet<>());
+        this.blackList = BlockTags.createOptional(blackListTag, new HashSet<>());
         saveSupplier = SaveManager.INSTANCE.registerUndoSave(w -> SaveManager.getUndoSave(w, undoLengthSupplier, undoName));
     }
 

@@ -2,4 +2,4 @@
 
 ## Fixed
 
-- Rare null pointer expection when mimiced blocks load slowly
+- The whitelist and blacklist tags not working due to incorrect registration
