@@ -96,7 +96,7 @@ public class PacketSetRemoteInventoryCache {
                 if (player != null) {
                     Set<UniqueItem> itemTypes = new HashSet<>();
                     ImmutableMultiset.Builder<UniqueItem> builder = ImmutableMultiset.builder();
-                    InventoryLinker.getLinkedInventory(player.level, msg.loc.getKey(), msg.loc.getValue(), null).ifPresent(inventory -> {
+                    InventoryLinker.getLinkedInventory(player.level(), msg.loc.getKey(), msg.loc.getValue(), null).ifPresent(inventory -> {
                         for (int i = 0; i < inventory.getSlots(); i++) {
                             ItemStack stack = inventory.getStackInSlot(i);
                             if (!stack.isEmpty()) {

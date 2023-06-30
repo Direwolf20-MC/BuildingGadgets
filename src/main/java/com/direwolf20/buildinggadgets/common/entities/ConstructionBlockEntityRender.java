@@ -45,7 +45,7 @@ public class ConstructionBlockEntityRender extends EntityRenderer<ConstructionBl
         matrixStackIn.translate(-0.0005f, -0.0005f, -0.0005f);
         matrixStackIn.scale(1.001f, 1.001f, 1.001f);//Slightly Larger block to avoid z-fighting.
         BlockColors blockColors = Minecraft.getInstance().getBlockColors();
-        int color = blockColors.getColor(renderBlockState, mc.player.level, entityIn.blockPosition(), 0);
+        int color = blockColors.getColor(renderBlockState, mc.player.level(), entityIn.blockPosition(), 0);
         float f = (float) (color >> 16 & 255) / 255.0F;
         float f1 = (float) (color >> 8 & 255) / 255.0F;
         float f2 = (float) (color & 255) / 255.0F;

@@ -44,6 +44,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -118,34 +119,33 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
     }
 
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
-        super.render(matrices, mouseX, mouseY, partialTicks);
-        this.renderTooltip(matrices, mouseX, mouseY);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
 
-        drawString(matrices, font, "Preview disabled for now...", leftPos - 10, topPos + 40, 0xFFFFFF);
+        guiGraphics.drawString(font, "Preview disabled for now...", leftPos - 10, topPos + 40, 0xFFFFFF);
         if (this.template != null) {
-            renderRequirement(matrices, mouseX, mouseY);
+            renderRequirement(guiGraphics, mouseX, mouseY);
         }
 
 //        validateCache(partialTicks);
     }
 
     @Override
-    protected void renderBg(PoseStack matrices, float partialTicks, int mouseX, int mouseY) {
-        renderBackground(matrices);
+    protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
+        renderBackground(guiGraphics);
 
-        RenderSystem.setShaderTexture(0, background);
-        blit(matrices, leftPos - 20, topPos - 12, 0, 0, imageWidth, imageHeight + 25);
-        blit(matrices, (leftPos - 20) + imageWidth, topPos + 8, imageWidth + 3, 30, 71, imageHeight);
+        guiGraphics.blit(background, leftPos - 20, topPos - 12, 0, 0, imageWidth, imageHeight + 25);
+        guiGraphics.blit(background, (leftPos - 20) + imageWidth, topPos + 8, imageWidth + 3, 30, 71, imageHeight);
 
         if (!buttonCopy.isHoveredOrFocused() && !buttonPaste.isHoveredOrFocused()) {
             if (buttonLoad.isHoveredOrFocused())
-                blit(matrices, (leftPos + imageWidth) - 44, topPos + 38, imageWidth, 0, 17, 24);
+                guiGraphics.blit(background, (leftPos + imageWidth) - 44, topPos + 38, imageWidth, 0, 17, 24);
             else
-                blit(matrices, (leftPos + imageWidth) - 44, topPos + 38, imageWidth + 17, 0, 16, 24);
+                guiGraphics.blit(background, (leftPos + imageWidth) - 44, topPos + 38, imageWidth + 17, 0, 16, 24);
         }
 
-        this.nameField.render(matrices, mouseX, mouseY, partialTicks);
+        this.nameField.render(guiGraphics, mouseX, mouseY, partialTicks);
 //        fill(matrices, guiLeft + panel.getX() - 1, guiTop + panel.getY() - 1, guiLeft + panel.getX() + panel.getWidth() + 1, guiTop + panel.getY() + panel.getHeight() + 1, 0xFF8A8A8A);
 
         if (this.template != null) {
@@ -246,19 +246,19 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
 //        }
     }
 
-    private void renderRequirement(PoseStack matrices, int mouseX, int mouseY) {
+    private void renderRequirement(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         MaterialList requirements = this.template.getHeaderAndForceMaterials(BuildContext.builder().build(getWorld())).getRequiredItems();
         if (requirements == null)
             return;
 
         Lighting.setupForFlatItems();
 
-        matrices.pushPose();
-        matrices.translate(leftPos - 30, topPos - 5, 200);
-        matrices.scale(.8f, .8f, .8f);
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(leftPos - 30, topPos - 5, 200);
+        guiGraphics.pose().scale(.8f, .8f, .8f);
 
         String title = "Requirements"; // Todo lang;
-        drawString(matrices, getMinecraft().font, title, 5 - (font.width(title)), 0, Color.WHITE.getRGB());
+        guiGraphics.drawString(getMinecraft().font, title, 5 - (font.width(title)), 0, Color.WHITE.getRGB());
 
         // The things you have to do to get anything from this system is just stupid.
         MatchResult list = InventoryHelper.CREATIVE_INDEX.tryMatch(requirements);
@@ -274,14 +274,14 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
             ItemStack stack = e.getElement().createStack();
             int x = (-20 - (column * 25)), y = (20 + (index * 25));
 
-            itemRenderer.renderAndDecorateItem(stack, x + 4, y + 4);
-            itemRenderer.renderGuiItemDecorations(Minecraft.getInstance().font, stack, x + 4, y + 4, GadgetUtils.withSuffix(foundItems.count(e.getElement())));
+            guiGraphics.renderItem(stack, x + 4, y + 4);
+            guiGraphics.renderItemDecorations(Minecraft.getInstance().font, stack, x + 4, y + 4, GadgetUtils.withSuffix(foundItems.count(e.getElement())));
 
             int space = (int) (25 - (.2f * 25));
             int zoneX = ((leftPos - 32) + (-15 - (column * space))), zoneY = (topPos - 9) + (20 + (index * space));
 
             if (mouseX > zoneX && mouseX < (zoneX + space) && mouseY > zoneY && mouseY < (zoneY + space)) {
-                renderTooltip(matrices, Lists.transform(stack.getTooltipLines(this.getMinecraft().player, TooltipFlag.Default.NORMAL), Component::getVisualOrderText), x + 15, y + 25);
+                guiGraphics.renderTooltip(font, Lists.transform(stack.getTooltipLines(this.getMinecraft().player, TooltipFlag.Default.NORMAL), Component::getVisualOrderText), x + 15, y + 25);
             }
 
             index++;
@@ -292,7 +292,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
         }
 
         Lighting.setupFor3DItems();
-        matrices.popPose();
+        guiGraphics.pose().popPose();
     }
 
     private void pasteTemplateToStack(Level world, ItemStack stack, Template newTemplate, boolean replaced) {
@@ -450,7 +450,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
     }
 
     @Override
-    protected void renderLabels(PoseStack matrices, int mouseX, int mouseY) {
+    protected void renderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         if (panelClicked) {
             if (clickButton == 0) {
                 float prevRotX = rotX;
@@ -472,17 +472,17 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
         momentumY *= momentumDampening;
 
         if (!nameField.isFocused() && nameField.getValue().isEmpty())
-            getMinecraft().font.draw(matrices, GuiTranslation.TEMPLATE_PLACEHOLDER.format(), nameField.getX() - leftPos + 4, (nameField.getY() + 2) - topPos, -10197916);
+            guiGraphics.drawString(font, GuiTranslation.TEMPLATE_PLACEHOLDER.format(), nameField.getX() - leftPos + 4, (nameField.getY() + 2) - topPos, -10197916);
 
         if (buttonSave.isHoveredOrFocused() || buttonLoad.isHoveredOrFocused() || buttonPaste.isHoveredOrFocused())
-            drawSlotOverlay(matrices, buttonLoad.isHoveredOrFocused() ? container.getSlot(0) : container.getSlot(1));
+            drawSlotOverlay(guiGraphics, buttonLoad.isHoveredOrFocused() ? container.getSlot(0) : container.getSlot(1));
     }
 
-    private void drawSlotOverlay(PoseStack matrices, Slot slot) {
-        matrices.pushPose();
-        matrices.translate(0, 0, 1000);
-        fill(matrices, slot.x, slot.y, slot.x + 16, slot.y + 16, -1660903937);
-        matrices.popPose();
+    private void drawSlotOverlay(GuiGraphics guiGraphics, Slot slot) {
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0, 0, 1000);
+        guiGraphics.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, -1660903937);
+        guiGraphics.pose().popPose();
     }
 
     @Override
@@ -631,7 +631,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
             if (!tagFromJson.contains("header")) {
                 BuildingGadgets.LOG.error("Attempted to use a 1.12 compound on a newer MC version");
                 getMinecraft().player.displayClientMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
-                        .componentTranslation("(1.12.x)", Minecraft.getInstance().getGame().getVersion().getName()).setStyle(Styles.RED), false);
+                        .componentTranslation("(1.12.x)", Minecraft.getInstance().getVersionType()).setStyle(Styles.RED), false);
                 return;
 
             }

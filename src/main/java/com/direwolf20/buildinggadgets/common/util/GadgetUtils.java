@@ -168,18 +168,18 @@ public class GadgetUtils {
     }
 
     public static void linkToInventory(ItemStack stack, Player player) {
-        Level world = player.level;
+        Level world = player.level();
         BlockHitResult lookingAt = VectorHelper.getLookingAt(player, AbstractGadget.shouldRayTraceFluid(stack) ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE);
         if (world.getBlockState(VectorHelper.getLookingAt(player, stack).getBlockPos()) == Blocks.AIR.defaultBlockState())
             return;
 
-        InventoryLinker.Result result = InventoryLinker.linkInventory(player.level, stack, lookingAt);
+        InventoryLinker.Result result = InventoryLinker.linkInventory(player.level(), stack, lookingAt);
         player.displayClientMessage(result.getI18n().componentTranslation(), true);
     }
 
     public static InteractionResultHolder<Block> selectBlock(ItemStack stack, Player player) {
         // Used to find which block the player is looking at, and store it in NBT on the tool.
-        Level world = player.level;
+        Level world = player.level();
         BlockHitResult lookingAt = VectorHelper.getLookingAt(player, AbstractGadget.shouldRayTraceFluid(stack) ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE);
         if (world.isEmptyBlock(lookingAt.getBlockPos()))
             return InteractionResultHolder.fail(Blocks.AIR);
@@ -235,11 +235,11 @@ public class GadgetUtils {
         Direction sideHit = lookingAt.getDirection();
 
         //If we aren't looking at anything, exit
-        if (player.level.isEmptyBlock(startBlock))
+        if (player.level().isEmptyBlock(startBlock))
             return false;
 
         BlockData blockData = getToolBlock(stack);
-        AbstractMode.UseContext context = new AbstractMode.UseContext(player.level, player, blockData.getState(), startBlock, stack, sideHit, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack), stack.getItem() instanceof GadgetBuilding ? GadgetBuilding.getConnectedArea(stack) : GadgetExchanger.getConnectedArea(stack));
+        AbstractMode.UseContext context = new AbstractMode.UseContext(player.level(), player, blockData.getState(), startBlock, stack, sideHit, stack.getItem() instanceof GadgetBuilding && GadgetBuilding.shouldPlaceAtop(stack), stack.getItem() instanceof GadgetBuilding ? GadgetBuilding.getConnectedArea(stack) : GadgetExchanger.getConnectedArea(stack));
 
         List<BlockPos> coords = stack.getItem() instanceof GadgetBuilding
                 ? GadgetBuilding.getToolMode(stack).getMode().getCollection(context, player)

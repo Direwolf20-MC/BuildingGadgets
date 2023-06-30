@@ -191,7 +191,7 @@ public class GadgetBuilding extends AbstractGadget {
 
     private void build(ServerPlayer player, ItemStack stack) {
         //Build the blocks as shown in the visual render
-        Level world = player.level;
+        Level world = player.level();
         ItemStack heldItem = getGadget(player);
         if (heldItem.isEmpty())
             return;
@@ -220,7 +220,7 @@ public class GadgetBuilding extends AbstractGadget {
         IItemIndex index = InventoryHelper.index(stack, player);
 
         //TODO replace with a better TileEntity supporting Fake IWorld
-        fakeWorld.setWorldAndState(player.level, blockData.getState(), coords); // Initialize the fake world's blocks
+        fakeWorld.setWorldAndState(player.level(), blockData.getState(), coords); // Initialize the fake world's blocks
         for (BlockPos coordinate : coords) {
             //Get the extended block state in the fake world
             //Disabled to fix Chisel

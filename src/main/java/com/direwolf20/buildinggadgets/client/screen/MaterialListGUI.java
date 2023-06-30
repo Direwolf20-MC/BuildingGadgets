@@ -16,6 +16,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -127,19 +128,18 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
     }
 
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float particleTicks) {
-        RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE);
-        blit(matrices, backgroundX, backgroundY, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT); // TODO: Might be wrong
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float particleTicks) {
+        guiGraphics.blit(BACKGROUND_TEXTURE, backgroundX, backgroundY, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT); // TODO: Might be wrong
 
-        scrollingList.render(matrices, mouseX, mouseY, particleTicks);
-        drawString(matrices, font, title, titleLeft, titleTop, Color.WHITE.getRGB());
-        super.render(matrices, mouseX, mouseY, particleTicks);
+        scrollingList.render(guiGraphics, mouseX, mouseY, particleTicks);
+        guiGraphics.drawString(font, title, titleLeft, titleTop, Color.WHITE.getRGB(), false);
+        super.render(guiGraphics, mouseX, mouseY, particleTicks);
 
         if (buttonCopyList.isMouseOver(mouseX, mouseY)) {
-            renderTooltip(matrices, Lists.transform(ImmutableList.of(MaterialListTranslation.HELP_COPY_LIST.componentTranslation()), Component::getVisualOrderText), mouseX, mouseY);
+            guiGraphics.renderTooltip(font, Lists.transform(ImmutableList.of(MaterialListTranslation.HELP_COPY_LIST.componentTranslation()), Component::getVisualOrderText), mouseX, mouseY);
 //            GuiUtils.drawHoveringText(matrices, ImmutableList.of(MaterialListTranslation.HELP_COPY_LIST.componentTranslation()), mouseX, mouseY, width, height, Integer.MAX_VALUE, textRenderer);
         } else if (hoveringText != null) {
-            renderTooltip(matrices, Lists.transform(hoveringText, Component::getVisualOrderText), mouseX, mouseY);
+            guiGraphics.renderTooltip(font, Lists.transform(hoveringText, Component::getVisualOrderText), mouseX, mouseY);
 
 //            GuiUtils.drawHoveringText(matrices, hoveringText, hoveringTextX, hoveringTextY, width, height, Integer.MAX_VALUE, textRenderer);
             hoveringText = null;
@@ -266,18 +266,18 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
         return top + (bottom - top) / 2 - height / 2;
     }
 
-    public static void renderTextVerticalCenter(PoseStack matrices, String text, int leftX, int top, int bottom, int color) {
+    public static void renderTextVerticalCenter(GuiGraphics guiGraphics, String text, int leftX, int top, int bottom, int color) {
         Font fontRenderer = Minecraft.getInstance().font;
         int y = getYForAlignedCenter(top, bottom, fontRenderer.lineHeight);
-        RenderSystem.enableTexture();
-        fontRenderer.draw(matrices, text, leftX, y, color);
+//        RenderSystem.enableTexture();
+        guiGraphics.drawString(fontRenderer, text, leftX, y, color, false);
     }
 
-    public static void renderTextHorizontalRight(PoseStack matrices, String text, int right, int y, int color) {
+    public static void renderTextHorizontalRight(GuiGraphics guiGraphics, String text, int right, int y, int color) {
         Font fontRenderer = Minecraft.getInstance().font;
         int x = getXForAlignedRight(right, fontRenderer.width(text));
-        RenderSystem.enableTexture();
-        fontRenderer.draw(matrices, text, x, y, color);
+//        RenderSystem.enableTexture();
+        guiGraphics.drawString(fontRenderer, text, x, y, color, false);
     }
 
     public static boolean isPointInBox(double x, double y, int bx, int by, int width, int height) {

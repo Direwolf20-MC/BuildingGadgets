@@ -65,8 +65,8 @@ final class AllowPlayerOverrideManager {
             return 0;
         }
         toggleAllowOverride(player);
-        context.getSource().sendSuccess(toggledTranslation.componentTranslation(player.getDisplayName(), mayOverride(player))
-                .setStyle(Styles.AQUA), true);
+        //TODO
+//        context.getSource().sendSuccess(toggledTranslation.componentTranslation(player.getDisplayName(), mayOverride(player)).setStyle(Styles.AQUA), true);
         return 1;
     }
 
@@ -74,7 +74,8 @@ final class AllowPlayerOverrideManager {
         for (Map.Entry<UUID, Boolean> entry : allowPlayerOverrideCache.asMap().entrySet()) {
             MutableComponent component = listTranslation.componentTranslation(entry.getKey(), entry.getValue());
             component = entry.getValue() ? component.setStyle(Styles.BLUE) : component.setStyle(Styles.DK_GREEN);
-            context.getSource().sendSuccess(component, true);
+            //TODO
+//            context.getSource().sendSuccess(component, true);
         }
         return 1;
     }

@@ -148,7 +148,7 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     @Override
     public boolean performRotate(ItemStack stack, Player player) {
-        return player.level.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
+        return player.level().getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
                         stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).map(key -> {
                             Template template = provider.getTemplateForKey(key);
                             provider.setTemplate(key, template.rotate(Rotation.CLOCKWISE_90));
@@ -160,7 +160,7 @@ public class GadgetCopyPaste extends AbstractGadget {
 
     @Override
     public boolean performMirror(ItemStack stack, Player player) {
-        return player.level.getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
+        return player.level().getCapability(CapabilityTemplate.TEMPLATE_PROVIDER_CAPABILITY).map(provider ->
                         stack.getCapability(CapabilityTemplate.TEMPLATE_KEY_CAPABILITY).map(key -> {
                             Template template = provider.getTemplateForKey(key);
                             provider.setTemplate(key, template.mirror(player.getDirection().getAxis()));

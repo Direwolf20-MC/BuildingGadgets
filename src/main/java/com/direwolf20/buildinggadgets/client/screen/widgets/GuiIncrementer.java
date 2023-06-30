@@ -2,6 +2,7 @@ package com.direwolf20.buildinggadgets.client.screen.widgets;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
@@ -73,10 +74,10 @@ public class GuiIncrementer extends AbstractWidget {
     }
 
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float partialTick) {
-        this.plusButton.render(matrices, mouseX, mouseY, partialTick);
-        this.minusButton.render(matrices, mouseX, mouseY, partialTick);
-        this.field.render(matrices, mouseX, mouseY, partialTick);
+    public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        this.plusButton.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.minusButton.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.field.render(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     @Override
@@ -113,9 +114,10 @@ public class GuiIncrementer extends AbstractWidget {
     }
 
     @Override
-    protected void onFocusedChanged(boolean isFocused) {
-        this.field.changeFocus(isFocused);
-        super.onFocusedChanged(isFocused);
+    public void setFocused(boolean isFocused)
+    {
+        this.field.setFocused(isFocused);
+        super.setFocused(isFocused);
     }
 
     public int getX() {

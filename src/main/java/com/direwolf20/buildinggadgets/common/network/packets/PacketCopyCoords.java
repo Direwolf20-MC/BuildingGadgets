@@ -52,7 +52,7 @@ public class PacketCopyCoords {
                 Optional<Region> regionOpt = GadgetCopyPaste.getSelectedRegion(heldItem);
                 if (! regionOpt.isPresent()) //notify of single copy
                     playerEntity.displayClientMessage(MessageTranslation.FIRST_COPY.componentTranslation().setStyle(Styles.DK_GREEN), true);
-                regionOpt.ifPresent(region -> ((GadgetCopyPaste) heldItem.getItem()).tryCopy(heldItem, playerEntity.level, playerEntity, region));
+                regionOpt.ifPresent(region -> ((GadgetCopyPaste) heldItem.getItem()).tryCopy(heldItem, playerEntity.level(), playerEntity, region));
             });
 
             ctx.get().setPacketHandled(true);

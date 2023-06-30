@@ -5,7 +5,6 @@ import com.direwolf20.buildinggadgets.common.util.lang.TooltipTranslation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.FallingBlock;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.item.ItemStack;
@@ -22,7 +21,7 @@ import java.util.List;
 
 public class ConstructionBlockPowder extends FallingBlock {
     public ConstructionBlockPowder() {
-        super(Block.Properties.of(Material.SAND).strength(0.5F));
+        super(Block.Properties.of().strength(0.5F));
     }
 
     @Override

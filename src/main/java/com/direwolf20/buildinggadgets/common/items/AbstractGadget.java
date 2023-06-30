@@ -221,7 +221,7 @@ public abstract class AbstractGadget extends Item {
     public final void onAnchor(ItemStack stack, Player player) {
         if (getAnchor(stack) == null) {
             BlockHitResult lookingAt = VectorHelper.getLookingAt(player, stack);
-            if ((player.level.isEmptyBlock(lookingAt.getBlockPos())))
+            if ((player.level().isEmptyBlock(lookingAt.getBlockPos())))
                 return;
             onAnchorSet(stack, player, lookingAt);
             player.displayClientMessage(MessageTranslation.ANCHOR_SET.componentTranslation().setStyle(Styles.AQUA), true);

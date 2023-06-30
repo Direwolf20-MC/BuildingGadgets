@@ -23,12 +23,13 @@ import com.direwolf20.buildinggadgets.common.util.ref.NBTKeys;
 import com.direwolf20.buildinggadgets.common.util.ref.Reference;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
@@ -42,6 +43,7 @@ import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.registries.RegistryObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -83,37 +85,35 @@ public final class BuildingGadgets {
         eventBus.addListener(this::registerCreativeTab);
     }
 
-    private void registerCreativeTab(CreativeModeTabEvent.Register register) {
-        register.registerCreativeModeTab(new ResourceLocation(Reference.MODID, Reference.MODID), builder ->
-            builder
-                .title(Component.translatable("itemGroup." + Reference.MODID))
-                .icon(() -> {
-                    ItemStack stack = new ItemStack(OurItems.BUILDING_GADGET_ITEM.get());
-                    stack.getOrCreateTag().putByte(NBTKeys.CREATIVE_MARKER, (byte) 0);
-                    return stack;
-                })
-                .displayItems((featureFlags, output, hasPermission) -> {
-                    // Register it alL!
-                    OurItems.ITEMS.getEntries()
-                            .forEach(e -> {
-                                if (e.get() instanceof AbstractGadget) {
-                                    output.accept(e.get());
+    private void registerCreativeTab(RegisterEvent event) {
+        ResourceKey<CreativeModeTab> TAB = ResourceKey.create(net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB, new ResourceLocation(Reference.MODID, Reference.MODID));
+        event.register(net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB, creativeModeTabRegisterHelper ->
+        {
+            creativeModeTabRegisterHelper.register(TAB, CreativeModeTab.builder().icon(() -> new ItemStack(OurItems.BUILDING_GADGET_ITEM.get()))
+                    .title(Component.translatable("itemGroup." + Reference.MODID))
+                    .displayItems((params, output) -> {
+                        // Register it alL!
+                        OurItems.ITEMS.getEntries()
+                                .forEach(e -> {
+                                    if (e.get() instanceof AbstractGadget) {
+                                        output.accept(e.get());
 
-                                    // Create charged versions of the gadgets :D
-                                    ItemStack stack = new ItemStack(e.get());
-                                    stack.getOrCreateTag().putInt(NBTKeys.ENERGY, ((AbstractGadget) e.get()).getEnergyMax());
-                                    output.accept(stack);
-                                } else {
-                                    output.accept(e.get());
-                                }
-                            });
+                                        // Create charged versions of the gadgets :D
+                                        ItemStack stack = new ItemStack(e.get());
+                                        stack.getOrCreateTag().putInt(NBTKeys.ENERGY, ((AbstractGadget) e.get()).getEnergyMax());
+                                        output.accept(stack);
+                                    } else {
+                                        output.accept(e.get());
+                                    }
+                                });
 
-                    // Some of the blocks too!
-                    OurBlocks.BLOCKS.getEntries()
-                            .stream().filter(e -> e != OurBlocks.EFFECT_BLOCK)
-                            .forEach(e -> output.accept(e.get()));
-                })
-            .build());
+                        // Some of the blocks too!
+                        OurBlocks.BLOCKS.getEntries()
+                                .stream().filter(e -> e != OurBlocks.EFFECT_BLOCK)
+                                .forEach(e -> output.accept(e.get()));
+                    })
+                    .build());
+        });
     }
 
     private void registerCaps(RegisterCapabilitiesEvent event) {

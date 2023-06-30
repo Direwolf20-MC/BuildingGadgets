@@ -42,7 +42,7 @@ public final class PacketTemplateManagerTemplateCreated extends UUIDPacket {
         NetworkEvent.Context ctx = contextSupplier.get();
         ctx.enqueueWork(() -> {
             if (contextSupplier.get().getDirection().getReceptionSide() == LogicalSide.SERVER) {
-                Level world = contextSupplier.get().getSender().level;
+                Level world = contextSupplier.get().getSender().level();
                 if (world.hasChunkAt(pos)) {
                     BlockEntity tileEntity = world.getBlockEntity(pos);
                     if (tileEntity != null) {
