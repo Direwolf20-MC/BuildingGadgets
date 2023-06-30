@@ -26,7 +26,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -446,18 +445,16 @@ public class ModeRadialMenu extends Screen {
             RenderSystem.setShaderTexture(0, signs.get(i));
             ResourceLocation resourceLocation = signs.get(i);
             guiGraphics.blit(resourceLocation, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
-
+            RenderSystem.setShaderColor(1, 1, 1, 1);
             matrices.popPose();
         }
 
         float s = 1.8F * fract;
-        PoseStack stack = RenderSystem.getModelViewStack();
-        stack.pushPose();
-        stack.scale(s, s, s);
+        matrices.pushPose();
+        matrices.scale(s, s, s);
+        matrices.translate(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8 : 8.5), y / s - 8, 250);
+        guiGraphics.renderItem(tool, 0, 0);
         matrices.popPose();
-        stack.translate(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8 : 8.5), y / s - 8, 0);
-        guiGraphics.renderItemDecorations(font, tool, 0, 0);
-        stack.popPose();
     }
 
     private boolean isCursorInSlice(float angle, float totalDeg, float degPer, boolean inRange) {
