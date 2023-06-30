@@ -27,7 +27,7 @@ public class DestructionRender extends BaseRenderer {
             return;
 
         BlockHitResult lookingAt = VectorHelper.getLookingAt(player, heldItem);
-        Level world = player.level;
+        Level world = player.level();
         BlockPos anchor = ((AbstractGadget) heldItem.getItem()).getAnchor(heldItem);
 
         if (world.getBlockState(VectorHelper.getLookingAt(player, heldItem).getBlockPos()) == AIR && anchor == null)

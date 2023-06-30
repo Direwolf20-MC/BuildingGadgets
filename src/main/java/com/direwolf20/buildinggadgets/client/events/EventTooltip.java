@@ -21,6 +21,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -62,8 +63,9 @@ public class EventTooltip {
             return Screen.hasShiftDown() && tooltipData.data != null ? (tooltipData.data.sortedEntries.size() <= STACKS_PER_LINE ? tooltipData.data.sortedEntries.size() * 18 : STACKS_PER_LINE * 18) : 0;
         }
 
+
         @Override
-        public void renderImage(Font font, int x, int y, PoseStack poseStack, ItemRenderer itemRenderer, int p_194053_) {
+        public void renderImage(Font font, int x, int y, GuiGraphics guiGraphics) {
             if (this.tooltipData.stack == null || !(this.tooltipData.stack.getItem() instanceof GadgetCopyPaste))
                 return;
 
@@ -85,7 +87,7 @@ public class EventTooltip {
             for (Multiset.Entry<IUniqueObject<?>> entry : tooltipData.data.sortedEntries) {
                 int xx = bx + (j % STACKS_PER_LINE) * 18;
                 int yy = by + (j / STACKS_PER_LINE) * 20;
-                totalMissing += renderRequiredBlocks(poseStack, itemRenderer, entry.getElement().createStack(), xx, yy, tooltipData.data.existing.count(entry.getElement()), entry.getCount());
+                totalMissing += renderRequiredBlocks(guiGraphics, entry.getElement().createStack(), xx, yy, tooltipData.data.existing.count(entry.getElement()), entry.getCount());
                 j++;
             }
 
@@ -105,7 +107,7 @@ public class EventTooltip {
                 } catch (ArithmeticException ignored) {
                 }
 
-                renderRequiredBlocks(poseStack, itemRenderer, pasteItem.createStack(), xx, yy, hasAmt, required);
+                renderRequiredBlocks(guiGraphics, pasteItem.createStack(), xx, yy, hasAmt, required);
             }
         }
 
@@ -147,7 +149,8 @@ public class EventTooltip {
         }
     }
 
-    private static int renderRequiredBlocks(PoseStack matrices, ItemRenderer itemRenderer, ItemStack itemStack, int x, int y, int count, int req) {
+    private static int renderRequiredBlocks(GuiGraphics guiGraphics, ItemStack itemStack, int x, int y, int count, int req) {
+        var matrices = guiGraphics.pose();
         Minecraft mc = Minecraft.getInstance();
 
         String s1 = req == Integer.MAX_VALUE ? "\u221E" : Integer.toString(req);
@@ -155,29 +158,22 @@ public class EventTooltip {
 
         boolean hasReq = req > 0;
 
-        itemRenderer.renderAndDecorateItem(itemStack, x, y);
-        itemRenderer.renderGuiItemDecorations(mc.font, itemStack, x, y);
+        guiGraphics.renderItem(itemStack, x, y);
+        guiGraphics.renderItemDecorations(mc.font, itemStack, x, y);
 
         MultiBufferSource.BufferSource irendertypebuffer$impl = Minecraft.getInstance().renderBuffers().bufferSource();
 
         matrices.pushPose();
-        matrices.translate(x + 8 - w1 / 4f, y + (hasReq ? 12 : 14), itemRenderer.blitOffset + 250);
         matrices.scale(.5f, .5f, 0);
-        mc.font.draw(matrices, s1, 0, 0, 0xFFFFFF);
+        guiGraphics.drawString(mc.font, s1, 0, 0, 0xFFFFFF, false);
         matrices.popPose();
 
         int missingCount = 0;
         if (hasReq) {
 
             if (count < req) {
-                String fs = Integer.toString(req - count);
-                String s2 = "(" + fs + ")";
-                int w2 = mc.font.width(s2);
-
                 matrices.pushPose();
-                matrices.translate(x + 8 - w2 / 4f, y + 17, itemRenderer.blitOffset + 250);
                 matrices.scale(.5f, .5f, 0);
-                mc.font.drawInBatch(s2, 0, 0, 0xFF0000, true, matrices.last().pose(), irendertypebuffer$impl, false, 0, 15728880);
                 matrices.popPose();
 
                 missingCount = (req - count);

@@ -76,7 +76,7 @@ public class InventoryHelper {
     static List<IInsertProvider> indexInsertProviders(ItemStack tool, Player player) {
         ImmutableList.Builder<IInsertProvider> builder = ImmutableList.builder();
 
-        InventoryLinker.getLinkedInventory(player.level, tool).ifPresent(e -> builder.add(new HandlerInsertProvider(e)));
+        InventoryLinker.getLinkedInventory(player.level(), tool).ifPresent(e -> builder.add(new HandlerInsertProvider(e)));
         builder.add(new PlayerInventoryInsertProvider(player));
 
         return builder.build();
@@ -94,7 +94,7 @@ public class InventoryHelper {
     static List<IItemHandler> getHandlers(ItemStack stack, Player player) {
         List<IItemHandler> handlers = new ArrayList<>();
 
-        InventoryLinker.getLinkedInventory(player.level, stack).ifPresent(handlers::add);
+        InventoryLinker.getLinkedInventory(player.level(), stack).ifPresent(handlers::add);
         player.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(handlers::add);
 
         return handlers;
@@ -269,7 +269,7 @@ public class InventoryHelper {
     }
 
     public static Optional<BlockData> getSafeBlockData(Player player, BlockPos pos, BlockPlaceContext useContext) {
-        Level world = player.level;
+        Level world = player.level();
         Boolean isCopyPasteGadget = (AbstractGadget.getGadget(player).getItem() instanceof GadgetCopyPaste);
         BlockState state = world.getBlockState(pos);
         if (state.getBlock() instanceof LiquidBlock)

@@ -14,6 +14,7 @@ import com.google.common.collect.Multiset;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import com.mojang.blaze3d.platform.Lighting;
 import net.minecraft.network.chat.Component;
@@ -99,11 +100,11 @@ class ScrollingMaterialList extends EntryList<Entry> {
     }
 
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         if (lastUpdate + UPDATE_MILLIS < System.currentTimeMillis())
             updateEntries();
 
-        super.render(matrices, mouseX, mouseY, partialTicks);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
     public void reset() {
@@ -139,7 +140,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
         }
 
         @Override
-        public void render(PoseStack matrices, int index, int topY, int leftX, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float particleTicks) {
+        public void render(GuiGraphics guiGraphics, int index, int topY, int leftX, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float particleTicks) {
             // Weird render issue with GuiSlot where the right border is slightly offset
             // MARGIN * 2 is just a magic number that made it look nice
             int right = leftX + entryWidth - MARGIN * 2;
@@ -149,16 +150,16 @@ class ScrollingMaterialList extends EntryList<Entry> {
             int slotX = leftX + MARGIN;
             int slotY = topY + MARGIN;
 
-            drawIcon(matrices, stack, slotX, slotY);
-            drawTextOverlay(matrices, right, topY, bottom, slotX);
+            drawIcon(guiGraphics, stack, slotX, slotY);
+            drawTextOverlay(guiGraphics, right, topY, bottom, slotX);
             drawHoveringText(stack, slotX, slotY, mouseX, mouseY);
         }
 
-        private void drawTextOverlay(PoseStack matrices, int right, int top, int bottom, int slotX) {
+        private void drawTextOverlay(GuiGraphics guiGraphics, int right, int top, int bottom, int slotX) {
             int itemNameX = slotX + SLOT_SIZE + MARGIN;
             // -1 because the bottom x coordinate is exclusive
-            renderTextVerticalCenter(matrices, itemName, itemNameX, top, bottom, Color.WHITE.getRGB());
-            renderTextHorizontalRight(matrices, amount, right, getYForAlignedCenter(top, bottom, Minecraft.getInstance().font.lineHeight), getTextColor());
+            renderTextVerticalCenter(guiGraphics, itemName, itemNameX, top, bottom, Color.WHITE.getRGB());
+            renderTextHorizontalRight(guiGraphics, amount, right, getYForAlignedCenter(top, bottom, Minecraft.getInstance().font.lineHeight), getTextColor());
 
             drawGuidingLine(right, top, bottom, itemNameX, widthItemName, widthAmount);
         }
@@ -169,7 +170,7 @@ class ScrollingMaterialList extends EntryList<Entry> {
                 int lineXEnd = right - widthAmount - LINE_SIDE_MARGIN;
                 int lineY = getYForAlignedCenter(top, bottom - 1, 1);
                 RenderSystem.enableBlend();
-                RenderSystem.disableTexture();
+//                RenderSystem.disableTexture();
                 RenderSystem.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
                 RenderSystem.setShaderColor(255, 255, 255, 34);
 
@@ -179,18 +180,18 @@ class ScrollingMaterialList extends EntryList<Entry> {
 //                glVertex3f(lineXEnd, lineY, 0);
 //                glEnd();
 
-                RenderSystem.enableTexture();
+//                RenderSystem.enableTexture();
             }
         }
 
         private void drawHoveringText(ItemStack item, int slotX, int slotY, int mouseX, int mouseY) {
             if (isPointInBox(mouseX, mouseY, slotX, slotY, 18, 18))
-                parent.gui.setTaskHoveringText(mouseX, mouseY, parent.gui.getTooltipFromItem(item));
+                parent.gui.setTaskHoveringText(mouseX, mouseY, parent.gui.getTooltipFromItem(Minecraft.getInstance(), item));
         }
 
-        private void drawIcon(PoseStack matrices, ItemStack item, int slotX, int slotY) {
+        private void drawIcon(GuiGraphics guiGraphics, ItemStack item, int slotX, int slotY) {
             Lighting.setupForFlatItems();
-            Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(item, slotX, slotY);
+            guiGraphics.renderItemDecorations(Minecraft.getInstance().font, item, slotX, slotY);
 //            RenderSystem.color3f(1, 1, 1);
             Lighting.setupFor3DItems();
         }

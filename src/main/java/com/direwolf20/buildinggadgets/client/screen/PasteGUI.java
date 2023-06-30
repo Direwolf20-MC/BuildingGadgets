@@ -12,6 +12,7 @@ import com.direwolf20.buildinggadgets.common.network.packets.PacketPasteGUI;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
@@ -94,17 +95,17 @@ public class PasteGUI extends Screen {
     }
 
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
-        drawLabel(matrices, "X", -75);
-        drawLabel(matrices, "Y", 0);
-        drawLabel(matrices, "Z", 75);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        drawLabel(guiGraphics, "X", -75);
+        drawLabel(guiGraphics, "Y", 0);
+        drawLabel(guiGraphics, "Z", 75);
 
-        drawCenteredString(matrices, Minecraft.getInstance().font, I18n.get(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), (int) (width / 2f), (int) (height / 2f) - 60, 0xFFFFFF);
+        guiGraphics.drawCenteredString(Minecraft.getInstance().font, I18n.get(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), (int) (width / 2f), (int) (height / 2f) - 60, 0xFFFFFF);
 
-        super.render(matrices, mouseX, mouseY, partialTicks);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
-    private void drawLabel(PoseStack matrices, String name, int x) {
-        font.drawShadow(matrices, name, (width / 2f) + x, (height / 2f) - 30, 0xFFFFFF);
+    private void drawLabel(GuiGraphics guiGraphics, String name, int x) {
+        guiGraphics.drawString(font, name, (width / 2f) + x, (height / 2f) - 30, 0xFFFFFF, false);
     }
 }

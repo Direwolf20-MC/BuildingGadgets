@@ -58,8 +58,8 @@ public class BuildRender extends BaseRenderer {
         BlockState state = AIR;
         Optional<List<BlockPos>> anchor = getAnchor(heldItem);
 
-        BlockState startBlock = player.level.getBlockState(lookingAt.getBlockPos());
-        if( (player.level.isEmptyBlock(lookingAt.getBlockPos()) && !anchor.isPresent()) || startBlock == DEFAULT_EFFECT_BLOCK )
+        BlockState startBlock = player.level().getBlockState(lookingAt.getBlockPos());
+        if( (player.level().isEmptyBlock(lookingAt.getBlockPos()) && !anchor.isPresent()) || startBlock == DEFAULT_EFFECT_BLOCK )
             return;
 
         BlockData data = getToolBlock(heldItem);
@@ -71,7 +71,7 @@ public class BuildRender extends BaseRenderer {
         List<BlockPos> coordinates = anchor.orElseGet(() -> {
             AbstractMode mode = !this.isExchanger ? GadgetBuilding.getToolMode(heldItem).getMode() : GadgetExchanger.getToolMode(heldItem).getMode();
             return mode.getCollection(
-                    new AbstractMode.UseContext(player.level, player, renderBlockState, lookingAt.getBlockPos(), heldItem, lookingAt.getDirection(), !this.isExchanger && GadgetBuilding.shouldPlaceAtop(heldItem), !this.isExchanger ? GadgetBuilding.getConnectedArea(heldItem) : GadgetExchanger.getConnectedArea(heldItem)),
+                    new AbstractMode.UseContext(player.level(), player, renderBlockState, lookingAt.getBlockPos(), heldItem, lookingAt.getDirection(), !this.isExchanger && GadgetBuilding.shouldPlaceAtop(heldItem), !this.isExchanger ? GadgetBuilding.getConnectedArea(heldItem) : GadgetExchanger.getConnectedArea(heldItem)),
                     player
             );
         });
@@ -80,7 +80,7 @@ public class BuildRender extends BaseRenderer {
 //        coordinates = SortingHelper.Blocks.byDistance(coordinates, player);
 
         //Prepare the fake world -- using a fake world lets us render things properly, like fences connecting.
-        getBuilderWorld().setWorldAndState(player.level, renderBlockState, coordinates);
+        getBuilderWorld().setWorldAndState(player.level(), renderBlockState, coordinates);
 
         Vec3 playerPos = getMc().gameRenderer.getMainCamera().getPosition();
         MultiBufferSource.BufferSource buffer = Minecraft.getInstance().renderBuffers().bufferSource();
@@ -129,7 +129,7 @@ public class BuildRender extends BaseRenderer {
 
             // Figure out how many of the block we're rendering we have in the inventory of the player.
             IItemIndex index = new RecordingItemIndex(InventoryHelper.index(heldItem, player));
-            BuildContext context = new BuildContext(player.level, player, heldItem);
+            BuildContext context = new BuildContext(player.level(), player, heldItem);
 
             MaterialList materials = data.getRequiredItems(context, null, null);
             int hasEnergy = getEnergy(player, heldItem);

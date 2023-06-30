@@ -20,10 +20,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.material.MaterialColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -96,12 +95,6 @@ public class EffectBlock extends BaseEntityBlock {
         return createTickerHelper(type, OurTileEntities.EFFECT_BLOCK_TILE_ENTITY.get(), EffectBlockTileEntity::tick);
     }
 
-    /**
-     * As the effect block is effectively air it needs to have a material just like Air.
-     * We don't use Material.AIR as this is replaceable.
-     */
-    private static final Material EFFECT_BLOCK_MATERIAL = new Material.Builder(MaterialColor.NONE).nonSolid().build();
-
     public static void spawnUndoBlock(BuildContext context, PlacementTarget target) {
         BlockState state = context.getWorld().getBlockState(target.getPos());
 
@@ -143,8 +136,7 @@ public class EffectBlock extends BaseEntityBlock {
     }
 
     public EffectBlock() {
-        super(Block.Properties.of(EFFECT_BLOCK_MATERIAL)
-                .strength(20f));
+        super(Block.Properties.of().strength(20f));
     }
 
     @Nullable
@@ -187,7 +179,8 @@ public class EffectBlock extends BaseEntityBlock {
      * @param p_220076_1_ Current state
      */
     @Override
-    public List<ItemStack> getDrops(BlockState p_220076_1_, LootContext.Builder p_220076_2_) {
+    public List<ItemStack> getDrops(BlockState p_287732_, LootParams.Builder p_287596_)
+    {
         return new ArrayList<>();
     }
 

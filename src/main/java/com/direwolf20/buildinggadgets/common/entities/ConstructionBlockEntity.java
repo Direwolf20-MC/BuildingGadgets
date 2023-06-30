@@ -59,7 +59,7 @@ public class ConstructionBlockEntity extends EntityBase {
         if (targetPos == null)
             return false;
 
-        Block block = level.getBlockState(targetPos).getBlock();
+        Block block = level().getBlockState(targetPos).getBlock();
         return !(block instanceof ConstructionBlock) && !(block instanceof ConstructionBlockPowder);
     }
 
@@ -67,11 +67,11 @@ public class ConstructionBlockEntity extends EntityBase {
     protected void onSetDespawning() {
         if (targetPos != null) {
             if (!getMakingPaste()) {
-                BlockEntity te = level.getBlockEntity(targetPos);
+                BlockEntity te = level().getBlockEntity(targetPos);
                 if (te instanceof ConstructionBlockTileEntity) {
                     BlockData tempState = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
 
-                    boolean opaque = tempState.getState().isSolidRender(level, targetPos);
+                    boolean opaque = tempState.getState().isSolidRender(level(), targetPos);
                     boolean neighborBrightness = false;//tempState.useNeighbourBrightness(world, targetPos); //TODO find replacement
                     //IBakedModel model;
                     //model = Minecraft.getInstance().getBlockRendererDispatcher().getBlockModelShapes().getModel(tempState.getState());
@@ -79,18 +79,18 @@ public class ConstructionBlockEntity extends EntityBase {
                     boolean ambient = false; //TODO Find a better way to get the proper ambient Occlusion value. This is client side only so can't be done here.
                     if (opaque || neighborBrightness || !ambient) {
                         BlockData tempSetBlock = ((ConstructionBlockTileEntity) te).getConstructionBlockData();
-                        level.setBlockAndUpdate(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().defaultBlockState()
+                        level().setBlockAndUpdate(targetPos, OurBlocks.CONSTRUCTION_BLOCK.get().defaultBlockState()
                                 .setValue(ConstructionBlock.BRIGHT, !opaque)
                                 .setValue(ConstructionBlock.NEIGHBOR_BRIGHTNESS, neighborBrightness)
                                 .setValue(ConstructionBlock.AMBIENT_OCCLUSION, ambient));
-                        te = level.getBlockEntity(targetPos);
+                        te = level().getBlockEntity(targetPos);
                         if (te instanceof ConstructionBlockTileEntity) {
                             ((ConstructionBlockTileEntity) te).setBlockState(tempSetBlock);
                         }
                     }
                 }
-            } else if (level.getBlockState(targetPos) == OurBlocks.CONSTRUCTION_POWDER_BLOCK.get().defaultBlockState()) {
-                level.setBlockAndUpdate(targetPos, OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().defaultBlockState());
+            } else if (level().getBlockState(targetPos) == OurBlocks.CONSTRUCTION_POWDER_BLOCK.get().defaultBlockState()) {
+                level().setBlockAndUpdate(targetPos, OurBlocks.CONSTRUCTION_DENSE_BLOCK.get().defaultBlockState());
             }
         }
     }

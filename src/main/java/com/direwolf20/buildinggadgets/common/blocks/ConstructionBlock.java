@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.pathfinder.PathComputationType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -34,7 +33,7 @@ public class ConstructionBlock extends Block implements EntityBlock /*implements
     public static final Property<Boolean> AMBIENT_OCCLUSION = BooleanProperty.create("ambient_occlusion");
 
     public ConstructionBlock() {
-        super(Block.Properties.of(Material.SAND).strength(1.5F, 6.0F));
+        super(Block.Properties.of().strength(1.5F, 6.0F));
         registerDefaultState(this.getStateDefinition().any().setValue(BRIGHT, true).setValue(NEIGHBOR_BRIGHTNESS, false).setValue(AMBIENT_OCCLUSION, false));
     }
 

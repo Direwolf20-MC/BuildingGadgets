@@ -126,7 +126,7 @@ public class CopyPasteRender extends BaseRenderer implements IUpdateListener {
     }
 
     private void renderPaste(PoseStack matrices, Vec3 cameraView, Player player, ItemStack heldItem) {
-        Level world = player.level;
+        Level world = player.level();
 
         // Check the template cap from the world
         // Fetch the template key (because for some reason this is it's own cap)

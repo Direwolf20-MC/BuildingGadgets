@@ -3,6 +3,7 @@ package com.direwolf20.buildinggadgets.client.screen.widgets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.ObjectSelectionList.Entry;
 import net.minecraft.util.Mth;
@@ -21,7 +22,7 @@ public class EntryList<E extends Entry<E>> extends ObjectSelectionList<E> {
     }
 
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
         glEnable(GL_SCISSOR_TEST);
         double guiScaleFactor = Minecraft.getInstance().getWindow().getGuiScale();
 
@@ -31,25 +32,22 @@ public class EntryList<E extends Entry<E>> extends ObjectSelectionList<E> {
                 (int)(width * guiScaleFactor),
                 (int)(height * guiScaleFactor));
 
-        renderParts(matrices, mouseX, mouseY, partialTicks);
+        renderParts(guiGraphics, mouseX, mouseY, partialTicks);
         glDisable(GL_SCISSOR_TEST);
     }
 
     // Copied and modified from AbstractLists#render(int, int, float)
-    private void renderParts(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
-        renderBackground(matrices);
-//        RenderSystem.disableLighting();
-//        RenderSystem.disableFog();
+    private void renderParts(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        renderBackground(guiGraphics);
         Tesselator tessellator = Tesselator.getInstance();
         BufferBuilder bufferbuilder = tessellator.getBuilder();
 
-        renderContentBackground(matrices, tessellator, bufferbuilder);
+        renderContentBackground(guiGraphics, tessellator, bufferbuilder);
 
         int k = getRowLeft();
         int l = getTop() + 4 - (int) getScrollAmount();
-        renderHeader(matrices, k, l, tessellator);
 
-        renderList(matrices, k, l, partialTicks);
+        renderList(guiGraphics, k, l, partialTicks);
         RenderSystem.disableDepthTest();
 
         int j1 = getMaxScroll();
@@ -63,7 +61,6 @@ public class EntryList<E extends Entry<E>> extends ObjectSelectionList<E> {
             int x1 = getScrollbarPosition();
             int x2 = x1 + 6;
 
-            RenderSystem.disableTexture();
             bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             bufferbuilder.vertex(x1, getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
             bufferbuilder.vertex(x2, getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
@@ -82,18 +79,17 @@ public class EntryList<E extends Entry<E>> extends ObjectSelectionList<E> {
             tessellator.end();
         }
 
-        renderDecorations(matrices, mouseX, mouseX);
-        RenderSystem.enableTexture();
+        renderDecorations(guiGraphics, mouseX, mouseX);
         RenderSystem.disableBlend();
     }
 
-    protected void renderContentBackground(PoseStack matrices, Tesselator tessellator, BufferBuilder bufferbuilder) {
-        fillGradient(matrices, getLeft(), getTop(), getRight(), getBottom(), 0xC0101010, 0xD0101010);
+    protected void renderContentBackground(GuiGraphics guiGraphics, Tesselator tessellator, BufferBuilder bufferbuilder) {
+        guiGraphics.fillGradient(getLeft(), getTop(), getRight(), getBottom(), 0xC0101010, 0xD0101010);
     }
 
     @Override
-    protected void renderBackground(PoseStack p_230433_1_) {
-        super.renderBackground(p_230433_1_);
+    protected void renderBackground(GuiGraphics guiGraphics) {
+        super.renderBackground(guiGraphics);
     }
 
     @Override

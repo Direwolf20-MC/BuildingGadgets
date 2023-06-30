@@ -9,6 +9,7 @@ import com.direwolf20.buildinggadgets.common.tainted.building.Region;
 import com.direwolf20.buildinggadgets.common.util.lang.GuiTranslation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
@@ -93,8 +94,8 @@ public class CopyGUI extends Screen {
         buttons.forEach(this::addRenderableWidget);
     }
 
-    private void drawFieldLabel(PoseStack matrices, String name, int x, int y) {
-        font.drawShadow(matrices, name, this.x + x, this.y + y, 0xFFFFFF);
+    private void drawFieldLabel(GuiGraphics guiGraphics, String name, int x, int y) {
+        guiGraphics.drawString(font, name, this.x + x, this.y + y, 0xFFFFFF);
     }
 
     private void coordsModeSwitch() {
@@ -123,18 +124,18 @@ public class CopyGUI extends Screen {
     }
 
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float partialTicks) {
-        drawFieldLabel(matrices, GuiTranslation.FIELD_START.format() + " X", -175, -36);
-        drawFieldLabel(matrices, "Y", -45, -36);
-        drawFieldLabel(matrices, "Z", 55, -36);
-        drawFieldLabel(matrices, GuiTranslation.FIELD_END.format() + " X", 8 - 175, -11);
-        drawFieldLabel(matrices, "Y", -45, -11);
-        drawFieldLabel(matrices, "Z", 55, -11);
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        drawFieldLabel(guiGraphics, GuiTranslation.FIELD_START.format() + " X", -175, -36);
+        drawFieldLabel(guiGraphics, "Y", -45, -36);
+        drawFieldLabel(guiGraphics, "Z", 55, -36);
+        drawFieldLabel(guiGraphics, GuiTranslation.FIELD_END.format() + " X", 8 - 175, -11);
+        drawFieldLabel(guiGraphics, "Y", -45, -11);
+        drawFieldLabel(guiGraphics, "Z", 55, -11);
 
-        drawCenteredString(matrices, Minecraft.getInstance().font, I18n.get(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), this.x, this.y - 80, 0xFFFFFF);
-        drawCenteredString(matrices, Minecraft.getInstance().font, I18n.get(GuiTranslation.COPY_LABEL_SUBHEADING.getTranslationKey()), this.x, this.y - 68, 0xFFFFFF);
+        guiGraphics.drawCenteredString(font, I18n.get(GuiTranslation.COPY_LABEL_HEADING.getTranslationKey()), this.x, this.y - 80, 0xFFFFFF);
+        guiGraphics.drawCenteredString(font, I18n.get(GuiTranslation.COPY_LABEL_SUBHEADING.getTranslationKey()), this.x, this.y - 68, 0xFFFFFF);
 
-        super.render(matrices, mouseX, mouseY, partialTicks);
+        super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
     @Override

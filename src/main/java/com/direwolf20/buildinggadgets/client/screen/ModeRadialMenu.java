@@ -30,6 +30,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -305,7 +306,8 @@ public class ModeRadialMenu extends Screen {
     }
 
     @Override
-    public void render(PoseStack matrices, int mx, int my, float partialTicks) {
+    public void render(GuiGraphics guiGraphics, int mx, int my, float partialTicks) {
+        var matrices = guiGraphics.pose();
         float stime = 5F;
         float fract = Math.min(stime, this.timeIn + partialTicks) / stime;
         int x = this.width / 2;
@@ -328,7 +330,7 @@ public class ModeRadialMenu extends Screen {
         matrices.pushPose();
         matrices.translate((1 - fract) * x, (1 - fract) * y, 0);
         matrices.scale(fract, fract, fract);
-        super.render(matrices, mx, my, partialTicks);
+        super.render(guiGraphics, mx, my, partialTicks);
         matrices.popPose();
 
         if (this.segments == 0) {
@@ -433,7 +435,7 @@ public class ModeRadialMenu extends Screen {
 
             Color color = i == modeIndex ? Color.GREEN : Color.WHITE;
             if (data.isSelected())
-                font.drawShadow(matrices, name, xsp + (data.isCentralized() ? width / 2f - 4 : 0), ysp, color.getRGB());
+                guiGraphics.drawString(font, name, xsp + (data.isCentralized() ? width / 2f - 4 : 0), ysp, color.getRGB(), true);
 
             double mod = 0.7;
             int xdp = (int) ((xp - x) * mod + x);
@@ -442,7 +444,8 @@ public class ModeRadialMenu extends Screen {
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F, 1);
             RenderSystem.setShaderTexture(0, signs.get(i));
-            blit(matrices, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
+            ResourceLocation resourceLocation = signs.get(i);
+            guiGraphics.blit(resourceLocation, xdp - 8, ydp - 8, 0, 0, 16, 16, 16, 16);
 
             matrices.popPose();
         }
@@ -453,7 +456,7 @@ public class ModeRadialMenu extends Screen {
         stack.scale(s, s, s);
         matrices.popPose();
         stack.translate(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8 : 8.5), y / s - 8, 0);
-        this.itemRenderer.renderAndDecorateItem(tool, 0, 0);
+        guiGraphics.renderItemDecorations(font, tool, 0, 0);
         stack.popPose();
     }
 

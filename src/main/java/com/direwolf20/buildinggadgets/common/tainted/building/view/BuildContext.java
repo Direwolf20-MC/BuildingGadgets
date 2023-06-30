@@ -99,7 +99,7 @@ public final class BuildContext {
         public Builder player(@Nullable Player buildingPlayer) {
             this.buildingPlayer = buildingPlayer;
             if (world == null && buildingPlayer != null)
-                this.world = buildingPlayer.level;
+                this.world = buildingPlayer.level();
             return this;
         }
 

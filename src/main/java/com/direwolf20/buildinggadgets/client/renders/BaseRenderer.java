@@ -64,7 +64,7 @@ public abstract class BaseRenderer {
             return;
         }
 
-        if (!player.level.dimension().equals(dataFromStack.getValue())) {
+        if (!player.level().dimension().equals(dataFromStack.getValue())) {
             return;
         }
 
