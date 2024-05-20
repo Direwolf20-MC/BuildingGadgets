@@ -269,14 +269,12 @@ public class MaterialListGUI extends Screen implements ITemplateProvider.IUpdate
     public static void renderTextVerticalCenter(PoseStack matrices, String text, int leftX, int top, int bottom, int color) {
         Font fontRenderer = Minecraft.getInstance().font;
         int y = getYForAlignedCenter(top, bottom, fontRenderer.lineHeight);
-        RenderSystem.enableTexture();
         fontRenderer.draw(matrices, text, leftX, y, color);
     }
 
     public static void renderTextHorizontalRight(PoseStack matrices, String text, int right, int y, int color) {
         Font fontRenderer = Minecraft.getInstance().font;
         int x = getXForAlignedRight(right, fontRenderer.width(text));
-        RenderSystem.enableTexture();
         fontRenderer.draw(matrices, text, x, y, color);
     }
 

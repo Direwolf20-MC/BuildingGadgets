@@ -43,6 +43,7 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -274,8 +275,8 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
             ItemStack stack = e.getElement().createStack();
             int x = (-20 - (column * 25)), y = (20 + (index * 25));
 
-            itemRenderer.renderAndDecorateItem(stack, x + 4, y + 4);
-            itemRenderer.renderGuiItemDecorations(Minecraft.getInstance().font, stack, x + 4, y + 4, GadgetUtils.withSuffix(foundItems.count(e.getElement())));
+            itemRenderer.renderAndDecorateItem(matrices, stack, x + 4, y + 4);
+            itemRenderer.renderGuiItemDecorations(matrices, Minecraft.getInstance().font, stack, x + 4, y + 4, GadgetUtils.withSuffix(foundItems.count(e.getElement())));
 
             int space = (int) (25 - (.2f * 25));
             int zoneX = ((leftPos - 32) + (-15 - (column * space))), zoneY = (topPos - 9) + (20 + (index * space));
@@ -631,7 +632,7 @@ public class TemplateManagerGUI extends AbstractContainerScreen<TemplateManagerC
             if (!tagFromJson.contains("header")) {
                 BuildingGadgets.LOG.error("Attempted to use a 1.12 compound on a newer MC version");
                 getMinecraft().player.displayClientMessage(MessageTranslation.PASTE_FAILED_WRONG_MC_VERSION
-                        .componentTranslation("(1.12.x)", Minecraft.getInstance().getGame().getVersion().getName()).setStyle(Styles.RED), false);
+                        .componentTranslation("(1.12.x)", "1.14.x", SharedConstants.VERSION_STRING).setStyle(Styles.RED), false);
                 return;
 
             }

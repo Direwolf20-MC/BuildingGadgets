@@ -73,6 +73,7 @@ public final class BuildingGadgets {
 
         MinecraftForge.EVENT_BUS.addListener(this::serverLoaded);
         MinecraftForge.EVENT_BUS.addListener(this::serverStopped);
+        MinecraftForge.EVENT_BUS.addListener(this::commandRegister);
 
         eventBus.addListener(this::setup);
         eventBus.addListener(this::clientSetup);
@@ -92,7 +93,7 @@ public final class BuildingGadgets {
                     stack.getOrCreateTag().putByte(NBTKeys.CREATIVE_MARKER, (byte) 0);
                     return stack;
                 })
-                .displayItems((featureFlags, output, hasPermission) -> {
+                .displayItems((featureFlags, output) -> {
                     // Register it alL!
                     OurItems.ITEMS.getEntries()
                             .forEach(e -> {
