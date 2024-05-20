@@ -11,15 +11,14 @@ import com.direwolf20.buildinggadgets.common.util.lang.MaterialListTranslation;
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Multiset;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ObjectSelectionList;
-import com.mojang.blaze3d.platform.Lighting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -28,7 +27,6 @@ import java.util.Iterator;
 
 import static com.direwolf20.buildinggadgets.client.screen.MaterialListGUI.*;
 import static com.direwolf20.buildinggadgets.client.screen.ScrollingMaterialList.Entry;
-import static org.lwjgl.opengl.GL11.*;
 
 // Todo change to AbstractList as it's an easy fix compared to duping the class
 class ScrollingMaterialList extends EntryList<Entry> {
@@ -149,9 +147,11 @@ class ScrollingMaterialList extends EntryList<Entry> {
             int slotX = leftX + MARGIN;
             int slotY = topY + MARGIN;
 
+            matrices.pushPose();
             drawIcon(matrices, stack, slotX, slotY);
             drawTextOverlay(matrices, right, topY, bottom, slotX);
             drawHoveringText(stack, slotX, slotY, mouseX, mouseY);
+            matrices.popPose();
         }
 
         private void drawTextOverlay(PoseStack matrices, int right, int top, int bottom, int slotX) {
@@ -159,28 +159,6 @@ class ScrollingMaterialList extends EntryList<Entry> {
             // -1 because the bottom x coordinate is exclusive
             renderTextVerticalCenter(matrices, itemName, itemNameX, top, bottom, Color.WHITE.getRGB());
             renderTextHorizontalRight(matrices, amount, right, getYForAlignedCenter(top, bottom, Minecraft.getInstance().font.lineHeight), getTextColor());
-
-            drawGuidingLine(right, top, bottom, itemNameX, widthItemName, widthAmount);
-        }
-
-        private void drawGuidingLine(int right, int top, int bottom, int itemNameX, int widthItemName, int widthAmount) {
-            if (!isSelected()) {
-                int lineXStart = itemNameX + widthItemName + LINE_SIDE_MARGIN;
-                int lineXEnd = right - widthAmount - LINE_SIDE_MARGIN;
-                int lineY = getYForAlignedCenter(top, bottom - 1, 1);
-                RenderSystem.enableBlend();
-                RenderSystem.disableTexture();
-                RenderSystem.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                RenderSystem.setShaderColor(255, 255, 255, 34);
-
-//                glLineWidth(1);
-//                glBegin(GL_LINES);
-//                glVertex3f(lineXStart, lineY, 0);
-//                glVertex3f(lineXEnd, lineY, 0);
-//                glEnd();
-
-                RenderSystem.enableTexture();
-            }
         }
 
         private void drawHoveringText(ItemStack item, int slotX, int slotY, int mouseX, int mouseY) {
@@ -189,10 +167,10 @@ class ScrollingMaterialList extends EntryList<Entry> {
         }
 
         private void drawIcon(PoseStack matrices, ItemStack item, int slotX, int slotY) {
-            Lighting.setupForFlatItems();
-            Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(item, slotX, slotY);
-//            RenderSystem.color3f(1, 1, 1);
             Lighting.setupFor3DItems();
+            Minecraft.getInstance().getItemRenderer().renderAndDecorateItem(matrices, item, slotX, slotY);
+//            RenderSystem.color3f(1, 1, 1);
+            Lighting.setupForFlatItems();
         }
 
         private boolean hasEnoughItems() {

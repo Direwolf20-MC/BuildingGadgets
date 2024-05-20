@@ -47,7 +47,7 @@ public class EntryList<E extends Entry<E>> extends ObjectSelectionList<E> {
 
         int k = getRowLeft();
         int l = getTop() + 4 - (int) getScrollAmount();
-        renderHeader(matrices, k, l, tessellator);
+        renderHeader(matrices, k, l);
 
         renderList(matrices, k, l, partialTicks);
         RenderSystem.disableDepthTest();
@@ -63,7 +63,6 @@ public class EntryList<E extends Entry<E>> extends ObjectSelectionList<E> {
             int x1 = getScrollbarPosition();
             int x2 = x1 + 6;
 
-            RenderSystem.disableTexture();
             bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             bufferbuilder.vertex(x1, getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
             bufferbuilder.vertex(x2, getBottom(), 0.0D).color(0, 0, 0, 255).endVertex();
@@ -83,7 +82,6 @@ public class EntryList<E extends Entry<E>> extends ObjectSelectionList<E> {
         }
 
         renderDecorations(matrices, mouseX, mouseX);
-        RenderSystem.enableTexture();
         RenderSystem.disableBlend();
     }
 

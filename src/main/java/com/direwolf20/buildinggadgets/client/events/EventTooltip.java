@@ -63,7 +63,7 @@ public class EventTooltip {
         }
 
         @Override
-        public void renderImage(Font font, int x, int y, PoseStack poseStack, ItemRenderer itemRenderer, int p_194053_) {
+        public void renderImage(Font font, int x, int y, PoseStack poseStack, ItemRenderer itemRenderer) {
             if (this.tooltipData.stack == null || !(this.tooltipData.stack.getItem() instanceof GadgetCopyPaste))
                 return;
 
@@ -155,13 +155,13 @@ public class EventTooltip {
 
         boolean hasReq = req > 0;
 
-        itemRenderer.renderAndDecorateItem(itemStack, x, y);
-        itemRenderer.renderGuiItemDecorations(mc.font, itemStack, x, y);
+        itemRenderer.renderAndDecorateItem(matrices, itemStack, x, y);
+        itemRenderer.renderGuiItemDecorations(matrices, mc.font, itemStack, x, y);
 
         MultiBufferSource.BufferSource irendertypebuffer$impl = Minecraft.getInstance().renderBuffers().bufferSource();
 
         matrices.pushPose();
-        matrices.translate(x + 8 - w1 / 4f, y + (hasReq ? 12 : 14), itemRenderer.blitOffset + 250);
+        matrices.translate(x + 8 - w1 / 4f, y + (hasReq ? 12 : 14), ItemRenderer.ITEM_COUNT_BLIT_OFFSET + 250);
         matrices.scale(.5f, .5f, 0);
         mc.font.draw(matrices, s1, 0, 0, 0xFFFFFF);
         matrices.popPose();
@@ -175,9 +175,9 @@ public class EventTooltip {
                 int w2 = mc.font.width(s2);
 
                 matrices.pushPose();
-                matrices.translate(x + 8 - w2 / 4f, y + 17, itemRenderer.blitOffset + 250);
+                matrices.translate(x + 8 - w2 / 4f, y + 17, ItemRenderer.ITEM_COUNT_BLIT_OFFSET + 250);
                 matrices.scale(.5f, .5f, 0);
-                mc.font.drawInBatch(s2, 0, 0, 0xFF0000, true, matrices.last().pose(), irendertypebuffer$impl, false, 0, 15728880);
+                mc.font.drawInBatch(s2, 0, 0, 0xFF0000, true, matrices.last().pose(), irendertypebuffer$impl, Font.DisplayMode.NORMAL, 0, 15728880);
                 matrices.popPose();
 
                 missingCount = (req - count);

@@ -93,7 +93,7 @@ public final class BuildingGadgets {
                     stack.getOrCreateTag().putByte(NBTKeys.CREATIVE_MARKER, (byte) 0);
                     return stack;
                 })
-                .displayItems((featureFlags, output, hasPermission) -> {
+                .displayItems((featureFlags, output) -> {
                     // Register it alL!
                     OurItems.ITEMS.getEntries()
                             .forEach(e -> {

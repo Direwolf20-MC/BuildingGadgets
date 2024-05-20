@@ -32,7 +32,7 @@ public class IncrementalSliderWidget extends ForgeSlider {
     }
 
     @Override
-    public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
+    public void renderWidget(PoseStack poseStack, int mouseX, int mouseY, float partialTick) {
         fill(poseStack, this.getX(), this.getY(), this.getX() + this.width, this.getY() + this.height, BACKGROUND);
         this.drawBorderedRect(poseStack, (this.getX() + (int)(this.value * (double)(this.width - 8)) + 4) - 4, this.getY(), 8, this.height);
         this.renderText(poseStack);

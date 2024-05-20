@@ -73,7 +73,7 @@ public class GuiIncrementer extends AbstractWidget {
     }
 
     @Override
-    public void render(PoseStack matrices, int mouseX, int mouseY, float partialTick) {
+    public void renderWidget(PoseStack matrices, int mouseX, int mouseY, float partialTick) {
         this.plusButton.render(matrices, mouseX, mouseY, partialTick);
         this.minusButton.render(matrices, mouseX, mouseY, partialTick);
         this.field.render(matrices, mouseX, mouseY, partialTick);
@@ -110,12 +110,6 @@ public class GuiIncrementer extends AbstractWidget {
             this.field.setValue(String.valueOf(this.max));
 
         return true;
-    }
-
-    @Override
-    protected void onFocusedChanged(boolean isFocused) {
-        this.field.changeFocus(isFocused);
-        super.onFocusedChanged(isFocused);
     }
 
     public int getX() {

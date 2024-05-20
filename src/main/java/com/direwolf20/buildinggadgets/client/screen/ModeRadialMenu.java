@@ -261,7 +261,7 @@ public class ModeRadialMenu extends Screen {
             button.setWidth(dim);
             button.setHeight(dim);
             if (isDestruction)
-                button.setX(height / 2 + (isRight ? 10 : -button.getHeight() - 10));
+                button.setY(height / 2 + (isRight ? 10 : -button.getHeight() - 10));
             else
                 button.setX(width / 2 + offset);
         }
@@ -453,7 +453,7 @@ public class ModeRadialMenu extends Screen {
         stack.scale(s, s, s);
         matrices.popPose();
         stack.translate(x / s - (tool.getItem() instanceof GadgetCopyPaste ? 8 : 8.5), y / s - 8, 0);
-        this.itemRenderer.renderAndDecorateItem(tool, 0, 0);
+        this.itemRenderer.renderAndDecorateItem(stack, tool, 0, 0);
         stack.popPose();
     }
 
