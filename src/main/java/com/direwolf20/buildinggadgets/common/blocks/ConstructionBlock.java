@@ -190,7 +190,7 @@ public class ConstructionBlock extends Block implements EntityBlock /*implements
     @Override
     public VoxelShape getOcclusionShape(BlockState state, BlockGetter worldIn, BlockPos pos) {
         BlockState mimic = getActualMimicBlock(worldIn, pos);
-        if (!mimic.canOcclude()) {
+        if (!isMimicNull(mimic) && !mimic.canOcclude()) {
             return Shapes.empty();
         }
         return !isMimicNull(mimic) ? mimic.getBlockSupportShape(worldIn, pos) : super.getOcclusionShape(state, worldIn, pos);
