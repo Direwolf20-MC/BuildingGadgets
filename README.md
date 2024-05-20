@@ -23,8 +23,10 @@ Go and download [`Building Gadgets 2`](https://github.com/direwolf20-mc/building
 
 # Welcome to Dire's Building Gadgets!
 
-`Dire's Building Gadgets` aims to make building a little bit easier. At this time there are `four` tools, and they are described below. Alternatively, watch the following mod spotlight for instructions!
+Dire's `Building Gadgets` aims to make building a little bit easier. At this time there are `four` tools, and they are described below. Alternatively, watch the following mod spotlight for instructions!
 
+[![Youtube Thumbnail](https://img.youtube.com/vi/D4Ib4h7aTSk/maxresdefault.jpg)](https://www.youtube.com/watch?v=D4Ib4h7aTSk)
+_(I'm a Youtube Link, click me)_
 
 ## Usage
 
@@ -34,7 +36,18 @@ Direwolf20's Spotlights - [Spotlight Part One](https://youtu.be/D4Ib4h7aTSk) and
 
 ### Using the Gadgets
 
-Building gadgets has grown a lot since its initial release to the point that we have multiple tools for every occasion, Our wiki has a great set of instructions on how to use each of our Gadgets, check out the [Building Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Building-Gadget), the [Exchanger Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Exchanger-Gadget), the [Copy Paste Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Copy-Paste-Gadget), or the [Destruction Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Destruction-Gadget)
+Building gadgets has grown a lot since its initial release to the point that we have multiple tools for every occasion, Our wiki has a great set of instructions on how to use each of our Gadgets, check out the
+
+- ![](./src/main/resources/assets/buildinggadgets/textures/item/gadget_building.png) [Building Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Building-Gadget)
+- ![](./src/main/resources/assets/buildinggadgets/textures/item/gadget_exchanging.png) [Exchanger Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Exchanger-Gadget)
+- ![](./src/main/resources/assets/buildinggadgets/textures/item/gadget_copy_paste.png) [Copy Paste Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Copy-Paste-Gadget)
+- ![](./src/main/resources/assets/buildinggadgets/textures/item/gadget_destruction.png) [Destruction Gadget](https://github.com/Direwolf20-MC/BuildingGadgets/wiki/Destruction-Gadget)
+
+## Schematics / Templates
+
+Building Gadgets' copy & paste tool supports loading and saving templates via the `Template Manager` block. You can use this feature to save your builds and share them with others. 
+
+If you're looking for templates to use, check out the [r/9x9](https://www.reddit.com/r/9x9/) community on reddit 🎉
 
 ## Contributing
 
