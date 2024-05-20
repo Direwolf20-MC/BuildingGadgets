@@ -6,6 +6,7 @@
 
 # files
 !/.gitignore
+!/.github
 !/README.md
 !/CONTRIBUTION.md
 !/License.md

@@ -1,7 +1,14 @@
+## Important notice
+
+As of Minecraft `1.20.1` this version of Building Gadget (Building Gadgets 1) is officially the 'Legacy' version of Building Gadgets. I will continue to update the mod for the Minecraft versions we already support but this mod will not be ported to Minecraft `1.20.1` or higher. 
+
+Go and download [`Building Gadgets 2`](https://github.com/direwolf20-mc/buildinggadgets2)! It's the same mod but with a bunch of new and awesome features built on a brand-new codebase. 
+
+---
 <p align="center" style="padding: 3em;"><img width="60" src="https://github.com/Direwolf20-MC/BuildingGadgets/blob/master/src/main/resources/buildinggadgets_logo.png?raw=true" /></p>
-<h1 align="center" style="margin-top: 20px; border-bottom: 0;">Building Gadgets (Legacy)</h1>
+<h1 align="center" style="margin-top: 20px; border-bottom: 0;">Building Gadgets (1.12.2 - 1.19.4)</h1>
 <p align="center">
-<b>Update!</b> See <a href="https://github.com/direwolf20-mc/buildinggadgets2">Building Gadgets 2</a>
+<b>Update!</b> See <a href="https://github.com/direwolf20-mc/buildinggadgets2">Building Gadgets 2</a> for Minecraft <code>1.20.1</code> and higher!
 </p>
 <p align="center">Sometimes, building large structures can be a little tedious, and take a lot of effort. Not all of us are great builders you know!
 </p>
@@ -18,23 +25,6 @@
 
 `Dire's Building Gadgets` aims to make building a little bit easier. At this time there are `four` tools, and they are described below. Alternatively, watch the following mod spotlight for instructions!
 
-## Important notice
-
-As of Minecraft `1.20.1` this version of Building Gadget (Building Gadgets 1) is officially the 'Legacy' version of Building Gadgets. I will continue to update the mod for the Minecraft versions we already support but this mod will not be ported to Minecraft `1.20.1` or higher.
-
-### What's next?
-
-I'm glad you've asked! Go and download [`Building Gadgets 2`](https://github.com/direwolf20-mc/buildinggadgets2)! It's the same mod but with a bunch of new and awesome features built on a brand-new codebase. It's just better! 
-
-### Why is it better?
-
-We've been officially supporting Building Gadgets 1 since Minecraft `1.12`... That's... *(checks notes)* 6 years! 6 years of updates, bug fixes, feature requests and Minecraft updates. After such a long time, code can become overcomplicated, messy and hard to maintain. When this happens, it's best to start again. After some consideration, we opted to start a new Github Repo and start from a truly clean state.
-
-### Thanks to our contributors
-
-One final note, I would like to thank of all of our contributors to Building Gadgets 1. You've all helped the mod stay updated, feature rich and ever-growing. This mod is vastly different to how it was back in `1.12` and our contributors are to thank for that!
-
----
 
 ## Usage
 
@@ -48,7 +38,7 @@ Building gadgets has grown a lot since its initial release to the point that we 
 
 ## Contributing
 
-**Update**: Don't. Thanks, see [Important Notice](#important-notice) as to why. Please support the new version of Building Gadgets at https://github.com/direwolf20-mc/buildinggadgets2 if you would like to support the project!
+See [Important Notice](#important-notice). Please support the new version of Building Gadgets at https://github.com/direwolf20-mc/buildinggadgets2 if you would like to support the project! You can see help maintain the legacy version by submitting PR's to this repo.
 
 ## Credit
 
