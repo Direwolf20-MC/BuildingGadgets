@@ -1,10 +1,10 @@
 # Changelog
 
-## Changed
+## Added
 
-- Ported to 1.19.3
+- `uk_ua` translation [#732](https://github.com/direworlf20-mc/issues/732)
 
 ## Fixed
 
-- An old issue where the construction paste containers don't render their filled amount. This used to happen pre 1.16.5...
-- Couple odd issues here and there, nothing special
+- Crashes being caused by construction blocks not checking for null correctly [#738](https://github.com/direworlf20-mc/issues/738)
+- Commands not being registered correctly [#734](https://github.com/direworlf20-mc/issues/734)
